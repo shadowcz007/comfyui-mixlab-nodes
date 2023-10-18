@@ -40,21 +40,30 @@ const updateUI=(node)=>{
         max_count.value=prompts.length;
 
         // 如果已经存在,删除
-        const pos = node.widgets.findIndex((w) => w.name === "prompts");
-				if (pos !== -1) {
-					for (let i = pos; i < node.widgets.length; i++) {
-						node.widgets[i].onRemove?.();
-					}
-				}
+        const pw = node.widgets.filter((w) => w.name === "prompts")[0];
+				if (pw) {
+					// node.widgets[pos].onRemove?.();
+          pw.value = prompts.join('\n\n');
+          pw.inputEl.title=`Total of ${prompts.length} prompts`;
+				}else{
 
-        // 动态添加
-        const w = ComfyWidgets.STRING(node, "prompts", ["STRING", { multiline: true }], app).widget;
+          // 动态添加
+          const w = ComfyWidgets.STRING(node, "prompts", ["STRING", { multiline: true }], app).widget;
               w.inputEl.readOnly = true;
               w.inputEl.style.opacity = 0.6;
-              w.value = prompts.join('\n');
+              w.value = prompts.join('\n\n');
               w.inputEl.title=`Total of ${prompts.length} prompts`;
-        
-        // node.widgets.length = 4;
+        }
+
+         // 移除无关的widget
+        //  for (let i = 0; i < node.widgets.length; i++) {
+        //   console.log(node.widgets[i]?.name)
+        //   if(node.widgets[i]&&!['mutable_prompt','immutable_prompt','max_count','prompts'].includes(node.widgets[i].name)) node.widgets[i].onRemove?.();
+        // }
+
+        // console.log(node.widgets.length,node.size);
+
+        node.widgets.length = 4;
         node.onResize?.(node.size);
 }
 
@@ -62,9 +71,10 @@ const updateUI=(node)=>{
 const node = {
     name: 'RandomPrompt',
     async setup(a){
-      console.log('#setup',app.graph._nodes )
+      
       for (const node of app.graph._nodes) {
         if(node.comfyClass==='RandomPrompt'){
+          console.log('#setup',node )
           updateUI(node)
         }
       }
@@ -88,21 +98,28 @@ const node = {
 			const onExecuted = nodeType.prototype.onExecuted;
 			nodeType.prototype.onExecuted = function (message) {
 				const r = onExecuted?.apply?.(this, arguments);
-        console.log('#RandomPrompt', this.widgets)
-				const pos = this.widgets.findIndex((w) => w.name === "prompts");
-				if (pos !== -1) {
-					for (let i = pos; i < this.widgets.length; i++) {
-						this.widgets[i].onRemove?.();
-					}
-					// this.widgets.length = 4;
-				}
 
-        let prompts=message.prompts.join('\n');
-			 
-        const w = ComfyWidgets["STRING"](this, "prompts", ["STRING", { multiline: true }], app).widget;
-					w.inputEl.readOnly = true;
-					w.inputEl.style.opacity = 0.6;
-					w.value = prompts;
+        let prompts=message.prompts;
+
+        // console.log('#RandomPrompt', this.widgets)
+				const pw = this.widgets.filter((w) => w.name === "prompts")[0];
+		 
+				if (pw) {
+					// node.widgets[pos].onRemove?.();
+          pw.value = prompts.join('\n\n');
+          pw.inputEl.title=`Total of ${prompts.length} prompts`;
+				}else{
+
+          // 动态添加
+          const w = ComfyWidgets.STRING(node, "prompts", ["STRING", { multiline: true }], app).widget;
+              w.inputEl.readOnly = true;
+              w.inputEl.style.opacity = 0.6;
+              w.value = prompts.join('\n\n');
+              w.inputEl.title=`Total of ${prompts.length} prompts`;
+        }
+
+
+				this.widgets.length = 4;
 
 				this.onResize?.(this.size);
 
