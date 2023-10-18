@@ -1,3 +1,8 @@
+## 
+##### randomPrompt
+![randomPrompt](./assets/randomPrompt.png)
+![workflow](./assets/City_Snapshot_00005_.png)
+
 ## Installation
 
 For the easiest install experience, install the [Comfyui Manager](https://github.com/ltdrdata/ComfyUI-Manager) and use that to automate the installation process.
@@ -16,7 +21,7 @@ pip install -r requirements.txt
 
 
 
-TODO:
-1  ImageFromClipborad:The node implementation to read an image from the clipboard.
-2  
+### TODO:
+- ImageFromClipborad:The node implementation to read an image from the clipboard.
+ 
 
