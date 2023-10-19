@@ -19,9 +19,14 @@ If you are using a venv, make sure you have it activated before installation and
 pip install -r requirements.txt
 ```
 
+直接运行：
+```
+install.bat
+```
+
 
 
 ### TODO:
 - ImageFromClipborad:The node implementation to read an image from the clipboard.
- 
+- vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 
