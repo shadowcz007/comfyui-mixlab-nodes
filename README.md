@@ -1,7 +1,5 @@
 ## 
-##### randomPrompt
-![randomPrompt](./assets/randomPrompt.png)
-![workflow](./assets/City_Snapshot_00005_.png)
+
 
 ## Installation
 
@@ -24,7 +22,15 @@ pip install -r requirements.txt
 install.bat
 ```
 
+## Nodes
+randomPrompt
+![randomPrompt](./assets/randomPrompt.png)
+TransparentImage
+![TransparentImage](./assets//TransparentImage.png)
 
+
+### Workflow
+[Workflow](./workflow.md)
 
 ### TODO:
 - ImageFromClipborad:The node implementation to read an image from the clipboard.
