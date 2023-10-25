@@ -8,6 +8,9 @@ import folder_paths
 import json
 from comfy.cli_args import args
 
+
+MAX_RESOLUTION=8192
+
 # Tensor to PIL
 def tensor2pil(image):
     return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
@@ -128,6 +131,56 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="invert",
 
 
 
+def load_image(fp):
+    i = Image.open(fp)
+    i = ImageOps.exif_transpose(i)
+    image = i.convert("RGB")
+    image = np.array(image).astype(np.float32) / 255.0
+    image = torch.from_numpy(image)[None,]
+    if 'A' in i.getbands():
+        mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+        mask = 1. - torch.from_numpy(mask)
+    else:
+        mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+    return (image,mask)
+
+
+# 获取图片s
+def get_images_filepath(f):
+    images = []
+ 
+    if os.path.isdir(f):
+        for root, dirs, files in os.walk(f):
+            for file in files:
+                file_path = os.path.join(root, file)
+                try:
+                    (im,mask)=load_image(file_path)
+                    images.append({
+                        "image":im,
+                        "mask":mask,
+                        "file_path":file_path
+                    })
+                except:
+                    print('非图片',file_path)
+ 
+    elif os.path.isfile(f):
+        try:
+            (im,mask)=load_image(f)
+            images.append({
+                        "image":im,
+                        "mask":mask,
+                        "file_path":f
+                    })
+        except:
+            print('非图片',file_path)
+    else:
+        print('路径不存在或无效',f)
+
+    return images
+
+
+
+
 class SplitLongMask:
 
     @classmethod
@@ -189,7 +242,6 @@ class TransparentImage:
 
     # INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
-    
     # OUTPUT_NODE = True
 
     # 运行的函数
@@ -234,14 +286,28 @@ const defaultVal = inputData[1].default || "";
 const multiline = !!inputData[1].multiline;
     '''
 
-class LoadImageFromPath:
+# 支持按照时间排序
+# 支持输出1张
+#
+class LoadImagesFromPath:
 
     @classmethod
     def INPUT_TYPES(s):
         return {
                 "required": {
                                 "file_path": ("STRING",{"multiline": False,"default": ""})
-                            }
+                            },
+                "optional":{
+                    "newest_files": (["enable", "disable"],),
+                    "index_variable":("INT", {
+                        "default": -1, 
+                        "min": -1, #Minimum value
+                        "max": 2048, #Maximum value
+                        "step": 1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                    "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                }
             }
     
     RETURN_TYPES = ('IMAGE','MASK')
@@ -249,19 +315,61 @@ class LoadImageFromPath:
     FUNCTION = "run"
 
     CATEGORY = "Mixlab/image"
+
+    # INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,True,)
   
     # 运行的函数
-    def run(self,file_path):
-        i = Image.open(file_path)
-        i = ImageOps.exif_transpose(i)
-        image = i.convert("RGB")
-        image = np.array(image).astype(np.float32) / 255.0
-        image = torch.from_numpy(image)[None,]
-        if 'A' in i.getbands():
-            mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
-            mask = 1. - torch.from_numpy(mask)
-        else:
-            mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
-        return (image, mask)
+    def run(self,file_path,newest_files,index_variable,seed):
 
+        images=get_images_filepath(file_path)
+
+        # 排序
+        sorted_files = sorted(images, key=lambda x: os.path.getmtime(x['file_path']), reverse=(newest_files=='enable'))
+
+        imgs=[]
+        masks=[]
+
+        for im in sorted_files:
+            imgs.append(im['image'])
+            masks.append(im['mask'])
+        
+        # print('index_variable',index_variable)
+        if index_variable!=-1:
+            imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
+            masks=[masks[index_variable]] if index_variable < len(masks) else None
+
+        return (imgs,masks)
+
+
+
+class ImagesCrop:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "images": ("IMAGE",),
+                              "width": ("INT", {"default": 512, "min": 64, "max": MAX_RESOLUTION, "step": 8}),
+                              "height": ("INT", {"default": 512, "min": 64, "max": MAX_RESOLUTION, "step": 8}),
+                              "x": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                              "y": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
+                              }}
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "crop"
+
+    CATEGORY = "Mixlab/image"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+
+    def crop(self, images, width, height, x, y):
+        width=width[0]
+        height=height[0]
+        x=x[0]
+        y=y[0]
+        cropped_images = []
+        for img in images:
+            im=tensor2pil(img)
+            cropped_img = im.crop((x, y, x + width, y + height))
+            cropped_images.append(pil2tensor(cropped_img))
+        return (cropped_images,)
 

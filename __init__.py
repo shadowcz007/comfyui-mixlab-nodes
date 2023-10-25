@@ -26,17 +26,19 @@ def is_installed(package, package_overwrite=None):
             print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
 
 # 导入节点
-from .PromptNode import RandomPrompt
-from .ImageNode import TransparentImage,LoadImageFromPath,SplitLongMask
-from .ModelNode import KandinskyModel,KandinskyModelLoad
+from .PromptNode import RandomPrompt,RunWorkflow
+from .ImageNode import TransparentImage,LoadImagesFromPath,SplitLongMask,ImagesCrop
+# from .ModelNode import KandinskyModel,KandinskyModelLoad
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
 NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "TransparentImage":TransparentImage,
-    "LoadImageFromPath":LoadImageFromPath,
-    "SplitLongMask":SplitLongMask
+    "LoadImagesFromPath":LoadImagesFromPath,
+    "SplitLongMask":SplitLongMask,
+    "ImagesCrop":ImagesCrop,
+    "RunWorkflow":RunWorkflow
     # "KandinskyModelLoad":KandinskyModelLoad,
     # "KandinskyModel":KandinskyModel
 }

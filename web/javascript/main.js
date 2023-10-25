@@ -63,7 +63,7 @@ const updateUI=(node)=>{
 
         // console.log(node.widgets.length,node.size);
 
-        node.widgets.length = 4;
+        node.widgets.length = 5;
         node.onResize?.(node.size);
 }
 
@@ -83,6 +83,23 @@ const node = {
       if(node.comfyClass==='RandomPrompt'){
         updateUI(node)
       }
+
+      if(node.comfyClass==='RunWorkflow'){
+        
+
+        const pw = node.widgets.filter((w) => w.name === "workflow")[0];
+        console.log('nodeCreated',pw)
+				// if (pw) {
+				// 	// node.widgets[pos].onRemove?.();
+        //   pw.value = prompts.join('\n\n');
+        //   // pw.inputEl=document.createElement('input');
+				// }
+
+        //  node.widgets.length = 1;
+        node.onResize?.(node.size);
+
+      }
+
     },
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         
@@ -96,15 +113,11 @@ const node = {
           const onExecuted = nodeType.prototype.onExecuted;
           nodeType.prototype.onExecuted = function (message) {
             const r = onExecuted?.apply?.(this, arguments);
-
             console.log('executed',message)
             const {image_path}=message;
             if(image_path){
               
             }
-
-
-
             return r
           }
         }
@@ -134,13 +147,24 @@ const node = {
                   w.inputEl.title=`Total of ${prompts.length} prompts`;
             }
 
-            this.widgets.length = 4;
+            this.widgets.length = 5;
 
             this.onResize?.(this.size);
 
             return r;
           };
         } 
+
+
+        if(nodeData.name === "RunWorkflow"){
+          const onExecuted = nodeType.prototype.onExecuted;
+          nodeType.prototype.onExecuted = function (message) {
+            const r = onExecuted?.apply?.(this, arguments);
+          
+            return r
+          }
+        }
+        
 
 
         }

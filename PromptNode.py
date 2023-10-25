@@ -1,5 +1,16 @@
 import random
 import comfy.utils
+import json
+from urllib import request, parse
+
+
+
+def queue_prompt(prompt_workflow):
+    p = {"prompt": prompt_workflow}
+    data = json.dumps(p).encode('utf-8')
+    req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
+    request.urlopen(req)    
+
 
 default_prompt1='''Swing
                                                 Slide
@@ -57,7 +68,8 @@ class RandomPrompt:
                          {
                             "multiline": True, 
                             "default": 'sticker, Cartoon, ``'
-                          })
+                          }),
+                "random_sample": (["enable", "disable"],),
                 }
             }
     
@@ -74,8 +86,8 @@ class RandomPrompt:
 
 
     # 运行的函数
-    def run(self,max_count,mutable_prompt,immutable_prompt):
-        print('#运行的函数',mutable_prompt,immutable_prompt,max_count)
+    def run(self,max_count,mutable_prompt,immutable_prompt,random_sample):
+        print('#运行的函数',mutable_prompt,immutable_prompt,max_count,random_sample)
         
         # Split the text into an array of words
         words1 = mutable_prompt.split("\n")
@@ -98,9 +110,77 @@ class RandomPrompt:
                     prompts.append(w2.replace('``', w1))
                 pbar.update(1)
         
-        # 随机从数组中取max个元素
-        prompts = random.sample(prompts, min(max_count,len(prompts)))
+        if len(prompts)==0:
+            prompts.append(immutable_prompt)
+
+        if random_sample=='enable':
+            # 随机从数组中取max个元素
+            prompts = random.sample(prompts, min(max_count,len(prompts)))
+        else:
+            prompts = prompts[:min(max_count,len(prompts))]
 
         # return (new_prompt)
         return {"ui": {"prompts": prompts}, "result": (prompts,)}
+
+
+
+
+class RunWorkflow:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "workflow": ("STRING", {
+                            "multiline": False, 
+                            "default": ''
+                          }),
+                "prompt": ("STRING", {
+                            "multiline": False, 
+                            "default": ''
+                          }),
+                 "image": ("IMAGE",),
+                 "input_node": ("STRING", {
+                            "multiline": False, 
+                            "default": ''
+                          }),
+                "output_node": ("STRING", {
+                            "multiline": False, 
+                            "default": ''
+                          }),
+                },
+                
+            }
+    
+    
+
+    RETURN_TYPES = ("IMAGE","STRING",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/workflow"
+
+    OUTPUT_IS_LIST = (True,)
+    OUTPUT_NODE = True
+
+
+    # 运行的函数
+    def run(self,workflow,prompt,image,input_node,output_node):
+        print('#运行的函数',prompt,image,input_node,output_node)
+        workflow=json.loads(workflow)
+        input_node=input_node.split(".")
+        workflow[input_node[0]][input_node[1]][input_node[2]]=prompt
+
+        workflow_new={}
+        # 遍历，seed设为随机
+        for key, value in workflow.items():
+            if 'inputs' in value:
+                if 'seed' in value['inputs']:
+                    value['inputs']['seed']= random.randint(1, 18446744073709551614)
+            workflow_new[key]=value
+
+        queue_prompt(workflow_new)
+        print('#运行的函数',workflow_new[input_node[0]])
+
+        # return (new_prompt)
+        return  {"ui":{"images": []},"result": ([image],['text'],)}
 
