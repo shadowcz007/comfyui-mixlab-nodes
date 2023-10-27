@@ -34,6 +34,7 @@ TransparentImage
 [Workflow](./workflow.md)
 
 ### TODO:
+- 从模板库里 粘贴workflow进工作区
 - ImageFromClipborad:The node implementation to read an image from the clipboard.
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 

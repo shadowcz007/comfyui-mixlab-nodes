@@ -125,6 +125,7 @@ class RandomPrompt:
 
 
 
+
 class RunWorkflow:
     @classmethod
     def INPUT_TYPES(s):
@@ -143,7 +144,7 @@ class RunWorkflow:
                             "multiline": False, 
                             "default": ''
                           }),
-                "output_node": ("STRING", {
+                 "output_node": ("STRING", {
                             "multiline": False, 
                             "default": ''
                           }),
