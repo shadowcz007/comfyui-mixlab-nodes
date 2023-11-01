@@ -300,7 +300,7 @@ const my = {
 }
 
 // 添加workflow
-const importWorkflow = (my) => {
+const importWorkflow = my => {
   localStorage.setItem('litegrapheditor_clipboard', JSON.stringify(my))
   app.canvas.pasteFromClipboard()
 }
@@ -315,6 +315,21 @@ const node = {
       }
     }
     console.log('[logging]', 'loaded graph node: ', exportGraph(app.graph))
+  },
+  addCustomNodeDefs (defs, app) {
+    console.log(
+      '[logging]',
+      'add custom node definitions',
+      'current nodes:',
+       defs 
+    )
+    // 在这里进行 语言切换
+    for (const nodeName in defs) {
+      if(nodeName==='RandomPrompt'){
+        // defs[nodeName].category
+        // defs[nodeName].display_name
+      }
+    }
   },
   loadedGraphNode (node, app) {
     // Fires for each node when loading/dragging/etc a workflow json or png

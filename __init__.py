@@ -38,7 +38,7 @@ NODE_CLASS_MAPPINGS = {
     "LoadImagesFromPath":LoadImagesFromPath,
     "SplitLongMask":SplitLongMask,
     "ImagesCrop":ImagesCrop,
-    "RunWorkflow":RunWorkflow
+    # "RunWorkflow":RunWorkflow
     # "KandinskyModelLoad":KandinskyModelLoad,
     # "KandinskyModel":KandinskyModel
 }
