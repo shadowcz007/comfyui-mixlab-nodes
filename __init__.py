@@ -28,6 +28,7 @@ def is_installed(package, package_overwrite=None):
 # 导入节点
 from .PromptNode import RandomPrompt,RunWorkflow
 from .ImageNode import TransparentImage,LoadImagesFromPath,SplitLongMask,ImagesCrop
+from .Vae import VAELoader,VAEDecode
 # from .ModelNode import KandinskyModel,KandinskyModelLoad
 
 # 要导出的所有节点及其名称的字典
@@ -38,6 +39,8 @@ NODE_CLASS_MAPPINGS = {
     "LoadImagesFromPath":LoadImagesFromPath,
     "SplitLongMask":SplitLongMask,
     "ImagesCrop":ImagesCrop,
+    "VAELoaderConsistencyDecoder":VAELoader,
+    "VAEDecodeConsistencyDecoder":VAEDecode
     # "RunWorkflow":RunWorkflow
     # "KandinskyModelLoad":KandinskyModelLoad,
     # "KandinskyModel":KandinskyModel
@@ -46,7 +49,9 @@ NODE_CLASS_MAPPINGS = {
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
     "RandomPrompt": "Random Prompt #Example Node",
-    "SplitLongMask":"Splitting a long image into sections"
+    "SplitLongMask":"Splitting a long image into sections",
+    "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
+    "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode"
 }
 
 # web ui的节点功能

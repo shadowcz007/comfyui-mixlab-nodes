@@ -30,8 +30,13 @@ TransparentImage
 ![TransparentImage](./assets//TransparentImage.png)
 
 
-### Workflow
-[Workflow](./workflow.md)
+## 
+openai vae 模型下载后放model/vae里使用
+https://openaipublic.azureedge.net/diff-vae/c9cebd3132dd9c42936d803e33424145a748843c8f716c0814838bdc8a2fe7cb/decoder.pt
+
+
+<!-- ### Workflow
+[Workflow](./workflow.md) -->
 
 ### TODO:
 - 从模板库里 粘贴workflow进工作区
