@@ -24,13 +24,17 @@ install.bat
 ```
 
 ## Nodes
+
 randomPrompt
+
 ![randomPrompt](./assets/randomPrompt.png)
 
 TransparentImage
+
 ![TransparentImage](./assets//TransparentImage.png)
 
 Consistency Decoder
+
 [openai发布的新vae模型]( https://github.com/openai/consistencydecoder)
 
 openai vae 模型下载后放model/vae里使用
