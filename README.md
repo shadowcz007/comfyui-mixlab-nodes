@@ -11,7 +11,7 @@ git clone https://github.com/shadowcz007/comfyui-mixlab-nodes.git
 ```
 and install the requirements using:
 ```
-.\python_embed\python.exe -s -m pip install -r requirements.txt
+.\python_embeded\python.exe -s -m pip install -r requirements.txt
 ```
 If you are using a venv, make sure you have it activated before installation and use:
 ```

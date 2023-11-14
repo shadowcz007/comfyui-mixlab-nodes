@@ -7,6 +7,7 @@ from io import BytesIO
 import folder_paths
 import json
 from comfy.cli_args import args
+import cv2 
 
 
 MAX_RESOLUTION=8192
@@ -60,7 +61,7 @@ def split_mask_by_new_height(masks,new_height):
     return split_masks
 
 
-def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="invert",save_mask=False,prompt=None, extra_pnginfo=None):
+def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",save_mask=False,prompt=None, extra_pnginfo=None):
    
     output_dir = (
             folder_paths.get_output_directory()
@@ -87,7 +88,7 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="invert",
     im=naive_cutout(image, mask,invert=='yes')
 
     # format="image/png",
-    end="1" if invert=='invert' else ""
+    end="1" if invert=='yes' else ""
     image_file = f"{filename}_{counter:05}_{end}.png"
     mask_file = f"{filename}_{counter:05}_{end}_mask.png"
 
@@ -181,6 +182,152 @@ def get_images_filepath(f):
 
 
 
+# 对轮廓进行平滑
+def smooth_edges(image_rgba, smoothness):
+
+    # 将图像中的不透明物体提取出来
+    alpha_channel = image_rgba[:, :, 3]
+    _, mask = cv2.threshold(alpha_channel, 0, 255, cv2.THRESH_BINARY)
+
+    # 对提取的不透明物体进行边缘检测
+    edges = cv2.Canny(mask, 100, 200)
+
+    # 对边缘进行光滑处理
+    smoothed_edges = cv2.GaussianBlur(edges, (smoothness, smoothness), 0)
+
+    # 将光滑处理后的边缘与原始图像合并
+    result = np.copy(image_rgba)
+    result[:, :, 3] = smoothed_edges
+
+    return result
+
+
+
+
+class SmoothMask:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+                "required": {
+                                "mask": ("MASK",),
+                                "smoothness":("INT", {"default": 1, 
+                                                        "min":0, 
+                                                        "max": 150, 
+                                                        "step": 1,
+                                                        "display": "slider"})
+                            }
+            }
+    
+    RETURN_TYPES = ('MASK',)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/mask"
+
+    OUTPUT_IS_LIST = (False,)
+  
+    # 运行的函数
+    def run(self,mask,smoothness):
+        print(mask.shape)
+        
+        
+
+        mask=mask.numpy()
+        
+        mask = np.uint8(mask * 255) 
+
+        # 创建一个空的RGBA图像
+        rgba_img = np.zeros((mask.shape[0], mask.shape[1],mask.shape[2], 4), dtype=np.uint8)
+        
+        rgba_img[:, :, 0] = mask
+        rgba_img[:, :, 1] = mask
+        rgba_img[:, :, 2] = mask
+        
+        
+        # result=smooth_edges(image,smoothness)
+
+        # mask=pil2tensor(result)
+           
+        return (mask,)
+
+
+
+
+class FeatheredMask:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+                "required": {
+                                "mask": ("MASK",),
+                                "start_offset":("INT", {"default": 1, 
+                                                        "min": -150, 
+                                                        "max": 150, 
+                                                        "step": 1,
+                                                        "display": "slider"}),
+                                "feathering_weight":("FLOAT", {"default": 0.1,
+                                                                "min": 0.0,
+                                                                "max": 1,
+                                                                "step": 0.1,
+                                                                "display": "slider"})
+                            }
+            }
+    
+    RETURN_TYPES = ('MASK',)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/mask"
+
+    OUTPUT_IS_LIST = (False,)
+  
+    # 运行的函数
+    def run(self,mask,start_offset, feathering_weight):
+
+        if start_offset>0:
+            mask = 1.0 - mask
+        
+        image_np=mask.numpy()
+        
+        image = np.uint8(image_np * 255) 
+        # image = cv2.cvtColor(image_cv) 
+        # print(image)
+        # 使用Canny边缘检测获取黑色轮廓线
+        edges = cv2.Canny(image, 30, 150)
+
+        # 对黑色轮廓线进行膨胀操作，使其变宽
+        kernel = np.ones((start_offset if start_offset>0 else -start_offset, 
+                          start_offset if start_offset>0 else -start_offset), np.uint8)
+        # dilated_edges = cv2.dilate(edges, kernel, iterations=1)
+
+        # if start_offset>=0:
+        dilated_edges = cv2.dilate(edges, kernel, iterations=1)
+        # else:
+        #     dilated_edges = cv2.erode(edges, kernel, iterations=1)
+
+        # 使用高斯滤波平滑黑色轮廓线
+        smoothed_edges = cv2.GaussianBlur(dilated_edges, (5, 5), 0)
+        
+        # 调整羽化程度
+    
+        # smoothed_edges = cv2.cvtColor(smoothed_edges, cv2.COLOR_GRAY2BGR)
+        # 将平滑后的黑色轮廓线与原始图片进行融合，实现羽化效果
+        result = cv2.addWeighted(image, 1, smoothed_edges, feathering_weight, 0)
+
+        if start_offset>0:
+            mask = 1.0 - mask
+
+        mask=pil2tensor(result)
+        
+        if start_offset>0:
+            mask = 1.0 - mask
+
+        # "ui":{"images": ui_images,
+        # return {"ui":{"image": tensor2pil(mask)},"result": (mask,)}        
+        return (mask,)
+
+
+
+
 class SplitLongMask:
 
     @classmethod
@@ -223,7 +370,7 @@ class TransparentImage:
                 "required": {
                                 "images": ("IMAGE",),
                                 "masks": ("MASK",),
-                                "invert": (["invert", ""],),
+                                "invert": (["yes", "no"],),
                                 "save": (["yes", "no"],),
                             },
                 "optional":{
