@@ -183,24 +183,24 @@ def get_images_filepath(f):
 
 
 # 对轮廓进行平滑
-def smooth_edges(image_rgba, smoothness):
+def smooth_edges(alpha_channel, smoothness):
 
     # 将图像中的不透明物体提取出来
-    alpha_channel = image_rgba[:, :, 3]
-    _, mask = cv2.threshold(alpha_channel, 0, 255, cv2.THRESH_BINARY)
+    # alpha_channel = image_rgba[:, :, 3]
+    # 0：表示设定的阈值，即像素值小于或等于这个阈值的像素将被设置为0。
+    # 255：表示设置的最大值，即像素值大于阈值的像素将被设置为255。
+    _, mask = cv2.threshold(alpha_channel, 127, 255, cv2.THRESH_BINARY)
 
     # 对提取的不透明物体进行边缘检测
-    edges = cv2.Canny(mask, 100, 200)
+    # edges = cv2.Canny(mask, 100, 200)
 
-    # 对边缘进行光滑处理
-    smoothed_edges = cv2.GaussianBlur(edges, (smoothness, smoothness), 0)
+    
+    # 将一个整数变成最接近的奇数
+    smoothness = smoothness if smoothness % 2 != 0 else smoothness + 1
+    # 进行光滑处理
+    smoothed_mask = cv2.GaussianBlur(mask, (smoothness, smoothness), 0)
 
-    # 将光滑处理后的边缘与原始图像合并
-    result = np.copy(image_rgba)
-    result[:, :, 3] = smoothed_edges
-
-    return result
-
+    return smoothed_mask
 
 
 
@@ -228,25 +228,29 @@ class SmoothMask:
   
     # 运行的函数
     def run(self,mask,smoothness):
-        print(mask.shape)
-        
-        
-
+        # result = mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
+        # print(result.shape)
         mask=mask.numpy()
-        
-        mask = np.uint8(mask * 255) 
+        images=[]
+        for i in range(mask.shape[0]):
+            m=mask[i]
+            m = np.uint8(m * 255) 
 
-        # 创建一个空的RGBA图像
-        rgba_img = np.zeros((mask.shape[0], mask.shape[1],mask.shape[2], 4), dtype=np.uint8)
+            # 创建一个空的RGBA图像
+            # rgb_img = np.zeros((m.shape[1],m.shape[0], 3), dtype=np.uint8)
         
-        rgba_img[:, :, 0] = mask
-        rgba_img[:, :, 1] = mask
-        rgba_img[:, :, 2] = mask
+        #     rgba_img[:, :, 0] = m
+        #     rgba_img[:, :, 1] = m
+        #     rgba_img[:, :, 2] = m
+        #     rgba_img[:, :, 3] = m
         
-        
-        # result=smooth_edges(image,smoothness)
+            result=smooth_edges(m,smoothness)
 
-        # mask=pil2tensor(result)
+            
+
+            images.append(result)
+
+        mask=pil2tensor(np.array(images))
            
         return (mask,)
 

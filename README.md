@@ -18,7 +18,7 @@ If you are using a venv, make sure you have it activated before installation and
 pip install -r requirements.txt
 ```
 
-直接运行：
+Run directly:
 ```
 install.bat
 ```
@@ -35,20 +35,26 @@ install.bat
 
 > Consistency Decoder
 
-[openai发布的新vae模型]( https://github.com/openai/consistencydecoder)
+[openai Consistency Decoder]( https://github.com/openai/consistencydecoder)
 
 ![Consistency](./assets/consistency.png)
-
-
-openai vae 模型下载后放model/vae里使用
+After downloading the OpenAI VAE model, place it in the "model/vae" directory for use.
 https://openaipublic.azureedge.net/diff-vae/c9cebd3132dd9c42936d803e33424145a748843c8f716c0814838bdc8a2fe7cb/decoder.pt
+
+
+> FeatheredMask、SmoothMask
+
+Add edges to an image.
+
+![FeatheredMask](./assets/FlVou_Y6kaGWYoEj1Tn0aTd4AjMI.jpg)
+
 
 
 <!-- ### Workflow
 [Workflow](./workflow.md) -->
 
 ### TODO:
-- 从模板库里 粘贴workflow进工作区
+- Copy and paste the workflow from the template library into the workspace.
 - ImageFromClipborad:The node implementation to read an image from the clipboard.
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 
