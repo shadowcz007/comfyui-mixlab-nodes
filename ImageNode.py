@@ -132,7 +132,7 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",sav
 
 
 
-def load_image(fp):
+def load_image(fp,white_bg=False):
     i = Image.open(fp)
     i = ImageOps.exif_transpose(i)
     image = i.convert("RGB")
@@ -141,13 +141,17 @@ def load_image(fp):
     if 'A' in i.getbands():
         mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
         mask = 1. - torch.from_numpy(mask)
+        if white_bg==True:
+            nw = mask.unsqueeze(0).unsqueeze(-1).repeat(1, 1, 1, 3)
+            # 将mask的黑色部分对image进行白色处理
+            image[nw == 1] = 1.0
     else:
         mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
     return (image,mask)
 
 
 # 获取图片s
-def get_images_filepath(f):
+def get_images_filepath(f,white_bg=False):
     images = []
  
     if os.path.isdir(f):
@@ -155,7 +159,7 @@ def get_images_filepath(f):
             for file in files:
                 file_path = os.path.join(root, file)
                 try:
-                    (im,mask)=load_image(file_path)
+                    (im,mask)=load_image(file_path,white_bg)
                     images.append({
                         "image":im,
                         "mask":mask,
@@ -166,14 +170,14 @@ def get_images_filepath(f):
  
     elif os.path.isfile(f):
         try:
-            (im,mask)=load_image(f)
+            (im,mask)=load_image(f,white_bg)
             images.append({
                         "image":im,
                         "mask":mask,
                         "file_path":f
                     })
         except:
-            print('非图片',file_path)
+            print('非图片',f)
     else:
         print('路径不存在或无效',f)
 
@@ -230,7 +234,8 @@ class SmoothMask:
     def run(self,mask,smoothness):
         # result = mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
         # print(result.shape)
-        mask=mask.numpy()
+        if hasattr(mask,'numpy'):
+            mask=mask.numpy()
         images=[]
         for i in range(mask.shape[0]):
             m=mask[i]
@@ -290,7 +295,10 @@ class FeatheredMask:
         if start_offset>0:
             mask = 1.0 - mask
         
-        image_np=mask.numpy()
+        if hasattr(mask,'numpy'):
+            image_np=mask.numpy()
+        else:
+            image_np=mask
         
         image = np.uint8(image_np * 255) 
         # image = cv2.cvtColor(image_cv) 
@@ -449,6 +457,7 @@ class LoadImagesFromPath:
                                 "file_path": ("STRING",{"multiline": False,"default": ""})
                             },
                 "optional":{
+                    "white_bg": (["disable","enable"],),
                     "newest_files": (["enable", "disable"],),
                     "index_variable":("INT", {
                         "default": -1, 
@@ -471,9 +480,9 @@ class LoadImagesFromPath:
     OUTPUT_IS_LIST = (True,True,)
   
     # 运行的函数
-    def run(self,file_path,newest_files,index_variable,seed):
-
-        images=get_images_filepath(file_path)
+    def run(self,file_path,white_bg,newest_files,index_variable,seed):
+        print(file_path)
+        images=get_images_filepath(file_path,white_bg=='enable')
 
         # 排序
         sorted_files = sorted(images, key=lambda x: os.path.getmtime(x['file_path']), reverse=(newest_files=='enable'))

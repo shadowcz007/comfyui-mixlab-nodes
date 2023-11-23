@@ -29,7 +29,7 @@ def is_installed(package, package_overwrite=None):
 from .PromptNode import RandomPrompt,RunWorkflow
 from .ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImagesCrop
 from .Vae import VAELoader,VAEDecode
-# from .ModelNode import KandinskyModel,KandinskyModelLoad
+from .ScreenShareNode import ScreenShareNode
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -42,8 +42,8 @@ NODE_CLASS_MAPPINGS = {
     "SmoothMask":SmoothMask,
     "ImagesCrop":ImagesCrop,
     "VAELoaderConsistencyDecoder":VAELoader,
-    "VAEDecodeConsistencyDecoder":VAEDecode
-    # "RunWorkflow":RunWorkflow
+    "VAEDecodeConsistencyDecoder":VAEDecode,
+    "ScreenShare":ScreenShareNode
     # "KandinskyModelLoad":KandinskyModelLoad,
     # "KandinskyModel":KandinskyModel
 }

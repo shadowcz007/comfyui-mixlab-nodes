@@ -1,6 +1,217 @@
 import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
+import { $el } from '../../../scripts/ui.js'
+
+let api_host = '127.0.0.1:8188'
+let api_base = ''
+let url = `http://${api_host}${api_base}`
+
+async function getQueue () {
+  try {
+    const res = await fetch(`${url}/queue`)
+    const data = await res.json()
+    // console.log(data.queue_running,data.queue_pending)
+    return {
+      // Running action uses a different endpoint for cancelling
+      Running: data.queue_running.length,
+      Pending:data.queue_pending.length
+    }
+  } catch (error) {
+    console.error(error)
+    return { Running:0, Pending:0 }
+  }
+}
+
+async function uploadFile (file) {
+  try {
+    const body = new FormData()
+    body.append('image', file)
+    body.append('overwrite', 'true')
+    body.append('type', 'temp')
+
+    const resp = await fetch(`${url}/upload/image`, {
+      method: 'POST',
+      body
+    })
+
+    if (resp.status === 200) {
+      const data = await resp.json()
+      let path = data.name
+      if (data.subfolder) path = data.subfolder + '/' + path
+      return path
+    } else {
+      alert(resp.status + ' - ' + resp.statusText)
+    }
+  } catch (error) {
+    alert(error)
+  }
+}
+
+async function shareScreenAndUpload (imgElement) {
+  try {
+    let webcamVideo = document.createElement('video')
+    const mediaStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true
+    })
+
+    webcamVideo.removeEventListener('timeupdate', videoTimeUpdateHandler)
+    webcamVideo.srcObject = mediaStream
+    webcamVideo.onloadedmetadata = () => {
+      webcamVideo.play()
+      webcamVideo.addEventListener('timeupdate', videoTimeUpdateHandler)
+    }
+
+    async function videoTimeUpdateHandler () {
+      if (window._mixlab_screen_time) {
+        console.log('loading')
+        return
+      };
+
+      const {Pending}=await getQueue();
+      if(Pending<5) document.querySelector('#queue-button').click();
+
+      const videoW = webcamVideo.videoWidth
+      const videoH = webcamVideo.videoHeight
+      const aspectRatio = videoW / videoH
+      const WIDTH = 512,
+        HEIGHT = Math.round(WIDTH / aspectRatio)
+      const canvas = new OffscreenCanvas(WIDTH, HEIGHT)
+
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(webcamVideo, 0, 0, videoW, videoH, 0, 0, WIDTH, HEIGHT)
+
+      const blob = await canvas.convertToBlob({
+        type: 'image/jpeg',
+        quality: 1
+      })
+
+      var reader = new FileReader()
+      reader.onload = function (event) {
+        // console.log(imgElement)
+        imgElement.src = event.target.result
+        // console.log(event.target.result)
+      } // data url!
+      var source = reader.readAsDataURL(blob)
+
+      const file = new File([blob], `screenshot_mixlab.jpeg`)
+      window._mixlab_screen_time = true
+      window._mixlab_screen_imagePath = await uploadFile(file)
+      window._mixlab_screen_time = false
+    }
+
+    // window._mixlab_screen_time = setInterval(() => {
+    //   context.drawImage(videoTrack, 0, 0, canvas.width, canvas.height)
+    // }, 300)
+  } catch (error) {
+    alert('Error accessing screen stream: ' + error)
+  }
+}
+
+/* 
+A method that returns the required style for the html 
+*/
+function get_position_style (ctx, widget_width, y, node_height) {
+  const MARGIN = 4 // the margin around the html element
+
+  /* Create a transform that deals with all the scrolling and zooming */
+  const elRect = ctx.canvas.getBoundingClientRect()
+  const transform = new DOMMatrix()
+    .scaleSelf(
+      elRect.width / ctx.canvas.width,
+      elRect.height / ctx.canvas.height
+    )
+    .multiplySelf(ctx.getTransform())
+    .translateSelf(MARGIN, MARGIN + y)
+
+  return {
+    transformOrigin: '0 0',
+    transform: transform,
+    left: `0`,
+    top: `0`,
+    cursor: 'pointer',
+    position: 'absolute',
+    maxWidth: `${widget_width - MARGIN * 2}px`,
+    maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
+    width: `${widget_width - MARGIN * 2}px`,
+    height: `${node_height - MARGIN * 2}px`
+  }
+}
+
+app.registerExtension({
+  name: 'Mixlab.image.ScreenShareNode',
+  getCustomWidgets (app) {
+    return {
+      CHEESE (node, inputName, inputData, app) {
+        // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 72], // a default size
+          draw (ctx, node, width, y) {
+            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+          },
+          computeSize (...args) {
+            return [128, 72] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            return window._mixlab_screen_imagePath
+          }
+        }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      }
+    }
+  },
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'ScreenShare') {
+      /* 
+          Hijack the onNodeCreated call to add our widget
+          */
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        const widget = {
+          type: 'HTML', // whatever
+          name: 'flying', // whatever
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.inputEl.style,
+              get_position_style(ctx, widget_width, y, node.size[1])
+            ) // assign the required style when we are drawn
+          }
+        }
+
+        /*
+              Create an html element and add it to the document.  
+              Look at $el in ui.js for all the options here
+              */
+        widget.inputEl = $el('img', {
+          src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+        })
+        // widget.inputEl = $el('button', {
+        //   innerText: 'Start'
+        // })
+        document.body.appendChild(widget.inputEl)
+        widget.inputEl.addEventListener('click', () => {
+          shareScreenAndUpload(widget.inputEl)
+        })
+        // console.log('widget.inputEl',widget.inputEl)
+
+        /*
+              Add the widget, make sure we clean up nicely, and we do not want to be serialized!
+              */
+        this.addCustomWidget(widget)
+        this.onRemoved = function () {
+          widget.inputEl.remove()
+        }
+        this.serialize_widgets = false
+      }
+    }
+  }
+})
 
 // 和python实现一样
 function run (mutable_prompt, immutable_prompt) {
@@ -321,11 +532,11 @@ const node = {
       '[logging]',
       'add custom node definitions',
       'current nodes:',
-       defs 
+      defs
     )
     // 在这里进行 语言切换
     for (const nodeName in defs) {
-      if(nodeName==='RandomPrompt'){
+      if (nodeName === 'RandomPrompt') {
         // defs[nodeName].category
         // defs[nodeName].display_name
       }
@@ -374,6 +585,54 @@ const node = {
       }
     }
 
+    if (nodeData.name === 'WSServer') {
+      // Create the button widget for selecting the files
+      // node.addWidget(
+      //   'button',
+      //   'choose file to upload',
+      //   'video',
+      //   () => {
+      //     console.log('click')
+      //   }
+      // )
+      // uploadWidget.serialize = false
+      // const onExecuted = nodeType.prototype.onExecuted
+      // nodeType.prototype.onExecuted = function (message) {
+      //   const r = onExecuted?.apply?.(this, arguments)
+      //   console.log('executed', message)
+      //   const upload = this.widgets.filter(w => w.name === 'upload')[0]
+      //   console.log('executed', this.widgets)
+      //   // navigator.mediaDevices
+      //   //   .getDisplayMedia({ video: true })
+      //   //   .then(stream => {
+      //   //     const videoElement = document.createElement('video')
+      //   //     videoElement.srcObject = stream
+      //   //     videoElement.autoplay = true
+      //   //     const canvasElement = document.createElement('canvas')
+      //   //     const context = canvasElement.getContext('2d')
+      //   //     videoElement.addEventListener('loadedmetadata', () => {
+      //   //       canvasElement.width = videoElement.videoWidth
+      //   //       canvasElement.height = videoElement.videoHeight
+      //   //       setInterval(async () => {
+      //   //         context.drawImage(
+      //   //           videoElement,
+      //   //           0,
+      //   //           0,
+      //   //           canvasElement.width,
+      //   //           canvasElement.height
+      //   //         )
+      //   //         const imageData = canvasElement.toDataURL()
+      //   //         upload.value = await uploadScreenshot(imageData)
+      //   //       }, 200)
+      //   //     })
+      //   //   })
+      //   //   .catch(error => {
+      //   //     console.error('Error getting screen share:', error)
+      //   //   })
+      //   return r
+      // }
+    }
+
     if (nodeData.name === 'RandomPrompt') {
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
@@ -405,15 +664,6 @@ const node = {
         this.widgets.length = 5
 
         this.onResize?.(this.size)
-
-        return r
-      }
-    }
-
-    if (nodeData.name === 'RunWorkflow') {
-      const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
-        const r = onExecuted?.apply?.(this, arguments)
 
         return r
       }
