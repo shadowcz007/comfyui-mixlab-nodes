@@ -8,6 +8,10 @@ In progress.
 https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/3167aed0-cea0-41f2-9075-b05e0ed08536
 
 
+
+
+
+
 ## Installation
 
 For the easiest install experience, install the [Comfyui Manager](https://github.com/ltdrdata/ComfyUI-Manager) and use that to automate the installation process.
@@ -30,6 +34,10 @@ install.bat
 ```
 
 ## Nodes
+
+![main](./assets/all.png)
+
+[workflow-1](./workflow/1-workflow.json)
 
 > randomPrompt
 

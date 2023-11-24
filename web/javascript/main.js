@@ -69,7 +69,7 @@ async function shareScreenAndUpload (imgElement) {
       };
 
       const {Pending}=await getQueue();
-      if(Pending<5) document.querySelector('#queue-button').click();
+      if(Pending<1) document.querySelector('#queue-button').click();
 
       const videoW = webcamVideo.videoWidth
       const videoH = webcamVideo.videoHeight

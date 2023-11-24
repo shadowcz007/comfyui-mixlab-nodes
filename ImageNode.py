@@ -92,9 +92,7 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",sav
     image_file = f"{filename}_{counter:05}_{end}.png"
     mask_file = f"{filename}_{counter:05}_{end}_mask.png"
 
-    # im_tensor=pil2tensor(im)
     image_path=os.path.join(full_output_folder, image_file)
-
 
     metadata = None
     if not args.disable_metadata:
@@ -124,11 +122,40 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",sav
                 "type": "output" if save_image else "temp"
             })
     
+    im_tensor=pil2tensor(im)
 
     return {
         "result":result,
-        "image_path":image_path
+        "image_path":image_path,
+        "im_tensor":im_tensor
     }
+
+
+# 提取不透明部分，裁切图片
+def crop_image_remove_transparent(image):
+    # 将PIL的Image类型转换为OpenCV的numpy数组
+    image_np = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
+
+    # 分离图像的RGBA通道
+    rgba = cv2.split(image_np)
+    alpha = rgba[3]
+
+    # 使用阈值将非透明部分转换为纯白色（255），透明部分转换为纯黑色（0）
+    _, mask = cv2.threshold(alpha, 1, 255, cv2.THRESH_BINARY)
+
+    # 查找轮廓
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # 获取最大轮廓的边界框
+    x, y, w, h = cv2.boundingRect(max(contours, key=cv2.contourArea))
+
+    # 使用边界框裁剪图像
+    cropped_image = image_np[y:y+h, x:x+w]
+
+    # 将裁剪后的图像转换为PIL的Image类型
+    result_pil = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGRA2RGBA))
+
+    return result_pil
 
 
 
@@ -291,51 +318,48 @@ class FeatheredMask:
   
     # 运行的函数
     def run(self,mask,start_offset, feathering_weight):
+        # print(mask.shape,mask.size())
+        
+        image=tensor2pil(mask)
+
+        # Open the image using PIL
+        image = image.convert("L")
+        if start_offset>0:
+            image=ImageOps.invert(image)
+
+        # Convert the image to a numpy array
+        image_np = np.array(image)
+
+        # Use Canny edge detection to get black contours
+        edges = cv2.Canny(image_np, 30, 150)
+
+        for i in range(0,abs(start_offset)):
+            # int(100*feathering_weight)
+            a=int(abs(start_offset)*0.1*i)
+            # Dilate the black contours to make them wider
+            kernel = np.ones((a, a), np.uint8)
+
+            dilated_edges = cv2.dilate(edges, kernel, iterations=1)
+            # dilated_edges = cv2.erode(edges, kernel, iterations=1)
+            # Smooth the dilated edges using Gaussian blur
+            smoothed_edges = cv2.GaussianBlur(dilated_edges, (5, 5), 0)
+
+            # Adjust the feathering weight
+            feathering_weight = max(0, min(feathering_weight, 1))
+
+            # Blend the smoothed edges with the original image to achieve feathering effect
+            image_np = cv2.addWeighted(image_np, 1, smoothed_edges, feathering_weight, feathering_weight)
+
+        # Convert the result back to PIL image
+        result_image = Image.fromarray(np.uint8(image_np))
+        result_image=result_image.convert("L")
 
         if start_offset>0:
-            mask = 1.0 - mask
+            result_image=ImageOps.invert(result_image)
         
-        if hasattr(mask,'numpy'):
-            image_np=mask.numpy()
-        else:
-            image_np=mask
-        
-        image = np.uint8(image_np * 255) 
-        # image = cv2.cvtColor(image_cv) 
-        # print(image)
-        # 使用Canny边缘检测获取黑色轮廓线
-        edges = cv2.Canny(image, 30, 150)
-
-        # 对黑色轮廓线进行膨胀操作，使其变宽
-        kernel = np.ones((start_offset if start_offset>0 else -start_offset, 
-                          start_offset if start_offset>0 else -start_offset), np.uint8)
-        # dilated_edges = cv2.dilate(edges, kernel, iterations=1)
-
-        # if start_offset>=0:
-        dilated_edges = cv2.dilate(edges, kernel, iterations=1)
-        # else:
-        #     dilated_edges = cv2.erode(edges, kernel, iterations=1)
-
-        # 使用高斯滤波平滑黑色轮廓线
-        smoothed_edges = cv2.GaussianBlur(dilated_edges, (5, 5), 0)
-        
-        # 调整羽化程度
-    
-        # smoothed_edges = cv2.cvtColor(smoothed_edges, cv2.COLOR_GRAY2BGR)
-        # 将平滑后的黑色轮廓线与原始图片进行融合，实现羽化效果
-        result = cv2.addWeighted(image, 1, smoothed_edges, feathering_weight, 0)
-
-        if start_offset>0:
-            mask = 1.0 - mask
-
-        mask=pil2tensor(result)
-        
-        if start_offset>0:
-            mask = 1.0 - mask
-
-        # "ui":{"images": ui_images,
-        # return {"ui":{"image": tensor2pil(mask)},"result": (mask,)}        
-        return (mask,)
+        mask=pil2tensor(result_image)
+        # print(mask.shape,mask.size())
+        return mask
 
 
 
@@ -373,8 +397,9 @@ class SplitLongMask:
 
 
 
-
+# 一个batch传进来 INPUT_IS_LIST = False
 # mask始终会被拍平,([2, 568, 512]) -- > ([1136, 512])
+# 原因是一个batch传来的
 class TransparentImage:
     @classmethod
     def INPUT_TYPES(s):
@@ -391,7 +416,7 @@ class TransparentImage:
                 "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"}
             }
     
-    RETURN_TYPES = ('STRING',)
+    RETURN_TYPES = ('STRING','IMAGE')
 
     OUTPUT_NODE = True
 
@@ -399,12 +424,15 @@ class TransparentImage:
 
     CATEGORY = "Mixlab/image"
 
-    # INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    # INPUT_IS_LIST = True， 一个batch传进来
+    OUTPUT_IS_LIST = (True,True,)
     # OUTPUT_NODE = True
 
     # 运行的函数
     def run(self,images,masks,invert,save,filename_prefix,prompt=None, extra_pnginfo=None):
+        # print('TransparentImage',images.shape,images.size())
+        # print(masks.shape,masks.size())
+
         ui_images=[]
         image_paths=[]
         
@@ -412,6 +440,7 @@ class TransparentImage:
         masks_new=[]
         nh=masks.shape[0]//count
 
+        #INPUT_IS_LIST = False, 一个batch传进来
         if nh*count==masks.shape[0]:
             masks_new=split_mask_by_new_height(masks,nh)
         else:
@@ -420,6 +449,9 @@ class TransparentImage:
 
         is_save=True if save=='yes' else False
         # filename_prefix += self.prefix_append
+
+        images_res=[]
+
         for i in range(len(images)):
             image=images[i]
             mask=masks_new[i]
@@ -430,11 +462,13 @@ class TransparentImage:
                 ui_images.append(item)
 
             image_paths.append(result['image_path'])
+
+            images_res.append(result['im_tensor'])
         
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
 
-        return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,)}
+        return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_res,)}
         
 
 
@@ -511,7 +545,11 @@ class ImagesCrop:
                               "height": ("INT", {"default": 512, "min": 64, "max": MAX_RESOLUTION, "step": 8}),
                               "x": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
                               "y": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                              }}
+                              },
+                "optional":{
+                    "auto_transparent": (["enable", "disable"],)
+                }
+                }
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "crop"
 
@@ -521,15 +559,26 @@ class ImagesCrop:
     OUTPUT_IS_LIST = (True,)
 
 
-    def crop(self, images, width, height, x, y):
+    def crop(self, images, width, height, x, y,auto_transparent):
+        print('#ImageCrop:',width,auto_transparent,type(images[0]))
         width=width[0]
         height=height[0]
         x=x[0]
         y=y[0]
+        auto_transparent=auto_transparent[0]
+
         cropped_images = []
+        
         for img in images:
+
             im=tensor2pil(img)
-            cropped_img = im.crop((x, y, x + width, y + height))
+
+            if auto_transparent=='enable':
+                cropped_img=crop_image_remove_transparent(im)
+            else:
+                cropped_img = im.crop((x, y, x + width, y + height))
+            
             cropped_images.append(pil2tensor(cropped_img))
+
         return (cropped_images,)
 
