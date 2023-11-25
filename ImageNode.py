@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps,ImageFilter
 from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
@@ -255,34 +255,23 @@ class SmoothMask:
 
     CATEGORY = "Mixlab/mask"
 
+    INPUT_IS_LIST = False
+
     OUTPUT_IS_LIST = (False,)
   
     # 运行的函数
     def run(self,mask,smoothness):
         # result = mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
-        # print(result.shape)
-        if hasattr(mask,'numpy'):
-            mask=mask.numpy()
-        images=[]
-        for i in range(mask.shape[0]):
-            m=mask[i]
-            m = np.uint8(m * 255) 
+        print('SmoothMask',mask.shape)
+        mask=tensor2pil(mask)
+    
+        # 打开图像并将其转换为黑白图
+        # image = mask.convert('L')
 
-            # 创建一个空的RGBA图像
-            # rgb_img = np.zeros((m.shape[1],m.shape[0], 3), dtype=np.uint8)
-        
-        #     rgba_img[:, :, 0] = m
-        #     rgba_img[:, :, 1] = m
-        #     rgba_img[:, :, 2] = m
-        #     rgba_img[:, :, 3] = m
-        
-            result=smooth_edges(m,smoothness)
+        # 应用羽化效果
+        feathered_image = mask.filter(ImageFilter.GaussianBlur(smoothness))
 
-            
-
-            images.append(result)
-
-        mask=pil2tensor(np.array(images))
+        mask=pil2tensor(feathered_image)
            
         return (mask,)
 
