@@ -1,6 +1,6 @@
 {
-  "last_node_id": 37,
-  "last_link_id": 50,
+  "last_node_id": 38,
+  "last_link_id": 52,
   "nodes": [
     {
       "id": 4,
@@ -32,53 +32,6 @@
       },
       "widgets_values": [
         "GroundingDINO_SwinT_OGC (694MB)"
-      ]
-    },
-    {
-      "id": 16,
-      "type": "SplitLongMask",
-      "pos": [
-        2053,
-        112
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "long_mask",
-          "type": "MASK",
-          "link": 22
-        },
-        {
-          "name": "count",
-          "type": "INT",
-          "link": 37,
-          "widget": {
-            "name": "count"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": [
-            24
-          ],
-          "shape": 6,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "SplitLongMask"
-      },
-      "widgets_values": [
-        2
       ]
     },
     {
@@ -124,78 +77,6 @@
         512,
         2
       ]
-    },
-    {
-      "id": 18,
-      "type": "MaskListToMaskBatch",
-      "pos": [
-        2013,
-        329
-      ],
-      "size": {
-        "0": 210,
-        "1": 26
-      },
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "mask",
-          "type": "MASK",
-          "link": 26
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": [
-            38
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "MaskListToMaskBatch"
-      }
-    },
-    {
-      "id": 6,
-      "type": "MaskToImage",
-      "pos": [
-        2146,
-        227
-      ],
-      "size": {
-        "0": 210,
-        "1": 26
-      },
-      "flags": {},
-      "order": 18,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "mask",
-          "type": "MASK",
-          "link": 34
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            3
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "MaskToImage"
-      }
     },
     {
       "id": 10,
@@ -338,7 +219,7 @@
         "1": 82
       },
       "flags": {},
-      "order": 15,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -378,7 +259,7 @@
         26
       ],
       "flags": {},
-      "order": 17,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -459,7 +340,7 @@
         "1": 154
       },
       "flags": {},
-      "order": 21,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -563,7 +444,7 @@
         "1": 413.53533935546875
       },
       "flags": {},
-      "order": 20,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -583,12 +464,12 @@
         2848,
         184
       ],
-      "size": [
-        315,
-        338
-      ],
+      "size": {
+        "0": 315,
+        "1": 338
+      },
       "flags": {},
-      "order": 19,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -635,12 +516,12 @@
         3603,
         87
       ],
-      "size": [
-        210,
-        246
-      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
       "flags": {},
-      "order": 22,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -648,31 +529,6 @@
           "type": "IMAGE",
           "link": 50,
           "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
-    },
-    {
-      "id": 17,
-      "type": "PreviewImage",
-      "pos": [
-        2061,
-        -183
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 23
         }
       ],
       "properties": {
@@ -789,66 +645,6 @@
       ]
     },
     {
-      "id": 3,
-      "type": "GroundingDinoSAMSegment (segment anything)",
-      "pos": [
-        1673,
-        100
-      ],
-      "size": {
-        "0": 352.79998779296875,
-        "1": 122
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "sam_model",
-          "type": "SAM_MODEL",
-          "link": 1
-        },
-        {
-          "name": "grounding_dino_model",
-          "type": "GROUNDING_DINO_MODEL",
-          "link": 2,
-          "slot_index": 1
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 21
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            23
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": [
-            22
-          ],
-          "shape": 3,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GroundingDinoSAMSegment (segment anything)"
-      },
-      "widgets_values": [
-        " person,human, head,face, hair , ears,body",
-        0.3
-      ]
-    },
-    {
       "id": 9,
       "type": "KSampler",
       "pos": [
@@ -906,6 +702,246 @@
         "normal",
         1
       ]
+    },
+    {
+      "id": 18,
+      "type": "MaskListToMaskBatch",
+      "pos": [
+        2000,
+        396
+      ],
+      "size": {
+        "0": 210,
+        "1": 26
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 26
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            38
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MaskListToMaskBatch"
+      }
+    },
+    {
+      "id": 6,
+      "type": "MaskToImage",
+      "pos": [
+        2139,
+        241
+      ],
+      "size": {
+        "0": 210,
+        "1": 26
+      },
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 34
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            3
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MaskToImage"
+      }
+    },
+    {
+      "id": 3,
+      "type": "GroundingDinoSAMSegment (segment anything)",
+      "pos": [
+        1673,
+        100
+      ],
+      "size": {
+        "0": 352.79998779296875,
+        "1": 122
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "sam_model",
+          "type": "SAM_MODEL",
+          "link": 1
+        },
+        {
+          "name": "grounding_dino_model",
+          "type": "GROUNDING_DINO_MODEL",
+          "link": 2,
+          "slot_index": 1
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            23
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            51
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GroundingDinoSAMSegment (segment anything)"
+      },
+      "widgets_values": [
+        " person,human, head,face, hair , ears,body",
+        0.3
+      ]
+    },
+    {
+      "id": 17,
+      "type": "PreviewImage",
+      "pos": [
+        2058,
+        -230
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 23
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 16,
+      "type": "SplitLongMask",
+      "pos": [
+        2055,
+        130
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "long_mask",
+          "type": "MASK",
+          "link": 52
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "link": 37,
+          "widget": {
+            "name": "count"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            24
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SplitLongMask"
+      },
+      "widgets_values": [
+        2
+      ]
+    },
+    {
+      "id": 38,
+      "type": "InvertMask (segment anything)",
+      "pos": [
+        2063,
+        60
+      ],
+      "size": {
+        "0": 210,
+        "1": 26
+      },
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 51
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            52
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "InvertMask (segment anything)"
+      }
     }
   ],
   "links": [
@@ -1004,14 +1040,6 @@
       3,
       2,
       "IMAGE"
-    ],
-    [
-      22,
-      3,
-      1,
-      16,
-      0,
-      "MASK"
     ],
     [
       23,
@@ -1124,6 +1152,22 @@
       31,
       0,
       "IMAGE"
+    ],
+    [
+      51,
+      3,
+      1,
+      38,
+      0,
+      "MASK"
+    ],
+    [
+      52,
+      38,
+      0,
+      16,
+      0,
+      "MASK"
     ]
   ],
   "groups": [],

@@ -122,6 +122,7 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",sav
                 "type": "output" if save_image else "temp"
             })
     
+    im=im.convert('RGB')
     im_tensor=pil2tensor(im)
 
     return {
@@ -419,7 +420,7 @@ class TransparentImage:
 
     # 运行的函数
     def run(self,images,masks,invert,save,filename_prefix,prompt=None, extra_pnginfo=None):
-        # print('TransparentImage',images.shape,images.size())
+        print('TransparentImage',images.shape,images.size())
         # print(masks.shape,masks.size())
 
         ui_images=[]
@@ -456,7 +457,7 @@ class TransparentImage:
         
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
-
+        print('TransparentImage',len(images_res))
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_res,)}
         
 
