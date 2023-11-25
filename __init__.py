@@ -27,7 +27,7 @@ def is_installed(package, package_overwrite=None):
 
 # 导入节点
 from .PromptNode import RandomPrompt,RunWorkflow
-from .ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImagesCrop
+from .ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImagesCrop,EnhanceImage
 from .Vae import VAELoader,VAEDecode
 from .ScreenShareNode import ScreenShareNode
 
@@ -37,6 +37,7 @@ NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "TransparentImage":TransparentImage,
     "LoadImagesFromPath":LoadImagesFromPath,
+    "EnhanceImage":EnhanceImage,
     "SplitLongMask":SplitLongMask,
     "FeatheredMask":FeatheredMask,
     "SmoothMask":SmoothMask,
@@ -44,7 +45,7 @@ NODE_CLASS_MAPPINGS = {
     "VAELoaderConsistencyDecoder":VAELoader,
     "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode
-    # "KandinskyModelLoad":KandinskyModelLoad,
+    
     # "KandinskyModel":KandinskyModel
 }
 

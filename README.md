@@ -8,7 +8,7 @@ In progress.
 https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/3167aed0-cea0-41f2-9075-b05e0ed08536
 
 
-
+[ScreenShareNode](./workflow/2-screeshare.json)
 
 
 

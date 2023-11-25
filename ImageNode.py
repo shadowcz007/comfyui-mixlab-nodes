@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageOps,ImageFilter
+from PIL import Image, ImageOps,ImageFilter,ImageEnhance
 from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
@@ -234,6 +234,20 @@ def smooth_edges(alpha_channel, smoothness):
 
     return smoothed_mask
 
+ 
+def enhance_depth_map(depth_map, contrast):
+    # 打开深度图像
+    # depth_map = Image.open(im)
+    
+    # 创建对比度增强对象
+    enhancer = ImageEnhance.Contrast(depth_map)
+    
+    # 对深度图像进行对比度增强
+    enhanced_depth_map = enhancer.enhance(contrast)
+    
+    return enhanced_depth_map
+
+
 
 
 class SmoothMask:
@@ -461,6 +475,40 @@ class TransparentImage:
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_res,)}
         
 
+class EnhanceImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+                "required": {
+                                "image": ("IMAGE",),
+                                "contrast":("FLOAT", {"default": 0.5, 
+                                                        "min":0, 
+                                                        "max": 10, 
+                                                        "step": 0.01,
+                                                        "display": "slider"})
+                            }
+            }
+    
+    RETURN_TYPES = ('IMAGE',)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/image"
+
+    INPUT_IS_LIST = False
+
+    OUTPUT_IS_LIST = (False,)
+  
+    # 运行的函数
+    def run(self,image,contrast):
+        # print('EnhanceImage',image.shape)
+        image=tensor2pil(image)
+     
+        image=enhance_depth_map(image,contrast)
+
+        image=pil2tensor(image)
+           
+        return (image,)
 
 ''' 
 ("STRING",{"multiline": False,"default": "Hello World!"})
