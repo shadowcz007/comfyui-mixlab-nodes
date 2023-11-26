@@ -38,7 +38,7 @@ def is_installed(package, package_overwrite=None):
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage
+from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -53,13 +53,14 @@ NODE_CLASS_MAPPINGS = {
     "SplitLongMask":SplitLongMask,
     "FeatheredMask":FeatheredMask,
     "SmoothMask":SmoothMask,
+    "FaceToMask":FaceToMask,
+    "AreaToMask":AreaToMask,
     "ImageCropByAlpha":ImageCropByAlpha,
     "VAELoaderConsistencyDecoder":VAELoader,
     "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "CLIPSeg":CLIPSeg,
     "CombineMasks":CombineMasks
-    # "KandinskyModel":KandinskyModel
 }
 
 # 一个包含节点友好/可读的标题的字典

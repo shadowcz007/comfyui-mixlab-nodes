@@ -36,6 +36,7 @@ install.bat
 ## Nodes
 
 ![main](./assets/all.png)
+![main2](./assets/detect-face-all.png)
 
 [workflow-1](./workflow/1-workflow.json)
 

@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageOps,ImageFilter,ImageEnhance
+from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw
 from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
@@ -241,26 +241,57 @@ def enhance_depth_map(depth_map, contrast):
     return enhanced_depth_map
 
 
-# def f():
-#     # Reading the Image
-#     image = cv2.imread('people1.jpg')
+def detect_faces(image):
+    # Read the image
+    # image = cv2.imread('people1.jpg')
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
 
-#     # initialize the HOG descriptor
-#     hog = cv2.HOGDescriptor()
-#     hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-#     # detect humans in input image
-#     (humans, _) = hog.detectMultiScale(image, winStride=(10, 10),
-#     padding=(32, 32), scale=1.1)
+    # Load the pre-trained face detector
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-#     # getting no. of human detected
-#     print('Human Detected : ', len(humans))
+    # Detect faces in the image
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=5, minSize=(50, 50))
 
-#     # loop over all detected humans
-#     for (x, y, w, h) in humans:
-#         pad_w, pad_h = int(0.15 * w), int(0.01 * h)
-#         cv2.rectangle(image, (x + pad_w, y + pad_h), (x + w - pad_w, y + h - pad_h), (0, 255, 0), 2)
-#     return
+    # Create a black and white mask image
+    mask = np.zeros_like(gray)
+
+    # Loop over all detected faces
+    for (x, y, w, h) in faces:
+        # Draw rectangles around the detected faces
+        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Set the corresponding region in the mask image to white
+        mask[y:y+h, x:x+w] = 255
+
+    # Display the number of faces detected
+    print('Faces Detected:', len(faces))
+
+    mask = Image.fromarray(cv2.cvtColor(mask, cv2.COLOR_BGRA2RGBA))
+
+    return mask
+
+
+def areaToMask(x,y,w,h,image):
+    # 创建一个与原图片大小相同的空白图片
+    mask = Image.new('1', image.size)
+
+    # 创建一个可用于绘制的对象
+    draw = ImageDraw.Draw(mask)
+
+    # 在空白图片上绘制一个矩形，表示要处理的区域
+    draw.rectangle((x, y, x+w, y+h), fill=255)
+
+    # 将处理区域之外的部分填充为黑色
+    draw.rectangle((0, 0, image.width, y), fill=0)
+    draw.rectangle((0, y+h, image.width, image.height), fill=0)
+    draw.rectangle((0, y, x, y+h), fill=0)
+    draw.rectangle((x+w, y, image.width, y+h), fill=0)
+    return mask
+
+
 
 class SmoothMask:
     @classmethod
@@ -588,7 +619,7 @@ class LoadImagesFromPath:
         return (imgs,masks)
 
 
-
+# TODO 扩大选区的功能,重新输出mask
 class ImageCropByAlpha:
     @classmethod
     def INPUT_TYPES(s):
@@ -619,4 +650,67 @@ class ImageCropByAlpha:
         to_y = h + y
         img = image[:,y:to_y, x:to_x, :]
         return (img,)
+
+
+class AreaToMask:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "RGBA": ("RGBA",),  },
+                }
+    
+    RETURN_TYPES = ("MASK",)
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/mask"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,RGBA):
+        # print(RGBA)
+        im=tensor2pil(RGBA)
+        im=naive_cutout(im,im)
+        x, y, w, h=get_not_transparent_area(im)
+        
+        im=im.convert("RGBA")
+        # print('#AreaToMask:',im)
+        img=areaToMask(x,y,w,h,im)
+        img=img.convert("RGBA")
+        mask=pil2tensor(img)
+
+        channels = ["red", "green", "blue", "alpha"]
+        # print(mask,mask.shape)
+        mask = mask[:, :, :, channels.index("green")]
+
+        return (mask,)
+
+
+class FaceToMask:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "image": ("IMAGE",)},
+                }
+    
+    RETURN_TYPES = ("MASK",)
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/mask"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,image):
+        # print(image)
+        im=tensor2pil(image)
+        mask=detect_faces(im)
+
+        mask=pil2tensor(mask)
+        channels = ["red", "green", "blue", "alpha"]
+        mask = mask[:, :, :, channels.index("green")]
+
+        return (mask,)
 
