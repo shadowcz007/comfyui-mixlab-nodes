@@ -122,18 +122,17 @@ def doMask(image,mask,save_image=False,filename_prefix="Mixlab",invert="yes",sav
                 "type": "output" if save_image else "temp"
             })
     
-    im=im.convert('RGB')
-    im_tensor=pil2tensor(im)
-
+ 
     return {
         "result":result,
         "image_path":image_path,
-        "im_tensor":im_tensor
+        "im_tensor":pil2tensor(im.convert('RGB')),
+        "im_rgba_tensor":pil2tensor(im)
     }
 
 
-# 提取不透明部分，裁切图片
-def crop_image_remove_transparent(image):
+# 提取不透明部分
+def get_not_transparent_area(image):
     # 将PIL的Image类型转换为OpenCV的numpy数组
     image_np = cv2.cvtColor(np.array(image), cv2.COLOR_RGBA2BGRA)
 
@@ -144,19 +143,13 @@ def crop_image_remove_transparent(image):
     # 使用阈值将非透明部分转换为纯白色（255），透明部分转换为纯黑色（0）
     _, mask = cv2.threshold(alpha, 1, 255, cv2.THRESH_BINARY)
 
-    # 查找轮廓
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    # 获取非透明区域的边界框
+    coords = cv2.findNonZero(mask)
+    x, y, w, h = cv2.boundingRect(coords)
 
-    # 获取最大轮廓的边界框
-    x, y, w, h = cv2.boundingRect(max(contours, key=cv2.contourArea))
+    return (x, y, w, h)
 
-    # 使用边界框裁剪图像
-    cropped_image = image_np[y:y+h, x:x+w]
 
-    # 将裁剪后的图像转换为PIL的Image类型
-    result_pil = Image.fromarray(cv2.cvtColor(cropped_image, cv2.COLOR_BGRA2RGBA))
-
-    return result_pil
 
 
 
@@ -248,7 +241,26 @@ def enhance_depth_map(depth_map, contrast):
     return enhanced_depth_map
 
 
+# def f():
+#     # Reading the Image
+#     image = cv2.imread('people1.jpg')
 
+#     # initialize the HOG descriptor
+#     hog = cv2.HOGDescriptor()
+#     hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+
+#     # detect humans in input image
+#     (humans, _) = hog.detectMultiScale(image, winStride=(10, 10),
+#     padding=(32, 32), scale=1.1)
+
+#     # getting no. of human detected
+#     print('Human Detected : ', len(humans))
+
+#     # loop over all detected humans
+#     for (x, y, w, h) in humans:
+#         pad_w, pad_h = int(0.15 * w), int(0.01 * h)
+#         cv2.rectangle(image, (x + pad_w, y + pad_h), (x + w - pad_w, y + h - pad_h), (0, 255, 0), 2)
+#     return
 
 class SmoothMask:
     @classmethod
@@ -420,7 +432,7 @@ class TransparentImage:
                 "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"}
             }
     
-    RETURN_TYPES = ('STRING','IMAGE')
+    RETURN_TYPES = ('STRING','IMAGE','RGBA')
 
     OUTPUT_NODE = True
 
@@ -429,7 +441,7 @@ class TransparentImage:
     CATEGORY = "Mixlab/image"
 
     # INPUT_IS_LIST = True， 一个batch传进来
-    OUTPUT_IS_LIST = (True,True,)
+    OUTPUT_IS_LIST = (True,True,True,)
     # OUTPUT_NODE = True
 
     # 运行的函数
@@ -454,7 +466,8 @@ class TransparentImage:
         is_save=True if save=='yes' else False
         # filename_prefix += self.prefix_append
 
-        images_res=[]
+        images_rgb=[]
+        images_rgba=[]
 
         for i in range(len(images)):
             image=images[i]
@@ -467,12 +480,13 @@ class TransparentImage:
 
             image_paths.append(result['image_path'])
 
-            images_res.append(result['im_tensor'])
+            images_rgb.append(result['im_tensor'])
+            images_rgba.append(result['im_rgba_tensor'])
         
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
-        print('TransparentImage',len(images_res))
-        return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_res,)}
+        print('TransparentImage',len(images_rgb))
+        return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_rgb,images_rgba)}
         
 
 class EnhanceImage:
@@ -575,48 +589,34 @@ class LoadImagesFromPath:
 
 
 
-class ImagesCrop:
+class ImageCropByAlpha:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "images": ("IMAGE",),
-                              "width": ("INT", {"default": 512, "min": 64, "max": MAX_RESOLUTION, "step": 8}),
-                              "height": ("INT", {"default": 512, "min": 64, "max": MAX_RESOLUTION, "step": 8}),
-                              "x": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                              "y": ("INT", {"default": 0, "min": 0, "max": MAX_RESOLUTION, "step": 8}),
-                              },
-                "optional":{
-                    "auto_transparent": (["enable", "disable"],)
+        return {"required": { "image": ("IMAGE",),
+                             "RGBA": ("RGBA",),  },
                 }
-                }
+    
     RETURN_TYPES = ("IMAGE",)
-    FUNCTION = "crop"
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
 
     CATEGORY = "Mixlab/image"
 
-    INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
 
+    def run(self,image,RGBA):
+        # print(RGBA)
+        im=tensor2pil(RGBA)
+        im=naive_cutout(im,im)
+        x, y, w, h=get_not_transparent_area(im)
+        print('#ForImageCrop:',w, h,x, y,)
 
-    def crop(self, images, width, height, x, y,auto_transparent):
-        print('#ImageCrop:',width,auto_transparent,type(images[0]))
-        width=width[0]
-        height=height[0]
-        x=x[0]
-        y=y[0]
-        auto_transparent=auto_transparent[0]
-
-        cropped_images = []
-        
-        for img in images:
-
-            im=tensor2pil(img)
-
-            if auto_transparent=='enable':
-                cropped_img=crop_image_remove_transparent(im)
-            else:
-                cropped_img = im.crop((x, y, x + width, y + height))
-            
-            cropped_images.append(pil2tensor(cropped_img))
-
-        return (cropped_images,)
+        x = min(x, image.shape[2] - 1)
+        y = min(y, image.shape[1] - 1)
+        to_x = w + x
+        to_y = h + y
+        img = image[:,y:to_y, x:to_x, :]
+        return (img,)
 

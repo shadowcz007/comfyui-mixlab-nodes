@@ -63,12 +63,16 @@ Add edges to an image.
 ![FeatheredMask](./assets/FlVou_Y6kaGWYoEj1Tn0aTd4AjMI.jpg)
 
 
+### Models
+下载[CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main)到 model/clipseg
 
 <!-- ### Workflow
 [Workflow](./workflow.md) -->
 
+#### Thanks:
+[ComfyUI-CLIPSeg](https://github.com/biegert/ComfyUI-CLIPSeg/tree/main)
+
+
 ### TODO:
-- Copy and paste the workflow from the template library into the workspace.
-- ImageFromClipborad:The node implementation to read an image from the clipboard.
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 

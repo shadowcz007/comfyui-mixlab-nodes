@@ -15,11 +15,11 @@ async function getQueue () {
     return {
       // Running action uses a different endpoint for cancelling
       Running: data.queue_running.length,
-      Pending:data.queue_pending.length
+      Pending: data.queue_pending.length
     }
   } catch (error) {
     console.error(error)
-    return { Running:0, Pending:0 }
+    return { Running: 0, Pending: 0 }
   }
 }
 
@@ -66,10 +66,10 @@ async function shareScreenAndUpload (imgElement) {
       if (window._mixlab_screen_time) {
         console.log('loading')
         return
-      };
+      }
 
-      const {Pending}=await getQueue();
-      if(Pending<1) document.querySelector('#queue-button').click();
+      const { Pending } = await getQueue()
+      if (Pending < 1) document.querySelector('#queue-button').click()
 
       const videoW = webcamVideo.videoWidth
       const videoH = webcamVideo.videoHeight

@@ -25,11 +25,23 @@ def is_installed(package, package_overwrite=None):
         if result.returncode != 0:
             print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
 
+# 扩展api接口
+# from server import PromptServer
+# from aiohttp import web
+
+# @routes.post('/ws_image')
+# async def my_hander_method(request):
+#     post = await request.post()
+#     x = post.get("something")
+#     return web.json_response({})
+
+
 # 导入节点
-from .PromptNode import RandomPrompt,RunWorkflow
-from .ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImagesCrop,EnhanceImage
-from .Vae import VAELoader,VAEDecode
-from .ScreenShareNode import ScreenShareNode
+from .nodes.PromptNode import RandomPrompt
+from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage
+from .nodes.Vae import VAELoader,VAEDecode
+from .nodes.ScreenShareNode import ScreenShareNode
+from .nodes.Clipseg import CLIPSeg,CombineMasks
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -41,11 +53,12 @@ NODE_CLASS_MAPPINGS = {
     "SplitLongMask":SplitLongMask,
     "FeatheredMask":FeatheredMask,
     "SmoothMask":SmoothMask,
-    "ImagesCrop":ImagesCrop,
+    "ImageCropByAlpha":ImageCropByAlpha,
     "VAELoaderConsistencyDecoder":VAELoader,
     "VAEDecodeConsistencyDecoder":VAEDecode,
-    "ScreenShare":ScreenShareNode
-    
+    "ScreenShare":ScreenShareNode,
+    "CLIPSeg":CLIPSeg,
+    "CombineMasks":CombineMasks
     # "KandinskyModel":KandinskyModel
 }
 
