@@ -48,6 +48,26 @@ async function uploadFile (file) {
   }
 }
 
+// function switchCamera (deviceId = 'desktop') {
+//   const constraints = {
+//     audio: false,
+//     video: {
+//       width: { ideal: 1920, max: 1920 },
+//       height: { ideal: 1080, max: 1080 },
+//       deviceId: mediaDevices[webcamsEl.value].deviceId
+//     }
+//   }
+//   console.log('switchCamera', constraints)
+
+//   let mediaStreamPro
+//   if (deviceId === 'desktop') {
+//     mediaStreamPro = navigator.mediaDevices.getDisplayMedia(constraints)
+//   } else {
+//     mediaStreamPro = navigator.mediaDevices.getUserMedia(constraints)
+//   }
+//   return mediaStreamPro
+// }
+
 async function shareScreenAndUpload (imgElement) {
   try {
     let webcamVideo = document.createElement('video')
