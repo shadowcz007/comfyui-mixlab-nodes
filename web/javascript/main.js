@@ -407,7 +407,7 @@ function setArea (src) {
   let div = document.createElement('div')
   div.innerHTML = `
     <div id='ml_overlay' style='position: absolute;top:0'>
-      <img id='ml_video' style='position: absolute; width: 500px; height: 300px; user-select: none; -webkit-user-drag: none;' />
+      <img id='ml_video' style='position: absolute; width: 500px;   user-select: none; -webkit-user-drag: none;' />
       <div id='ml_selection' style='position: absolute; border: 2px dashed red; pointer-events: none;'></div>
     </div>`
 
