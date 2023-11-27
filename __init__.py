@@ -40,7 +40,7 @@ def is_installed(package, package_overwrite=None):
 from .nodes.PromptNode import RandomPrompt
 from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
-from .nodes.ScreenShareNode import ScreenShareNode
+from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 
 # 要导出的所有节点及其名称的字典
@@ -59,6 +59,7 @@ NODE_CLASS_MAPPINGS = {
     "VAELoaderConsistencyDecoder":VAELoader,
     "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
+    "FloatingVideo":FloatingVideo,
     "CLIPSeg":CLIPSeg,
     "CombineMasks":CombineMasks
 }

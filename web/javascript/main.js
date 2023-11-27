@@ -138,16 +138,19 @@ async function startLive (btn) {
     // console.log('#ML', 'live')
     return
   }
-  const { Pending } = await getQueue()
+  const { Pending, Running } = await getQueue()
   // console.log('#ML', Pending, window._mixlab_screen_blob)
-  if (Pending <= 1 && window._mixlab_screen_blob) {
-    const file = new File(
-      [window._mixlab_screen_blob],
-      `screenshot_mixlab.jpeg`
-    )
+  if (Pending <= 1 && window._mixlab_screen_blob && Running === 0) {
+    // const file = new File(
+    //   [window._mixlab_screen_blob],
+    //   `screenshot_mixlab.jpeg`
+    // )
     window._mixlab_screen_time = true
     // console.log(file)
-    window._mixlab_screen_imagePath = await uploadFile(file)
+    window._mixlab_screen_imagePath = await blobToBase64(
+      window._mixlab_screen_blob
+    )
+    // await uploadFile(file)
     window._mixlab_screen_time = false
     document.querySelector('#queue-button').click()
     // console.log('#ML', window._mixlab_screen_imagePath)
@@ -221,7 +224,24 @@ async function blobToBase64 (blob) {
     reader.readAsDataURL(blob)
   })
 }
+function base64ToBlob (base64) {
+  // 将Base64分割成类型和数据部分
+  const parts = base64.split(';base64,')
+  const type = parts[0].split(':')[1]
+  const data = window.atob(parts[1])
+  const arrayBuffer = new ArrayBuffer(data.length)
+  const uint8Array = new Uint8Array(arrayBuffer)
 
+  // 将Base64数据转换为Uint8Array
+  for (let i = 0; i < data.length; i++) {
+    uint8Array[i] = data.charCodeAt(i)
+  }
+
+  // 创建Blob对象
+  const blob = new Blob([arrayBuffer], { type })
+
+  return blob
+}
 /* 
 A method that returns the required style for the html 
 */
@@ -257,9 +277,15 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
+const base64Df =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
-  getCustomWidgets (app) {
+  async getCustomWidgets (app) {
+    // const file = new File([base64ToBlob(base64Df)], `screenshot_mixlab_df.jpeg`)
+    // window._mixlab_screen_default = await uploadFile(file)
+
     return {
       CHEESE (node, inputName, inputData, app) {
         // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
@@ -274,7 +300,7 @@ app.registerExtension({
             return [128, 72] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            return window._mixlab_screen_imagePath
+            return window._mixlab_screen_imagePath || base64Df
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -302,11 +328,6 @@ app.registerExtension({
             )
           }
         }
-
-        /*
-              Create an html element and add it to the document.  
-              Look at $el in ui.js for all the options here
-              */
 
         widget.card = $el('div', {})
 
@@ -396,6 +417,7 @@ app.registerExtension({
           widget.preview.remove()
           widget.shareBtn.remove()
           widget.liveBtn.remove()
+          widget.card.remove()
         }
         this.serialize_widgets = false
       }
@@ -433,30 +455,28 @@ function setArea (src) {
       updateSelection(event)
       start = true
     } else {
+      // 获取img元素的真实宽度和高度
+      let imgWidth = img.naturalWidth
+      let imgHeight = img.naturalHeight
 
-      
-    // 获取img元素的真实宽度和高度
-    let imgWidth = img.naturalWidth
-    let imgHeight = img.naturalHeight
+      // 换算鼠标选区的尺寸
+      let realWidth = (Math.abs(endX - startX) / img.offsetWidth) * imgWidth
+      let realHeight = (Math.abs(endY - startY) / img.offsetHeight) * imgHeight
+      // 换算起始坐标
+      let realStartX = (startX / img.offsetWidth) * imgWidth
+      let realStartY = (startY / img.offsetHeight) * imgHeight
 
-    // 换算鼠标选区的尺寸
-    let realWidth = (Math.abs(endX - startX) / img.offsetWidth) * imgWidth
-    let realHeight = (Math.abs(endY - startY) / img.offsetHeight) * imgHeight
-// 换算起始坐标
-let realStartX = (startX / img.offsetWidth) * imgWidth
-let realStartY = (startY / img.offsetHeight) * imgHeight
+      // 换算起始坐标
+      let realEndX = (endX / img.offsetWidth) * imgWidth
+      let realEndY = (endY / img.offsetHeight) * imgHeight
 
-// 换算起始坐标
-let realEndX = (endX / img.offsetWidth) * imgWidth
-let realEndY = (endY / img.offsetHeight) * imgHeight
-
-    // 输出结果到控制台
-    console.log('真实宽度: ' + realWidth)
-    console.log('真实高度: ' + realHeight)
-    startX=realStartX;
-    startY=realStartY;
-    endX= realEndX
-    endY=realEndY
+      // 输出结果到控制台
+      console.log('真实宽度: ' + realWidth)
+      console.log('真实高度: ' + realHeight)
+      startX = realStartX
+      startY = realStartY
+      endX = realEndX
+      endY = realEndY
       // Calculate width, height, and coordinates
       let width = Math.abs(endX - startX)
       let height = Math.abs(endY - startY)
@@ -498,8 +518,136 @@ let realEndY = (endY / img.offsetHeight) * imgHeight
   function endSelection (event) {
     endX = event.clientX
     endY = event.clientY
+  }
+}
 
+app.registerExtension({
+  name: 'Mixlab.image.FloatingVideo',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'FloatingVideo') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
 
+        const widget = {
+          type: 'video',
+          name: 'FloatingVideo',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.card.style,
+              get_position_style(ctx, widget_width, y, node.size[1])
+            )
+          }
+        }
+
+        widget.card = $el('div', {})
+
+        widget.preview = $el('video', {
+          controls: true,
+          style: {
+            height: '240px'
+          },
+          poster:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+        })
+
+        widget.canvas = $el('canvas', {
+          style: {
+            display: 'none'
+          }
+        })
+
+        document.body.appendChild(widget.card)
+        widget.card.appendChild(widget.preview)
+        widget.card.appendChild(widget.canvas)
+
+        this.addCustomWidget(widget)
+        this.onRemoved = function () {
+          widget.preview.remove()
+          widget.canvas.remove()
+          widget.card.remove()
+        }
+        this.serialize_widgets = false
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        const r = onExecuted ? onExecuted.apply(this, message) : undefined
+
+        if (this.widgets) {
+          const video = this.widgets.filter(w => w.type === `video`)[0]
+          const canvas = video.canvas
+
+          if (video.preview.paused) {
+            const stream = canvas.captureStream()
+            const videoTrack = stream.getVideoTracks()[0]
+
+            video.preview.srcObject = new MediaStream([videoTrack])
+            video.preview.play()
+
+            // 检查浏览器是否支持画中画模式
+            if ('pictureInPictureEnabled' in document) {
+              // 检查video元素是否可以进入画中画模式
+              if (video.preview !== document.pictureInPictureElement) {
+                // 请求进入画中画模式
+                video.preview.addEventListener('loadedmetadata', () => {
+                  // 请求进入画中画模式
+                  video.preview
+                    .requestPictureInPicture()
+                    .then(() => {
+                      // 进入画中画模式成功
+                      console.log('进入画中画模式成功')
+                    })
+                    .catch(error => {
+                      // 进入画中画模式失败
+                      console.error('进入画中画模式失败', error)
+                    })
+                })
+              } else {
+                // 已经在画中画模式中
+                console.log('已经在画中画模式中')
+              }
+            } else {
+              // 浏览器不支持画中画模式
+              console.error('浏览器不支持画中画模式')
+            }
+          }
+
+          const context = canvas.getContext('2d')
+
+          if (message?.images) {
+            const base64 = message.images[0]
+            const image = new Image()
+            image.onload = function () {
+              canvas.width = image.width
+              canvas.height = image.height
+              context.drawImage(image, 0, 0)
+            }
+            // console.log(`data:image/jpeg;base64,${base64}`)
+            image.src = `data:image/jpeg;base64,${base64}`
+          }
+          const onRemoved = this.onRemoved
+          this.onRemoved = () => {
+            cleanupNode(this)
+            return onRemoved?.()
+          }
+        }
+        this.setSize([
+          this.size[0],
+          this.computeSize([this.size[0], this.size[1]])[1]
+        ])
+        return r
+      }
+    }
+  }
+})
+
+function last_y (node, widget_name) {
+  const w = node.widgets?.findIndex(w => w.name === widget_name) // search for the widget name
+  if (w >= 0) {
+    // if we find it (if not, w = -1)
+    const wid = node.widgets[w]
+    return wid.last_y
   }
 }
 

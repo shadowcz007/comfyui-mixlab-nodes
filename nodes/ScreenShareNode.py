@@ -3,10 +3,29 @@ from PIL import Image, ImageOps
 import numpy as np
 import torch
 import folder_paths
+import base64
+from io import BytesIO
 
 
-def load_image(fp,white_bg=False):
-    i = Image.open(fp)
+# Tensor to PIL
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
+
+def base64_save(base64_data):
+    # base64_data = "data:image/png;base64,iVBORw0KG..."
+    data = base64_data.split(",")[1]
+    decoded_data = base64.b64decode(data)
+
+    # 保存图像为本地文件
+    image = Image.open(BytesIO(decoded_data))
+    # image.save(fp)
+    image,mask=load_image(image)
+    return (image,mask)
+
+
+def load_image(i,white_bg=False):
+    # i = Image.open(fp)
     image = i.convert("RGB")
     image = np.array(image).astype(np.float32) / 255.0
     image = torch.from_numpy(image)[None,]
@@ -22,12 +41,11 @@ def load_image(fp,white_bg=False):
     return (image,mask)
 
 
-
 class ScreenShareNode:
     @classmethod
     def INPUT_TYPES(s):
         return { "required":{
-            "image_path": ("CHEESE",)
+            "image_base64": ("CHEESE",)
         },
           "optional":{
                     "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
@@ -43,11 +61,46 @@ class ScreenShareNode:
     OUTPUT_IS_LIST = (False,False,)
   
     # 运行的函数
-    def run(self,image_path,seed):
-        np=os.path.join(folder_paths.get_temp_directory(),image_path)
-        print(seed,np)
-
-        (im,mask)=load_image(np)
-  
+    def run(self,image_base64,seed):
+        im,mask=base64_save(image_base64)
         return (im,mask)
+    
+
+class FloatingVideo:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { "required":{
+            "images": ("IMAGE",)
+        }, "optional":{
+                    "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
+                } }
+    
+    # RETURN_TYPES = ('IMAGE','MASK')
+    RETURN_TYPES = ()
+ 
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+
+    CATEGORY = "Mixlab/image"
+
+    # INPUT_IS_LIST = True
+    # OUTPUT_IS_LIST = (False,False,)
+  
+    # 运行的函数
+    def run(self,images,seed):
+       
+        results = list()
+    
+        for image in images:
+            image=tensor2pil(image)
+            # image_base64 = base64.b64encode(image.tobytes())
+
+            buffered = BytesIO()
+            image.save(buffered, format="JPEG")
+            image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+            results.append(image_base64)
+  
+
+        return { "ui": { "images": results } }
 
