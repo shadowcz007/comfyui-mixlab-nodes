@@ -2,14 +2,14 @@
 In progress.
 ！！
 
-### ScreenShareNode
+### ScreenShareNode & FloatingVideoNode
 > Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
 
-https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/3167aed0-cea0-41f2-9075-b05e0ed08536
+https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43e-410a-ab3a-1952b7b4e7da
 
 
-[ScreenShareNode](./workflow/2-screeshare.json)
-
+<!-- [ScreenShareNode](./workflow/2-screeshare.json) -->
+[ScreenShareNode & FloatingVideoNode](./workflow/3-FloatVideo-workflow.json)
 
 
 ## Installation
