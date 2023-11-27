@@ -23,6 +23,12 @@ async function getQueue () {
   }
 }
 
+async function interrupt () {
+  const resp = await fetch(`${url}/interrupt`, {
+    method: 'POST'
+  })
+}
+
 async function uploadFile (file) {
   try {
     const body = new FormData()
@@ -68,9 +74,9 @@ async function uploadFile (file) {
 //   return mediaStreamPro
 // }
 
-async function shareScreenAndUpload (imgElement) {
+async function shareScreen (webcamVideo, shareBtn, liveBtn) {
   try {
-    let webcamVideo = document.createElement('video')
+    // let webcamVideo = document.createElement('video')
     const mediaStream = await navigator.mediaDevices.getDisplayMedia({
       video: true
     })
@@ -82,50 +88,138 @@ async function shareScreenAndUpload (imgElement) {
       webcamVideo.addEventListener('timeupdate', videoTimeUpdateHandler)
     }
 
-    async function videoTimeUpdateHandler () {
-      if (window._mixlab_screen_time) {
-        console.log('loading')
-        return
+    mediaStream.addEventListener('inactive', handleStopSharing)
+
+    // 停止共享的回调函数
+    function handleStopSharing () {
+      console.log('用户停止了共享')
+      // 执行其他操作
+      if (window._mixlab_stopVideo) {
+        window._mixlab_stopVideo()
+        window._mixlab_stopVideo = null
+        shareBtn.innerText = 'Share Screen'
       }
-
-      const { Pending } = await getQueue()
-      if (Pending < 1) document.querySelector('#queue-button').click()
-
-      const videoW = webcamVideo.videoWidth
-      const videoH = webcamVideo.videoHeight
-      const aspectRatio = videoW / videoH
-      const WIDTH = 512,
-        HEIGHT = Math.round(WIDTH / aspectRatio)
-      const canvas = new OffscreenCanvas(WIDTH, HEIGHT)
-
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(webcamVideo, 0, 0, videoW, videoH, 0, 0, WIDTH, HEIGHT)
-
-      const blob = await canvas.convertToBlob({
-        type: 'image/jpeg',
-        quality: 1
-      })
-
-      var reader = new FileReader()
-      reader.onload = function (event) {
-        // console.log(imgElement)
-        imgElement.src = event.target.result
-        // console.log(event.target.result)
-      } // data url!
-      var source = reader.readAsDataURL(blob)
-
-      const file = new File([blob], `screenshot_mixlab.jpeg`)
-      window._mixlab_screen_time = true
-      window._mixlab_screen_imagePath = await uploadFile(file)
-      window._mixlab_screen_time = false
+      if (window._mixlab_stopLive) {
+        window._mixlab_stopLive()
+        window._mixlab_stopLive = null
+        liveBtn.innerText = 'Live Run'
+      }
+      return
     }
 
-    // window._mixlab_screen_time = setInterval(() => {
-    //   context.drawImage(videoTrack, 0, 0, canvas.width, canvas.height)
-    // }, 300)
+    window._mixlab_screen_webcamVideo = webcamVideo
+
+    async function videoTimeUpdateHandler () {
+      if (!window._mixlab_screen_live) return
+
+      createBlobFromVideo(webcamVideo)
+    }
   } catch (error) {
     alert('Error accessing screen stream: ' + error)
   }
+  return () => {
+    webcamVideo.pause() // 暂停视频播放
+    webcamVideo.srcObject.getTracks().forEach(track => {
+      track.stop()
+    })
+    webcamVideo.srcObject = null // 清空视频源对象
+    window._mixlab_screen_live = false
+    window._mixlab_screen_blob = null
+    interrupt()
+  }
+}
+
+async function startLive (btn) {
+  if (btn) window._mixlab_screen_live = !window._mixlab_screen_live
+
+  if (btn) btn.innerText = `Stop Live`
+  // console.log('#ML', 'live run', window._mixlab_screen_time)
+  if (window._mixlab_screen_time) {
+    // console.log('#ML', 'live')
+    return
+  }
+  const { Pending } = await getQueue()
+  // console.log('#ML', Pending, window._mixlab_screen_blob)
+  if (Pending <= 1 && window._mixlab_screen_blob) {
+    const file = new File(
+      [window._mixlab_screen_blob],
+      `screenshot_mixlab.jpeg`
+    )
+    window._mixlab_screen_time = true
+    // console.log(file)
+    window._mixlab_screen_imagePath = await uploadFile(file)
+    window._mixlab_screen_time = false
+    document.querySelector('#queue-button').click()
+    // console.log('#ML', window._mixlab_screen_imagePath)
+  }
+
+  if (btn) {
+    startLive()
+    return () => {
+      // stop
+      window._mixlab_screen_live = false
+      window._mixlab_screen_blob = null
+      interrupt()
+    }
+  } else if (window._mixlab_screen_live) {
+    startLive()
+  }
+}
+
+async function createBlobFromVideoForArea (webcamVideo) {
+  const videoW = webcamVideo.videoWidth
+  const videoH = webcamVideo.videoHeight
+  const aspectRatio = videoW / videoH
+  const WIDTH = videoW,
+    HEIGHT = videoH
+  const canvas = new OffscreenCanvas(WIDTH, HEIGHT)
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(webcamVideo, 0, 0, videoW, videoH, 0, 0, WIDTH, HEIGHT)
+
+  const blob = await canvas.convertToBlob({
+    type: 'image/jpeg',
+    quality: 1
+  })
+  // imgElement.src = await blobToBase64(blob)
+  return blob
+}
+
+async function createBlobFromVideo (webcamVideo) {
+  const videoW = webcamVideo.videoWidth
+  const videoH = webcamVideo.videoHeight
+  const aspectRatio = videoW / videoH
+  const WIDTH = window._mixlab_screen_width,
+    HEIGHT = window._mixlab_screen_height
+  const canvas = new OffscreenCanvas(WIDTH, HEIGHT)
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(
+    webcamVideo,
+    window._mixlab_screen_x,
+    window._mixlab_screen_y,
+    WIDTH,
+    HEIGHT,
+    0,
+    0,
+    WIDTH,
+    HEIGHT
+  )
+
+  const blob = await canvas.convertToBlob({
+    type: 'image/jpeg',
+    quality: 1
+  })
+  // imgElement.src = await blobToBase64(blob)
+  window._mixlab_screen_blob = blob
+}
+
+async function blobToBase64 (blob) {
+  const reader = new FileReader()
+  return new Promise((res, rej) => {
+    reader.onload = function (event) {
+      res(event.target.result)
+    }
+    reader.readAsDataURL(blob)
+  })
 }
 
 /* 
@@ -154,7 +248,12 @@ function get_position_style (ctx, widget_width, y, node_height) {
     maxWidth: `${widget_width - MARGIN * 2}px`,
     maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
     width: `${widget_width - MARGIN * 2}px`,
-    height: `${node_height - MARGIN * 2}px`
+    height: `${node_height - MARGIN * 2}px`,
+    background: '#EEEEEE',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-around'
   }
 }
 
@@ -195,12 +294,12 @@ app.registerExtension({
 
         const widget = {
           type: 'HTML', // whatever
-          name: 'flying', // whatever
+          name: 'sreen_share', // whatever
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
-              this.inputEl.style,
+              this.card.style,
               get_position_style(ctx, widget_width, y, node.size[1])
-            ) // assign the required style when we are drawn
+            )
           }
         }
 
@@ -208,15 +307,84 @@ app.registerExtension({
               Create an html element and add it to the document.  
               Look at $el in ui.js for all the options here
               */
-        widget.inputEl = $el('img', {
-          src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
+        widget.card = $el('div', {})
+
+        widget.preview = $el('video', {
+          style: {
+            height: '120px'
+          },
+          poster:
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
         })
-        // widget.inputEl = $el('button', {
-        //   innerText: 'Start'
+        widget.shareBtn = $el('button', {
+          innerText: 'Share Screen'
+        })
+
+        widget.openFloatingWinBtn = $el('button', {
+          innerText: 'Set Area'
+        })
+
+        widget.liveBtn = $el('button', {
+          innerText: 'Live Run'
+        })
+
+        document.body.appendChild(widget.card)
+        widget.card.appendChild(widget.preview)
+        widget.card.appendChild(widget.shareBtn)
+        widget.card.appendChild(widget.openFloatingWinBtn)
+        widget.card.appendChild(widget.liveBtn)
+        // widget.inputEl.addEventListener('click', () => {
+        //   shareScreen(widget.inputEl)
         // })
-        document.body.appendChild(widget.inputEl)
-        widget.inputEl.addEventListener('click', () => {
-          shareScreenAndUpload(widget.inputEl)
+
+        widget.shareBtn.addEventListener('click', async () => {
+          if (widget.preview.paused) {
+            window._mixlab_stopVideo = await shareScreen(
+              widget.preview,
+              widget.shareBtn,
+              widget.liveBtn
+            )
+            widget.shareBtn.innerText = 'Stop Share'
+            console.log('视频已暂停')
+            if (window._mixlab_stopLive) {
+              window._mixlab_stopLive()
+              window._mixlab_stopLive = null
+              widget.liveBtn.innerText = 'Live Run'
+            }
+          } else {
+            console.log('视频正在播放')
+            if (window._mixlab_stopVideo) {
+              window._mixlab_stopVideo()
+              window._mixlab_stopVideo = null
+              widget.shareBtn.innerText = 'Share Screen'
+            }
+            if (window._mixlab_stopLive) {
+              window._mixlab_stopLive()
+              window._mixlab_stopLive = null
+              widget.liveBtn.innerText = 'Live Run'
+            }
+          }
+        })
+
+        widget.liveBtn.addEventListener('click', async () => {
+          if (window._mixlab_stopLive) {
+            window._mixlab_stopLive()
+            window._mixlab_stopLive = null
+            widget.liveBtn.innerText = 'Live Run'
+          } else {
+            window._mixlab_stopLive = await startLive(widget.liveBtn)
+            console.log('window._mixlab_stopLive', window._mixlab_stopLive)
+          }
+        })
+
+        widget.openFloatingWinBtn.addEventListener('click', async () => {
+          // console.log()
+          let blob = await createBlobFromVideoForArea(
+            window._mixlab_screen_webcamVideo
+          )
+
+          setArea(await blobToBase64(blob))
         })
         // console.log('widget.inputEl',widget.inputEl)
 
@@ -225,13 +393,115 @@ app.registerExtension({
               */
         this.addCustomWidget(widget)
         this.onRemoved = function () {
-          widget.inputEl.remove()
+          widget.preview.remove()
+          widget.shareBtn.remove()
+          widget.liveBtn.remove()
         }
         this.serialize_widgets = false
       }
     }
   }
 })
+
+function setArea (src) {
+  let div = document.createElement('div')
+  div.innerHTML = `
+    <div id='ml_overlay' style='position: absolute;top:0'>
+      <img id='ml_video' style='position: absolute; width: 500px; height: 300px; user-select: none; -webkit-user-drag: none;' />
+      <div id='ml_selection' style='position: absolute; border: 2px dashed red; pointer-events: none;'></div>
+    </div>`
+
+  document.body.appendChild(div)
+
+  let img = div.querySelector('#ml_video')
+  let overlay = div.querySelector('#ml_overlay')
+  let selection = div.querySelector('#ml_selection')
+  let startX, startY, endX, endY
+  let start = false
+  // Set video source
+  img.src = src
+
+  // Add mouse events
+  img.addEventListener('mousedown', startSelection)
+  img.addEventListener('mousemove', updateSelection)
+  img.addEventListener('mouseup', endSelection)
+
+  function startSelection (event) {
+    if (start == false) {
+      startX = event.clientX
+      startY = event.clientY
+      updateSelection(event)
+      start = true
+    } else {
+
+      
+    // 获取img元素的真实宽度和高度
+    let imgWidth = img.naturalWidth
+    let imgHeight = img.naturalHeight
+
+    // 换算鼠标选区的尺寸
+    let realWidth = (Math.abs(endX - startX) / img.offsetWidth) * imgWidth
+    let realHeight = (Math.abs(endY - startY) / img.offsetHeight) * imgHeight
+// 换算起始坐标
+let realStartX = (startX / img.offsetWidth) * imgWidth
+let realStartY = (startY / img.offsetHeight) * imgHeight
+
+// 换算起始坐标
+let realEndX = (endX / img.offsetWidth) * imgWidth
+let realEndY = (endY / img.offsetHeight) * imgHeight
+
+    // 输出结果到控制台
+    console.log('真实宽度: ' + realWidth)
+    console.log('真实高度: ' + realHeight)
+    startX=realStartX;
+    startY=realStartY;
+    endX= realEndX
+    endY=realEndY
+      // Calculate width, height, and coordinates
+      let width = Math.abs(endX - startX)
+      let height = Math.abs(endY - startY)
+      let left = Math.min(startX, endX)
+      let top = Math.min(startY, endY)
+      // Output results to console
+      console.log('坐标位置: (' + left + ', ' + top + ')')
+      console.log('宽度: ' + width)
+      console.log('高度: ' + height)
+
+      img.removeEventListener('mousedown', startSelection)
+      img.removeEventListener('mousemove', updateSelection)
+      img.removeEventListener('mouseup', endSelection)
+      div.remove()
+      window._mixlab_screen_x = left
+      window._mixlab_screen_y = top
+      window._mixlab_screen_width = width
+      window._mixlab_screen_height = height
+    }
+  }
+
+  function updateSelection (event) {
+    endX = event.clientX
+    endY = event.clientY
+
+    // Calculate width, height, and coordinates
+    let width = Math.abs(endX - startX)
+    let height = Math.abs(endY - startY)
+    let left = Math.min(startX, endX)
+    let top = Math.min(startY, endY)
+
+    // Set selection style
+    selection.style.left = left + 'px'
+    selection.style.top = top + 'px'
+    selection.style.width = width + 'px'
+    selection.style.height = height + 'px'
+  }
+
+  function endSelection (event) {
+    endX = event.clientX
+    endY = event.clientY
+
+
+  }
+}
 
 // 和python实现一样
 function run (mutable_prompt, immutable_prompt) {
