@@ -74,6 +74,8 @@ async function uploadFile (file) {
 //   return mediaStreamPro
 // }
 
+// alert(navigator.mediaDevices)
+
 async function shareScreen (webcamVideo, shareBtn, liveBtn) {
   try {
     // let webcamVideo = document.createElement('video')
@@ -86,6 +88,12 @@ async function shareScreen (webcamVideo, shareBtn, liveBtn) {
     webcamVideo.onloadedmetadata = () => {
       webcamVideo.play()
       webcamVideo.addEventListener('timeupdate', videoTimeUpdateHandler)
+
+      window._mixlab_screen_x = 0
+      window._mixlab_screen_y = 0
+      // console.log(webcamVideo)
+      window._mixlab_screen_width = webcamVideo.videoWidth
+      window._mixlab_screen_height = webcamVideo.videoHeight
     }
 
     mediaStream.addEventListener('inactive', handleStopSharing)
@@ -129,6 +137,14 @@ async function shareScreen (webcamVideo, shareBtn, liveBtn) {
   }
 }
 
+async function sleep (t = 200) {
+  return new Promise((res, rej) => {
+    setTimeout(() => {
+      res(true)
+    }, t)
+  })
+}
+
 async function startLive (btn) {
   if (btn) window._mixlab_screen_live = !window._mixlab_screen_live
 
@@ -141,10 +157,6 @@ async function startLive (btn) {
   const { Pending, Running } = await getQueue()
   // console.log('#ML', Pending, window._mixlab_screen_blob)
   if (Pending <= 1 && window._mixlab_screen_blob && Running === 0) {
-    // const file = new File(
-    //   [window._mixlab_screen_blob],
-    //   `screenshot_mixlab.jpeg`
-    // )
     window._mixlab_screen_time = true
     // console.log(file)
     window._mixlab_screen_imagePath = await blobToBase64(
@@ -153,6 +165,7 @@ async function startLive (btn) {
     // await uploadFile(file)
     window._mixlab_screen_time = false
     document.querySelector('#queue-button').click()
+    await sleep(window._mixlab_screen_refresh_rate || 200)
     // console.log('#ML', window._mixlab_screen_imagePath)
   }
 
@@ -292,18 +305,38 @@ app.registerExtension({
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
-          size: [128, 72], // a default size
+          size: [128, 12], // a default size
           draw (ctx, node, width, y) {
             // a method to draw the widget (ctx is a CanvasRenderingContext2D)
           },
           computeSize (...args) {
-            return [128, 72] // a method to compute the current size of the widget
+            return [128, 12] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
             return window._mixlab_screen_imagePath || base64Df
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      },
+      PROMPT (node, inputName, inputData, app) {
+        // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 12], // a default size
+          draw (ctx, node, width, y) {
+            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+          },
+          computeSize (...args) {
+            return [128, 12] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            return window._mixlab_screen_prompt||''
+          }
+        }
+        console.log('###widget',widget)
         node.addCustomWidget(widget) // adds it to the node
         return widget // and returns it.
       }
@@ -335,6 +368,7 @@ app.registerExtension({
           style: {
             height: '120px'
           },
+          controls: true,
           poster:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
         })
@@ -346,6 +380,12 @@ app.registerExtension({
           innerText: 'Set Area'
         })
 
+        widget.refreshInput = $el('input', {
+          placeholder: 'Refresh rate:200 ms',
+          type: 'number',
+          min: 100,
+          step: 100
+        })
         widget.liveBtn = $el('button', {
           innerText: 'Live Run'
         })
@@ -354,6 +394,7 @@ app.registerExtension({
         widget.card.appendChild(widget.preview)
         widget.card.appendChild(widget.shareBtn)
         widget.card.appendChild(widget.openFloatingWinBtn)
+        widget.card.appendChild(widget.refreshInput)
         widget.card.appendChild(widget.liveBtn)
         // widget.inputEl.addEventListener('click', () => {
         //   shareScreen(widget.inputEl)
@@ -388,6 +429,12 @@ app.registerExtension({
           }
         })
 
+        widget.refreshInput.addEventListener('change', async () => {
+          window._mixlab_screen_refresh_rate = Math.round(
+            widget.refreshInput.value
+          )
+        })
+
         widget.liveBtn.addEventListener('click', async () => {
           if (window._mixlab_stopLive) {
             window._mixlab_stopLive()
@@ -396,6 +443,16 @@ app.registerExtension({
           } else {
             window._mixlab_stopLive = await startLive(widget.liveBtn)
             console.log('window._mixlab_stopLive', window._mixlab_stopLive)
+
+
+            var node = this.graph._nodes.filter(n => n.type == 'ScreenShare')[0] // for you to look it up like this
+            var w = node?.widgets.find(w => w.name === 'prompt') // and then it's just the same
+            console.log('####node?.widgets',node?.widgets)
+            if (w) {
+              w.value = 'a girl'
+              node.onResize?.(node.size)
+            }
+
           }
         })
 
@@ -418,6 +475,7 @@ app.registerExtension({
           widget.shareBtn.remove()
           widget.liveBtn.remove()
           widget.card.remove()
+          widget.refreshInput.remove()
         }
         this.serialize_widgets = false
       }
@@ -459,9 +517,6 @@ function setArea (src) {
       let imgWidth = img.naturalWidth
       let imgHeight = img.naturalHeight
 
-      // 换算鼠标选区的尺寸
-      let realWidth = (Math.abs(endX - startX) / img.offsetWidth) * imgWidth
-      let realHeight = (Math.abs(endY - startY) / img.offsetHeight) * imgHeight
       // 换算起始坐标
       let realStartX = (startX / img.offsetWidth) * imgWidth
       let realStartY = (startY / img.offsetHeight) * imgHeight
@@ -471,8 +526,8 @@ function setArea (src) {
       let realEndY = (endY / img.offsetHeight) * imgHeight
 
       // 输出结果到控制台
-      console.log('真实宽度: ' + realWidth)
-      console.log('真实高度: ' + realHeight)
+      // console.log('真实宽度: ' + realWidth)
+      // console.log('真实高度: ' + realHeight)
       startX = realStartX
       startY = realStartY
       endX = realEndX
@@ -483,9 +538,9 @@ function setArea (src) {
       let left = Math.min(startX, endX)
       let top = Math.min(startY, endY)
       // Output results to console
-      console.log('坐标位置: (' + left + ', ' + top + ')')
-      console.log('宽度: ' + width)
-      console.log('高度: ' + height)
+      // console.log('坐标位置: (' + left + ', ' + top + ')')
+      // console.log('宽度: ' + width)
+      // console.log('高度: ' + height)
 
       img.removeEventListener('mousedown', startSelection)
       img.removeEventListener('mousemove', updateSelection)
@@ -545,7 +600,7 @@ app.registerExtension({
         widget.preview = $el('video', {
           controls: true,
           style: {
-            height: '240px'
+            width: '100%'
           },
           poster:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
@@ -557,15 +612,53 @@ app.registerExtension({
           }
         })
 
+        widget.PictureInPicture = $el('button', {
+          innerText: 'PictureInPicture',
+          style: {
+            display: 'pictureInPictureEnabled' in document ? 'block' : 'none'
+          }
+        })
+
         document.body.appendChild(widget.card)
+        widget.card.appendChild(widget.PictureInPicture)
         widget.card.appendChild(widget.preview)
         widget.card.appendChild(widget.canvas)
+
+        // widget.card.appendChild(widget.PictureInPicture)
+
+        widget.PictureInPicture.addEventListener('click', async () => {
+          // Open a Picture-in-Picture window.
+          let w = 360,
+            s = widget.preview.videoWidth / widget.preview.videoHeight,
+            h = w / s
+          const pipWindow = await documentPictureInPicture.requestWindow({
+            width: w,
+            height: Math.round(h) + 120
+          })
+
+          pipWindow.document.body.style = `margin: 0;    overflow: hidden;`
+          // console.log(pipWindow.document)
+          // Move the player to the Picture-in-Picture window.
+          let input = document.createElement('textarea')
+          input.style = `width: 100%;`
+          pipWindow.document.body.append(widget.preview)
+          pipWindow.document.body.append(input)
+          input.addEventListener('input', () => {
+            window._mixlab_screen_prompt=input.value
+          })
+          // Move the player back when the Picture-in-Picture window closes.
+          pipWindow.addEventListener('pagehide', event => {
+            widget.card.appendChild(widget.preview)
+            pipWindow.remove()
+          })
+        })
 
         this.addCustomWidget(widget)
         this.onRemoved = function () {
           widget.preview.remove()
           widget.canvas.remove()
           widget.card.remove()
+          widget.PictureInPicture.remove()
         }
         this.serialize_widgets = false
       }
@@ -588,25 +681,25 @@ app.registerExtension({
             // 检查浏览器是否支持画中画模式
             if ('pictureInPictureEnabled' in document) {
               // 检查video元素是否可以进入画中画模式
-              if (video.preview !== document.pictureInPictureElement) {
-                // 请求进入画中画模式
-                video.preview.addEventListener('loadedmetadata', () => {
-                  // 请求进入画中画模式
-                  video.preview
-                    .requestPictureInPicture()
-                    .then(() => {
-                      // 进入画中画模式成功
-                      console.log('进入画中画模式成功')
-                    })
-                    .catch(error => {
-                      // 进入画中画模式失败
-                      console.error('进入画中画模式失败', error)
-                    })
-                })
-              } else {
-                // 已经在画中画模式中
-                console.log('已经在画中画模式中')
-              }
+              // if (video.preview !== document.pictureInPictureElement) {
+              //   // 请求进入画中画模式
+              //   video.preview.addEventListener('loadedmetadata', () => {
+              //     // 请求进入画中画模式
+              //     video.preview
+              //       .requestPictureInPicture()
+              //       .then(() => {
+              //         // 进入画中画模式成功
+              //         console.log('进入画中画模式成功')
+              //       })
+              //       .catch(error => {
+              //         // 进入画中画模式失败
+              //         console.error('进入画中画模式失败', error)
+              //       })
+              //   })
+              // } else {
+              //   // 已经在画中画模式中
+              //   console.log('已经在画中画模式中')
+              // }
             } else {
               // 浏览器不支持画中画模式
               console.error('浏览器不支持画中画模式')
@@ -642,14 +735,22 @@ app.registerExtension({
   }
 })
 
-function last_y (node, widget_name) {
-  const w = node.widgets?.findIndex(w => w.name === widget_name) // search for the widget name
-  if (w >= 0) {
-    // if we find it (if not, w = -1)
-    const wid = node.widgets[w]
-    return wid.last_y
-  }
-}
+// ;(() => {
+//   // 创建一个新的style元素
+//   var styleElement = document.createElement('style')
+
+//   // 设置样式内容
+//   var cssCode = `
+//   :picture-in-picture {
+//     box-shadow: 0 0 0 5px red;
+//   }
+// `
+//   // 将样式内容添加到style元素中
+//   styleElement.appendChild(document.createTextNode(cssCode))
+
+//   // 将style元素添加到文档头部
+//   document.head.appendChild(styleElement)
+// })()
 
 // 和python实现一样
 function run (mutable_prompt, immutable_prompt) {

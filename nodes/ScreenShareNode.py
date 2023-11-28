@@ -45,25 +45,27 @@ class ScreenShareNode:
     @classmethod
     def INPUT_TYPES(s):
         return { "required":{
-            "image_base64": ("CHEESE",)
+            "image_base64": ("CHEESE",),
         },
           "optional":{
+              "prompt": ("PROMPT",),
                     "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
                 } }
     
-    RETURN_TYPES = ('IMAGE','MASK')
+    RETURN_TYPES = ('IMAGE','MASK','STRING')
 
     FUNCTION = "run"
 
     CATEGORY = "Mixlab/image"
 
     # INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (False,False,)
+    OUTPUT_IS_LIST = (False,False,False)
   
     # 运行的函数
-    def run(self,image_base64,seed):
+    def run(self,image_base64,prompt,seed):
         im,mask=base64_save(image_base64)
-        return (im,mask)
+        print('##########prompt',prompt)
+        return (im,mask,prompt)
     
 
 class FloatingVideo:
