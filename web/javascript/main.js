@@ -279,13 +279,13 @@ function get_position_style (ctx, widget_width, y, node_height) {
     cursor: 'pointer',
     position: 'absolute',
     maxWidth: `${widget_width - MARGIN * 2}px`,
-    maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
+    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
     width: `${widget_width - MARGIN * 2}px`,
-    height: `${node_height - MARGIN * 2}px`,
+    // height: `${node_height - MARGIN * 2}px`,
     background: '#EEEEEE',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    // alignItems: 'center',
     justifyContent: 'space-around'
   }
 }
@@ -333,10 +333,10 @@ app.registerExtension({
             return [128, 12] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            return window._mixlab_screen_prompt||''
+            return window._mixlab_screen_prompt || ''
           }
         }
-        console.log('###widget',widget)
+        console.log('###widget', widget)
         node.addCustomWidget(widget) // adds it to the node
         return widget // and returns it.
       }
@@ -366,28 +366,52 @@ app.registerExtension({
 
         widget.preview = $el('video', {
           style: {
-            height: '120px'
+            width: '100%'
           },
           controls: true,
           poster:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
         })
         widget.shareBtn = $el('button', {
-          innerText: 'Share Screen'
+          innerText: 'Share Screen',
+          style: {
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px'
+          }
         })
 
         widget.openFloatingWinBtn = $el('button', {
-          innerText: 'Set Area'
+          innerText: 'Set Area',
+          style: {
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px'
+          }
         })
 
         widget.refreshInput = $el('input', {
-          placeholder: 'Refresh rate:200 ms',
+          placeholder: '  Refresh rate:200 ms',
           type: 'number',
           min: 100,
-          step: 100
+          step: 100,
+          style: {
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px'
+          }
         })
         widget.liveBtn = $el('button', {
-          innerText: 'Live Run'
+          innerText: 'Live Run',
+          style: {
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px'
+          }
         })
 
         document.body.appendChild(widget.card)
@@ -444,15 +468,13 @@ app.registerExtension({
             window._mixlab_stopLive = await startLive(widget.liveBtn)
             console.log('window._mixlab_stopLive', window._mixlab_stopLive)
 
-
             var node = this.graph._nodes.filter(n => n.type == 'ScreenShare')[0] // for you to look it up like this
             var w = node?.widgets.find(w => w.name === 'prompt') // and then it's just the same
-            console.log('####node?.widgets',node?.widgets)
+            console.log('####node?.widgets', node?.widgets)
             if (w) {
               w.value = 'a girl'
               node.onResize?.(node.size)
             }
-
           }
         })
 
@@ -615,7 +637,12 @@ app.registerExtension({
         widget.PictureInPicture = $el('button', {
           innerText: 'PictureInPicture',
           style: {
-            display: 'pictureInPictureEnabled' in document ? 'block' : 'none'
+            display: 'pictureInPictureEnabled' in document ? 'block' : 'none',
+
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px'
           }
         })
 
@@ -636,15 +663,29 @@ app.registerExtension({
             height: Math.round(h) + 120
           })
 
-          pipWindow.document.body.style = `margin: 0;    overflow: hidden;`
+          pipWindow.document.body.style = `margin: 0px;
+          overflow: hidden;
+          background: #2a2c34;
+          border: 4px solid #878787;
+          outline: none;`
           // console.log(pipWindow.document)
           // Move the player to the Picture-in-Picture window.
           let input = document.createElement('textarea')
-          input.style = `width: 100%;`
+          input.style = `width: 100%;
+          margin: 12px;
+          background: rgb(249, 249, 249);
+          color: black;
+          font-size: 16px;
+          padding: 8px;
+          font-weight: 800;
+          letter-spacing: 1px;
+          border-radius: 8px;
+          border: 1px solid rgb(221, 221, 221);
+          box-shadow: rgb(228, 228, 228) 1px 3px`
           pipWindow.document.body.append(widget.preview)
           pipWindow.document.body.append(input)
           input.addEventListener('input', () => {
-            window._mixlab_screen_prompt=input.value
+            window._mixlab_screen_prompt = input.value
           })
           // Move the player back when the Picture-in-Picture window closes.
           pipWindow.addEventListener('pagehide', event => {
