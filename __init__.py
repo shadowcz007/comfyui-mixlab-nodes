@@ -17,7 +17,36 @@ except ImportError:
     print("or")
     print("pip install -r requirements.txt")
     sys.exit()
+   
+def is_installed(package, package_overwrite=None):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        pass
 
+    package = package_overwrite or package
+
+    if spec is None:
+        print(f"Installing {package}...")
+        # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
+        command = f'"{python}" -m pip install {package}'
+  
+        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
+
+        if result.returncode != 0:
+            print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
+    else:
+        print('##pyOpenSSL OK')
+        
+try:
+    import OpenSSL
+except ImportError:
+    print("Module 'pyOpenSSL' not installed. Please install it via:")
+    print("pip install pyOpenSSL")
+    print("or")
+    print("pip install -r requirements.txt")
+    is_installed('pyOpenSSL')
+    sys.exit()
 
 
 def create_key(key_p,crt_p):
@@ -100,25 +129,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 PromptServer.start=new_start
 
 
-def is_installed(package, package_overwrite=None):
-    try:
-        spec = importlib.util.find_spec(package)
-    except ModuleNotFoundError:
-        pass
 
-    package = package_overwrite or package
-
-    if spec is None:
-        print(f"Installing {package}...")
-        # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
-        command = f'"{python}" -m pip install {package}'
-  
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
-
-        if result.returncode != 0:
-            print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
-
-is_installed('pyOpenSSL')
 
 # 扩展api接口
 # from server import PromptServer
