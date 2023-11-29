@@ -7,6 +7,98 @@ import sys
 python = sys.executable
 
 
+from server import PromptServer
+try:
+    import aiohttp
+    from aiohttp import web
+except ImportError:
+    print("Module 'aiohttp' not installed. Please install it via:")
+    print("pip install aiohttp")
+    print("or")
+    print("pip install -r requirements.txt")
+    sys.exit()
+
+
+def create_key(key_p,crt_p):
+    import OpenSSL
+    # 生成自签名证书
+    # 生成私钥
+    private_key = OpenSSL.crypto.PKey()
+    private_key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
+
+    # 生成CSR
+    csr = OpenSSL.crypto.X509Req()
+    csr.get_subject().CN = "mixlab.com"  # 设置证书的通用名称
+    csr.set_pubkey(private_key)
+    csr.sign(private_key, "sha256")
+    # 生成证书
+    certificate = OpenSSL.crypto.X509()
+    certificate.set_serial_number(1)
+    certificate.gmtime_adj_notBefore(0)
+    certificate.gmtime_adj_notAfter(365 * 24 * 60 * 60)  # 设置证书的有效期
+    certificate.set_issuer(csr.get_subject())
+    certificate.set_subject(csr.get_subject())
+    certificate.set_pubkey(csr.get_pubkey())
+    certificate.sign(private_key, "sha256")
+    # 保存私钥到文件
+    with open(key_p, "wb") as f:
+        f.write(OpenSSL.crypto.dump_privatekey(OpenSSL.crypto.FILETYPE_PEM, private_key))
+
+    # 保存证书到文件
+    with open(crt_p, "wb") as f:
+        f.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, certificate))
+    return
+
+def create_for_https():
+    current_path = os.path.abspath(os.path.dirname(__file__))
+    # print("#####path::", current_path)
+
+    # TODO 处理路径
+    https_key_path=os.path.join(current_path, "https")
+    crt=os.path.join(https_key_path, "certificate.crt")
+    key=os.path.join(https_key_path, "private.key")
+    print("##https_key_path", crt,key)
+    if not os.path.exists(https_key_path):
+        # 使用mkdir()方法创建新目录
+        os.mkdir(https_key_path)
+    if not os.path.exists(crt):
+        create_key(key,crt)
+    return (crt,key)
+
+
+# https
+async def new_start(self, address, port, verbose=True, call_on_start=None):
+        runner = web.AppRunner(self.app, access_log=None)
+        await runner.setup()
+        site = web.TCPSite(runner, address, port)
+        await site.start()
+
+        import ssl
+        crt,key=create_for_https()
+        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        ssl_context.load_cert_chain(crt,key)
+        site2 = web.TCPSite(runner, address, 443,ssl_context=ssl_context)
+        await site2.start()
+
+        if address == '':
+            address = '0.0.0.0'
+        if verbose:
+            print("Starting server\n")
+            print("To see the GUI go to: http://{}:{}".format(address, port))
+            print("To see the GUI go to: https://{}".format(address))
+        if call_on_start is not None:
+            call_on_start(address, port)
+
+        # import webbrowser
+        # if os.name == 'nt' and address == '0.0.0.0':
+        #     address = '127.0.0.1'
+        # webbrowser.open(f"https://{address}")
+        # webbrowser.open(f"http://{address}:{port}")
+
+
+PromptServer.start=new_start
+
+
 def is_installed(package, package_overwrite=None):
     try:
         spec = importlib.util.find_spec(package)

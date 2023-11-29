@@ -3,9 +3,9 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-let api_host = '127.0.0.1:8188'
+let api_host = `127.0.0.1:${window.location.port}`
 let api_base = ''
-let url = `http://${api_host}${api_base}`
+let url = `${window.location.protocol}//${api_host}${api_base}`
 
 async function getQueue () {
   try {
@@ -467,14 +467,6 @@ app.registerExtension({
           } else {
             window._mixlab_stopLive = await startLive(widget.liveBtn)
             console.log('window._mixlab_stopLive', window._mixlab_stopLive)
-
-            var node = this.graph._nodes.filter(n => n.type == 'ScreenShare')[0] // for you to look it up like this
-            var w = node?.widgets.find(w => w.name === 'prompt') // and then it's just the same
-            console.log('####node?.widgets', node?.widgets)
-            if (w) {
-              w.value = 'a girl'
-              node.onResize?.(node.size)
-            }
           }
         })
 
@@ -654,6 +646,10 @@ app.registerExtension({
         // widget.card.appendChild(widget.PictureInPicture)
 
         widget.PictureInPicture.addEventListener('click', async () => {
+          if (window.location.protocol != 'https:') {
+            window.alert('About to redirect to HTTPS access.https://127.0.0.1')
+            window.open('https://127.0.0.1')
+          }
           // Open a Picture-in-Picture window.
           let w = 360,
             s = widget.preview.videoWidth / widget.preview.videoHeight,
@@ -667,30 +663,113 @@ app.registerExtension({
           overflow: hidden;
           background: #2a2c34;
           border: 4px solid #878787;
-          outline: none;`
+          outline: none;background: black;`
+
+          let div = document.createElement('div')
+          div.style = `display:flex;position: fixed;
+          bottom: 0px;
+          z-index: 9999;
+          left: 0px;
+          width: calc(100% - 24px);
+         margin: 12px;`
+
           // console.log(pipWindow.document)
           // Move the player to the Picture-in-Picture window.
           let input = document.createElement('textarea')
-          input.style = `width: 100%;
-          margin: 12px;
-          background: rgb(249, 249, 249);
-          color: black;
-          font-size: 16px;
+          input.style = `
+          min-width:90%;
+          max-width:100%;
+          background: #24283db3;
+          color: white;
+          font-size: 14px;
           padding: 8px;
-          font-weight: 800;
+          font-weight: 300;
           letter-spacing: 1px;
+          outline: none;
+          min-height: 98px;
           border-radius: 8px;
-          border: 1px solid rgb(221, 221, 221);
-          box-shadow: rgb(228, 228, 228) 1px 3px`
+          border: 1px solid rgb(91, 91, 91);
+          font-family: sans-serif;
+          `
+
+          window._mixlab_screen_prompt =
+            window._mixlab_screen_prompt ||
+            'beautiful scenery nature glass bottle landscape,under water'
+          input.value = window._mixlab_screen_prompt
+
+          let btnDiv = document.createElement('div')
+
+          btnDiv.style = `cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          justify-content: start;
+          align-items: center;
+          width: 24px;
+          font-size: 16px;
+          margin-right: 6px;`
+
+          let btn = document.createElement('butotn')
+          btn.innerText = '❤'
+          btn.style = `cursor: pointer;height: 24px;margin:4px;
+          color: red;`
+          btn.addEventListener('click', () => {
+            if (input.style.display == 'none') {
+              input.style.display = 'block'
+            } else {
+              input.style.display = 'none'
+            }
+          })
+
+          let pauseBtn = document.createElement('butotn')
+          pauseBtn.innerText = '⏸'
+          pauseBtn.style = `cursor: pointer;height: 24px;margin:4px;
+          color: #03A9F4;`
+
+          pauseBtn.addEventListener('click', async () => {
+            if (window._mixlab_stopLive) {
+              pauseBtn.innerText = '▶'
+
+              window._mixlab_stopLive()
+              window._mixlab_stopLive = null
+
+              let node = this.graph._nodes.filter(
+                n => n.type === 'ScreenShare'
+              )[0]
+
+              var w = node.widgets?.filter(w => w.name === 'sreen_share')[0] // see if it already exists
+              if (w) {
+                w.liveBtn.innerText = 'Live Run'
+              }
+            } else {
+              pauseBtn.innerText = '⏸'
+              let node = this.graph._nodes.filter(
+                n => n.type === 'ScreenShare'
+              )[0]
+              var w = node.widgets?.filter(w => w.name === 'sreen_share')[0] // see if it already exists
+              if (w) {
+                w.liveBtn.innerText = 'Stop Live'
+                window._mixlab_stopLive = await startLive(w.liveBtn)
+                console.log('window._mixlab_stopLive', window._mixlab_stopLive)
+              }
+            }
+          })
+
           pipWindow.document.body.append(widget.preview)
-          pipWindow.document.body.append(input)
+          pipWindow.document.body.append(div)
+
+          div.appendChild(btnDiv)
+          btnDiv.appendChild(btn)
+          btnDiv.appendChild(pauseBtn)
+          div.appendChild(input)
+
           input.addEventListener('input', () => {
             window._mixlab_screen_prompt = input.value
           })
           // Move the player back when the Picture-in-Picture window closes.
           pipWindow.addEventListener('pagehide', event => {
             widget.card.appendChild(widget.preview)
-            pipWindow.remove()
+            // pipWindow.remove()
+            pipWindow.close()
           })
         })
 
@@ -749,8 +828,8 @@ app.registerExtension({
 
           const context = canvas.getContext('2d')
 
-          if (message?.images) {
-            const base64 = message.images[0]
+          if (message?.images_) {
+            const base64 = message.images_[0]
             const image = new Image()
             image.onload = function () {
               canvas.width = image.width
@@ -762,7 +841,7 @@ app.registerExtension({
           }
           const onRemoved = this.onRemoved
           this.onRemoved = () => {
-            cleanupNode(this)
+            // cleanupNode(this)
             return onRemoved?.()
           }
         }

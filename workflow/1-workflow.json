@@ -1,6 +1,6 @@
 {
-  "last_node_id": 38,
-  "last_link_id": 52,
+  "last_node_id": 40,
+  "last_link_id": 60,
   "nodes": [
     {
       "id": 4,
@@ -285,93 +285,6 @@
       }
     },
     {
-      "id": 14,
-      "type": "VAEDecode",
-      "pos": [
-        2277.0850690937427,
-        -468.5410711699221
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {
-        "collapsed": false
-      },
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 18
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 19
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            20,
-            21,
-            47
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      }
-    },
-    {
-      "id": 36,
-      "type": "ImagesCrop",
-      "pos": [
-        3217,
-        81
-      ],
-      "size": {
-        "0": 315,
-        "1": 154
-      },
-      "flags": {},
-      "order": 22,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 49
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            50
-          ],
-          "shape": 6,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ImagesCrop"
-      },
-      "widgets_values": [
-        512,
-        512,
-        0,
-        0,
-        "enable"
-      ]
-    },
-    {
       "id": 22,
       "type": "PrimitiveNode",
       "pos": [
@@ -451,84 +364,6 @@
           "name": "images",
           "type": "IMAGE",
           "link": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
-    },
-    {
-      "id": 35,
-      "type": "TransparentImage",
-      "pos": [
-        2848,
-        184
-      ],
-      "size": {
-        "0": 315,
-        "1": 338
-      },
-      "flags": {},
-      "order": 20,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 47
-        },
-        {
-          "name": "masks",
-          "type": "MASK",
-          "link": 46
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": null,
-          "shape": 6
-        },
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            49
-          ],
-          "shape": 6,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "TransparentImage"
-      },
-      "widgets_values": [
-        "no",
-        "yes",
-        "Mixlab_save"
-      ]
-    },
-    {
-      "id": 31,
-      "type": "PreviewImage",
-      "pos": [
-        3603,
-        87
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 23,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 50,
-          "slot_index": 0
         }
       ],
       "properties": {
@@ -915,7 +750,7 @@
         60
       ],
       "size": {
-        "0": 210,
+        "0": 243.60000610351562,
         "1": 26
       },
       "flags": {},
@@ -942,6 +777,178 @@
       "properties": {
         "Node name for S&R": "InvertMask (segment anything)"
       }
+    },
+    {
+      "id": 40,
+      "type": "ImageCropByAlpha",
+      "pos": [
+        3365,
+        -68
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 60
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "link": 56
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            57
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageCropByAlpha"
+      }
+    },
+    {
+      "id": 14,
+      "type": "VAEDecode",
+      "pos": [
+        2277.0850690937427,
+        -468.5410711699221
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {
+        "collapsed": false
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 18
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            20,
+            21,
+            47
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 31,
+      "type": "PreviewImage",
+      "pos": [
+        3667,
+        -93
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 57,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 35,
+      "type": "TransparentImage",
+      "pos": [
+        2943,
+        -54
+      ],
+      "size": [
+        315,
+        358
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 47
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": 46
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            60
+          ],
+          "shape": 6,
+          "slot_index": 1
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "links": [
+            56
+          ],
+          "shape": 6,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TransparentImage"
+      },
+      "widgets_values": [
+        "no",
+        "yes",
+        "Mixlab_save"
+      ]
     }
   ],
   "links": [
@@ -1138,22 +1145,6 @@
       "IMAGE"
     ],
     [
-      49,
-      35,
-      1,
-      36,
-      0,
-      "IMAGE"
-    ],
-    [
-      50,
-      36,
-      0,
-      31,
-      0,
-      "IMAGE"
-    ],
-    [
       51,
       3,
       1,
@@ -1168,6 +1159,30 @@
       16,
       0,
       "MASK"
+    ],
+    [
+      56,
+      35,
+      2,
+      40,
+      1,
+      "RGBA"
+    ],
+    [
+      57,
+      40,
+      0,
+      31,
+      0,
+      "IMAGE"
+    ],
+    [
+      60,
+      35,
+      1,
+      40,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [],

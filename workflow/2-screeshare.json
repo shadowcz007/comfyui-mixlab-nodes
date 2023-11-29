@@ -1,6 +1,6 @@
 {
-  "last_node_id": 25,
-  "last_link_id": 27,
+  "last_node_id": 28,
+  "last_link_id": 30,
   "nodes": [
     {
       "id": 7,
@@ -14,7 +14,7 @@
         "1": 180.6060791015625
       },
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -52,7 +52,7 @@
         "1": 98
       },
       "flags": {},
-      "order": 9,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -103,7 +103,7 @@
         "1": 164.31304931640625
       },
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -245,7 +245,7 @@
         "1": 58.083831787109375
       },
       "flags": {},
-      "order": 5,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
@@ -273,41 +273,6 @@
       ]
     },
     {
-      "id": 24,
-      "type": "ScreenShare",
-      "pos": [
-        -399,
-        472
-      ],
-      "size": {
-        "0": 315,
-        "1": 202
-      },
-      "flags": {},
-      "order": 1,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            25
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "MASK",
-          "type": "MASK",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ScreenShare"
-      }
-    },
-    {
       "id": 5,
       "type": "EmptyLatentImage",
       "pos": [
@@ -319,7 +284,7 @@
         "1": 106
       },
       "flags": {},
-      "order": 2,
+      "order": 1,
       "mode": 0,
       "outputs": [
         {
@@ -358,7 +323,7 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 25
+          "link": 29
         }
       ],
       "outputs": [
@@ -384,46 +349,6 @@
       ]
     },
     {
-      "id": 8,
-      "type": "VAEDecode",
-      "pos": [
-        1100,
-        -241
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 7
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 8
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            17
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      }
-    },
-    {
       "id": 3,
       "type": "KSampler",
       "pos": [
@@ -435,7 +360,7 @@
         "1": 262
       },
       "flags": {},
-      "order": 10,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -484,24 +409,131 @@
       ]
     },
     {
-      "id": 16,
-      "type": "PreviewImage",
+      "id": 8,
+      "type": "VAEDecode",
       "pos": [
-        1513,
-        -320
+        1100,
+        -241
       ],
       "size": {
-        "0": 578.1627807617188,
-        "1": 544.9364013671875
+        "0": 210,
+        "1": 46
       },
       "flags": {},
       "order": 12,
       "mode": 0,
       "inputs": [
         {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            28
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 26,
+      "type": "FloatingVideo",
+      "pos": [
+        1689,
+        -484
+      ],
+      "size": [
+        315,
+        106
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
           "name": "images",
           "type": "IMAGE",
-          "link": 17
+          "link": 28
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "FloatingVideo"
+      }
+    },
+    {
+      "id": 27,
+      "type": "ScreenShare",
+      "pos": [
+        -387,
+        454
+      ],
+      "size": {
+        "0": 315,
+        "1": 154
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            29,
+            30
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ScreenShare"
+      }
+    },
+    {
+      "id": 28,
+      "type": "PreviewImage",
+      "pos": [
+        -393,
+        975
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 30
         }
       ],
       "properties": {
@@ -512,15 +544,15 @@
       "id": 20,
       "type": "PreviewImage",
       "pos": [
-        1521,
-        277
+        492,
+        955
       ],
       "size": {
         "0": 526.9624633789062,
         "1": 367.3833923339844
       },
       "flags": {},
-      "order": 8,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
@@ -608,14 +640,6 @@
       "CLIP"
     ],
     [
-      17,
-      8,
-      0,
-      16,
-      0,
-      "IMAGE"
-    ],
-    [
       18,
       19,
       0,
@@ -648,14 +672,6 @@
       "MODEL"
     ],
     [
-      25,
-      24,
-      0,
-      25,
-      0,
-      "IMAGE"
-    ],
-    [
       26,
       25,
       0,
@@ -668,6 +684,30 @@
       25,
       0,
       20,
+      0,
+      "IMAGE"
+    ],
+    [
+      28,
+      8,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      29,
+      27,
+      0,
+      25,
+      0,
+      "IMAGE"
+    ],
+    [
+      30,
+      27,
+      0,
+      28,
       0,
       "IMAGE"
     ]

@@ -1,6 +1,8 @@
 ## 
 In progress.
 ！！
+![screenshare](./assets/screenshare.png)
+
 
 ### ScreenShareNode & FloatingVideoNode
 > Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
@@ -11,27 +13,38 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 <!-- [ScreenShareNode](./workflow/2-screeshare.json) -->
 [ScreenShareNode & FloatingVideoNode](./workflow/3-FloatVideo-workflow.json)
 
+!! Please use the address with HTTPS (https://127.0.0.1).
 
 ## Installation
 
-For the easiest install experience, install the [Comfyui Manager](https://github.com/ltdrdata/ComfyUI-Manager) and use that to automate the installation process.
-Otherwise, to manually install, simply clone the repo into the custom_nodes directory with this command:
+manually install, simply clone the repo into the custom_nodes directory with this command:
+
 ```
+cd ComfyUI/custom_nodes
+
 git clone https://github.com/shadowcz007/comfyui-mixlab-nodes.git
-```
-and install the requirements using:
-```
-.\python_embeded\python.exe -s -m pip install -r requirements.txt
-```
-If you are using a venv, make sure you have it activated before installation and use:
-```
-pip install -r requirements.txt
+
 ```
 
-Run directly:
+Install the requirements:
+
+run directly:
 ```
+cd ComfyUI_Mixlab
 install.bat
 ```
+
+or install the requirements using:
+```
+../../../python_embeded/python.exe -s -m pip install -r requirements.txt
+```
+
+If you are using a venv, make sure you have it activated before installation and use:
+```
+pip3 install -r requirements.txt
+```
+
+
 
 ## Nodes
 
@@ -65,7 +78,7 @@ Add edges to an image.
 
 
 ### Models
-下载[CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main)到 model/clipseg
+[Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : model/clipseg
 
 <!-- ### Workflow
 [Workflow](./workflow.md) -->

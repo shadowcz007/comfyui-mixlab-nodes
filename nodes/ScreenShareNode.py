@@ -104,5 +104,5 @@ class FloatingVideo:
             results.append(image_base64)
   
 
-        return { "ui": { "images": results } }
+        return { "ui": { "images_": results } }
 
