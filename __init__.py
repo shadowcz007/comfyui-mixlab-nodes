@@ -19,6 +19,7 @@ except ImportError:
     sys.exit()
 
 
+
 def create_key(key_p,crt_p):
     import OpenSSL
     # 生成自签名证书
@@ -116,6 +117,8 @@ def is_installed(package, package_overwrite=None):
 
         if result.returncode != 0:
             print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
+
+is_installed('pyOpenSSL')
 
 # 扩展api接口
 # from server import PromptServer

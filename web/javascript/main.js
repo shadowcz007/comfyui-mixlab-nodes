@@ -3,7 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-let api_host = `127.0.0.1:${window.location.port}`
+let api_host = `${window.location.hostname}:${window.location.port}`
 let api_base = ''
 let url = `${window.location.protocol}//${api_host}${api_base}`
 
@@ -296,8 +296,12 @@ const base64Df =
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
   async getCustomWidgets (app) {
-    // const file = new File([base64ToBlob(base64Df)], `screenshot_mixlab_df.jpeg`)
-    // window._mixlab_screen_default = await uploadFile(file)
+    //     position: absolute;
+    //     background: red;
+    //     width:100*(_mixlab_screen_width/_mixlab_screen_webcamVideo.videoWidth)+'%';
+    // height:100*(_mixlab_screen_height/_mixlab_screen_webcamVideo.videoWidth)+'%';
+    // left:100*(_mixlab_screen_x/_mixlab_screen_webcamVideo.videoWidth)+'%';
+    // top:100*(_mixlab_screen_y/_mixlab_screen_webcamVideo.videoHeight)+'%';
 
     return {
       CHEESE (node, inputName, inputData, app) {
@@ -372,6 +376,13 @@ app.registerExtension({
           poster:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
         })
+
+        widget.previewArea = $el('div', {
+          style: {
+            // position:'ab'
+          }
+        })
+
         widget.shareBtn = $el('button', {
           innerText: 'Share Screen',
           style: {
@@ -416,6 +427,8 @@ app.registerExtension({
 
         document.body.appendChild(widget.card)
         widget.card.appendChild(widget.preview)
+        widget.card.appendChild(widget.previewArea)
+
         widget.card.appendChild(widget.shareBtn)
         widget.card.appendChild(widget.openFloatingWinBtn)
         widget.card.appendChild(widget.refreshInput)
@@ -490,6 +503,7 @@ app.registerExtension({
           widget.liveBtn.remove()
           widget.card.remove()
           widget.refreshInput.remove()
+          widget.previewArea.remove()
         }
         this.serialize_widgets = false
       }
@@ -647,8 +661,12 @@ app.registerExtension({
 
         widget.PictureInPicture.addEventListener('click', async () => {
           if (window.location.protocol != 'https:') {
-            window.alert(`About to redirect to HTTPS access.https://127.0.0.1:${~~(window.location.port)+1}`)
-            window.open(`https://127.0.0.1:${~~(window.location.port)+1}`)
+            window.alert(
+              `About to redirect to HTTPS access.https://${window.location.hostname}:${
+                ~~window.location.port + 1
+              }`
+            )
+            window.open(`https://${window.location.hostname}:${~~window.location.port + 1}`)
           }
           // Open a Picture-in-Picture window.
           let w = 360,
