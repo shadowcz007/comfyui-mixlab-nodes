@@ -296,13 +296,6 @@ const base64Df =
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
   async getCustomWidgets (app) {
-    //     position: absolute;
-    //     background: red;
-    //     width:100*(_mixlab_screen_width/_mixlab_screen_webcamVideo.videoWidth)+'%';
-    // height:100*(_mixlab_screen_height/_mixlab_screen_webcamVideo.videoWidth)+'%';
-    // left:100*(_mixlab_screen_x/_mixlab_screen_webcamVideo.videoWidth)+'%';
-    // top:100*(_mixlab_screen_y/_mixlab_screen_webcamVideo.videoHeight)+'%';
-
     return {
       CHEESE (node, inputName, inputData, app) {
         // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
@@ -578,6 +571,24 @@ function setArea (src) {
       window._mixlab_screen_y = top
       window._mixlab_screen_width = width
       window._mixlab_screen_height = height
+
+      try {
+        let area = graph._nodes
+          .filter(n => n.type === 'ScreenShare')[0]
+          .widgets.filter(w => w.name == 'sreen_share')[0].previewArea
+        area.style = `
+        position: absolute;
+        background: red;
+        width:${
+          100 * (_mixlab_screen_width / _mixlab_screen_webcamVideo.videoWidth)
+        }%;
+    height:${
+      100 * (_mixlab_screen_height / _mixlab_screen_webcamVideo.videoWidth)
+    }%;
+    left:${100 * (_mixlab_screen_x / _mixlab_screen_webcamVideo.videoWidth)}%;
+    top:${100 * (_mixlab_screen_y / _mixlab_screen_webcamVideo.videoHeight)}%;
+        `
+      } catch (error) {}
     }
   }
 
@@ -662,11 +673,15 @@ app.registerExtension({
         widget.PictureInPicture.addEventListener('click', async () => {
           if (window.location.protocol != 'https:') {
             window.alert(
-              `About to redirect to HTTPS access.https://${window.location.hostname}:${
+              `About to redirect to HTTPS access.https://${
+                window.location.hostname
+              }:${~~window.location.port + 1}`
+            )
+            window.open(
+              `https://${window.location.hostname}:${
                 ~~window.location.port + 1
               }`
             )
-            window.open(`https://${window.location.hostname}:${~~window.location.port + 1}`)
           }
           // Open a Picture-in-Picture window.
           let w = 360,
