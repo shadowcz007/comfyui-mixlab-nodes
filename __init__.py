@@ -77,7 +77,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         crt,key=create_for_https()
         ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
         ssl_context.load_cert_chain(crt,key)
-        site2 = web.TCPSite(runner, address, 443,ssl_context=ssl_context)
+        site2 = web.TCPSite(runner, address, port+1,ssl_context=ssl_context)
         await site2.start()
 
         if address == '':
@@ -85,7 +85,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         if verbose:
             print("Starting server\n")
             print("To see the GUI go to: http://{}:{}".format(address, port))
-            print("To see the GUI go to: https://{}".format(address))
+            print("To see the GUI go to: https://{}:{}".format(address, port))
         if call_on_start is not None:
             call_on_start(address, port)
 

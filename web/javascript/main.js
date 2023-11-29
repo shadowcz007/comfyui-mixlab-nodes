@@ -647,8 +647,8 @@ app.registerExtension({
 
         widget.PictureInPicture.addEventListener('click', async () => {
           if (window.location.protocol != 'https:') {
-            window.alert('About to redirect to HTTPS access.https://127.0.0.1')
-            window.open('https://127.0.0.1')
+            window.alert(`About to redirect to HTTPS access.https://127.0.0.1:${~~(window.location.port)+1}`)
+            window.open(`https://127.0.0.1:${~~(window.location.port)+1}`)
           }
           // Open a Picture-in-Picture window.
           let w = 360,
