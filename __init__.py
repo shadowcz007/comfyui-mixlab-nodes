@@ -85,7 +85,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         if verbose:
             print("Starting server\n")
             print("To see the GUI go to: http://{}:{}".format(address, port))
-            print("To see the GUI go to: https://{}:{}".format(address, port))
+            print("To see the GUI go to: https://{}:{}".format(address, port+1))
         if call_on_start is not None:
             call_on_start(address, port)
 
