@@ -49,7 +49,7 @@ class ScreenShareNode:
         },
           "optional":{
               "prompt": ("PROMPT",),
-                    "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
+            #   "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
                 } }
     
     RETURN_TYPES = ('IMAGE','MASK','STRING')
@@ -62,9 +62,9 @@ class ScreenShareNode:
     OUTPUT_IS_LIST = (False,False,False)
   
     # 运行的函数
-    def run(self,image_base64,prompt,seed):
+    def run(self,image_base64,prompt):
         im,mask=base64_save(image_base64)
-        print('##########prompt',prompt)
+        # print('##########prompt',prompt)
         return (im,mask,prompt)
     
 
@@ -73,9 +73,7 @@ class FloatingVideo:
     def INPUT_TYPES(s):
         return { "required":{
             "images": ("IMAGE",)
-        }, "optional":{
-                    "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
-                } }
+        }, }
     
     # RETURN_TYPES = ('IMAGE','MASK')
     RETURN_TYPES = ()
@@ -89,7 +87,7 @@ class FloatingVideo:
     # OUTPUT_IS_LIST = (False,False,)
   
     # 运行的函数
-    def run(self,images,seed):
+    def run(self,images):
        
         results = list()
     

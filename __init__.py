@@ -2,12 +2,14 @@
 import os
 import subprocess
 import importlib.util
-import sys
+import sys,json
+import urllib
 
 python = sys.executable
 
 
 from server import PromptServer
+
 try:
     import aiohttp
     from aiohttp import web
@@ -36,7 +38,7 @@ def is_installed(package, package_overwrite=None):
         if result.returncode != 0:
             print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
     else:
-        print('##pyOpenSSL OK')
+        print(package+'## OK')
         
 try:
     import OpenSSL
@@ -47,6 +49,19 @@ except ImportError:
     print("pip install -r requirements.txt")
     is_installed('pyOpenSSL')
     sys.exit()
+
+try:
+    import watchdog
+except ImportError:
+    print("Module 'watchdog' not installed. Please install it via:")
+    print("pip install watchdog")
+    print("or")
+    print("pip install -r requirements.txt")
+    is_installed('watchdog')
+    sys.exit()
+
+
+current_path = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_key(key_p,crt_p):
@@ -79,15 +94,16 @@ def create_key(key_p,crt_p):
         f.write(OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_PEM, certificate))
     return
 
+
+
 def create_for_https():
-    current_path = os.path.abspath(os.path.dirname(__file__))
     # print("#####path::", current_path)
 
-    # TODO 处理路径
     https_key_path=os.path.join(current_path, "https")
     crt=os.path.join(https_key_path, "certificate.crt")
     key=os.path.join(https_key_path, "private.key")
-    print("##https_key_path", crt,key)
+    # print("##https_key_path", crt,key)
+    print('\033[91mhttps_key: ', crt,key)
     if not os.path.exists(https_key_path):
         # 使用mkdir()方法创建新目录
         os.mkdir(https_key_path)
@@ -113,9 +129,10 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         if address == '':
             address = '0.0.0.0'
         if verbose:
-            print("Starting server\n")
-            print("To see the GUI go to: http://{}:{}".format(address, port))
-            print("To see the GUI go to: https://{}:{}".format(address, port+1))
+            # print('\033[91mMixlab Nodes: \033[93mLoaded\033[0m')
+            print("\033[93mStarting server\n")
+            print("\033[93mTo see the GUI go to: http://{}:{}".format(address, port))
+            print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, port+1))
         if call_on_start is not None:
             call_on_start(address, port)
 
@@ -128,6 +145,33 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
 PromptServer.start=new_start
 
+# 创建路由表
+routes = web.RouteTableDef()
+
+@routes.post('/mixlab')
+async def mixlab_hander(request):
+    config=os.path.join(current_path, "nodes/config.json")
+    data={}
+    # print(config)
+    if os.path.exists(config):
+        with open(config, 'r') as f:
+            data = json.load(f)
+            # print(data)
+    return web.json_response(data)
+
+def new_add_routes(self):
+        import nodes
+        self.app.add_routes(routes)
+        self.app.add_routes(self.routes)
+        for name, dir in nodes.EXTENSION_WEB_DIRS.items():
+            self.app.add_routes([
+                web.static('/extensions/' + urllib.parse.quote(name), dir, follow_symlinks=True),
+            ])
+        self.app.add_routes([
+            web.static('/', self.web_root, follow_symlinks=True),
+        ])
+
+PromptServer.add_routes=new_add_routes
 
 
 
@@ -175,12 +219,14 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "RandomPrompt": "Random Prompt #Example Node",
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
-    "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode"
+    "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
+    "ScreenShare":"ScreenShare #Mixlab",
+    "FloatingVideo":"FloatingVideo #Mixlab"
 }
 
 # web ui的节点功能
 WEB_DIRECTORY = "./web"
 
 print('--------------')
-print('\033[34mMixlab Custom Nodes: \033[92mLoaded\033[0m')
+print('\033[91mMixlab Nodes: \033[93mLoaded\033[0m')
 print('--------------')

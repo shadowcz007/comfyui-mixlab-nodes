@@ -9,6 +9,9 @@ import json
 from comfy.cli_args import args
 import cv2 
 
+from .Watcher import FolderWatcher
+
+
 
 MAX_RESOLUTION=8192
 
@@ -555,6 +558,9 @@ class EnhanceImage:
            
         return (image,)
 
+
+
+
 ''' 
 ("STRING",{"multiline": False,"default": "Hello World!"})
 对应 widgets.js 里：
@@ -566,12 +572,12 @@ const multiline = !!inputData[1].multiline;
 # 支持输出1张
 #
 class LoadImagesFromPath:
-
+ 
     @classmethod
     def INPUT_TYPES(s):
         return {
                 "required": {
-                                "file_path": ("STRING",{"multiline": False,"default": ""})
+                                "file_path": ("STRING",{"multiline": False,"default": ""}),
                             },
                 "optional":{
                     "white_bg": (["disable","enable"],),
@@ -583,11 +589,13 @@ class LoadImagesFromPath:
                         "step": 1, #Slider's step
                         "display": "number" # Cosmetic only: display as "number" or "slider"
                     }),
-                    "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                    "watcher":(["disable","enable"],),
+                    "result": ("WATCHER",),
+                    # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 }
             }
     
-    RETURN_TYPES = ('IMAGE','MASK')
+    RETURN_TYPES = ('IMAGE','MASK',)
 
     FUNCTION = "run"
 
@@ -596,9 +604,27 @@ class LoadImagesFromPath:
     # INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)
   
+    global watcher_folder
+    watcher_folder=None
+
     # 运行的函数
-    def run(self,file_path,white_bg,newest_files,index_variable,seed):
-        print(file_path)
+    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result):
+        global watcher_folder
+        # print('###监听:',watcher_folder,watcher,file_path,result)
+
+        if watcher=='enable':
+            if watcher_folder==None:
+                watcher_folder = FolderWatcher(file_path)
+            
+            # 在这里可以进行其他操作，监听会在后台持续
+            watcher_folder.set_folder_path(file_path)
+            watcher_folder.start()
+
+        else:
+            if watcher_folder!=None:
+                watcher_folder.stop()
+
+
         images=get_images_filepath(file_path,white_bg=='enable')
 
         # 排序
@@ -616,7 +642,8 @@ class LoadImagesFromPath:
             imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
             masks=[masks[index_variable]] if index_variable < len(masks) else None
 
-        return (imgs,masks)
+        
+        return (imgs,masks,)
 
 
 # TODO 扩大选区的功能,重新输出mask

@@ -61,6 +61,10 @@ pip3 install -r requirements.txt
 
 ![TransparentImage](./assets/TransparentImage.png)
 
+>LoadImagesFromLocal
+
+[workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
+
 > Consistency Decoder
 
 [openai Consistency Decoder]( https://github.com/openai/consistencydecoder)
