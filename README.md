@@ -61,7 +61,11 @@ pip3 install -r requirements.txt
 
 ![TransparentImage](./assets/TransparentImage.png)
 
+
+
 >LoadImagesFromLocal
+
+![watch](./assets/load-watch.png)
 
 [workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
 
