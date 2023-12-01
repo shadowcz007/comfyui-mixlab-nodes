@@ -8,12 +8,19 @@ import os
 # print('Watcher:',current_directory)
 
 def save_to_json(file_path, data):
-    with open(file_path, 'w') as f:
-        json.dump(data, f)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f)
+    except Exception as e:
+            print(e)
 
 def read_from_json(file_path):
-    with open(file_path, 'r') as f:
-        data = json.load(f)
+    data={}
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+    except Exception as e:
+            print(e)
     return data
 
 
@@ -44,7 +51,7 @@ class FolderWatcher:
         # self.observer = Observer()
         self.event_handler = self._create_event_handler()
         self.status = "Not started"
-        self.event_type=''
+        self.event_type='-'
         
     def _create_event_handler(self):
 
@@ -79,14 +86,14 @@ class FolderWatcher:
             config=read_config()
             config['folder_path']=new_folder_path
             save_to_json(config_json,config)
-            self.event_type=''
+            self.event_type='-'
 
     def start(self):
         self.observer = Observer()
         self.observer.schedule(self.event_handler, self.folder_path, recursive=True)
         self.observer.start()
         self.status = "Listening"
-        self.event_type=''
+        self.event_type='-'
         print('Listening')
 
     def stop(self):
@@ -94,7 +101,7 @@ class FolderWatcher:
         self.observer.join()
         self.observer=None
         self.status = "Stopped"
-        self.event_type=''
+        self.event_type='-'
         print('Stopped')
     
   
