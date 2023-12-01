@@ -5,6 +5,9 @@ import importlib.util
 import sys,json
 import urllib
 
+import datetime
+
+
 python = sys.executable
 
 
@@ -95,22 +98,63 @@ def create_key(key_p,crt_p):
     return
 
 
-
 def create_for_https():
     # print("#####path::", current_path)
-
     https_key_path=os.path.join(current_path, "https")
     crt=os.path.join(https_key_path, "certificate.crt")
     key=os.path.join(https_key_path, "private.key")
     # print("##https_key_path", crt,key)
-    print('\033[91mhttps_key: ', crt,key)
     if not os.path.exists(https_key_path):
         # 使用mkdir()方法创建新目录
         os.mkdir(https_key_path)
     if not os.path.exists(crt):
         create_key(key,crt)
+
+    print('https_key OK: ', crt,key)
     return (crt,key)
 
+
+# workflow  
+def read_workflow_json_files(folder_path):
+    json_files = []
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.json'):
+            json_files.append(filename)
+
+    data = []
+    for file in json_files:
+        file_path = os.path.join(folder_path, file)
+        try:
+            with open(file_path) as json_file:
+                json_data = json.load(json_file)
+                creation_time=datetime.datetime.fromtimestamp(os.path.getctime(file_path))
+                numeric_timestamp = creation_time.timestamp()
+                file_info = {
+                    'filename': file,
+                    'data': json_data,
+                    'date': numeric_timestamp
+                }
+                data.append(file_info)
+        except Exception as e:
+            print(e)
+    sorted_data = sorted(data, key=lambda x: x['date'], reverse=True)
+    return sorted_data
+
+def get_workflows():
+    # print("#####path::", current_path)
+    workflow_path=os.path.join(current_path, "workflow")
+    print('workflow_path: ',workflow_path)
+    if not os.path.exists(workflow_path):
+        # 使用mkdir()方法创建新目录
+        os.mkdir(workflow_path)
+    workflows=read_workflow_json_files(workflow_path)
+    return workflows
+
+def save_workflow_json(data):
+    workflow_path=os.path.join(current_path, "workflow/my_workflow.json")
+    with open(workflow_path, 'w') as file:
+        json.dump(data, file)
+    return workflow_path
 
 # https
 async def new_start(self, address, port, verbose=True, call_on_start=None):
@@ -158,6 +202,28 @@ async def mixlab_hander(request):
             data = json.load(f)
             # print(data)
     return web.json_response(data)
+
+@routes.post('/mixlab/workflow')
+async def mixlab_hander(request):
+    data = await request.json()
+    result={}
+    try:
+        if 'task' in data:
+            if data['task']=='save':
+                file_path=save_workflow_json(data['data'])
+                result={
+                    'status':'success',
+                    'file_path':file_path
+                }
+            elif data['task']=='list':
+                result={
+                    'data':get_workflows(),
+                    'status':'success',
+                }
+    except Exception as e:
+            print(e)
+
+    return web.json_response(result)
 
 def new_add_routes(self):
         import nodes

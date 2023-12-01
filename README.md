@@ -1,6 +1,4 @@
 ## 
-In progress.
-！！
 ![screenshare](./assets/screenshare.png)
 
 
@@ -94,6 +92,8 @@ Add edges to an image.
 #### Thanks:
 [ComfyUI-CLIPSeg](https://github.com/biegert/ComfyUI-CLIPSeg/tree/main)
 
+#### discussions:
+[discussions](https://github.com/shadowcz007/comfyui-mixlab-nodes/discussions)
 
 ### TODO:
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio

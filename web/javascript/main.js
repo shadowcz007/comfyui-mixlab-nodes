@@ -332,7 +332,6 @@ async function createBlobFromVideo (webcamVideo) {
   // if (!window._mixlab_screen_imagePath) {
   //   window._mixlab_screen_imagePath = currentImage
   // }
-
 }
 
 async function blobToBase64 (blob) {
@@ -546,7 +545,7 @@ app.registerExtension({
               widget.liveBtn,
               widget.previewArea
             )
-            widget.shareBtn.innerText = 'Stop Share';
+            widget.shareBtn.innerText = 'Stop Share'
 
             console.log('视频已暂停')
             if (window._mixlab_stopLive) {
@@ -748,6 +747,36 @@ function setArea (src) {
   }
 }
 
+async function save_workflow (json) {
+  let api_host = `${window.location.hostname}:${window.location.port}`
+  let api_base = ''
+  let url = `${window.location.protocol}//${api_host}${api_base}`
+
+  const res = await fetch(`${url}/mixlab/workflow`, {
+    method: 'POST',
+    body: JSON.stringify({
+      data: json,
+      task: 'save'
+    })
+  })
+  return await res.json()
+}
+
+async function get_my_workflow () {
+  let api_host = `${window.location.hostname}:${window.location.port}`
+  let api_base = ''
+  let url = `${window.location.protocol}//${api_host}${api_base}`
+
+  const res = await fetch(`${url}/mixlab/workflow`, {
+    method: 'POST',
+    body: JSON.stringify({
+      task: 'list'
+    })
+  })
+  let result = await res.json()
+  return result.data
+}
+
 app.registerExtension({
   name: 'Mixlab.image.FloatingVideo',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
@@ -805,15 +834,18 @@ app.registerExtension({
 
         widget.PictureInPicture.addEventListener('click', async () => {
           if (window.location.protocol != 'https:') {
+            let http_workflow = app.graph.serialize()
+            await save_workflow(http_workflow)
+
             window.alert(
-              `About to redirect to HTTPS access.https://${
+              `Redirecting to HTTPS access due to the requirement of the floating window. https://${
                 window.location.hostname
               }:${~~window.location.port + 1}`
             )
             window.open(
               `https://${window.location.hostname}:${
                 ~~window.location.port + 1
-              }`
+              }?workflow=1`
             )
           }
           // Open a Picture-in-Picture window.
@@ -1376,31 +1408,71 @@ const importWorkflow = my => {
   app.canvas.pasteFromClipboard()
 }
 
+function getURLParameters (url) {
+  var params = {}
+  var paramStr = url.split('?')[1]
+  if (paramStr) {
+    var paramArr = paramStr.split('&')
+    for (var i = 0; i < paramArr.length; i++) {
+      var param = paramArr[i].split('=')
+      var paramName = decodeURIComponent(param[0])
+      var paramValue = decodeURIComponent(param[1] || '')
+      if (paramName) {
+        if (params[paramName]) {
+          params[paramName] = Array.isArray(params[paramName])
+            ? [...params[paramName], paramValue]
+            : [params[paramName], paramValue]
+        } else {
+          params[paramName] = paramValue
+        }
+      }
+    }
+  }
+  return params
+}
+
+// var url = "http://example.com/page?param1=value1&param2=value2&param3=value3";
+// var params = getURLParameters(url);
+// console.log(params);
+
 const node = {
   name: 'RandomPrompt',
   async setup (a) {
     for (const node of app.graph._nodes) {
-      if (node.comfyClass === 'RandomPrompt') {
-        console.log('#setup', node)
+      // console.log('#setup', node)
+      if (node.type === 'RandomPrompt') {
         updateUI(node)
+        if (window.location.href.match('/?')) {
+          const { workflow } = getURLParameters(window.location.href)
+          if (workflow)
+            get_my_workflow().then(data => {
+              console.log('#get_my_workflow', data)
+              let my_workflow = data.filter(
+                d => d.filename == 'my_workflow.json'
+              )[0]
+              if (my_workflow?.data) {
+                app.loadGraphData(my_workflow.data)
+              }
+            })
+        }
       }
     }
-    console.log('[logging]', 'loaded graph node: ', exportGraph(app.graph))
+    // console.log('[logging]', 'loaded graph node: ', exportGraph(app.graph))
   },
   addCustomNodeDefs (defs, app) {
-    console.log(
-      '[logging]',
-      'add custom node definitions',
-      'current nodes:',
-      defs
-    )
+    // console.log(
+    //   '[logging]',
+    //   'add custom node definitions',
+    //   'current nodes:',
+    //   defs
+    // )
     // 在这里进行 语言切换
-    for (const nodeName in defs) {
-      if (nodeName === 'RandomPrompt') {
-        // defs[nodeName].category
-        // defs[nodeName].display_name
-      }
-    }
+    // for (const nodeName in defs) {
+    //   if (nodeName === 'RandomPrompt') {
+    //     // defs[nodeName].category
+    //     // defs[nodeName].display_name
+    //   }
+    // }
   },
   loadedGraphNode (node, app) {
     // Fires for each node when loading/dragging/etc a workflow json or png
@@ -1409,11 +1481,11 @@ const node = {
     // console.log("[logging]", "loaded graph node: ", exportGraph(node.graph));
   },
   async nodeCreated (node) {
-    if (node.comfyClass === 'RandomPrompt') {
+    if (node.type === 'RandomPrompt') {
       updateUI(node)
     }
 
-    if (node.comfyClass === 'RunWorkflow') {
+    if (node.type === 'RunWorkflow') {
       const pw = node.widgets.filter(w => w.name === 'workflow')[0]
       console.log('nodeCreated', pw)
       // if (pw) {
