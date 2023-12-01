@@ -402,6 +402,7 @@ const base64Df =
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
   async getCustomWidgets (app) {
+    console.log('#Mixlab.image.ScreenShareNode',app)
     return {
       CHEESE (node, inputName, inputData, app) {
         // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
@@ -419,8 +420,8 @@ app.registerExtension({
             return window._mixlab_screen_imagePath || base64Df
           }
         }
-        //  widget.something = something;          // maybe adds stuff to it
-        node.addCustomWidget(widget) // adds it to the node
+        // console.log('#Mixlab.image.ScreenShareNode',widget)
+        node.addCustomWidget(widget)  
         return widget // and returns it.
       },
       PROMPT (node, inputName, inputData, app) {
@@ -439,7 +440,7 @@ app.registerExtension({
             return window._mixlab_screen_prompt || ''
           }
         }
-        console.log('###widget', widget)
+        // console.log('###widget', widget)
         node.addCustomWidget(widget) // adds it to the node
         return widget // and returns it.
       }

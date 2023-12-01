@@ -1,4 +1,9 @@
 ## 
+
+!!!In version :ComfyUI Revision: 1692 [7114cfec] | Released on '2023-11-15'  testing,it runs normally.
+
+
+
 ![screenshare](./assets/screenshare.png)
 
 
