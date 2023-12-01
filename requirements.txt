@@ -1,3 +1,5 @@
 numpy
 pyOpenSSL
 watchdog
+opencv-python-headless
+matplotlib
