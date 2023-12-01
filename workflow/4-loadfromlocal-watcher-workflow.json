@@ -1,6 +1,6 @@
 {
   "last_node_id": 23,
-  "last_link_id": 47,
+  "last_link_id": 48,
   "nodes": [
     {
       "id": 11,
@@ -94,7 +94,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        882790958612696,
+        1088992701378297,
         "randomize",
         4,
         1.6,
@@ -110,10 +110,10 @@
         -470,
         840
       ],
-      "size": [
-        430.924072265625,
-        253.48239135742188
-      ],
+      "size": {
+        "0": 430.924072265625,
+        "1": 253.48239135742188
+      },
       "flags": {},
       "order": 0,
       "mode": 0,
@@ -212,7 +212,7 @@
         "1": 58
       },
       "flags": {},
-      "order": 9,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -272,45 +272,6 @@
       ]
     },
     {
-      "id": 8,
-      "type": "CLIPTextEncode",
-      "pos": [
-        678,
-        -77
-      ],
-      "size": {
-        "0": 400,
-        "1": 200
-      },
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 32
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            39
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "superman,"
-      ]
-    },
-    {
       "id": 7,
       "type": "CLIPTextEncode",
       "pos": [
@@ -322,7 +283,7 @@
         "1": 200
       },
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
@@ -361,7 +322,7 @@
         "1": 126
       },
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
@@ -465,7 +426,7 @@
         "1": 246
       },
       "flags": {},
-      "order": 8,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -513,6 +474,53 @@
       ]
     },
     {
+      "id": 8,
+      "type": "CLIPTextEncode",
+      "pos": [
+        678,
+        -77
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 32
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 48,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            39
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "superman,"
+      ]
+    },
+    {
       "id": 22,
       "type": "LoadImagesFromPath",
       "pos": [
@@ -521,7 +529,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 202
+        "1": 238
       },
       "flags": {},
       "order": 4,
@@ -542,6 +550,15 @@
           "type": "MASK",
           "links": null,
           "shape": 6
+        },
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            48
+          ],
+          "shape": 3,
+          "slot_index": 2
         }
       ],
       "properties": {
@@ -813,6 +830,14 @@
       18,
       0,
       "IMAGE"
+    ],
+    [
+      48,
+      22,
+      2,
+      8,
+      1,
+      "STRING"
     ]
   ],
   "groups": [

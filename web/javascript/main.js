@@ -402,7 +402,7 @@ const base64Df =
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
   async getCustomWidgets (app) {
-    console.log('#Mixlab.image.ScreenShareNode',app)
+    console.log('#Mixlab.image.ScreenShareNode', app)
     return {
       CHEESE (node, inputName, inputData, app) {
         // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
@@ -421,7 +421,7 @@ app.registerExtension({
           }
         }
         // console.log('#Mixlab.image.ScreenShareNode',widget)
-        node.addCustomWidget(widget)  
+        node.addCustomWidget(widget)
         return widget // and returns it.
       },
       PROMPT (node, inputName, inputData, app) {
@@ -991,11 +991,17 @@ app.registerExtension({
 
           function handleKeyDown (event) {
             if (event.key === 'Enter') {
-              console.log('##更新Prompt')
-              window._mixlab_screen_prompt =
-                window._mixlab_screen_prompt_input ||
-                window._mixlab_screen_prompt
-              document.querySelector('#queue-button').click()
+            
+              if (!event.shiftKey) {
+                // 回车键被按下且未同时按下Shift键，执行你的操作
+                event.preventDefault() // 阻止默认行为（如提交表单）
+                // 在这里添加你的代码
+                console.log('##更新Prompt')
+                window._mixlab_screen_prompt =
+                  window._mixlab_screen_prompt_input ||
+                  window._mixlab_screen_prompt
+                document.querySelector('#queue-button').click()
+              }
             }
           }
 
