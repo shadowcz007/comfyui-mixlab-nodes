@@ -62,7 +62,7 @@ pip3 install -r requirements.txt
 
 
 
->LoadImagesFromLocal
+> LoadImagesFromLocal
 
 ![watch](./assets/load-watch.png)
 

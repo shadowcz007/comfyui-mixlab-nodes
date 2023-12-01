@@ -583,32 +583,33 @@ class LoadImagesFromPath:
                     "white_bg": (["disable","enable"],),
                     "newest_files": (["enable", "disable"],),
                     "index_variable":("INT", {
-                        "default": -1, 
+                        "default": 0, 
                         "min": -1, #Minimum value
                         "max": 2048, #Maximum value
                         "step": 1, #Slider's step
                         "display": "number" # Cosmetic only: display as "number" or "slider"
                     }),
                     "watcher":(["disable","enable"],),
-                    "result": ("WATCHER",),
+                    "result": ("WATCHER",),#为了激活本节点运行
+                     "prompt": ("PROMPT",),
                     # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 }
             }
     
-    RETURN_TYPES = ('IMAGE','MASK',)
+    RETURN_TYPES = ('IMAGE','MASK','STRING')
 
     FUNCTION = "run"
 
     CATEGORY = "Mixlab/image"
 
     # INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,True,)
+    OUTPUT_IS_LIST = (True,True,False,)
   
     global watcher_folder
     watcher_folder=None
 
     # 运行的函数
-    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result):
+    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result,prompt):
         global watcher_folder
         # print('###监听:',watcher_folder,watcher,file_path,result)
 
@@ -642,8 +643,8 @@ class LoadImagesFromPath:
             imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
             masks=[masks[index_variable]] if index_variable < len(masks) else None
 
-        
-        return (imgs,masks,)
+        print('#prompt::::',prompt)
+        return (imgs,masks,prompt,)
 
 
 # TODO 扩大选区的功能,重新输出mask

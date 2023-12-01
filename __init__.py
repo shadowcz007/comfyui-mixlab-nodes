@@ -276,8 +276,8 @@ NODE_CLASS_MAPPINGS = {
     "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
-    "CLIPSeg":CLIPSeg,
-    "CombineMasks":CombineMasks
+    "CLIPSeg_":CLIPSeg,
+    "CombineMasks_":CombineMasks
 }
 
 # 一个包含节点友好/可读的标题的字典

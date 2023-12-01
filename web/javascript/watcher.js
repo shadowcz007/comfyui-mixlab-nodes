@@ -14,6 +14,8 @@ async function getConfig () {
   return await res.json()
 }
 
+if(!window._mixlab_screen_prompt) window._mixlab_screen_prompt="beautiful scenery nature glass bottle landscape,under water"
+
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
 
@@ -64,6 +66,26 @@ app.registerExtension({
           },
           async serializeValue (nodeId, widgetIndex) {
             return window._mixlab_file_path_watcher || ''
+          }
+        }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      },
+      PROMPT (node, inputName, inputData, app) {
+        // console.log('node', inputName, inputData[0])
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 24], // a default size
+          draw (ctx, node, width, y) {
+            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+          },
+          computeSize (...args) {
+            return [128, 24] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            return window._mixlab_screen_prompt || ''
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
