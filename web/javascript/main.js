@@ -991,7 +991,6 @@ app.registerExtension({
 
           function handleKeyDown (event) {
             if (event.key === 'Enter') {
-            
               if (!event.shiftKey) {
                 // 回车键被按下且未同时按下Shift键，执行你的操作
                 event.preventDefault() // 阻止默认行为（如提交表单）
@@ -1444,24 +1443,30 @@ function getURLParameters (url) {
 
 const node = {
   name: 'RandomPrompt',
+  async init (app) {
+    // Any initial setup to run as soon as the page loads
+    console.log('[logging]', 'extension init')
+
+    if (window.location.href.match('/?')) {
+      const { workflow } = getURLParameters(window.location.href)
+      if (workflow)
+        get_my_workflow().then(data => {
+          console.log('#get_my_workflow', data)
+          let my_workflow = data.filter(
+            d => d.filename == 'my_workflow.json'
+          )[0]
+          if (my_workflow?.data) {
+            // app.loadGraphData(my_workflow.data)
+            localStorage.setItem('workflow',JSON.stringify(my_workflow.data));
+          }
+        })
+    }
+  },
   async setup (a) {
     for (const node of app.graph._nodes) {
-      // console.log('#setup', node)
+      console.log('#setup', node)
       if (node.type === 'RandomPrompt') {
         updateUI(node)
-        if (window.location.href.match('/?')) {
-          const { workflow } = getURLParameters(window.location.href)
-          if (workflow)
-            get_my_workflow().then(data => {
-              console.log('#get_my_workflow', data)
-              let my_workflow = data.filter(
-                d => d.filename == 'my_workflow.json'
-              )[0]
-              if (my_workflow?.data) {
-                app.loadGraphData(my_workflow.data)
-              }
-            })
-        }
       }
     }
     // console.log('[logging]', 'loaded graph node: ', exportGraph(app.graph))
@@ -1512,17 +1517,17 @@ const node = {
     // 汉化
     // app.graph._nodes // title ='123'
 
-    if (nodeData.name === 'SaveTransparentImage') {
-      const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
-        const r = onExecuted?.apply?.(this, arguments)
-        console.log('executed', message)
-        const { image_path } = message
-        if (image_path) {
-        }
-        return r
-      }
-    }
+    // if (nodeData.name === 'SaveTransparentImage') {
+    //   const onExecuted = nodeType.prototype.onExecuted
+    //   nodeType.prototype.onExecuted = function (message) {
+    //     const r = onExecuted?.apply?.(this, arguments)
+    //     console.log('executed', message)
+    //     const { image_path } = message
+    //     if (image_path) {
+    //     }
+    //     return r
+    //   }
+    // }
 
     if (nodeData.name === 'WSServer') {
       // Create the button widget for selecting the files
