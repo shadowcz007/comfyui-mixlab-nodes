@@ -4,7 +4,7 @@ const repoOwner = 'shadowcz007' // 替换为仓库的所有者
 const repoName = 'comfyui-mixlab-nodes' // 替换为仓库的名称
 
 const version='v0.2.1'
-// const vn=(v)=>parseFloat(v.replace('v', '').replace(/\./ig, ''))
+
 
 fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`)
   .then(response => response.json())
