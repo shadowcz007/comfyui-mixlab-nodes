@@ -20,13 +20,15 @@ def read_from_json(file_path):
 # read_from_json()
 current_path = os.path.abspath(os.path.dirname(__file__))
 config_json=os.path.join(current_path,'config.json')
-print('Watcher:',config_json)
+# print('Watcher:',config_json)
 
 def read_config():
     config={}
-    if os.path.exists(config_json):
-        # print('exists')
-        config=read_from_json(config_json)
+    try:
+        if os.path.exists(config_json):
+            config=read_from_json(config_json)
+    except Exception as e:
+            print(e)  
     return config
 
 

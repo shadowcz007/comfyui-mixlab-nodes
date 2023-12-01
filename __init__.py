@@ -196,15 +196,17 @@ routes = web.RouteTableDef()
 async def mixlab_hander(request):
     config=os.path.join(current_path, "nodes/config.json")
     data={}
-    # print(config)
-    if os.path.exists(config):
-        with open(config, 'r') as f:
-            data = json.load(f)
-            # print(data)
+    try:
+        if os.path.exists(config):
+            with open(config, 'r') as f:
+                data = json.load(f)
+                # print(data)
+    except Exception as e:
+            print(e)
     return web.json_response(data)
 
 @routes.post('/mixlab/workflow')
-async def mixlab_hander(request):
+async def mixlab_workflow_hander(request):
     data = await request.json()
     result={}
     try:
