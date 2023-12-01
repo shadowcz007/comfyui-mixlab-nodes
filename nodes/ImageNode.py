@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw
+from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence
 from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
@@ -153,25 +153,48 @@ def get_not_transparent_area(image):
     return (x, y, w, h)
 
 
-
+# 读取不了分层
+def load_psd(image):
+    layers=[]
+    print('load_psd',image.format)
+    if image.format=='PSD':
+        layers = [frame.copy() for frame in ImageSequence.Iterator(image)]
+        print('#PSD',len(layers))
+    else:
+        image = ImageOps.exif_transpose(image) #校对方向
+    layers.append(image)
+    return layers
 
 
 def load_image(fp,white_bg=False):
-    i = Image.open(fp)
-    i = ImageOps.exif_transpose(i)
-    image = i.convert("RGB")
-    image = np.array(image).astype(np.float32) / 255.0
-    image = torch.from_numpy(image)[None,]
-    if 'A' in i.getbands():
-        mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
-        mask = 1. - torch.from_numpy(mask)
-        if white_bg==True:
-            nw = mask.unsqueeze(0).unsqueeze(-1).repeat(1, 1, 1, 3)
-            # 将mask的黑色部分对image进行白色处理
-            image[nw == 1] = 1.0
-    else:
-        mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
-    return (image,mask)
+    im = Image.open(fp)
+
+    # ims=load_psd(im)
+    im = ImageOps.exif_transpose(im) #校对方向
+    ims=[im]
+
+    images=[]
+ 
+    for i in ims:
+        image = i.convert("RGB")
+        image = np.array(image).astype(np.float32) / 255.0
+        image = torch.from_numpy(image)[None,]
+        if 'A' in i.getbands():
+            mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+            mask = 1. - torch.from_numpy(mask)
+            if white_bg==True:
+                nw = mask.unsqueeze(0).unsqueeze(-1).repeat(1, 1, 1, 3)
+                # 将mask的黑色部分对image进行白色处理
+                image[nw == 1] = 1.0
+        else:
+            mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+        
+        images.append({
+            "image":image,
+            "mask":mask
+        })
+        
+    return images
 
 
 # 获取图片s
@@ -183,23 +206,27 @@ def get_images_filepath(f,white_bg=False):
             for file in files:
                 file_path = os.path.join(root, file)
                 try:
-                    (im,mask)=load_image(file_path,white_bg)
-                    images.append({
-                        "image":im,
-                        "mask":mask,
-                        "file_path":file_path
-                    })
+                    imgs=load_image(file_path,white_bg)
+                    for img in imgs:
+                        images.append({
+                            "image":img['image'],
+                            "mask":img['mask'],
+                            "file_path":file_path,
+                            "psd":len(imgs)>1
+                        })
                 except:
                     print('非图片',file_path)
  
     elif os.path.isfile(f):
         try:
-            (im,mask)=load_image(f,white_bg)
-            images.append({
-                        "image":im,
-                        "mask":mask,
-                        "file_path":f
-                    })
+            imgs=load_image(f,white_bg)
+            for img in imgs:
+                images.append({
+                    "image":img['image'],
+                    "mask":img['mask'],
+                    "file_path":file_path,
+                    "psd":len(imgs)>1
+                })
         except:
             print('非图片',f)
     else:
