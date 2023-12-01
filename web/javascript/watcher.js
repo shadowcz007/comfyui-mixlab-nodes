@@ -14,7 +14,9 @@ async function getConfig () {
   return await res.json()
 }
 
-if(!window._mixlab_screen_prompt) window._mixlab_screen_prompt="beautiful scenery nature glass bottle landscape,under water"
+if (!window._mixlab_screen_prompt)
+  window._mixlab_screen_prompt =
+    'beautiful scenery nature glass bottle landscape,under water'
 
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
@@ -59,7 +61,28 @@ app.registerExtension({
           name: inputName, // the name, slice
           size: [128, 24], // a default size
           draw (ctx, node, width, y) {
-            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+            // // 绘制文件图标的函数
+            // function drawFileIcon () {
+            //   // 清空画布
+            //   // ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            //   // 绘制文件外框
+            //   ctx.fillStyle = '#000'
+            //   ctx.fillRect(5, 5, 40, 40)
+
+            //   // 绘制文件夹图标
+            //   ctx.fillStyle = '#f00'
+            //   ctx.fillRect(10, 15, 30, 20)
+
+            //   // 绘制监听符号
+            //   ctx.beginPath()
+            //   ctx.arc(30, 35, 5, 0, 2 * Math.PI)
+            //   ctx.fillStyle = '#00f'
+            //   ctx.fill()
+            // }
+
+            // // 调用绘制函数
+            // drawFileIcon()
           },
           computeSize (...args) {
             return [128, 24] // a method to compute the current size of the widget
@@ -101,11 +124,7 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-         
-        // console.log(
-        //   'watch widtget',
-        //   this.widgets.filter(w => w.name == 'watcher')[0]
-        // )
+        console.log('watch widtget', this.widgets)
 
         const watcher = this.widgets.filter(w => w.name == 'watcher')[0]
 
@@ -133,7 +152,6 @@ app.registerExtension({
           }
         }
 
-      
         // 上次路径填充
         getConfig().then(json => {
           let w = this.widgets.filter(w => w.name == 'file_path')[0]
@@ -142,7 +160,6 @@ app.registerExtension({
           }
           // console.log(json.event_type)
           window._mixlab_file_path_watcher = json.event_type
-          
         })
 
         /*
