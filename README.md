@@ -84,6 +84,13 @@ Add edges to an image.
 ![FeatheredMask](./assets/FlVou_Y6kaGWYoEj1Tn0aTd4AjMI.jpg)
 
 
+
+### Improvement 
+An improvement has been made to directly redirect to GitHub to search for missing nodes when loading the graph.
+
+![node-not-found](./assets/node-not-found.png)
+
+
 ### Models
 [Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : model/clipseg
 
