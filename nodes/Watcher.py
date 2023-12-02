@@ -48,7 +48,7 @@ class FolderWatcher:
             config['folder_path']=folder_path
             save_to_json(config_json,config)
 
-        # self.observer = Observer()
+        self.observer = None
         self.event_handler = self._create_event_handler()
         self.status = "Not started"
         self.event_type='-'
@@ -97,11 +97,12 @@ class FolderWatcher:
         print('Listening')
 
     def stop(self):
-        self.observer.stop()
-        self.observer.join()
-        self.observer=None
-        self.status = "Stopped"
-        self.event_type='-'
+        if self.observer!=None:
+            self.observer.stop()
+            self.observer.join()
+            self.observer=None
+            self.status = "Stopped"
+            self.event_type='-'
         print('Stopped')
     
   

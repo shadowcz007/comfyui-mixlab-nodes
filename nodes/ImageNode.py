@@ -640,14 +640,15 @@ class LoadImagesFromPath:
         global watcher_folder
         # print('###监听:',watcher_folder,watcher,file_path,result)
 
-        if watcher=='enable':
-            if watcher_folder==None:
-                watcher_folder = FolderWatcher(file_path)
-            
+        if watcher_folder==None:
+            watcher_folder = FolderWatcher(file_path)
+
+        watcher_folder.set_folder_path(file_path)
+        
+        if watcher=='enable': 
             # 在这里可以进行其他操作，监听会在后台持续
             watcher_folder.set_folder_path(file_path)
             watcher_folder.start()
-
         else:
             if watcher_folder!=None:
                 watcher_folder.stop()

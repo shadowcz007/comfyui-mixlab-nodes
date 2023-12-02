@@ -29,6 +29,36 @@ async function interrupt () {
   })
 }
 
+async function clipboardWriteImage (win, url) {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  // console.log(url)
+  const img = await createImage(url)
+  // console.log(img)
+  canvas.width = img.naturalWidth
+  canvas.height = img.naturalHeight
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.drawImage(img, 0, 0)
+  // 将canvas转为blob
+  canvas.toBlob(async blob => {
+    const data = [
+      new ClipboardItem({
+        [blob.type]: blob
+      })
+    ]
+
+    win.navigator.clipboard
+      .write(data)
+      .then(() => {
+        console.log('Image URL copied to clipboard')
+      })
+      .catch(error => {
+        console.error('Failed to copy image URL to clipboard:', error)
+      })
+  })
+}
+
 async function uploadFile (file) {
   try {
     const body = new FormData()
@@ -801,12 +831,35 @@ app.registerExtension({
 
         widget.preview = $el('video', {
           controls: true,
+          draggable: true,
           style: {
             width: '100%'
           },
           poster:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
         })
+
+        // })
+        // const dropTarget = document.getElementById('your-drop-target-id')
+
+        // dropTarget.addEventListener('dragover', event => {
+        //   event.preventDefault()
+        // })
+
+        // dropTarget.addEventListener('drop', event => {
+        //   event.preventDefault()
+
+        //   const imageUrl = event.dataTransfer.getData('text/plain')
+
+        //   navigator.clipboard
+        //     .writeText(imageUrl)
+        //     .then(() => {
+        //       console.log('Image URL copied to clipboard')
+        //     })
+        //     .catch(error => {
+        //       console.error('Failed to copy image URL to clipboard:', error)
+        //     })
+        // })
 
         widget.canvas = $el('canvas', {
           style: {
@@ -818,7 +871,6 @@ app.registerExtension({
           innerText: 'PictureInPicture',
           style: {
             display: 'pictureInPictureEnabled' in document ? 'block' : 'none',
-
             cursor: 'pointer',
             padding: '8px 0',
             fontWeight: '300',
@@ -830,6 +882,28 @@ app.registerExtension({
         widget.card.appendChild(widget.PictureInPicture)
         widget.card.appendChild(widget.preview)
         widget.card.appendChild(widget.canvas)
+
+        widget.preview.addEventListener('click', event => {
+          const imageUrl = window._mixlab_screen_result || ''
+          // console.log(imageUrl)
+          try {
+            if (imageUrl) clipboardWriteImage(pipWindow, imageUrl)
+          } catch (error) {
+            console.log(error)
+            if (imageUrl) clipboardWriteImage(window, imageUrl)
+          }
+
+          // pipWindow.navigator.permissions
+          //   .query({ name: 'clipboard-write' })
+          //   .then(result => {
+          //     if (result.state === 'granted' || result.state === 'prompt') {
+          //       // 执行复制操作
+
+          //     } else {
+          //       console.error('Clipboard write permission denied')
+          //     }
+          //   })
+        })
 
         // widget.card.appendChild(widget.PictureInPicture)
 
@@ -974,9 +1048,31 @@ app.registerExtension({
             document.querySelector('#queue-button').click()
           })
 
+          widget.preview.addEventListener('click', event => {
+            const imageUrl = window._mixlab_screen_result || ''
+            // console.log(imageUrl)
+            try {
+              if (imageUrl) clipboardWriteImage(pipWindow, imageUrl)
+            } catch (error) {
+              console.log(error)
+              if (imageUrl) clipboardWriteImage(window, imageUrl)
+            }
+  
+            // pipWindow.navigator.permissions
+            //   .query({ name: 'clipboard-write' })
+            //   .then(result => {
+            //     if (result.state === 'granted' || result.state === 'prompt') {
+            //       // 执行复制操作
+  
+            //     } else {
+            //       console.error('Clipboard write permission denied')
+            //     }
+            //   })
+          })
+
           pipWindow.document.body.append(widget.preview)
           pipWindow.document.body.append(div)
-
+          console.log(pipWindow)
           div.appendChild(btnDiv)
           btnDiv.appendChild(btn)
           btnDiv.appendChild(pauseBtn)
@@ -1035,7 +1131,11 @@ app.registerExtension({
             const videoTrack = stream.getVideoTracks()[0]
 
             video.preview.srcObject = new MediaStream([videoTrack])
-            video.preview.play()
+            try {
+              video.preview.play()
+            } catch (error) {
+              console.log(error)
+            }
 
             // 检查浏览器是否支持画中画模式
             if ('pictureInPictureEnabled' in document) {
@@ -1068,7 +1168,7 @@ app.registerExtension({
           const context = canvas.getContext('2d')
 
           if (message?.images_) {
-            const base64 = message.images_[0]
+            window._mixlab_screen_result = `data:image/png;base64,${message.images_[0]}`
             const image = new Image()
             image.onload = function () {
               canvas.width = image.width
@@ -1076,7 +1176,7 @@ app.registerExtension({
               context.drawImage(image, 0, 0)
             }
             // console.log(`data:image/jpeg;base64,${base64}`)
-            image.src = `data:image/jpeg;base64,${base64}`
+            image.src = window._mixlab_screen_result
           }
           const onRemoved = this.onRemoved
           this.onRemoved = () => {
@@ -1457,7 +1557,7 @@ const node = {
           )[0]
           if (my_workflow?.data) {
             // app.loadGraphData(my_workflow.data)
-            localStorage.setItem('workflow',JSON.stringify(my_workflow.data));
+            localStorage.setItem('workflow', JSON.stringify(my_workflow.data))
           }
         })
     }
