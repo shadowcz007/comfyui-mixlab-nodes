@@ -51,10 +51,10 @@ async function clipboardWriteImage (win, url) {
     win.navigator.clipboard
       .write(data)
       .then(() => {
-        console.log('Image URL copied to clipboard')
+        console.log('Image copied to clipboard')
       })
       .catch(error => {
-        console.error('Failed to copy image URL to clipboard:', error)
+        console.error('Failed to copy image to clipboard:', error)
       })
   })
 }
@@ -948,7 +948,17 @@ app.registerExtension({
           width: calc(100% - 24px);
           margin: 12px;`
 
-          // console.log(pipWindow.document)
+          let inputDiv = document.createElement('div')
+          // inputDiv.style = ``
+          let infoDiv = document.createElement('div')
+          infoDiv.style = `    width: 100%;
+          height: 16px;
+          color: white;
+          margin-bottom: 4px;
+          font-size: 12px;
+          text-shadow: 1px 1px gray;`
+          infoDiv.id = 'info'
+
           // Move the player to the Picture-in-Picture window.
           let input = document.createElement('textarea')
           input.style = `
@@ -1002,8 +1012,14 @@ app.registerExtension({
             } else {
               input.style.display = 'none'
             }
+            try {
+              pipWindow.document.querySelector('#info').innerText = ''
+            } catch (error) {
+              console.log(error)
+            }
           })
 
+          // TODO 需要判断是否有screenshare节点，没有的话，不需要添加
           let pauseBtn = document.createElement('butotn')
           pauseBtn.innerText = '⏸'
           pauseBtn.style = `cursor: pointer;height: 24px;margin:4px;
@@ -1024,6 +1040,13 @@ app.registerExtension({
               if (w) {
                 w.liveBtn.innerText = 'Live Run'
               }
+
+              try {
+                pipWindow.document.querySelector('#info').innerText =
+                  'Stop Live'
+              } catch (error) {
+                console.log(error)
+              }
             } else {
               pauseBtn.innerText = '⏸'
               let node = this.graph._nodes.filter(
@@ -1034,6 +1057,12 @@ app.registerExtension({
                 w.liveBtn.innerText = 'Stop Live'
                 window._mixlab_stopLive = await startLive(w.liveBtn)
                 console.log('window._mixlab_stopLive', window._mixlab_stopLive)
+              }
+
+              try {
+                pipWindow.document.querySelector('#info').innerText = 'Live'
+              } catch (error) {
+                console.log(error)
               }
             }
           })
@@ -1046,6 +1075,13 @@ app.registerExtension({
             window._mixlab_screen_prompt =
               window._mixlab_screen_prompt_input || window._mixlab_screen_prompt
             document.querySelector('#queue-button').click()
+
+            try {
+              pipWindow.document.querySelector('#info').innerText =
+                'Update Prompt'
+            } catch (error) {
+              console.log(error)
+            }
           })
 
           widget.preview.addEventListener('click', event => {
@@ -1057,13 +1093,24 @@ app.registerExtension({
               console.log(error)
               if (imageUrl) clipboardWriteImage(window, imageUrl)
             }
-  
+
+            try {
+              pipWindow.document.querySelector('#info').innerText =
+                'Image copied to clipboard'
+              setTimeout(
+                () =>
+                  (pipWindow.document.querySelector('#info').innerText = ''),
+                8000
+              )
+            } catch (error) {
+              console.log(error)
+            }
             // pipWindow.navigator.permissions
             //   .query({ name: 'clipboard-write' })
             //   .then(result => {
             //     if (result.state === 'granted' || result.state === 'prompt') {
             //       // 执行复制操作
-  
+
             //     } else {
             //       console.error('Clipboard write permission denied')
             //     }
@@ -1072,15 +1119,25 @@ app.registerExtension({
 
           pipWindow.document.body.append(widget.preview)
           pipWindow.document.body.append(div)
-          console.log(pipWindow)
+          // console.log(pipWindow)
+
           div.appendChild(btnDiv)
           btnDiv.appendChild(btn)
           btnDiv.appendChild(pauseBtn)
           btnDiv.appendChild(promptFinishBtn)
-          div.appendChild(input)
+
+          // 输入框
+          div.appendChild(inputDiv)
+          inputDiv.appendChild(infoDiv)
+          inputDiv.appendChild(input)
 
           input.addEventListener('input', () => {
             window._mixlab_screen_prompt_input = input.value
+            try {
+              pipWindow.document.querySelector('#info').innerText = ''
+            } catch (error) {
+              console.log(error)
+            }
           })
 
           input.addEventListener('keydown', handleKeyDown)
@@ -1096,6 +1153,13 @@ app.registerExtension({
                   window._mixlab_screen_prompt_input ||
                   window._mixlab_screen_prompt
                 document.querySelector('#queue-button').click()
+
+                try {
+                  pipWindow.document.querySelector('#info').innerText =
+                    'Update Prompt'
+                } catch (error) {
+                  console.log(error)
+                }
               }
             }
           }
