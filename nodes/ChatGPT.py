@@ -88,7 +88,7 @@ class ChatGPTNode:
         }
 
     RETURN_TYPES = ("STRING","STRING",)
-    RETURN_NAMES = ("STRING","session_history",)
+    RETURN_NAMES = ("text","session_history",)
     FUNCTION = "generate_contextual_text"
     CATEGORY = "Mixlab/GPT"
     INPUT_IS_LIST = False
