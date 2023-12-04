@@ -1,46 +1,59 @@
 {
-  "last_node_id": 32,
-  "last_link_id": 32,
+  "last_node_id": 34,
+  "last_link_id": 35,
   "nodes": [
     {
-      "id": 26,
-      "type": "EmptyLatentImage",
+      "id": 27,
+      "type": "CLIPTextEncode",
       "pos": [
-        1170,
-        620
+        1961.178268896482,
+        527.6060791015625
       ],
       "size": {
-        "0": 315,
-        "1": 106
+        "0": 422.84503173828125,
+        "1": 164.31304931640625
       },
       "flags": {},
-      "order": 0,
+      "order": 7,
       "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 24
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 35,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
       "outputs": [
         {
-          "name": "LATENT",
-          "type": "LATENT",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
           "links": [
-            23
+            21
           ],
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "EmptyLatentImage"
+        "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        512,
-        512,
-        1
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
       ]
     },
     {
       "id": 28,
       "type": "CLIPTextEncode",
       "pos": [
-        1170,
-        390
+        1958.7452854980445,
+        266
       ],
       "size": {
         "0": 425.27801513671875,
@@ -74,180 +87,11 @@
       ]
     },
     {
-      "id": 27,
-      "type": "CLIPTextEncode",
-      "pos": [
-        1180,
-        190
-      ],
-      "size": [
-        422.84503173828125,
-        164.31304931640625
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "clip",
-          "type": "CLIP",
-          "link": 24
-        },
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 30,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            21
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
-      ]
-    },
-    {
-      "id": 23,
-      "type": "SessionHistory",
-      "pos": [
-        389,
-        159
-      ],
-      "size": [
-        600,
-        160
-      ],
-      "flags": {},
-      "order": 6,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "session_history",
-          "type": "STRING",
-          "link": 19,
-          "widget": {
-            "name": "session_history"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": null,
-          "shape": 6
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "SessionHistory"
-      },
-      "widgets_values": [
-        "[\n  {\n    \"role\": \"user\",\n    \"content\": \"冬天的小面馆\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"In the cold winter months, a small noodle shop located in the heart of the city provides a warm and inviting respite for the public. The outside of the shop is decorated with strings of twinkling lights and a sign that reads \\\"Xiao开放式\\\" (小吃店), inviting customers to come inside. The interior is designed with a traditional Chinese style, featuring red lanterns hanging from the ceiling and wooden chairs arranged around a small table. The walls are adorned with abstract artwork, giving the space a unique and artistic feel. Through the windows, customers can see the hustle and bustle of the city, but inside the shop, it is always peaceful and comfortable. The light from the windows casts a warm glow on the tables, making the space feel cozy and inviting. The menu offers a variety of traditional Chinese dishes, including noodles, dumplings, and other snacks, all made with fresh and high-quality ingredients. The shop is open late into the night, providing a late-night snack for the hungry and寒风中的人们。\"\n  }\n]"
-      ]
-    },
-    {
-      "id": 30,
-      "type": "SessionHistory",
-      "pos": [
-        390,
-        -57
-      ],
-      "size": [
-        600,
-        160
-      ],
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "session_history",
-          "type": "STRING",
-          "link": 29,
-          "widget": {
-            "name": "session_history"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            30
-          ],
-          "shape": 6,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "SessionHistory"
-      },
-      "widgets_values": [
-        "In the cold winter months, a small noodle shop located in the heart of the city provides a warm and inviting respite for the public. The outside of the shop is decorated with strings of twinkling lights and a sign that reads \"Xiao开放式\" (小吃店), inviting customers to come inside. The interior is designed with a traditional Chinese style, featuring red lanterns hanging from the ceiling and wooden chairs arranged around a small table. The walls are adorned with abstract artwork, giving the space a unique and artistic feel. Through the windows, customers can see the hustle and bustle of the city, but inside the shop, it is always peaceful and comfortable. The light from the windows casts a warm glow on the tables, making the space feel cozy and inviting. The menu offers a variety of traditional Chinese dishes, including noodles, dumplings, and other snacks, all made with fresh and high-quality ingredients. The shop is open late into the night, providing a late-night snack for the hungry and寒风中的人们。"
-      ]
-    },
-    {
-      "id": 29,
-      "type": "VAEDecode",
-      "pos": [
-        1970,
-        190
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {
-        "collapsed": false
-      },
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 26
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 27
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            31
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      }
-    },
-    {
       "id": 24,
       "type": "KSampler",
       "pos": [
-        1620,
-        190
+        2434.0233006347635,
+        80
       ],
       "size": {
         "0": 315,
@@ -292,7 +136,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        219322566744810,
+        264070254513477,
         "randomize",
         15,
         8,
@@ -302,11 +146,86 @@
       ]
     },
     {
+      "id": 29,
+      "type": "VAEDecode",
+      "pos": [
+        2799.0233006347635,
+        80
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {
+        "collapsed": false
+      },
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 26
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 27
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            31
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 26,
+      "type": "EmptyLatentImage",
+      "pos": [
+        2069.0233006347635,
+        80
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        512,
+        512,
+        1
+      ]
+    },
+    {
       "id": 25,
       "type": "CheckpointLoaderSimple",
       "pos": [
-        608,
-        387
+        1593.7452854980445,
+        80
       ],
       "size": {
         "0": 315,
@@ -353,13 +272,13 @@
       "id": 31,
       "type": "PreviewImage",
       "pos": [
-        2225,
-        170
+        2439,
+        408
       ],
-      "size": [
-        563.4671477929692,
-        720.8866341601565
-      ],
+      "size": {
+        "0": 563.4671630859375,
+        "1": 720.8866577148438
+      },
       "flags": {},
       "order": 10,
       "mode": 0,
@@ -375,16 +294,130 @@
       }
     },
     {
+      "id": 33,
+      "type": "SessionHistory",
+      "pos": [
+        1300,
+        430
+      ],
+      "size": [
+        580.1640810546876,
+        223.1105875244142
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "link": 33,
+          "widget": {
+            "name": "session_history"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SessionHistory"
+      },
+      "widgets_values": [
+        "[\n  {\n    \"role\": \"user\",\n    \"content\": \"黑客与画家\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"\\\"Hacker and Painter\\\" is a popular Chinese comic series written and illustrated by Cheng先辈， which has gained a large following worldwide.\\n\\nThe series revolves around the lives of two main characters, a young hacker and an artist, who embark on a journey of self-discovery and personal growth. Set in a futuristic, dystopian world, the story combines elements of science fiction, technology, and action with a touch of humor and satire.\\n\\nThe art style in \\\"Hacker and Painter\\\" is a mix of sci-fi and traditional Chinese ink painting, with bold lines, vibrant colors, and intricate details. Cheng先辈 employs a unique painting technique, using watercolor washes and ink to create a dynamic, expressive, and visually striking visual style.\\n\\nThe artist's use of photography and various camera angles adds an extra layer of depth to the storytelling, allowing the viewer to experience the world from different perspectives and gain a deeper understanding of the characters' emotions and motivations.\\n\\nLighting plays a significant role in the series, with the use of dramatic, contrasting light sources adding to the intensity and emotion of various scenes. Cheng先辈 expertly utilizes lighting to enhance the mood and setting, drawing the audience into the world of \\\"Hacker and Painter\\\" and making them feel like they are part of the action.\\n\\nOverall, \\\"Hacker and Painter\\\" is a visually stunning and thought-provoking series that combines the best of science fiction, action, and art, making it a must-read for fans of all ages.\"\n  }\n]"
+      ]
+    },
+    {
+      "id": 34,
+      "type": "SessionHistory",
+      "pos": [
+        1300,
+        230
+      ],
+      "size": [
+        562.8610810546875,
+        125.32558752441412
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "link": 34,
+          "widget": {
+            "name": "session_history"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            35
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SessionHistory"
+      },
+      "widgets_values": [
+        "\"Hacker and Painter\" is a popular Chinese comic series written and illustrated by Cheng先辈， which has gained a large following worldwide.\n\nThe series revolves around the lives of two main characters, a young hacker and an artist, who embark on a journey of self-discovery and personal growth. Set in a futuristic, dystopian world, the story combines elements of science fiction, technology, and action with a touch of humor and satire.\n\nThe art style in \"Hacker and Painter\" is a mix of sci-fi and traditional Chinese ink painting, with bold lines, vibrant colors, and intricate details. Cheng先辈 employs a unique painting technique, using watercolor washes and ink to create a dynamic, expressive, and visually striking visual style.\n\nThe artist's use of photography and various camera angles adds an extra layer of depth to the storytelling, allowing the viewer to experience the world from different perspectives and gain a deeper understanding of the characters' emotions and motivations.\n\nLighting plays a significant role in the series, with the use of dramatic, contrasting light sources adding to the intensity and emotion of various scenes. Cheng先辈 expertly utilizes lighting to enhance the mood and setting, drawing the audience into the world of \"Hacker and Painter\" and making them feel like they are part of the action.\n\nOverall, \"Hacker and Painter\" is a visually stunning and thought-provoking series that combines the best of science fiction, action, and art, making it a must-read for fans of all ages."
+      ]
+    },
+    {
+      "id": 32,
+      "type": "PrimitiveNode",
+      "pos": [
+        1314,
+        1075
+      ],
+      "size": {
+        "0": 571.9803466796875,
+        "1": 100.6700210571289
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            32
+          ],
+          "widget": {
+            "name": "prompt"
+          }
+        }
+      ],
+      "title": "prompt",
+      "properties": {},
+      "widgets_values": [
+        "黑客与画家"
+      ]
+    },
+    {
       "id": 10,
       "type": "ChatGPT",
       "pos": [
-        -56,
-        -56
+        1300,
+        720
       ],
-      "size": [
-        400,
-        298
-      ],
+      "size": {
+        "0": 586.7649536132812,
+        "1": 301.5857849121094
+      },
       "flags": {},
       "order": 4,
       "mode": 0,
@@ -404,7 +437,7 @@
           "name": "STRING",
           "type": "STRING",
           "links": [
-            29
+            34
           ],
           "shape": 3,
           "slot_index": 0
@@ -413,7 +446,7 @@
           "name": "JSON",
           "type": "STRING",
           "links": [
-            19
+            33
           ],
           "shape": 3,
           "slot_index": 1
@@ -422,38 +455,6 @@
       "properties": {
         "Node name for S&R": "ChatGPT"
       }
-    },
-    {
-      "id": 32,
-      "type": "PrimitiveNode",
-      "pos": [
-        2224,
-        11
-      ],
-      "size": [
-        559.4171142578116,
-        95.45722167968722
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            32
-          ],
-          "widget": {
-            "name": "prompt"
-          }
-        }
-      ],
-      "title": "prompt",
-      "properties": {},
-      "widgets_values": [
-        "冬天的小面馆"
-      ]
     }
   ],
   "links": [
@@ -504,14 +505,6 @@
       16,
       0,
       "JSON"
-    ],
-    [
-      19,
-      10,
-      1,
-      23,
-      0,
-      "STRING"
     ],
     [
       20,
@@ -578,22 +571,6 @@
       "VAE"
     ],
     [
-      29,
-      10,
-      0,
-      30,
-      0,
-      "STRING"
-    ],
-    [
-      30,
-      30,
-      0,
-      27,
-      1,
-      "STRING"
-    ],
-    [
       31,
       29,
       0,
@@ -607,6 +584,30 @@
       0,
       10,
       0,
+      "STRING"
+    ],
+    [
+      33,
+      10,
+      1,
+      33,
+      0,
+      "STRING"
+    ],
+    [
+      34,
+      10,
+      0,
+      34,
+      0,
+      "STRING"
+    ],
+    [
+      35,
+      34,
+      0,
+      27,
+      1,
       "STRING"
     ]
   ],
