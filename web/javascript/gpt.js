@@ -149,83 +149,91 @@ app.registerExtension({
                 Add the widget, make sure we clean up nicely, and we do not want to be serialized!
                 */
         this.addCustomWidget(widget)
-        this.onRemoved = function () {
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          inputUrl.remove()
+          inputKey.remove()
           widget.div.remove()
+          return onRemoved?.()
         }
+
         this.serialize_widgets = false
       }
     }
   }
 })
 
-
-
 app.registerExtension({
-	name: "Mixlab.GPT.SessionHistory",
-	async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		if (nodeData.name === "SessionHistory") {
-			function populate(text) {
-				if (this.widgets) {
- 
-					// const pos = this.widgets.findIndex((w) => w.name === "text");
-					// if (pos !== -1) {
-					// 	for (let i = pos; i < this.widgets.length; i++) {
-					// 		this.widgets[i].onRemove?.();
-					// 	}
-					// 	this.widgets.length = pos;
-					// }
-                   
-                    for (let i = 0; i < this.widgets.length; i++) {
-                        this.widgets[i].onRemove?.();
-                    }
-                    this.widgets.length = 0;
-				}
+  name: 'Mixlab.GPT.SessionHistory',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeData.name === 'SessionHistory') {
+      function populate (text) {
+        if (this.widgets) {
+          // const pos = this.widgets.findIndex((w) => w.name === "text");
+          // if (pos !== -1) {
+          // 	for (let i = pos; i < this.widgets.length; i++) {
+          // 		this.widgets[i].onRemove?.();
+          // 	}
+          // 	this.widgets.length = pos;
+          // }
 
-                console.log('SessionHistory',this.widgets,text)
+          for (let i = 0; i < this.widgets.length; i++) {
+            this.widgets[i].onRemove?.()
+          }
+          this.widgets.length = 0
+        }
 
-				for (const list of text) {
-					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
-					w.inputEl.readOnly = true;
-					w.inputEl.style.opacity = 0.6;
+        console.log('SessionHistory', this.widgets, text)
 
-                    let res=list;
+        for (const list of text) {
+          const w = ComfyWidgets['STRING'](
+            this,
+            'text',
+            ['STRING', { multiline: true }],
+            app
+          ).widget
+          w.inputEl.readOnly = true
+          w.inputEl.style.opacity = 0.6
 
-                    try {
-                        res=JSON.stringify(JSON.parse(list),null,2)
-                    } catch (error) {
-                        // console.log(list)
-                    }
+          let res = list
 
-					w.value = res;
-				}
+          try {
+            res = JSON.stringify(JSON.parse(list), null, 2)
+          } catch (error) {
+            // console.log(list)
+          }
 
-				requestAnimationFrame(() => {
-					const sz = this.computeSize();
-					if (sz[0] < this.size[0]) {
-						sz[0] = this.size[0];
-					}
-					if (sz[1] < this.size[1]) {
-						sz[1] = this.size[1];
-					}
-					this.onResize?.(sz);
-					app.graph.setDirtyCanvas(true, false);
-				});
-			}
+          w.value = res
+        }
 
-			// When the node is executed we will be sent the input text, display this in the widget
-			const onExecuted = nodeType.prototype.onExecuted;
-			nodeType.prototype.onExecuted = function (message) {
-				onExecuted?.apply(this, arguments);
-				populate.call(this, message.text);
-			};
+        requestAnimationFrame(() => {
+          const sz = this.computeSize()
+          if (sz[0] < this.size[0]) {
+            sz[0] = this.size[0]
+          }
+          if (sz[1] < this.size[1]) {
+            sz[1] = this.size[1]
+          }
+          this.onResize?.(sz)
+          app.graph.setDirtyCanvas(true, false)
+        })
+      }
 
-			const onConfigure = nodeType.prototype.onConfigure;
-			nodeType.prototype.onConfigure = function () {
-				onConfigure?.apply(this, arguments);
-				if (this.widgets_values?.length) {
-					populate.call(this, this.widgets_values);
-				}
-			};
-		}
-	},
-});
+      // When the node is executed we will be sent the input text, display this in the widget
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        populate.call(this, message.text)
+      }
+
+      const onConfigure = nodeType.prototype.onConfigure
+      nodeType.prototype.onConfigure = function () {
+        onConfigure?.apply(this, arguments)
+        if (this.widgets_values?.length) {
+          populate.call(this, this.widgets_values)
+        }
+      }
+    }
+  }
+})
