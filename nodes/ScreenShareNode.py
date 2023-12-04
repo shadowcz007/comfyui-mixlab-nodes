@@ -24,9 +24,42 @@ def base64_save(base64_data):
     return (image,mask)
 
 
+# # 把白色部分处理成黑色
+# def convert_to_bw(image):
+#     # 读取图片
+#     # image = Image.open(image_path)
+    
+#     # 获取图片的宽度和高度
+#     width, height = image.size
+    
+#     # 遍历图片的每个像素点
+#     for x in range(width):
+#         for y in range(height):
+#             # 获取当前像素点的RGB值
+#             r, g, b = image.getpixel((x, y))
+            
+#             # 判断当前像素点是否为白色
+#             if r == 255 and g == 255 and b == 255:
+#                 # 将白色部分处理成黑色
+#                 image.putpixel((x, y), (0, 0, 0))
+#             else:
+#                 # 将非白色部分处理成白色
+#                 image.putpixel((x, y), (255, 255, 255))
+    
+#     # 转换为黑白图
+#     mask = image.convert("L")
+    
+#     # # 保存处理后的图片
+#     # image.save("black_white_image.jpg")
+    
+#     # print("图片处理完成！")
+#     return mask
+
+
 def load_image(i,white_bg=False):
     # i = Image.open(fp)
     image = i.convert("RGB")
+
     image = np.array(image).astype(np.float32) / 255.0
     image = torch.from_numpy(image)[None,]
     if 'A' in i.getbands():
@@ -52,7 +85,7 @@ class ScreenShareNode:
             #   "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
                 } }
     
-    RETURN_TYPES = ('IMAGE','MASK','STRING')
+    RETURN_TYPES = ('IMAGE','STRING')
 
     FUNCTION = "run"
 
@@ -65,7 +98,7 @@ class ScreenShareNode:
     def run(self,image_base64,prompt):
         im,mask=base64_save(image_base64)
         # print('##########prompt',prompt)
-        return (im,mask,prompt)
+        return (im,prompt)
     
 
 class FloatingVideo:
