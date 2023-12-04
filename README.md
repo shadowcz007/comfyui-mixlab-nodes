@@ -18,13 +18,14 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ### LoadImagesFromLocal
 > Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. Q: Translate into English
 
-![watch](./assets/load-watch.png)
+![watch](./assets/4-loadfromlocal-watcher-workflow.svg)
 
 [workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
 
 
 ### GPT
-> ChatGPT、ChatGLM3
+> ChatGPT、ChatGLM3 , Some code provided by rui.
+
 
 ![gpt-workflow.svg](./assets/gpt-workflow.svg)
 
@@ -64,7 +65,7 @@ pip3 install -r requirements.txt
 
 ## Nodes
 
-![main](./assets/all.png)
+![main](./assets/all-workflow.svg)
 ![main2](./assets/detect-face-all.png)
 
 [workflow-1](./workflow/1-workflow.json)
