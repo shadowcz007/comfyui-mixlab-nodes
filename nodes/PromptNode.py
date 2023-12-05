@@ -79,7 +79,7 @@ class RandomPrompt:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/prompt"
 
     OUTPUT_IS_LIST = (True,)
     OUTPUT_NODE = True
@@ -158,7 +158,7 @@ class RunWorkflow:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/workflow"
+    CATEGORY = "♾️Mixlab/workflow"
 
     OUTPUT_IS_LIST = (True,)
     OUTPUT_NODE = True

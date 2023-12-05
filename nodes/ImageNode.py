@@ -341,7 +341,7 @@ class SmoothMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/mask"
+    CATEGORY = "♾️Mixlab/mask"
 
     INPUT_IS_LIST = False
 
@@ -389,7 +389,7 @@ class FeatheredMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/mask"
+    CATEGORY = "♾️Mixlab/mask"
 
     OUTPUT_IS_LIST = (False,)
   
@@ -456,7 +456,7 @@ class SplitLongMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/mask"
+    CATEGORY = "♾️Mixlab/mask"
 
     OUTPUT_IS_LIST = (True,)
   
@@ -499,7 +499,7 @@ class TransparentImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     # INPUT_IS_LIST = True， 一个batch传进来
     OUTPUT_IS_LIST = (True,True,True,)
@@ -568,7 +568,7 @@ class EnhanceImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = False
 
@@ -627,7 +627,7 @@ class LoadImagesFromPath:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     # INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,False,)
@@ -688,7 +688,7 @@ class ImageCropByAlpha:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -719,7 +719,7 @@ class AreaToMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/mask"
+    CATEGORY = "♾️Mixlab/mask"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -754,7 +754,7 @@ class FaceToMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/mask"
+    CATEGORY = "♾️Mixlab/mask"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)

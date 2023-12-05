@@ -61,7 +61,8 @@ app.registerExtension({
             return [128, 24] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            return localStorage.getItem('_mixlab_api_key') || ''
+            //localStorage.getItem('_mixlab_api_key') || ''
+            return 'by Mixlab'
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -81,7 +82,7 @@ app.registerExtension({
             return [128, 24] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            return localStorage.getItem('_mixlab_api_url') || ''
+            return localStorage.getItem('_mixlab_api_url') || 'https://api.openai.com/v1'
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -101,7 +102,7 @@ app.registerExtension({
 
         const api_key = this.widgets.filter(w => w.name == 'api_key')[0]
         const api_url = this.widgets.filter(w => w.name == 'api_url')[0]
-        console.log('api_key', api_key, api_url)
+        // console.log('api_key', api_key, api_url)
 
         const widget = {
           type: 'div',
@@ -129,19 +130,19 @@ app.registerExtension({
         inputKey.style = `margin:4px 48px;`
         inputUrl.style = `margin:4px 48px`
 
-        inputUrl.value = localStorage.getItem('_mixlab_api_url') || ''
-        inputKey.value = localStorage.getItem('_mixlab_api_key') || ''
+        inputUrl.value = localStorage.getItem('_mixlab_api_url') || 'https://api.openai.com/v1'
+        inputKey.value = localStorage.getItem('_mixlab_api_key') || 'by Mixlab'
 
         widget.div.appendChild(inputKey)
         widget.div.appendChild(inputUrl)
 
         inputKey.addEventListener('change', () => {
-          api_key.serializeValue = () => inputKey.value || ''
+          api_key.serializeValue = () => inputKey.value || 'by Mixlab'
           localStorage.setItem('_mixlab_api_key', inputKey.value)
         })
 
         inputUrl.addEventListener('change', () => {
-          api_url.serializeValue = () => inputUrl.value || ''
+          api_url.serializeValue = () => inputUrl.value || 'https://api.openai.com/v1'
           localStorage.setItem('_mixlab_api_url', inputUrl.value)
         })
 
@@ -165,9 +166,9 @@ app.registerExtension({
 })
 
 app.registerExtension({
-  name: 'Mixlab.GPT.SessionHistory',
+  name: 'Mixlab.GPT.ShowTextForGPT',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    if (nodeData.name === 'SessionHistory') {
+    if (nodeData.name === 'ShowTextForGPT') {
       function populate (text) {
         if (this.widgets) {
           // const pos = this.widgets.findIndex((w) => w.name === "text");
@@ -184,7 +185,7 @@ app.registerExtension({
           this.widgets.length = 0
         }
 
-        console.log('SessionHistory', this.widgets, text)
+        console.log('ShowTextForGPT', this.widgets, text)
 
         for (const list of text) {
           const w = ComfyWidgets['STRING'](

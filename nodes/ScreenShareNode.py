@@ -89,7 +89,7 @@ class ScreenShareNode:
 
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     # INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (False,False,False)
@@ -114,7 +114,7 @@ class FloatingVideo:
     OUTPUT_NODE = True
     FUNCTION = "run"
 
-    CATEGORY = "Mixlab/image"
+    CATEGORY = "♾️Mixlab/image"
 
     # INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (False,False,)

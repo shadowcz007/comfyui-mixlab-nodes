@@ -16,7 +16,7 @@ fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`)
       app.ui.dialog.show(`<h4 style="font-size: 18px;">${repoName} <br>
       Latest release version: ${latestVersion}</h4>
       <p>Please proceed to the official repository to download the latest version.</p>
-      <a style="    color: #2196F3;
+      <a style="color: #2196F3;
       font-size: 18px;
       font-weight: 800;
       letter-spacing: 2px;

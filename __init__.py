@@ -260,7 +260,7 @@ from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,AreaToMask,Smoo
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
-from .nodes.ChatGPT import ChatGPTNode,SessionHistory
+from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -282,7 +282,8 @@ NODE_CLASS_MAPPINGS = {
     "CLIPSeg_":CLIPSeg,
     "CombineMasks_":CombineMasks,
     "ChatGPT":ChatGPTNode,
-    "SessionHistory":SessionHistory
+    "ShowTextForGPT":ShowTextForGPT,
+    "CharacterInText":CharacterInText
 }
 
 # 一个包含节点友好/可读的标题的字典
@@ -294,7 +295,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ScreenShare":"ScreenShare #Mixlab",
     "FloatingVideo":"FloatingVideo #Mixlab",
     "ChatGPT":"ChatGPT #Mixlab",
-    "SessionHistory":"SessionHistory #Mixlab"
+    "ShowTextForGPT":"ShowTextForGPT #Mixlab"
 }
 
 # web ui的节点功能

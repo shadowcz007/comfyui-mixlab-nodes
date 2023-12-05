@@ -66,7 +66,7 @@ class ChatGPTNode:
     def __init__(self):
         # self.__client = OpenAI()
         self.session_history = []  # 用于存储会话历史的列表
-        self.seed=0
+        # self.seed=0
         self.system_content="You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."
 
     @classmethod
@@ -84,15 +84,16 @@ class ChatGPTNode:
                 "model": (["gpt-3.5-turbo", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
                           {"default": "gpt-3.5-turbo"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
+                "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
             },
         }
 
-    RETURN_TYPES = ("STRING","STRING",)
-    RETURN_NAMES = ("text","session_history",)
+    RETURN_TYPES = ("STRING","STRING","STRING",)
+    RETURN_NAMES = ("text","messages","session_history",)
     FUNCTION = "generate_contextual_text"
-    CATEGORY = "Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/GPT"
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,)
+    OUTPUT_IS_LIST = (False,False,False,)
 
     
     def generate_contextual_text(self,
@@ -101,18 +102,13 @@ class ChatGPTNode:
                                  prompt, 
                                  system_content,
                                    model, 
-                                   seed):
-        print(api_key,
-                                 api_url, 
-                                 prompt, 
-                                 system_content,
-                                   model, 
-                                   seed)
+                                   seed,context_size):
+        # print(api_key!='',api_url,prompt,system_content,model,seed)
         # 可以选择保留会话历史以维持上下文记忆
         # 或者在此处清除会话历史 self.session_history.clear()
-        if seed!=self.seed:
-            self.seed=seed
-            self.session_history=[]
+        # if seed!=self.seed:
+        #     self.seed=seed
+        #     self.session_history=[]
         
         # 把系统信息和初始信息添加到会话历史中
         if system_content:
@@ -129,21 +125,32 @@ class ChatGPTNode:
 
         # 把用户的提示添加到会话历史中
         # 调用API时传递整个会话历史
-        messages=[{"role": "system", "content": self.system_content}]+self.session_history+[{"role": "user", "content": prompt}]
+
+        def crop_list_tail(lst, size):
+            if size >= len(lst):
+                return lst
+            elif size==0:
+                return []
+            else:
+                return lst[-size:]
+            
+        session_history=crop_list_tail(self.session_history,context_size)
+
+        messages=[{"role": "system", "content": self.system_content}]+session_history+[{"role": "user", "content": prompt}]
         response_content = chat(client,model,messages)
         
         self.session_history=self.session_history+[{"role": "user", "content": prompt}]+[{'role':'assistant',"content":response_content}]
         
-        return (response_content,json.dumps(self.session_history, indent=4),)
+        return (response_content,json.dumps(messages, indent=4),json.dumps(self.session_history, indent=4),)
 
 
 
-class SessionHistory:
+class ShowTextForGPT:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
-                "session_history": ("STRING", {"forceInput": True}),
+                "text": ("STRING", {"forceInput": True}),
             }
         }
 
@@ -153,8 +160,32 @@ class SessionHistory:
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
 
-    CATEGORY = "Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, session_history):
+    def run(self, text):
         # print(session_history)
-        return {"ui": {"text": session_history}, "result": (session_history,)}
+        return {"ui": {"text": text}, "result": (text,)}
+
+
+class CharacterInText:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                 "text": ("STRING", {"multiline": True}),
+                 "character": ("STRING", {"multiline": True}),
+            }
+        }
+
+    INPUT_IS_LIST = False
+    RETURN_TYPES = ("INT",)
+    FUNCTION = "run"
+    # OUTPUT_NODE = True
+    OUTPUT_IS_LIST = (False,)
+
+    CATEGORY = "♾️Mixlab/GPT"
+
+    def run(self, text,character):
+        b=[1 if character in text else 0]
+        return (b,)
+
