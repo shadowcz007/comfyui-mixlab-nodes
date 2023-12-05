@@ -174,6 +174,13 @@ class CharacterInText:
             "required": {
                  "text": ("STRING", {"multiline": True}),
                  "character": ("STRING", {"multiline": True}),
+                 "start_index": ("INT", {
+                    "default": 1,
+                    "min": 0, #Minimum value
+                    "max": 1024, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
             }
         }
 
@@ -185,7 +192,9 @@ class CharacterInText:
 
     CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, text,character):
-        b=[1 if character in text else 0]
-        return (b,)
+    def run(self, text,character,start_index):
+        # print(text,character,start_index)
+        b=1 if character in text else 0
+        
+        return (b+start_index,)
 

@@ -1,6 +1,6 @@
 {
-  "last_node_id": 34,
-  "last_link_id": 35,
+  "last_node_id": 46,
+  "last_link_id": 42,
   "nodes": [
     {
       "id": 27,
@@ -14,7 +14,7 @@
         "1": 164.31304931640625
       },
       "flags": {},
-      "order": 7,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
@@ -25,7 +25,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 35,
+          "link": 42,
           "widget": {
             "name": "text"
           }
@@ -136,7 +136,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        264070254513477,
+        261818020972971,
         "randomize",
         15,
         8,
@@ -294,26 +294,26 @@
       }
     },
     {
-      "id": 33,
-      "type": "SessionHistory",
+      "id": 44,
+      "type": "ShowTextForGPT",
       "pos": [
-        1300,
-        430
+        1171,
+        425
       ],
       "size": [
-        580.1640810546876,
-        223.1105875244142
+        432.46002197265625,
+        264.40771484375
       ],
       "flags": {},
       "order": 6,
       "mode": 0,
       "inputs": [
         {
-          "name": "session_history",
+          "name": "text",
           "type": "STRING",
-          "link": 33,
+          "link": 40,
           "widget": {
-            "name": "session_history"
+            "name": "text"
           }
         }
       ],
@@ -322,38 +322,37 @@
           "name": "STRING",
           "type": "STRING",
           "links": null,
-          "shape": 6,
-          "slot_index": 0
+          "shape": 6
         }
       ],
       "properties": {
-        "Node name for S&R": "SessionHistory"
+        "Node name for S&R": "ShowTextForGPT"
       },
       "widgets_values": [
-        "[\n  {\n    \"role\": \"user\",\n    \"content\": \"黑客与画家\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"\\\"Hacker and Painter\\\" is a popular Chinese comic series written and illustrated by Cheng先辈， which has gained a large following worldwide.\\n\\nThe series revolves around the lives of two main characters, a young hacker and an artist, who embark on a journey of self-discovery and personal growth. Set in a futuristic, dystopian world, the story combines elements of science fiction, technology, and action with a touch of humor and satire.\\n\\nThe art style in \\\"Hacker and Painter\\\" is a mix of sci-fi and traditional Chinese ink painting, with bold lines, vibrant colors, and intricate details. Cheng先辈 employs a unique painting technique, using watercolor washes and ink to create a dynamic, expressive, and visually striking visual style.\\n\\nThe artist's use of photography and various camera angles adds an extra layer of depth to the storytelling, allowing the viewer to experience the world from different perspectives and gain a deeper understanding of the characters' emotions and motivations.\\n\\nLighting plays a significant role in the series, with the use of dramatic, contrasting light sources adding to the intensity and emotion of various scenes. Cheng先辈 expertly utilizes lighting to enhance the mood and setting, drawing the audience into the world of \\\"Hacker and Painter\\\" and making them feel like they are part of the action.\\n\\nOverall, \\\"Hacker and Painter\\\" is a visually stunning and thought-provoking series that combines the best of science fiction, action, and art, making it a must-read for fans of all ages.\"\n  }\n]"
+        "[\n  {\n    \"role\": \"system\",\n    \"content\": \"你现在充当stable diffsion 提示词专家，根据我输入的场景或需求描述，生成提示词，由stable diffsion根据你的提示词生成画面。stable diffusion是文本到图像的扩散模型。你的任务是在各种情况下产生适当的提示，引导人工智能创造出所需的图像。\\n\\n一个优秀的提示词需要遵循下面的规范：\\n\\n“““\\n\\n简洁明了：避免过于复杂或模糊的描述，以免造成模型的混乱或错误。\\n\\n具体细致：提供足够的细节，以便模型能够准确地捕捉想要生成的图片的特征。\\n\\n逻辑连贯：避免出现矛盾或不合理的描述，以免影响模型的理解和生成。\\n\\n创意独特：有创意，展示自己的想象力和个性，以便模型能够生成有趣和新颖的图片。\\n\\n我建议你可以参考以下几个步骤思考：\\n\\n• 确定主题：首先，你需要确定想要生成图片的主题，例如风景、动物、人物等。\\n\\n• 确定风格：其次，根据主题要求，确定合适的风格(如极简、现代)或根据主题(人物、风景等)调整提示词的语言风格、词汇和描述角度。\\n\\n• 选择关键词：再次，你需要选择一些能够描述主题的关键词，常用的关键词类别包括：主体、媒介、风格、画家、网站、分辨率、额外细节、色调和光影。 可以使用名人的名字作为关键词，来控制人物形象，因为他们在训练集中出现频次较大而训练充分。\\n\\n• 组合句子：然后，你需要将关键词组合成一个或多个简单句子，提示词的句式通常如：【图片的风格】,【内容主题 】,【 细节描述】,【 绘画风格或者艺术家风格】， 用逗号或分号隔开，例如a blue sky with white clouds, a green field with yellow flowers。\\n\\n• 调整细节：最后，根据告诉你的内容主题，尽可能细致刻画画面，譬如，要画“大海”，你需要给出类似这样的提示：梦幻的大海，白沙滩岸边铺满了粉色的玫瑰花，月光轻柔的人洒在海面上，绿色发光的海浪。对于细节描述，我们可以拆分【形容词】+【视角】+【时间】+【颜色】+【其他】，形容词可以是梦幻，神秘，浪漫或者写实 ……视角可以是：超广角，俯视和仰视 ……,时间：秋天，清晨，黄昏，夜晚 ……,颜色可以是 红黄绿蓝橙紫……,其他可以包含图片的尺寸，4k,8k ，HD,光效，高细节等。\\n\\n• 如果想让生成的图片更加的艺术化、风格化，可以考虑在 提示词中添加绘画风格和艺术家。艺术绘画风格可以是一些美术风格：梵高风格，油画，水彩，古风，CG感，动漫，少女，赛博朋克，卡通画，中国画，黄昏等等，艺术家风格包含：现实主义，印象派，野兽派，新艺术，表现主义，立体主义，未来主义等等\\n\\n• 以简洁的英语输出。输出完整提示词后，把它翻译成中文，然后保留英语版本备用。\\n\\n“““\\n\\n为了让你更好的理解提示词，我收集了一些表现效果较好的提示词案例，你可以对照上面的规则学习吸收：\\n\\n“““\\n\\nMaximalist chaotic buenos aires, birds eye view, illustrated by hergé, style of tin tin comics, pen and ink\\n\\nHyper -realistic girl in blue coat, left in the woods, weird, otherworldly, real, vintage photograph, film set, 85mm lens, f/2.8 aperture\\n\\ninstagram photo of a Japanese and Scandinavian design style living room with lots of golden light, hyperrealistic surrealism, award winning masterpiece with incredible details\\n\\nPortrait of an owl, steampunk, indigo blue, colorful, illustration, highly detailed, simple, smooth, and clean vector, no jagged lines, vector art, smooth, made all with grey colored gears inspired by future technology\\n\\n“““\\n\\n请通过回复 “确认 “来确认你是否理解了这项任务。然后我将向你发送第一条命令。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"证件照，女生,请认真回答噢，很重要这个问题\"\n  }\n]"
       ]
     },
     {
-      "id": 34,
-      "type": "SessionHistory",
+      "id": 43,
+      "type": "ShowTextForGPT",
       "pos": [
-        1300,
-        230
+        1166,
+        740
       ],
       "size": [
-        562.8610810546875,
-        125.32558752441412
+        424.00797187258513,
+        430.6391176555039
       ],
       "flags": {},
-      "order": 5,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
-          "name": "session_history",
+          "name": "text",
           "type": "STRING",
-          "link": 34,
+          "link": 39,
           "widget": {
-            "name": "session_history"
+            "name": "text"
           }
         }
       ],
@@ -361,95 +360,98 @@
         {
           "name": "STRING",
           "type": "STRING",
-          "links": [
-            35
-          ],
-          "shape": 6,
-          "slot_index": 0
+          "links": null,
+          "shape": 6
         }
       ],
       "properties": {
-        "Node name for S&R": "SessionHistory"
+        "Node name for S&R": "ShowTextForGPT"
       },
       "widgets_values": [
-        "\"Hacker and Painter\" is a popular Chinese comic series written and illustrated by Cheng先辈， which has gained a large following worldwide.\n\nThe series revolves around the lives of two main characters, a young hacker and an artist, who embark on a journey of self-discovery and personal growth. Set in a futuristic, dystopian world, the story combines elements of science fiction, technology, and action with a touch of humor and satire.\n\nThe art style in \"Hacker and Painter\" is a mix of sci-fi and traditional Chinese ink painting, with bold lines, vibrant colors, and intricate details. Cheng先辈 employs a unique painting technique, using watercolor washes and ink to create a dynamic, expressive, and visually striking visual style.\n\nThe artist's use of photography and various camera angles adds an extra layer of depth to the storytelling, allowing the viewer to experience the world from different perspectives and gain a deeper understanding of the characters' emotions and motivations.\n\nLighting plays a significant role in the series, with the use of dramatic, contrasting light sources adding to the intensity and emotion of various scenes. Cheng先辈 expertly utilizes lighting to enhance the mood and setting, drawing the audience into the world of \"Hacker and Painter\" and making them feel like they are part of the action.\n\nOverall, \"Hacker and Painter\" is a visually stunning and thought-provoking series that combines the best of science fiction, action, and art, making it a must-read for fans of all ages."
+        "[\n  {\n    \"role\": \"user\",\n    \"content\": \"\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"ChatGPT is an artificial intelligence chatbot program launched by OpenAI in November 2022. The program is based on a large language model GPT-3.5, trained with Instruction Tuning and Reinforcement Learning with Human Feedback (RLHF).\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"GPT-3.5 is a language model developed by OpenAI, based on the Transformer architecture. It is designed to perform a wide range of natural language processing tasks, including language translation, text summarization, and text generation.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"Is there anything specific you would like to know about GPT-3.5? I am here to help.\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"今天天气\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"I'm sorry, I am a text-based AI model and do not have the capability to access the current weather. However, I can tell you that it is likely to be a beautiful day, with the sun shining and a gentle breeze in the air. Enjoy your day!\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"今天天气不错噢，小明……\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"谢谢您的夸奖，不过我是一个人工智能模型，没有能力感知天气，只是通过语言理解回答问题。如果您需要查询当地的天气情况，建议您查询当地的天气预报。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"今天天气不错噢，小明……\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"今天天气不错噢，小明……(这句话是重复的，之前已经回答过您的问题了。如果您需要查询当地的天气情况，建议您查询当地的天气预报。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"证件照，女生\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"“女生分别为： Cut out of a colorful plaid skirt and white shirt, faced front, with a friendly smile, blonde-haired girl, age 22, blue eyes, naturalistic, clear, bright, young，以及人像，摄于户外，背景为美丽的自然风光，使用的相机是佳能5D Mark IV，镜头焦距为50mm，拍摄模式为肖像模式，使用的后期处理软件为Adobe Lightroom和Photoshop。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"证件照，女生\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"• 拍摄证件照，要求提供女生的照片，背景可以是一片白色的天空，或者一片纯色的草地，不能有杂色。\\n• 视角应该从 above，即从上方俯视，让女生显得稳定自信。\\n• 时间应该选择在阳光明媚的早晨，这样可以让女生看起来更加青春活力。\\n• 颜色可以选择蓝色，这种颜色可以让人感到清新自然。\\n• 照片应该有高清清晰的效果，不能有模糊模糊的现象。\\n• 照片的尺寸可以选择2K或者4K，这样可以让照片更加清晰。\\n• 光效可以选择自然光，这样可以让照片看起来更加自然。\\n• 照片的风格可以选择日系或者韩系，这样可以让照片看起来更加时尚。\\n• 照片的背景可以选择浅色系，这样可以让照片看起来更加清新自然。\\n• 照片中不能有重大的人物或者动物，否则需要事先沟通好。\\n• 照片中不能有太强烈的光线或者阴影，需要调整好光线和阴影的平衡，使照片更加均匀。\\n• 照片中不能有太多的文字或者文字的内容，需要将文字或者文字的内容进行处理。\\n• 在拍摄证件照之前，需要让女生进行一些准备，比如保持好心态，调整好光线，保持好角度等等。\\n• 拍摄完证件照之后，需要将照片进行一些处理，比如进行美颜，磨皮，瘦脸等等。\"\n  },\n  {\n    \"role\": \"user\",\n    \"content\": \"证件照，女生,请认真回答噢，很重要这个问题\"\n  },\n  {\n    \"role\": \"assistant\",\n    \"content\": \"确认\"\n  }\n]"
       ]
     },
     {
-      "id": 32,
-      "type": "PrimitiveNode",
+      "id": 45,
+      "type": "ShowTextForGPT",
       "pos": [
-        1314,
-        1075
+        1092,
+        262
       ],
-      "size": {
-        "0": 571.9803466796875,
-        "1": 100.6700210571289
-      },
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            32
-          ],
-          "widget": {
-            "name": "prompt"
-          }
-        }
+      "size": [
+        635.8358236838778,
+        101.46092513017766
       ],
-      "title": "prompt",
-      "properties": {},
-      "widgets_values": [
-        "黑客与画家"
-      ]
-    },
-    {
-      "id": 10,
-      "type": "ChatGPT",
-      "pos": [
-        1300,
-        720
-      ],
-      "size": {
-        "0": 586.7649536132812,
-        "1": 301.5857849121094
-      },
       "flags": {},
       "order": 4,
       "mode": 0,
       "inputs": [
         {
-          "name": "prompt",
+          "name": "text",
           "type": "STRING",
-          "link": 32,
+          "link": 41,
           "widget": {
-            "name": "prompt"
-          },
-          "slot_index": 0
+            "name": "text"
+          }
         }
       ],
       "outputs": [
         {
           "name": "STRING",
           "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "确认"
+      ]
+    },
+    {
+      "id": 42,
+      "type": "ChatGPT",
+      "pos": [
+        611,
+        285
+      ],
+      "size": [
+        417.3319772767625,
+        531.1873476643206
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
           "links": [
-            34
+            41,
+            42
           ],
           "shape": 3,
           "slot_index": 0
         },
         {
-          "name": "JSON",
+          "name": "messages",
           "type": "STRING",
           "links": [
-            33
+            40
           ],
           "shape": 3,
           "slot_index": 1
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": [
+            39
+          ],
+          "shape": 3,
+          "slot_index": 2
         }
       ],
       "properties": {
@@ -579,32 +581,32 @@
       "IMAGE"
     ],
     [
-      32,
-      32,
-      0,
-      10,
+      39,
+      42,
+      2,
+      43,
       0,
       "STRING"
     ],
     [
-      33,
-      10,
+      40,
+      42,
       1,
-      33,
+      44,
       0,
       "STRING"
     ],
     [
-      34,
-      10,
+      41,
+      42,
       0,
-      34,
+      45,
       0,
       "STRING"
     ],
     [
-      35,
-      34,
+      42,
+      42,
       0,
       27,
       1,
