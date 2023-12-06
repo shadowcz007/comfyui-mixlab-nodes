@@ -1,9 +1,10 @@
 ## 
 
-v0.2.6 🚀🚗🚚🏃‍
+v0.2.7 🚀🚗🚚🏃‍
 
 - [Add getting camera video stream](./workflow/7-camera-workflow.json)
 - Add a slider to the floating window, which can be used as input for denoise
+- Add random seed control method to the floating window
 - OSupport for calling multiple GPTs
 
 
