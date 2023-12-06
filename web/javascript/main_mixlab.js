@@ -560,6 +560,26 @@ app.registerExtension({
         // console.log('###widget', widget)
         node.addCustomWidget(widget) // adds it to the node
         return widget // and returns it.
+      },
+      SEED (node, inputName, inputData, app) {
+        // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 12], // a default size
+          draw (ctx, node, width, y) {
+            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+          },
+          computeSize (...args) {
+            return [128, 12] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            return window._mixlab_screen_seed_input || 0
+          }
+        }
+        // console.log('###widget', widget)
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
       }
     }
   },
@@ -576,9 +596,15 @@ app.registerExtension({
           type: 'HTML', // whatever
           name: 'sreen_share', // whatever
           draw (ctx, node, widget_width, y, widget_height) {
+            console.log('ScreenSHare', y, widget_height)
             Object.assign(
               this.card.style,
-              get_position_style(ctx, widget_width, y, node.size[1])
+              get_position_style(
+                ctx,
+                widget_width,
+                widget_height * 5,
+                node.size[1]
+              )
             )
           }
         }
@@ -1305,13 +1331,38 @@ app.registerExtension({
 
           // inputDiv.style = ``
           let infoDiv = document.createElement('div')
-          infoDiv.style = `    width: 100%;
+          infoDiv.style = `width: 100%;
+          display: flex;
+          justify-content: space-between;
           height: 16px;
           color: white;
           margin-bottom: 4px;
           font-size: 12px;
-          text-shadow: 1px 1px gray;`
-          infoDiv.id = 'info'
+          text-shadow: gray 1px 1px;
+          align-items: center;`
+
+          let infoText = document.createElement('div')
+          infoText.id = 'info'
+
+          let hideBtn = document.createElement('button')
+          hideBtn.innerText = '🤖'
+          hideBtn.style = `
+          border: none;
+          background: none;
+          cursor: pointer; height: 24px; margin: 4px; color: red;`
+
+          hideBtn.addEventListener('click', () => {
+            if (fnDiv.style.display == 'none') {
+              fnDiv.style.display = 'flex'
+            } else {
+              fnDiv.style.display = 'none'
+            }
+            try {
+              pipWindow.document.querySelector('#info').innerText = ''
+            } catch (error) {
+              console.log(error)
+            }
+          })
 
           // Move the player to the Picture-in-Picture window.
           let input = document.createElement('textarea')
@@ -1356,21 +1407,25 @@ app.registerExtension({
           font-size: 16px;
           margin-right: 6px;user-select: none;`
 
-          let btn = document.createElement('butotn')
-          btn.innerText = '❤'
-          btn.style = `cursor: pointer;height: 24px;margin:4px;
+          let seedBtn = document.createElement('butotn')
+          seedBtn.innerText = '🎲'
+          seedBtn.style = `cursor: pointer;height: 24px;margin:4px;
           color: red;`
-          btn.addEventListener('click', () => {
-            if (inputDiv.style.display == 'none') {
-              inputDiv.style.display = 'block'
-            } else {
-              inputDiv.style.display = 'none'
-            }
+
+          seedBtn.addEventListener('click', () => {
+            window._mixlab_screen_seed_input = Math.round(
+              Math.floor(Math.random() * 0xffffffffffffffff)
+            )
+
             try {
-              pipWindow.document.querySelector('#info').innerText = ''
+              pipWindow.document.querySelector('#info').innerText =window._mixlab_screen_seed_input
             } catch (error) {
               console.log(error)
             }
+
+            // console.log(window._mixlab_screen_seed_input)
+            if (window._mixlab_screen_blob)
+              document.querySelector('#queue-button').click()
           })
 
           // TODO 需要判断是否有screenshare节点，没有的话，不需要添加
@@ -1428,7 +1483,9 @@ app.registerExtension({
             console.log('##更新Prompt')
             window._mixlab_screen_prompt =
               window._mixlab_screen_prompt_input || window._mixlab_screen_prompt
-            document.querySelector('#queue-button').click()
+
+            if (window._mixlab_screen_blob)
+              document.querySelector('#queue-button').click()
 
             try {
               pipWindow.document.querySelector('#info').innerText =
@@ -1490,7 +1547,8 @@ app.registerExtension({
             window._mixlab_screen_slide_input = ~~slideInp.value / 100
             try {
               pipWindow.document.querySelector('#info').innerText =
-                window._mixlab_screen_slide_input;
+                window._mixlab_screen_slide_input
+              if (window._mixlab_screen_blob)
                 document.querySelector('#queue-button').click()
             } catch (error) {
               console.log(error)
@@ -1505,9 +1563,12 @@ app.registerExtension({
           div.appendChild(infoDiv)
           div.appendChild(fnDiv)
 
-          fnDiv.appendChild(btnDiv)
+          infoDiv.appendChild(infoText)
+          infoDiv.appendChild(hideBtn)
 
-          btnDiv.appendChild(btn)
+          fnDiv.appendChild(btnDiv)
+          // 按钮区域
+          btnDiv.appendChild(seedBtn)
           btnDiv.appendChild(pauseBtn)
           btnDiv.appendChild(promptFinishBtn)
 
@@ -1538,7 +1599,9 @@ app.registerExtension({
                 window._mixlab_screen_prompt =
                   window._mixlab_screen_prompt_input ||
                   window._mixlab_screen_prompt
-                document.querySelector('#queue-button').click()
+
+                if (window._mixlab_screen_blob)
+                  document.querySelector('#queue-button').click()
 
                 try {
                   pipWindow.document.querySelector('#info').innerText =
