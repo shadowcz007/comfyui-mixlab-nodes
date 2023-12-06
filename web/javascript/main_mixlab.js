@@ -1424,7 +1424,7 @@ app.registerExtension({
             }
 
             // console.log(window._mixlab_screen_seed_input)
-            if (window._mixlab_screen_blob)
+            if (window._mixlab_screen_imagePath)
               document.querySelector('#queue-button').click()
           })
 
@@ -1484,7 +1484,7 @@ app.registerExtension({
             window._mixlab_screen_prompt =
               window._mixlab_screen_prompt_input || window._mixlab_screen_prompt
 
-            if (window._mixlab_screen_blob)
+            if (window._mixlab_screen_imagePath)
               document.querySelector('#queue-button').click()
 
             try {
@@ -1548,7 +1548,7 @@ app.registerExtension({
             try {
               pipWindow.document.querySelector('#info').innerText =
                 window._mixlab_screen_slide_input
-              if (window._mixlab_screen_blob)
+              if (window._mixlab_screen_imagePath)
                 document.querySelector('#queue-button').click()
             } catch (error) {
               console.log(error)
@@ -1600,7 +1600,7 @@ app.registerExtension({
                   window._mixlab_screen_prompt_input ||
                   window._mixlab_screen_prompt
 
-                if (window._mixlab_screen_blob)
+                if (window._mixlab_screen_imagePath)
                   document.querySelector('#queue-button').click()
 
                 try {
