@@ -65,10 +65,10 @@ app.registerExtension({
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
-          size: [128, 24], // a default size
+          size: [128, 32], // a default size
           draw (ctx, node, width, y) {},
           computeSize (...args) {
-            return [128, 24] // a method to compute the current size of the widget
+            return [128,32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
             let data = getLocalData('_mixlab_api_key')
@@ -84,12 +84,12 @@ app.registerExtension({
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
-          size: [128, 24], // a default size
+          size: [128, 32], // a default size
           draw (ctx, node, width, y) {
             // a method to draw the widget (ctx is a CanvasRenderingContext2D)
           },
           computeSize (...args) {
-            return [128, 24] // a method to compute the current size of the widget
+            return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
             let data = getLocalData('_mixlab_api_url')
