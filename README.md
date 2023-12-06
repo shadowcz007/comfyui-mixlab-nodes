@@ -1,10 +1,19 @@
 ## 
 
+v0.2.6 🚀🚗🚚🏃‍
+
+- [Add getting camera video stream](./workflow/7-camera-workflow.json)
+- Add a slider to the floating window, which can be used as input for denoise
+- OSupport for calling multiple GPTs
+
+
 ![screenshare](./assets/screenshare.png)
 
 
 ### ScreenShareNode & FloatingVideoNode
 > Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
+
+> 
 
 https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43e-410a-ab3a-1952b7b4e7da
 
@@ -16,7 +25,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 
 ### LoadImagesFromLocal
-> Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. Q: Translate into English
+> Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. 
 
 ![watch](./assets/4-loadfromlocal-watcher-workflow.svg)
 
@@ -24,7 +33,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 
 ### GPT
-> ChatGPT、ChatGLM3 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1
+>Support for calling multiple GPTs.ChatGPT、ChatGLM3 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 .  Azure OpenAI:https://xxxx.openai.azure.com 
 
 
 ![gpt-workflow.svg](./assets/gpt-workflow.svg)

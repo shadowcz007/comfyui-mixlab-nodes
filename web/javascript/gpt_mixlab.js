@@ -46,12 +46,22 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
+const getLocalData = key => {
+  let data = {}
+  try {
+    data = JSON.parse(localStorage.getItem(key)) || {}
+  } catch (error) {
+    return {}
+  }
+  return data
+}
+
 app.registerExtension({
-  name: 'Mixlab.GPT.ChatGPT',
+  name: 'Mixlab.GPT.ChatGPTOpenAI',
   async getCustomWidgets (app) {
     return {
       KEY (node, inputName, inputData, app) {
-        // console.log('node', inputName, inputData[0])
+        // console.log('##node', node)
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
@@ -61,8 +71,8 @@ app.registerExtension({
             return [128, 24] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            //localStorage.getItem('_mixlab_api_key') || ''
-            return 'by Mixlab'
+            let data = getLocalData('_mixlab_api_key')
+            return data[node.id] || 'by Mixlab'
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -82,7 +92,8 @@ app.registerExtension({
             return [128, 24] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            return localStorage.getItem('_mixlab_api_url') || 'https://api.openai.com/v1'
+            let data = getLocalData('_mixlab_api_url')
+            return data[node.id] || 'https://api.openai.com/v1'
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -91,22 +102,21 @@ app.registerExtension({
       }
     }
   },
+
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    // console.log(nodeType.comfyClass)
-    if (nodeType.comfyClass == 'ChatGPT') {
+    if (nodeType.comfyClass == 'ChatGPTOpenAI') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        console.log('ChatGPT widtget', this.widgets)
-
         const api_key = this.widgets.filter(w => w.name == 'api_key')[0]
         const api_url = this.widgets.filter(w => w.name == 'api_url')[0]
-        // console.log('api_key', api_key, api_url)
+
+        console.log('ChatGPTOpenAI nodeData', this.widgets)
 
         const widget = {
           type: 'div',
-          name: 'chatgpt div',
+          name: 'chatgptdiv',
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
@@ -119,36 +129,43 @@ app.registerExtension({
 
         document.body.appendChild(widget.div)
 
-        const inputKey = document.createElement('input'),
-          inputUrl = document.createElement('input')
-        inputKey.type = 'text'
-        inputUrl.type = 'text'
+        const inputDiv = (key, placeholder) => {
+          let div = document.createElement('div')
+          const ip = document.createElement('input')
+          ip.type = placeholder === 'Key' ? 'password' : 'text'
+          ip.className = `${'comfy-multiline-input'} ${placeholder}`
+          div.style = `display: flex;
+          align-items: center; 
+          margin: 6px 8px;
+          margin-top: 0;`
+          ip.placeholder = placeholder
+          ip.value = placeholder
 
-        inputKey.placeholder = 'Key'
-        inputUrl.placeholder = 'URL'
+          ip.style = `margin-left: 24px;
+          outline: none;
+          border: none;
+          padding: 4px;width: 100%;`
+          const label = document.createElement('label')
+          label.style = 'font-size: 10px;min-width:32px'
+          label.innerText = placeholder
+          div.appendChild(label)
+          div.appendChild(ip)
 
-        inputKey.style = `margin:4px 48px;`
-        inputUrl.style = `margin:4px 48px`
+          ip.addEventListener('change', () => {
+            let data = getLocalData(key)
+            data[this.id] = ip.value.trim()
+            localStorage.setItem(key, JSON.stringify(data))
+            console.log(this.id, key)
+          })
+          return div
+        }
 
-        inputUrl.value = localStorage.getItem('_mixlab_api_url') || 'https://api.openai.com/v1'
-        inputKey.value = localStorage.getItem('_mixlab_api_key') || 'by Mixlab'
+        let inputKey = inputDiv('_mixlab_api_key', 'Key')
+        let inputUrl = inputDiv('_mixlab_api_url', 'URL')
 
         widget.div.appendChild(inputKey)
         widget.div.appendChild(inputUrl)
 
-        inputKey.addEventListener('change', () => {
-          api_key.serializeValue = () => inputKey.value || 'by Mixlab'
-          localStorage.setItem('_mixlab_api_key', inputKey.value)
-        })
-
-        inputUrl.addEventListener('change', () => {
-          api_url.serializeValue = () => inputUrl.value || 'https://api.openai.com/v1'
-          localStorage.setItem('_mixlab_api_url', inputUrl.value)
-        })
-
-        /*
-                Add the widget, make sure we clean up nicely, and we do not want to be serialized!
-                */
         this.addCustomWidget(widget)
 
         const onRemoved = this.onRemoved
@@ -159,82 +176,87 @@ app.registerExtension({
           return onRemoved?.()
         }
 
-        this.serialize_widgets = false
+        this.serialize_widgets = true //需要保存参数
       }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    // Fires every time a node is constructed
+    // You can modify widgets/add handlers/etc here
+
+    if (node.type === 'ChatGPTOpenAI') {
+      let widget = node.widgets.filter(w => w.div)[0]
+
+      let apiKey = getLocalData('_mixlab_api_key'),
+        url = getLocalData('_mixlab_api_url')
+
+      let id = node.id
+
+      console.log('ChatGPTOpenAI serialize_widgets', this)
+
+      widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
+      widget.div.querySelector('.URL').value =
+        url[id] || 'https://api.openai.com/v1'
     }
   }
 })
 
 app.registerExtension({
   name: 'Mixlab.GPT.ShowTextForGPT',
-  async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    if (nodeData.name === 'ShowTextForGPT') {
-      function populate (text) {
-        if (this.widgets) {
-          // const pos = this.widgets.findIndex((w) => w.name === "text");
-          // if (pos !== -1) {
-          // 	for (let i = pos; i < this.widgets.length; i++) {
-          // 		this.widgets[i].onRemove?.();
-          // 	}
-          // 	this.widgets.length = pos;
-          // }
+  async beforeRegisterNodeDef(nodeType, nodeData, app) {
+		if (nodeData.name === "ShowTextForGPT") {
+			function populate(text) {
+				if (this.widgets) {
+          
+					const pos = this.widgets.findIndex((w) => w.name === "text");
+					if (pos !== -1) {
+						for (let i = pos; i < this.widgets.length; i++) {
+							this.widgets[i].onRemove?.();
+						}
+						this.widgets.length = pos;
+					}
+				}
+        // console.log('ShowTextForGPT',this.widgets.length)
+				for (const list of text) {
+					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
+					w.inputEl.readOnly = true;
+					w.inputEl.style.opacity = 0.6;
+					w.value = list;
+				}
+        // console.log('ShowTextForGPT',this.widgets.length)
+				requestAnimationFrame(() => {
+					const sz = this.computeSize();
+					if (sz[0] < this.size[0]) {
+						sz[0] = this.size[0];
+					}
+					if (sz[1] < this.size[1]) {
+						sz[1] = this.size[1];
+					}
+					this.onResize?.(sz);
+					app.graph.setDirtyCanvas(true, false);
+				});
+			}
 
-          for (let i = 0; i < this.widgets.length; i++) {
-            this.widgets[i].onRemove?.()
-          }
-          this.widgets.length = 0
-        }
+			// When the node is executed we will be sent the input text, display this in the widget
+			const onExecuted = nodeType.prototype.onExecuted;
+			nodeType.prototype.onExecuted = function (message) {
+				onExecuted?.apply(this, arguments);
+				populate.call(this, message.text);
+			};
 
-        console.log('ShowTextForGPT', this.widgets, text)
+			const onConfigure = nodeType.prototype.onConfigure;
+			nodeType.prototype.onConfigure = function () {
+				onConfigure?.apply(this, arguments);
+				if (this.widgets_values?.length) {
+          
+					populate.call(this, this.widgets_values);
+				}
+			};
 
-        for (const list of text) {
-          const w = ComfyWidgets['STRING'](
-            this,
-            'text',
-            ['STRING', { multiline: true }],
-            app
-          ).widget
-          w.inputEl.readOnly = true
-          w.inputEl.style.opacity = 0.6
+      this.serialize_widgets = true //需要保存参数
 
-          let res = list
+		}
 
-          try {
-            res = JSON.stringify(JSON.parse(list), null, 2)
-          } catch (error) {
-            // console.log(list)
-          }
 
-          w.value = res
-        }
-
-        requestAnimationFrame(() => {
-          const sz = this.computeSize()
-          if (sz[0] < this.size[0]) {
-            sz[0] = this.size[0]
-          }
-          if (sz[1] < this.size[1]) {
-            sz[1] = this.size[1]
-          }
-          this.onResize?.(sz)
-          app.graph.setDirtyCanvas(true, false)
-        })
-      }
-
-      // When the node is executed we will be sent the input text, display this in the widget
-      const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
-        onExecuted?.apply(this, arguments)
-        populate.call(this, message.text)
-      }
-
-      const onConfigure = nodeType.prototype.onConfigure
-      nodeType.prototype.onConfigure = function () {
-        onConfigure?.apply(this, arguments)
-        if (this.widgets_values?.length) {
-          populate.call(this, this.widgets_values)
-        }
-      }
-    }
-  }
+	},
 })

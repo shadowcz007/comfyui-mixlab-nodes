@@ -75,16 +75,20 @@ class ChatGPTNode:
             "required": {
                 "api_key":("KEY", {"default": "", "multiline": True}),
                 "api_url":("URL", {"default": "", "multiline": True}),
-                "prompt": ("STRING", {"default": "", "multiline": True}),
+                "prompt": ("STRING", {"multiline": True}),
                 "system_content": ("STRING", 
                                    {
                                        "default": "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.", 
                                        "multiline": True
                                        }),
-                "model": (["gpt-3.5-turbo", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
+                "model": (["gpt-3.5-turbo","gpt-35-turbo","gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
                           {"default": "gpt-3.5-turbo"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
                 "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
+            },
+             "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "extra_pnginfo": "EXTRA_PNGINFO",
             },
         }
 
@@ -102,7 +106,7 @@ class ChatGPTNode:
                                  prompt, 
                                  system_content,
                                    model, 
-                                   seed,context_size):
+                                   seed,context_size,unique_id = None, extra_pnginfo=None):
         # print(api_key!='',api_url,prompt,system_content,model,seed)
         # 可以选择保留会话历史以维持上下文记忆
         # 或者在此处清除会话历史 self.session_history.clear()
@@ -140,6 +144,19 @@ class ChatGPTNode:
         response_content = chat(client,model,messages)
         
         self.session_history=self.session_history+[{"role": "user", "content": prompt}]+[{'role':'assistant',"content":response_content}]
+
+
+        # if unique_id and extra_pnginfo and "workflow" in extra_pnginfo[0]:
+        #     workflow = extra_pnginfo[0]["workflow"]
+        #     node = next((x for x in workflow["nodes"] if str(x["id"]) == unique_id[0]), None)
+        #     if node:
+        #         node["widgets_values"] = ["",
+        #                          api_url, 
+        #                          prompt, 
+        #                          system_content,
+        #                            model,
+        #                            seed,
+        #                            context_size]
         
         return (response_content,json.dumps(messages, indent=4),json.dumps(self.session_history, indent=4),)
 

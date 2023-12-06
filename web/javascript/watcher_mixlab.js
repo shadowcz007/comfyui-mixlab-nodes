@@ -169,7 +169,7 @@ app.registerExtension({
         this.onRemoved = function () {
           // widget.card.remove()
         }
-        this.serialize_widgets = false
+        this.serialize_widgets = true
       }
     }
   }

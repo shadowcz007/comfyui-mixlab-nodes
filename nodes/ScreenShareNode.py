@@ -82,23 +82,24 @@ class ScreenShareNode:
         },
           "optional":{
               "prompt": ("PROMPT",),
+              "slide": ("SLIDE",),
             #   "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
                 } }
     
-    RETURN_TYPES = ('IMAGE','STRING')
-
+    RETURN_TYPES = ('IMAGE','STRING','FLOAT')
+    RETURN_NAMES = ("IMAGE","PROMPT","FLOAT",)
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/image"
 
     # INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (False,False,False)
+    OUTPUT_IS_LIST = (False,False,False,False)
   
     # 运行的函数
-    def run(self,image_base64,prompt):
+    def run(self,image_base64,prompt,slide):
         im,mask=base64_save(image_base64)
         # print('##########prompt',prompt)
-        return (im,prompt)
+        return (im,prompt,slide)
     
 
 class FloatingVideo:
@@ -137,3 +138,15 @@ class FloatingVideo:
 
         return { "ui": { "images_": results } }
 
+
+
+# class SildeNode:
+#     CATEGORY = "quicknodes"
+#     @classmethod    
+#     def INPUT_TYPES(s):
+#         return { "required":{} }
+#     RETURN_TYPES = ()
+#     RETURN_NAMES = ()
+#     FUNCTION = "func"
+#     def func(self):
+#         return ()

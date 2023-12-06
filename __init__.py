@@ -64,6 +64,18 @@ except ImportError:
     sys.exit()
 
 
+
+def install_openai():
+    # Helper function to install the OpenAI module if not already installed
+    try:
+        importlib.import_module('openai')
+    except ImportError:
+        import pip
+        pip.main(['install', 'openai'])
+
+install_openai()
+
+
 current_path = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -281,21 +293,21 @@ NODE_CLASS_MAPPINGS = {
     "FloatingVideo":FloatingVideo,
     "CLIPSeg_":CLIPSeg,
     "CombineMasks_":CombineMasks,
-    "ChatGPT":ChatGPTNode,
+    "ChatGPTOpenAI":ChatGPTNode,
     "ShowTextForGPT":ShowTextForGPT,
     "CharacterInText":CharacterInText
 }
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "RandomPrompt": "Random Prompt #Mixlab",
+    "RandomPrompt": "Random Prompt ♾️Mixlab",
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
     "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
-    "ScreenShare":"ScreenShare #Mixlab",
-    "FloatingVideo":"FloatingVideo #Mixlab",
-    "ChatGPT":"ChatGPT #Mixlab",
-    "ShowTextForGPT":"ShowTextForGPT #Mixlab"
+    "ScreenShare":"ScreenShare ♾️Mixlab",
+    "FloatingVideo":"FloatingVideo ♾️Mixlab",
+    "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
+    "ShowTextForGPT":"ShowTextForGPT ♾️Mixlab"
 }
 
 # web ui的节点功能

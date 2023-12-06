@@ -106,24 +106,65 @@ async function uploadFile (file) {
 
 // alert(navigator.mediaDevices)
 
-async function shareScreen (webcamVideo, shareBtn, liveBtn, previewArea) {
+async function shareScreen (
+  isCamera = false,
+  webcamVideo,
+  shareBtn,
+  liveBtn,
+  previewArea
+) {
   try {
-    // let webcamVideo = document.createElement('video')
-    const mediaStream = await navigator.mediaDevices.getDisplayMedia({
-      video: true
-    })
+    let mediaStream
+
+    if (!isCamera) {
+      mediaStream = await navigator.mediaDevices.getDisplayMedia({
+        video: true
+      })
+    } else {
+      if (!localStorage.getItem('_mixlab_webcamera_select')) return
+      let constraints =
+        JSON.parse(localStorage.getItem('_mixlab_webcamera_select')) || {}
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints)
+    }
 
     webcamVideo.removeEventListener('timeupdate', videoTimeUpdateHandler)
     webcamVideo.srcObject = mediaStream
     webcamVideo.onloadedmetadata = () => {
+      let x = 0,
+        y = 0,
+        width = webcamVideo.videoWidth,
+        height = webcamVideo.videoHeight,
+        imgWidth = webcamVideo.videoWidth,
+        imgHeight = webcamVideo.videoHeight
+
+      let d = getSetAreaData()
+      if (
+        d &&
+        d.x >= 0 &&
+        d.imgWidth === imgWidth &&
+        d.imgHeight === imgHeight
+      ) {
+        x = d.x
+        y = d.y
+        width = d.width
+        height = d.height
+        imgWidth = d.imgWidth
+        imgHeight = d.imgHeight
+        console.log('#screen_share::使用上一次选区')
+      }
+      updateSetAreaData(x, y, width, height, imgWidth, imgHeight)
+
       webcamVideo.play()
+
+      createBlobFromVideo(webcamVideo, true)
+
       webcamVideo.addEventListener('timeupdate', videoTimeUpdateHandler)
 
-      window._mixlab_screen_x = 0
-      window._mixlab_screen_y = 0
-      // console.log(webcamVideo)
-      window._mixlab_screen_width = webcamVideo.videoWidth
-      window._mixlab_screen_height = webcamVideo.videoHeight
+      // window._mixlab_screen_x = 0
+      // window._mixlab_screen_y = 0
+      // // console.log(webcamVideo)
+      // window._mixlab_screen_width = webcamVideo.videoWidth
+      // window._mixlab_screen_height = webcamVideo.videoHeight
     }
 
     mediaStream.addEventListener('inactive', handleStopSharing)
@@ -278,7 +319,7 @@ async function startLive (btn) {
         previousImage,
         currentImage
       )
-      // console.log('#图片是否有变化:', imageChanged)
+      console.log('#图片是否有变化:', imageChanged)
 
       if (imageChanged) {
         window._mixlab_screen_imagePath = currentImage
@@ -328,26 +369,17 @@ async function createBlobFromVideoForArea (webcamVideo) {
   return blob
 }
 
-async function createBlobFromVideo (webcamVideo) {
+async function createBlobFromVideo (webcamVideo, updateImageBase64 = false) {
   const videoW = webcamVideo.videoWidth
   const videoH = webcamVideo.videoHeight
   const aspectRatio = videoW / videoH
-  const WIDTH = window._mixlab_screen_width,
-    HEIGHT = window._mixlab_screen_height
-  const canvas = new OffscreenCanvas(WIDTH, HEIGHT)
+
+  const { x, y, width, height } = window._mixlab_share_screen
+
+  const canvas = new OffscreenCanvas(width, height)
   const ctx = canvas.getContext('2d')
-  // console.log('#createBlobFromVideo', WIDTH, HEIGHT)
-  ctx.drawImage(
-    webcamVideo,
-    window._mixlab_screen_x,
-    window._mixlab_screen_y,
-    WIDTH,
-    HEIGHT,
-    0,
-    0,
-    WIDTH,
-    HEIGHT
-  )
+
+  ctx.drawImage(webcamVideo, x, y, width, height, 0, 0, width, height)
 
   const blob = await canvas.convertToBlob({
     type: 'image/jpeg',
@@ -356,12 +388,17 @@ async function createBlobFromVideo (webcamVideo) {
   // imgElement.src = await blobToBase64(blob)
   window._mixlab_screen_blob = blob
 
-  console.log('########')
-  // let currentImage = await blobToBase64(blob)
-  // // console.log(window._mixlab_screen_imagePath)
-  // if (!window._mixlab_screen_imagePath) {
-  //   window._mixlab_screen_imagePath = currentImage
-  // }
+  console.log(
+    '########updateImageBase64 ',
+    updateImageBase64,
+    x,
+    y,
+    width,
+    height
+  )
+  if (updateImageBase64) {
+    window._mixlab_screen_imagePath = await blobToBase64(blob)
+  }
 }
 
 async function blobToBase64 (blob) {
@@ -391,6 +428,36 @@ function base64ToBlob (base64) {
 
   return blob
 }
+
+async function requestCamera () {
+  // 请求授权
+  try {
+    let stream = await navigator.mediaDevices.getUserMedia({ video: true })
+    console.log('摄像头授权成功')
+    // 获取视频轨道
+    var videoTrack = stream.getVideoTracks()[0]
+
+    // 停止视频轨道
+    videoTrack.stop()
+
+    return true
+  } catch (error) {
+    // 用户拒绝授权或发生其他错误
+    console.error('摄像头授权失败：', error)
+
+    // 提示用户授权摄像头访问权限
+    if (error.name === 'NotAllowedError') {
+      alert('请授权摄像头访问权限 chrome://settings/content/camera')
+    } else {
+      alert('摄像头访问权限请求失败，请重试 chrome://settings/content/camera')
+    }
+
+    // // 跳转到浏览器的授权设置页面
+    // window.location.href = 'chrome://settings/content/camera'
+  }
+  return false
+}
+
 /* 
 A method that returns the required style for the html 
 */
@@ -432,7 +499,7 @@ const base64Df =
 app.registerExtension({
   name: 'Mixlab.image.ScreenShareNode',
   async getCustomWidgets (app) {
-    console.log('#Mixlab.image.ScreenShareNode', app)
+    // console.log('#Mixlab.image.ScreenShareNode', app)
     return {
       CHEESE (node, inputName, inputData, app) {
         // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
@@ -468,6 +535,26 @@ app.registerExtension({
           },
           async serializeValue (nodeId, widgetIndex) {
             return window._mixlab_screen_prompt || ''
+          }
+        }
+        // console.log('###widget', widget)
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      },
+      SLIDE (node, inputName, inputData, app) {
+        // We return an object containing a field CHEESE which has a function (taking node, name, data, app)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 12], // a default size
+          draw (ctx, node, width, y) {
+            // a method to draw the widget (ctx is a CanvasRenderingContext2D)
+          },
+          computeSize (...args) {
+            return [128, 12] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            return window._mixlab_screen_slide_input || 0.5
           }
         }
         // console.log('###widget', widget)
@@ -510,8 +597,15 @@ app.registerExtension({
         })
 
         widget.previewArea = $el('div', {
+          style: {}
+        })
+
+        widget.shareDiv = $el('div', {
+          // innerText: 'Share Screen',
           style: {
-            // position:'ab'
+            cursor: 'pointer',
+            fontWeight: '300',
+            display: 'flex'
           }
         })
 
@@ -521,7 +615,19 @@ app.registerExtension({
             cursor: 'pointer',
             padding: '8px 0',
             fontWeight: '300',
-            margin: '2px'
+            margin: '2px',
+            width: '100%'
+          }
+        })
+
+        widget.shareOfWebCamBtn = $el('button', {
+          innerText: 'Camera',
+          style: {
+            cursor: 'pointer',
+            padding: '8px 0',
+            fontWeight: '300',
+            margin: '2px',
+            width: '100%'
           }
         })
 
@@ -563,20 +669,30 @@ app.registerExtension({
         widget.previewCard.appendChild(widget.preview)
         widget.previewCard.appendChild(widget.previewArea)
 
-        widget.card.appendChild(widget.shareBtn)
+        widget.card.appendChild(widget.shareDiv)
+        widget.shareDiv.appendChild(widget.shareBtn)
+        widget.shareDiv.appendChild(widget.shareOfWebCamBtn)
         widget.card.appendChild(widget.openFloatingWinBtn)
         widget.card.appendChild(widget.refreshInput)
         widget.card.appendChild(widget.liveBtn)
 
-        widget.shareBtn.addEventListener('click', async () => {
+        const toggleShare = async (isCamera = false) => {
           if (widget.preview.paused) {
             window._mixlab_stopVideo = await shareScreen(
+              isCamera,
               widget.preview,
               widget.shareBtn,
               widget.liveBtn,
               widget.previewArea
             )
-            widget.shareBtn.innerText = 'Stop Share'
+
+            if (isCamera) {
+              widget.shareOfWebCamBtn.innerText = 'Stop Share'
+              widget.shareBtn.innerText = 'Stop'
+            } else {
+              widget.shareOfWebCamBtn.innerText = 'Stop'
+              widget.shareBtn.innerText = 'Stop Share'
+            }
 
             console.log('视频已暂停')
             if (window._mixlab_stopLive) {
@@ -584,12 +700,15 @@ app.registerExtension({
               window._mixlab_stopLive = null
               widget.liveBtn.innerText = 'Live Run'
             }
+
+            setTimeout(() => updateSetAreaDisplay(), 2000)
           } else {
             console.log('视频正在播放')
             if (window._mixlab_stopVideo) {
               window._mixlab_stopVideo()
               window._mixlab_stopVideo = null
               widget.shareBtn.innerText = 'Share Screen'
+              widget.shareOfWebCamBtn.innerText = 'Camera'
             }
             if (window._mixlab_stopLive) {
               window._mixlab_stopLive()
@@ -597,6 +716,121 @@ app.registerExtension({
               widget.liveBtn.innerText = 'Live Run'
             }
           }
+        }
+
+        // updateSetAreaDisplay(widget.previewArea, 200, 200)
+        widget.shareOfWebCamBtn.addEventListener('click', async () => {
+          if (!widget.preview.paused) {
+            if (window._mixlab_stopVideo) {
+              window._mixlab_stopVideo()
+              window._mixlab_stopVideo = null
+              widget.shareBtn.innerText = 'Share Screen'
+              widget.shareOfWebCamBtn.innerText = 'Camera'
+            }
+            if (window._mixlab_stopLive) {
+              window._mixlab_stopLive()
+              window._mixlab_stopLive = null
+              widget.liveBtn.innerText = 'Live Run'
+            }
+            return
+          }
+
+          let r = await requestCamera()
+          if (r === false) return
+          const devices = await navigator.mediaDevices.enumerateDevices()
+
+          // 查找摄像头设备
+          var cameras = devices.filter(function (device) {
+            // console.log(device)
+            return device.kind === 'videoinput'
+          })
+
+          // 创建 <select> 元素
+          var select = document.createElement('select')
+
+          // 创建默认选项
+          // var defaultOption = document.createElement('option')
+          // defaultOption.text = '请选择摄像头'
+          // defaultOption.disabled = true
+          // defaultOption.selected = true
+          // select.appendChild(defaultOption)
+
+          // 创建每个摄像头设备的选项
+          Array.from(cameras, (camera, i) => {
+            var option = document.createElement('option')
+            option.value = camera.deviceId
+            option.text = camera.label || 'Camera ' + (select.length - 1)
+            if (i === 0) option.selected = true
+            select.appendChild(option)
+          })
+
+          let modal = document.createElement('div')
+          modal.className = 'comfy-modal'
+          modal.style.display = 'flex'
+
+          let modalContent = document.createElement('div')
+          modalContent.className = 'comfy-modal-content'
+
+          let title = document.createElement('p')
+          title.innerText = 'Please select a camera'
+
+          modalContent.appendChild(title)
+          modalContent.appendChild(select)
+
+          let btns = document.createElement('div')
+          btns.style = `display: flex;
+          justify-content: space-between;
+          margin: 24px 0;`
+
+          let btn = document.createElement('button')
+          btn.innerText = 'OK'
+          btn.style = `width: 112px;`
+
+          let closeBtn = document.createElement('button')
+          closeBtn.innerText = 'Cancel'
+          closeBtn.style = `width: 112px;`
+
+          modalContent.appendChild(btns)
+          btns.appendChild(btn)
+          btns.appendChild(closeBtn)
+
+          modal.appendChild(modalContent)
+          document.body.appendChild(modal)
+
+          btn.addEventListener('click', () => {
+            // 获取所选择的选项的索引
+            var selectedIndex = select.selectedIndex
+
+            // 获取所选择的选项的值
+            var selectedValue = select.options[selectedIndex].value
+            if (selectedValue) {
+              const constraints = {
+                audio: false,
+                video: {
+                  width: { ideal: 1920, max: 1920 },
+                  height: { ideal: 1080, max: 1080 },
+                  deviceId: selectedValue
+                }
+              }
+
+              localStorage.setItem(
+                '_mixlab_webcamera_select',
+                JSON.stringify(constraints)
+              )
+
+              toggleShare(true)
+            }
+
+            modal.remove()
+          })
+
+          closeBtn.addEventListener('click', () => {
+            modal.remove()
+          })
+        })
+
+        widget.shareBtn.addEventListener('click', async () => {
+          toggleShare()
         })
 
         widget.refreshInput.addEventListener('change', async () => {
@@ -636,6 +870,8 @@ app.registerExtension({
         this.addCustomWidget(widget)
         this.onRemoved = function () {
           widget.preview.remove()
+          widget.shareDiv.remove()
+          widget.shareOfWebCamBtn.remove()
           widget.shareBtn.remove()
           widget.liveBtn.remove()
           widget.card.remove()
@@ -643,21 +879,113 @@ app.registerExtension({
           widget.previewArea.remove()
           widget.previewCard.remove()
         }
-        this.serialize_widgets = false
+        this.serialize_widgets = true
       }
     }
   }
 })
 
-function setArea (src) {
+function updateSetAreaDisplay () {
+  try {
+    let canvas = document.createElement('canvas')
+    canvas.width = window._mixlab_screen_webcamVideo.videoWidth
+    canvas.height = window._mixlab_screen_webcamVideo.videoHeight
+    let ctx = canvas.getContext('2d')
+    const lineWidth = 2 // Width of the stroke line
+    const strokeColor = 'red' // Color of the stroke
+
+    // Draw the rectangle
+    ctx.strokeStyle = strokeColor // Set the stroke color
+    ctx.lineWidth = lineWidth // Set the stroke line width
+
+    ctx.fillStyle = 'rgba(255,0,0,0.35)'
+
+    let x = 0,
+      y = 0,
+      width = canvas.width,
+      height = canvas.height
+
+    if (!window._mixlab_share_screen) {
+      let d = getSetAreaData()
+      if (d) {
+        window._mixlab_share_screen = d
+      }
+    }
+
+    if (window._mixlab_share_screen) {
+      x = window._mixlab_share_screen.x
+      y = window._mixlab_share_screen.y
+      width = window._mixlab_share_screen.width
+      height = window._mixlab_share_screen.height
+    }
+
+    ctx.strokeRect(x, y, width, height) // Draw the stroked rectangle
+    ctx.fillRect(x, y, width, height)
+
+    canvas.style.width = '100%'
+
+    let area = graph._nodes
+      .filter(n => n.type === 'ScreenShare')[0]
+      .widgets.filter(w => w.name == 'sreen_share')[0].previewArea
+
+    area.innerHTML = ''
+    area.appendChild(canvas)
+    area.style = `
+    position: absolute;
+    width:100%%;
+    left:0;
+    top:0;
+    `
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function updateSetAreaData (left, top, width, height, imgWidth, imgHeight) {
+  window._mixlab_share_screen = {
+    x: left,
+    y: top,
+    width,
+    height,
+    imgWidth,
+    imgHeight
+  }
+  localStorage.setItem(
+    '_mixlab_share_screen',
+    JSON.stringify(window._mixlab_share_screen)
+  )
+}
+
+function getSetAreaData () {
+  try {
+    let data = JSON.parse(localStorage.getItem('_mixlab_share_screen')) || {}
+    if (data.width === 0 || data.height === 0 || data.width === undefined)
+      return
+    return data
+  } catch (error) {}
+  return
+}
+
+async function setArea (src) {
+  let displayHeight = Math.round(window.screen.availHeight * 0.6)
   let div = document.createElement('div')
   div.innerHTML = `
-    <div id='ml_overlay' style='position: absolute;top:0'>
-      <img id='ml_video' style='position: absolute; width: 500px;   user-select: none; -webkit-user-drag: none;' />
-      <div id='ml_selection' style='position: absolute; border: 2px dashed red; pointer-events: none;'></div>
+    <div id='ml_overlay' style='position: absolute;top:0;background: #251f1fc4;
+    height: 100vh;
+    width: 100%;'>
+      <img id='ml_video' style='position: absolute; 
+      height: ${displayHeight}px;user-select: none; 
+      -webkit-user-drag: none;
+      outline: 2px solid #eaeaea;
+      box-shadow: 8px 9px 17px #575757;' />
+      <div id='ml_selection' style='position: absolute; 
+      border: 2px dashed red; 
+      pointer-events: none;'></div>
     </div>`
   // document.body.querySelector('#ml_overlay')
   document.body.appendChild(div)
+
+  let im = await createImage(src)
 
   let img = div.querySelector('#ml_video')
   let overlay = div.querySelector('#ml_overlay')
@@ -667,10 +995,56 @@ function setArea (src) {
   // Set video source
   img.src = src
 
+  // init area
+  const data = getSetAreaData()
+  let x = 0,
+    y = 0,
+    width = (im.naturalWidth * displayHeight) / im.naturalHeight,
+    height = displayHeight
+  let imgWidth = im.naturalWidth
+  let imgHeight = im.naturalHeight
+  // console.log(
+  //   '#screen_share::使用上一次选区 selection',
+  //   data,
+  //   imgWidth,
+  //   img.width
+  // )
+  if (
+    data &&
+    data.width > 0 &&
+    data.height > 0 &&
+    data.imgWidth === imgWidth &&
+    data.imgHeight === imgHeight &&
+    data.imgHeight > 0
+  ) {
+    // 相同尺寸窗口，恢复选区
+    x = (img.width * data.x) / data.imgWidth
+    y = (img.height * data.y) / data.imgHeight
+    width = (img.width * data.width) / data.imgWidth
+    height = (img.height * data.height) / data.imgHeight
+    // imgWidth = data.imgWidth
+    // imgHeight = data.imgHeight;
+    // console.log('#screen_share::使用上一次选区 selection', x, y, width, height)
+  }
+
+  selection.style.left = x + 'px'
+  selection.style.top = y + 'px'
+  selection.style.width = width + 'px'
+  selection.style.height = height + 'px'
+
   // Add mouse events
   img.addEventListener('mousedown', startSelection)
   img.addEventListener('mousemove', updateSelection)
   img.addEventListener('mouseup', endSelection)
+  overlay.addEventListener('click', remove)
+
+  function remove () {
+    overlay.removeEventListener('click', remove)
+    img.removeEventListener('mousedown', startSelection)
+    img.removeEventListener('mousemove', updateSelection)
+    img.removeEventListener('mouseup', endSelection)
+    div.remove()
+  }
 
   function startSelection (event) {
     if (start == false) {
@@ -732,49 +1106,27 @@ function setArea (src) {
     // console.log('宽度: ' + width)
     // console.log('高度: ' + height)
 
-    img.removeEventListener('mousedown', startSelection)
-    img.removeEventListener('mousemove', updateSelection)
-    img.removeEventListener('mouseup', endSelection)
+    // img.removeEventListener('mousedown', startSelection)
+    // img.removeEventListener('mousemove', updateSelection)
+    // img.removeEventListener('mouseup', endSelection)
 
-    window._mixlab_screen_x = left
-    window._mixlab_screen_y = top
-    window._mixlab_screen_width = width
-    window._mixlab_screen_height = height
+    // window._mixlab_screen_x = left
+    // window._mixlab_screen_y = top
+    // window._mixlab_screen_width = width
+    // window._mixlab_screen_height = height
 
-    try {
-      let canvas = document.createElement('canvas')
-      canvas.width = _mixlab_screen_webcamVideo.videoWidth
-      canvas.height = _mixlab_screen_webcamVideo.videoHeight
-      let ctx = canvas.getContext('2d')
-      const lineWidth = 1 // Width of the stroke line
-      const strokeColor = 'red' // Color of the stroke
+    if (width <= 0 && height <= 0) return remove()
 
-      // Draw the rectangle
-      ctx.strokeStyle = strokeColor // Set the stroke color
-      ctx.lineWidth = lineWidth // Set the stroke line width
-      ctx.strokeRect(
-        _mixlab_screen_x,
-        _mixlab_screen_y,
-        _mixlab_screen_width,
-        _mixlab_screen_height
-      ) // Draw the stroked rectangle
+    updateSetAreaData(left, top, width, height, imgWidth, imgHeight)
 
-      canvas.style.width = '100%'
+    updateSetAreaDisplay()
 
-      let area = graph._nodes
-        .filter(n => n.type === 'ScreenShare')[0]
-        .widgets.filter(w => w.name == 'sreen_share')[0].previewArea
-      area.innerHTML = ''
-      area.appendChild(canvas)
-      area.style = `
-      position: absolute;
-      width:100%%;
-  left:0;
-  top:0;
-      `
-    } catch (error) {}
+    createBlobFromVideo(
+      window._mixlab_screen_webcamVideo,
+      !window._mixlab_screen_live
+    )
 
-    div.remove()
+    remove()
   }
 }
 
@@ -941,7 +1293,7 @@ app.registerExtension({
           outline: none;background: black;`
 
           let div = document.createElement('div')
-          div.style = `display:flex;position: fixed;
+          div.style = `display:flex;position: fixed;flex-direction: column;
           bottom: 0px;
           z-index: 9999;
           left: 0px;
@@ -949,6 +1301,8 @@ app.registerExtension({
           margin: 12px;`
 
           let inputDiv = document.createElement('div')
+          inputDiv.style = `width: 100%;`
+
           // inputDiv.style = ``
           let infoDiv = document.createElement('div')
           infoDiv.style = `    width: 100%;
@@ -1007,10 +1361,10 @@ app.registerExtension({
           btn.style = `cursor: pointer;height: 24px;margin:4px;
           color: red;`
           btn.addEventListener('click', () => {
-            if (input.style.display == 'none') {
-              input.style.display = 'block'
+            if (inputDiv.style.display == 'none') {
+              inputDiv.style.display = 'block'
             } else {
-              input.style.display = 'none'
+              inputDiv.style.display = 'none'
             }
             try {
               pipWindow.document.querySelector('#info').innerText = ''
@@ -1119,16 +1473,48 @@ app.registerExtension({
 
           pipWindow.document.body.append(widget.preview)
           pipWindow.document.body.append(div)
+
+          // 滑动条
+          const createSlide = () => {
+            let d = document.createElement('div')
+            d.style = `width: 100%;margin-bottom: 12px;`
+            let range = document.createElement('input')
+            range.type = 'range'
+            d.appendChild(range)
+            return range
+          }
+
+          let slideInp = createSlide()
+          slideInp.addEventListener('change', () => {
+            console.log(~~slideInp.value / 100)
+            window._mixlab_screen_slide_input = ~~slideInp.value / 100
+            try {
+              pipWindow.document.querySelector('#info').innerText =
+                window._mixlab_screen_slide_input;
+                document.querySelector('#queue-button').click()
+            } catch (error) {
+              console.log(error)
+            }
+          })
+
           // console.log(pipWindow)
 
-          div.appendChild(btnDiv)
+          let fnDiv = document.createElement('div')
+          fnDiv.style = `display: flex;`
+
+          div.appendChild(infoDiv)
+          div.appendChild(fnDiv)
+
+          fnDiv.appendChild(btnDiv)
+
           btnDiv.appendChild(btn)
           btnDiv.appendChild(pauseBtn)
           btnDiv.appendChild(promptFinishBtn)
 
           // 输入框
-          div.appendChild(inputDiv)
-          inputDiv.appendChild(infoDiv)
+          fnDiv.appendChild(inputDiv)
+          inputDiv.appendChild(slideInp)
+
           inputDiv.appendChild(input)
 
           input.addEventListener('input', () => {
@@ -1179,7 +1565,7 @@ app.registerExtension({
           widget.card.remove()
           widget.PictureInPicture.remove()
         }
-        this.serialize_widgets = false
+        this.serialize_widgets = true
       }
 
       const onExecuted = nodeType.prototype.onExecuted
@@ -1628,7 +2014,7 @@ const node = {
   },
   async setup (a) {
     for (const node of app.graph._nodes) {
-      console.log('#setup', node)
+      // console.log('#setup', node)
       if (node.type === 'RandomPrompt') {
         updateUI(node)
       }
