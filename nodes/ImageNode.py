@@ -770,3 +770,31 @@ class FaceToMask:
 
         return (mask,)
 
+
+
+class DrawImageToImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+            "layers": ("LAYERS",),
+            "image": ("IMAGE",),
+                             },
+                }
+    
+    RETURN_TYPES = ("IMAGE",)
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,layers,image):
+        # print(image)
+        im=tensor2pil(image)
+
+
+        im=pil2tensor(im)
+        return (im,)
