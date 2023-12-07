@@ -136,5 +136,6 @@ pip3 install -r requirements.txt
 [discussions](https://github.com/shadowcz007/comfyui-mixlab-nodes/discussions)
 
 ### TODO:
+- 音频播放节点：带可视化、支持多音轨、可配置音轨音量
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 

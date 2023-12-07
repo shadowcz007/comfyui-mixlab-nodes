@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence
+from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
@@ -12,6 +12,7 @@ import cv2
 from .Watcher import FolderWatcher
 
 
+FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 
 MAX_RESOLUTION=8192
 
@@ -374,6 +375,47 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     # 输出合成后的图片
     return bg_image
 
+
+
+def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
+    # Load Chinese font
+    font = ImageFont.truetype(font_path, font_size)
+
+    # Calculate image size based on the number of characters and orientation
+    if vertical:
+        width = font_size + 100
+        height = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
+    else:
+        width = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
+        height = font_size + 100
+
+    # Create a blank image
+    image = Image.new('RGBA', (width, height), (255, 255, 255,0))
+    draw = ImageDraw.Draw(image)
+
+    # Draw text
+    if vertical:
+        for i, char in enumerate(text_list):
+            char_position = (50, 50 + i * font_size)
+            draw.text(char_position, char, font=font, fill=text_color)
+    else:
+        for i, char in enumerate(text_list):
+            char_position = (50 + i * (font_size + spacing), 50)
+            draw.text(char_position, char, font=font, fill=text_color)
+
+    # Save the image
+    # image.save(output_image_path)
+
+    # 分离alpha通道
+    alpha_channel = image.split()[3]
+
+    # 创建一个只有alpha通道的新图像
+    alpha_image = Image.new('L', image.size)
+    alpha_image.putdata(alpha_channel.getdata())
+
+    image=image.convert('RGB')
+
+    return (image,alpha_image)
 
 
 
@@ -762,6 +804,54 @@ class ImageCropByAlpha:
         img = image[:,y:to_y, x:to_x, :]
         return (img,)
 
+
+
+class TextImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+            
+                    "text": ("STRING",{"multiline": False,"default": "龍馬精神迎新歲"}),
+                    "font_path": ("STRING",{"multiline": False,"default": FONT_PATH}),
+                    "font_size": ("INT",{
+                                "default":100, 
+                                "min": 100, #Minimum value
+                                "max": 1000, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }), 
+                    "spacing": ("INT",{
+                                "default":12, 
+                                "min": 1, #Minimum value
+                                "max": 200, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }), 
+                    "text_color":("COLOR",),
+                    "vertical":("BOOLEAN", {"default": True},),
+                             },
+                }
+    
+    RETURN_TYPES = ("IMAGE","MASK")
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,False,)
+
+    def run(self,text,font_path,font_size,spacing,text_color,vertical):
+        
+        text_list=list(text)
+
+        img,mask=generate_text_image(text_list,font_path,font_size,text_color,vertical,spacing)
+        
+        img=pil2tensor(img)
+        mask=pil2tensor(mask)
+
+        return (img,mask,)
 
 class AreaToMask:
     @classmethod

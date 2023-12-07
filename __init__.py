@@ -268,7 +268,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,EmptyLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,TextImage,EmptyLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -280,6 +280,7 @@ NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "TransparentImage":TransparentImage,
     "LoadImagesFromPath":LoadImagesFromPath,
+    "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
     "EmptyLayer":EmptyLayer,
     "NewLayer":NewLayer,
@@ -310,7 +311,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ScreenShare":"ScreenShare ♾️Mixlab",
     "FloatingVideo":"FloatingVideo ♾️Mixlab",
     "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
-    "ShowTextForGPT":"ShowTextForGPT ♾️Mixlab"
+    "ShowTextForGPT":"ShowTextForGPT ♾️Mixlab",
+    "MergeLayers":"MergeLayers ♾️Mixlab"
 }
 
 # web ui的节点功能
