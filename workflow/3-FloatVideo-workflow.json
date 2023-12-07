@@ -1,6 +1,6 @@
 {
-  "last_node_id": 22,
-  "last_link_id": 48,
+  "last_node_id": 23,
+  "last_link_id": 51,
   "nodes": [
     {
       "id": 7,
@@ -105,7 +105,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 48,
+          "link": 51,
           "widget": {
             "name": "text"
           }
@@ -316,13 +316,13 @@
         "1": 246
       },
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 46
+          "link": 50
         }
       ],
       "properties": {
@@ -445,13 +445,13 @@
         "1": 58
       },
       "flags": {},
-      "order": 7,
+      "order": 6,
       "mode": 0,
       "inputs": [
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 47
+          "link": 49
         }
       ],
       "outputs": [
@@ -473,55 +473,16 @@
       ]
     },
     {
-      "id": 22,
-      "type": "ScreenShare",
-      "pos": [
-        -63,
-        483
-      ],
-      "size": {
-        "0": 315,
-        "1": 98
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            46,
-            47
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            48
-          ],
-          "shape": 3,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ScreenShare"
-      }
-    },
-    {
       "id": 20,
       "type": "FloatingVideo",
       "pos": [
         1928,
         295
       ],
-      "size": [
-        315,
-        58
-      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
       "flags": {},
       "order": 12,
       "mode": 0,
@@ -534,7 +495,68 @@
       ],
       "properties": {
         "Node name for S&R": "FloatingVideo"
-      }
+      },
+      "widgets_values": [
+        null
+      ]
+    },
+    {
+      "id": 23,
+      "type": "ScreenShare",
+      "pos": [
+        -65,
+        446
+      ],
+      "size": {
+        "0": 315,
+        "1": 170
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            49,
+            50
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "PROMPT",
+          "type": "STRING",
+          "links": [
+            51
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ScreenShare"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
     }
   ],
   "links": [
@@ -787,24 +809,24 @@
       "CLIP"
     ],
     [
-      46,
-      22,
-      0,
-      2,
-      0,
-      "IMAGE"
-    ],
-    [
-      47,
-      22,
+      49,
+      23,
       0,
       18,
       0,
       "IMAGE"
     ],
     [
-      48,
-      22,
+      50,
+      23,
+      0,
+      2,
+      0,
+      "IMAGE"
+    ],
+    [
+      51,
+      23,
       1,
       8,
       1,

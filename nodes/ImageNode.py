@@ -322,6 +322,60 @@ def areaToMask(x,y,w,h,image):
     return mask
 
 
+# def merge_images(bg_image, layer_image,mask, x, y, width, height):
+#     # 打开底图
+#     # bg_image = Image.open(background)
+#     bg_image=bg_image.convert("RGBA")
+
+#     # 打开图层
+#     layer_image=layer_image.convert("RGBA")
+#     layer_image = layer_image.resize((width, height))
+#     # mask = Image.new("L", layer_image.size, 255)
+#     mask = mask.resize((width, height))
+#     # 在底图上粘贴图层
+#     bg_image.paste(layer_image, (x, y), mask=mask)
+
+#     # 输出合成后的图片
+#     # bg_image.save("output.jpg")
+#     return bg_image
+
+def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option):
+    # 打开底图
+    bg_image = bg_image.convert("RGBA")
+
+    # 打开图层
+    layer_image = layer_image.convert("RGBA")
+    # layer_image = layer_image.resize((width, height))
+
+    # 根据缩放选项调整图像大小
+    if scale_option == "height":
+        # 按照高度比例缩放
+        original_width, original_height = layer_image.size
+        scale = height / original_height
+        new_width = int(original_width * scale)
+        layer_image = layer_image.resize((new_width, height))
+    elif scale_option == "width":
+        # 按照宽度比例缩放
+        original_width, original_height = layer_image.size
+        scale = width / original_width
+        new_height = int(original_height * scale)
+        layer_image = layer_image.resize((width, new_height))
+    elif scale_option == "overall":
+        # 整体缩放
+        layer_image = layer_image.resize((width, height))
+
+    # 调整mask的大小
+    nw, nh = layer_image.size
+    mask = mask.resize((nw, nh))
+
+    # 在底图上粘贴图层
+    bg_image.paste(layer_image, (x, y), mask=mask)
+
+    # 输出合成后的图片
+    return bg_image
+
+
+
 
 class SmoothMask:
     @classmethod
@@ -494,6 +548,7 @@ class TransparentImage:
             }
     
     RETURN_TYPES = ('STRING','IMAGE','RGBA')
+    RETURN_NAMES = ("file_path","IMAGE","RGBA",)
 
     OUTPUT_NODE = True
 
@@ -771,12 +826,149 @@ class FaceToMask:
         return (mask,)
 
 
+class EmptyLayer:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": { 
+                "width": ("INT",{
+                    "default":512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+               "height": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+            },
+        
+                }
+    
+    RETURN_TYPES = ("LAYER",)
+    RETURN_NAMES = ("layers",)
 
-class DrawImageToImage:
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/layer"
+
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self, width,height):
+        blank_image = Image.new("RGB", (width, height))
+        
+        mask=blank_image.convert('L')
+
+        blank_image=pil2tensor(blank_image)
+        mask=pil2tensor(mask)
+
+        layer_n=[{
+            "x":0,
+            "y":0,
+            "width":width,
+            "height":height,
+            "z_index":0,
+            "scale_option":'width',
+            "image":blank_image,
+            "mask":mask
+        }]
+        return (layer_n,)
+
+class NewLayer:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            
+            "required": { 
+                "x": ("INT",{
+                    "default": 0, 
+                    "min": -100, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "y": ("INT",{
+                    "default": 0, 
+                    "min": 0, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "z_index": ("INT",{
+                    "default": 0, 
+                    "min":0, #Minimum value
+                    "max": 100, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "scale_option": (["width","height",'overall'],),
+                "image": ("IMAGE",),
+            },
+             "optional":{
+                    "mask": ("MASK",{"default": None}),
+                    "layers": ("LAYER",{"default": None}), 
+                }
+                }
+    
+    RETURN_TYPES = ("LAYER",)
+    RETURN_NAMES = ("layers",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/layer"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self,x,y,width,height,z_index,scale_option,image,mask,layers):
+        # print(x,y,width,height,z_index,image,mask)
+        
+        if mask==None:
+            im=tensor2pil(image)
+            mask=im.convert('L')
+            mask=pil2tensor(mask)
+        else:
+            mask=mask[0]
+
+        layer_n=[{
+            "x":x[0],
+            "y":y[0],
+            "width":width[0],
+            "height":height[0],
+            "z_index":z_index[0],
+            "scale_option":scale_option[0],
+            "image":image[0],
+            "mask":mask
+        }]
+
+        if layers!=None:
+            layer_n=layer_n+layers
+
+        return (layer_n,)
+
+class MergeLayers:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-            "layers": ("LAYERS",),
+            "layers": ("LAYER",),
             "image": ("IMAGE",),
                              },
                 }
@@ -786,15 +978,30 @@ class DrawImageToImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/layer"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (False,)
 
     def run(self,layers,image):
-        # print(image)
-        im=tensor2pil(image)
+        # print(len(layers),len(image))
+        bg_image=image[0]
+        bg_image=tensor2pil(bg_image)
+        # 按z-index排序
+        layers = sorted(layers, key=lambda x: x["z_index"])
+     
+        for layer in layers:
+            layer_image=tensor2pil(layer['image'])
+            layer_mask=tensor2pil(layer['mask'])
+            bg_image=merge_images(bg_image,
+                                  layer_image,
+                                  layer_mask,
+                                  layer['x'],
+                                  layer['y'],
+                                  layer['width'],
+                                  layer['height'],
+                                  layer['scale_option']
+                                  )
 
-
-        im=pil2tensor(im)
-        return (im,)
+        bg_image=pil2tensor(bg_image)
+        return (bg_image,)

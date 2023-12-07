@@ -1,13 +1,13 @@
 {
-  "last_node_id": 23,
-  "last_link_id": 54,
+  "last_node_id": 24,
+  "last_link_id": 59,
   "nodes": [
     {
       "id": 7,
       "type": "CLIPTextEncode",
       "pos": [
-        495,
-        307
+        515,
+        130
       ],
       "size": {
         "0": 400,
@@ -45,8 +45,8 @@
       "id": 8,
       "type": "CLIPTextEncode",
       "pos": [
-        504,
-        33
+        515,
+        1268
       ],
       "size": {
         "0": 400,
@@ -64,7 +64,7 @@
         {
           "name": "text",
           "type": "STRING",
-          "link": 48,
+          "link": 59,
           "widget": {
             "name": "text"
           }
@@ -92,8 +92,8 @@
       "id": 6,
       "type": "LoraLoader",
       "pos": [
-        112,
-        5
+        515,
+        460
       ],
       "size": {
         "0": 315,
@@ -141,57 +141,16 @@
       ]
     },
     {
-      "id": 23,
-      "type": "VAEEncode",
-      "pos": [
-        563,
-        663
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pixels",
-          "type": "IMAGE",
-          "link": 52
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 53
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [
-            54
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEEncode"
-      }
-    },
-    {
       "id": 5,
       "type": "KSampler",
       "pos": [
-        1085,
-        49
+        1015,
+        130
       ],
-      "size": [
-        315,
-        262
-      ],
+      "size": {
+        "0": 315,
+        "1": 262
+      },
       "flags": {},
       "order": 7,
       "mode": 0,
@@ -219,7 +178,7 @@
         {
           "name": "denoise",
           "type": "FLOAT",
-          "link": 49,
+          "link": 56,
           "widget": {
             "name": "denoise"
           }
@@ -253,8 +212,8 @@
       "id": 11,
       "type": "VAEDecode",
       "pos": [
-        1451,
-        59
+        1430,
+        130
       ],
       "size": {
         "0": 210,
@@ -294,13 +253,13 @@
       "id": 20,
       "type": "FloatingVideo",
       "pos": [
-        1464,
-        243
+        1740,
+        130
       ],
-      "size": [
-        315,
-        58
-      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
       "flags": {},
       "order": 9,
       "mode": 0,
@@ -319,11 +278,77 @@
       ]
     },
     {
+      "id": 2,
+      "type": "PreviewImage",
+      "pos": [
+        515,
+        716
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 55
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 23,
+      "type": "VAEEncode",
+      "pos": [
+        515,
+        1092
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "pixels",
+          "type": "IMAGE",
+          "link": 57
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 58
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            54
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEEncode"
+      }
+    },
+    {
       "id": 10,
       "type": "CheckpointLoaderSimple",
       "pos": [
-        80,
-        238
+        100,
+        130
       ],
       "size": {
         "0": 315,
@@ -358,7 +383,7 @@
           "type": "VAE",
           "links": [
             34,
-            53
+            58
           ],
           "shape": 3,
           "slot_index": 2
@@ -372,15 +397,15 @@
       ]
     },
     {
-      "id": 22,
+      "id": 24,
       "type": "ScreenShare",
       "pos": [
-        103,
-        412
+        100,
+        358
       ],
       "size": {
         "0": 315,
-        "1": 146
+        "1": 170
       },
       "flags": {},
       "order": 1,
@@ -390,17 +415,17 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            46,
-            52
+            55,
+            57
           ],
           "shape": 3,
           "slot_index": 0
         },
         {
-          "name": "STRING",
+          "name": "PROMPT",
           "type": "STRING",
           "links": [
-            48
+            59
           ],
           "shape": 3,
           "slot_index": 1
@@ -409,10 +434,16 @@
           "name": "FLOAT",
           "type": "FLOAT",
           "links": [
-            49
+            56
           ],
           "shape": 3,
           "slot_index": 2
+        },
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -422,33 +453,9 @@
         null,
         null,
         null,
+        null,
         null
       ]
-    },
-    {
-      "id": 2,
-      "type": "PreviewImage",
-      "pos": [
-        -501,
-        918
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 46
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
     }
   ],
   "links": [
@@ -661,30 +668,6 @@
       "CLIP"
     ],
     [
-      46,
-      22,
-      0,
-      2,
-      0,
-      "IMAGE"
-    ],
-    [
-      48,
-      22,
-      1,
-      8,
-      1,
-      "STRING"
-    ],
-    [
-      49,
-      22,
-      2,
-      5,
-      4,
-      "FLOAT"
-    ],
-    [
       51,
       8,
       0,
@@ -693,15 +676,39 @@
       "CONDITIONING"
     ],
     [
-      52,
-      22,
+      54,
+      23,
+      0,
+      5,
+      3,
+      "LATENT"
+    ],
+    [
+      55,
+      24,
+      0,
+      2,
+      0,
+      "IMAGE"
+    ],
+    [
+      56,
+      24,
+      2,
+      5,
+      4,
+      "FLOAT"
+    ],
+    [
+      57,
+      24,
       0,
       23,
       0,
       "IMAGE"
     ],
     [
-      53,
+      58,
       10,
       2,
       23,
@@ -709,12 +716,12 @@
       "VAE"
     ],
     [
-      54,
-      23,
-      0,
-      5,
-      3,
-      "LATENT"
+      59,
+      24,
+      1,
+      8,
+      1,
+      "STRING"
     ]
   ],
   "groups": [],
