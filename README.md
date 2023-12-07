@@ -110,7 +110,7 @@ Install the requirements:
 
 run directly:
 ```
-cd ComfyUI_Mixlab
+cd ComfyUI/custom_nodes/comfyui-mixlab-nodes
 install.bat
 ```
 
