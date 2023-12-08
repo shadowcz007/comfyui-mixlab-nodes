@@ -784,7 +784,7 @@ class LoadImagesFromPath:
             imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
             masks=[masks[index_variable]] if index_variable < len(masks) else None
 
-        print('#prompt::::',prompt)
+        # print('#prompt::::',prompt)
         return (imgs,masks,prompt,)
 
 
@@ -1121,13 +1121,8 @@ class EditLayer:
         return {
             
             "required": { 
-                "edit_index": ("INT",{
-                    "default": 0, 
-                    "min": 0, #Minimum value
-                    "max": 99, #Maximum value
-                    "step": 1, #Slider's step
-                    "display": "number" # Cosmetic only: display as "number" or "slider"
-                }),
+                "edit": ("EDIT",),
+               
                 "x": ("INT",{
                     "default": 0, 
                     "min": -100, #Minimum value
@@ -1182,7 +1177,7 @@ class EditLayer:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self,edit_index,x,y,width,height,z_index,scale_option,image,mask,layers):
+    def run(self,edit,x,y,width,height,z_index,scale_option,image,mask,layers):
         # print(x,y,width,height,z_index,image,mask)
         
         if mask==None:
@@ -1192,7 +1187,7 @@ class EditLayer:
         else:
             mask=mask[0]
 
-        layers[edit_index[0]]={
+        layers[edit[0]]={
             "x":x[0],
             "y":y[0],
             "width":width[0],
@@ -1223,28 +1218,30 @@ class MergeLayers:
     CATEGORY = "♾️Mixlab/layer"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (False,)
+    # OUTPUT_IS_LIST = (False,)
 
     def run(self,layers,image):
         # print(len(layers),len(image))
         bg_image=image[0]
         bg_image=tensor2pil(bg_image)
         # 按z-index排序
-        layers = sorted(layers, key=lambda x: x["z_index"])
+        layers_new = sorted(layers, key=lambda x: x["z_index"])
      
-        for layer in layers:
-            if 'type' in layer and layer['type']=='base64' and type(layer['image']) == str:
-                im=base64_to_image(layer['image'])
+        for layer in layers_new:
+            image=layer['image']
+            mask=layer['mask']
+            if 'type' in layer and layer['type']=='base64' and type(image) == str:
+                im=base64_to_image(image)
                 im=im.convert('RGB')
-                layer['image']=pil2tensor(im)
+                image=pil2tensor(im)
 
-                mask=base64_to_image(layer['mask'])
+                mask=base64_to_image(mask)
                 mask=mask.convert('L')
-                layer['mask']=pil2tensor(mask)
+                mask=pil2tensor(mask)
             
             
-            layer_image=tensor2pil(layer['image'])
-            layer_mask=tensor2pil(layer['mask'])
+            layer_image=tensor2pil(image)
+            layer_mask=tensor2pil(mask)
             bg_image=merge_images(bg_image,
                                   layer_image,
                                   layer_mask,

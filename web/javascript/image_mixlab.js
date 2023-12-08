@@ -1,7 +1,29 @@
 import { app } from '../../../scripts/app.js'
-// import { api } from '../../../scripts/api.js'
+import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
+
+async function uploadImage (blob) {
+  // const blob = await (await fetch(src)).blob();
+  const body = new FormData()
+  body.append('image', new File([blob], new Date().getTime() + '.svg'))
+
+  const resp = await api.fetchApi('/upload/image', {
+    method: 'POST',
+    body
+  })
+
+  // console.log(resp)
+  let data = await resp.json()
+  let { name, subfolder } = data
+  let src = api.apiURL(
+    `/view?filename=${encodeURIComponent(
+      name
+    )}&type=input&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
+  )
+
+  return src
+}
 
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
@@ -45,6 +67,11 @@ const getLocalData = key => {
   return data
 }
 
+const setLocalDataOfWin = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value))
+  // window[key] = value
+}
+
 function createImage (url) {
   let im = new Image()
   return new Promise((res, rej) => {
@@ -60,9 +87,9 @@ const parseSvg = async svgContent => {
 
   // 提取SVG元素
   const svgElement = tempContainer.querySelector('svg')
-  if(!svgElement)return
+  if (!svgElement) return
   // 获取SVG中 rect元素
-  var rectElements = svgElement?.querySelectorAll('rect')||[]
+  var rectElements = svgElement?.querySelectorAll('rect') || []
 
   // 定义一个数组来存储处理后的数据
   var data = []
@@ -140,7 +167,7 @@ const parseSvg = async svgContent => {
   data.push(rectData)
 
   // 打印处理后的数据
-  console.log({ data, image: base64, svgElement })
+  // console.log({ data, image: base64, svgElement })
   return { data, image: base64, svgElement }
 }
 
@@ -270,7 +297,7 @@ app.registerExtension({
   async getCustomWidgets (app) {
     return {
       SVG (node, inputName, inputData, app) {
-        console.log('##node', node,inputName, inputData)
+        // console.log('##node', node, inputName, inputData)
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
@@ -281,13 +308,25 @@ app.registerExtension({
           },
           async serializeValue (nodeId, widgetIndex) {
             let d = getLocalData('_mixlab_svg_image')
-            const { data, image } = (await parseSvg(d[node.id]))||{}
-            // console.log(data, image)
-            return JSON.parse(JSON.stringify({ data, image }))
-          }
+            // console.log('serializeValue',d)
+            if (d) {
+              let url = d[node.id]
+              let dt = await fetch(url)
+              let svgStr = await dt.text()
+              const { data, image } = (await parseSvg(svgStr)) || {}
+              // console.log(data, image)
+              return JSON.parse(JSON.stringify({ data, image }))
+            } else {
+              return
+            }
+          },
+          
         }
+
+        // console.log('##node',node.serialize)
         //  widget.something = something;          // maybe adds stuff to it
         node.addCustomWidget(widget) // adds it to the node
+
         return widget // and returns it.
       }
     }
@@ -296,10 +335,11 @@ app.registerExtension({
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'SvgImage') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
-      nodeType.prototype.onNodeCreated = function () {
+      nodeType.prototype.onNodeCreated =async function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        // console.log('SvgImage nodeData', this.widgets)
+        const uploadWidget=this.widgets.filter(w=>w.name=='upload')[0];
+        // console.log('SvgImage nodeData',await uploadWidget.serializeValue())
 
         const widget = {
           type: 'div',
@@ -337,9 +377,9 @@ app.registerExtension({
           label.style = 'font-size: 10px;min-width:32px'
           label.innerText = placeholder
           div.appendChild(label)
-          div.appendChild(ip);
+          div.appendChild(ip)
 
-          let that=this;
+          let that = this
 
           ip.addEventListener('change', event => {
             const file = event.target.files[0]
@@ -349,11 +389,14 @@ app.registerExtension({
             reader.onload = async e => {
               const svgContent = e.target.result
 
-              const { svgElement } = await parseSvg(svgContent)
+              var blob = new Blob([svgContent], { type: 'image/svg+xml' })
+              let url = await uploadImage(blob)
+              // console.log(url)
+              const { svgElement, data, image } = await parseSvg(svgContent)
               // 将提取的SVG元素显示在页面上
-              let data = getLocalData(key)
-              data[that.id] = svgElement.outerHTML
-              localStorage.setItem(key, JSON.stringify(data))
+              let dd = getLocalData(key)
+              dd[that.id] = url
+              setLocalDataOfWin(key, dd)
               // console.log(this.id, ip.value.trim())
 
               svgElement.style = `width: 90%;padding: 5%;`
@@ -361,6 +404,9 @@ app.registerExtension({
 
               svgContainer.innerHTML = ''
               svgContainer.appendChild(svgElement)
+              
+              uploadWidget.value=await uploadWidget.serializeValue();
+
             }
 
             // 以文本形式读取文件
@@ -370,6 +416,7 @@ app.registerExtension({
         }
 
         let svg = document.createElement('div')
+        svg.className = 'preview'
         svg.style = `background:#eee;margin-top: 12px;`
 
         let upload = inputDiv('_mixlab_svg_image', 'Svg', svg)
@@ -386,22 +433,41 @@ app.registerExtension({
           return onRemoved?.()
         }
 
-        this.serialize_widgets = false //需要保存参数
+        this.serialize_widgets = true //需要保存参数
       }
     }
   },
   async loadedGraphNode (node, app) {
     // Fires every time a node is constructed
     // You can modify widgets/add handlers/etc here
-
+    const sleep=(t=1000)=>{
+      return new Promise((res,rej)=>{
+        setTimeout(()=>res(1),t)
+      })
+    }
     if (node.type === 'SvgImage') {
-      let widget = node.widgets.filter(w => w.div)[0]
+      // await sleep(0)
+      let widget = node.widgets.filter(w => w.name === 'upload-preview')[0]
 
-      let data = getLocalData('_mixlab_svg_image')
+      let dd = getLocalData('_mixlab_svg_image')
 
       let id = node.id
+      console.log('SvgImage load',node.widgets[0], node.widgets)
+      if (!dd[id]) return
+      let dt = await fetch(dd[id])
+      let svgStr = await dt.text()
 
-      // widget.div.querySelector('.Svg').value = data[id] || '#000000'
+      const { svgElement, data, image } = await parseSvg(svgStr)
+      svgElement.style = `width: 90%;padding: 5%;`
+      // 将提取的SVG元素显示在页面上
+    
+      widget.div.querySelector('.preview').innerHTML = ''
+      widget.div.querySelector('.preview').appendChild(svgElement)
+
+      const uploadWidget=node.widgets.filter(w=>w.name=='upload')[0];
+      uploadWidget.value= await uploadWidget.serializeValue();
+     
+      // console.log(node.widgets_values)
     }
   }
 })

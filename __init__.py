@@ -282,7 +282,7 @@ NODE_CLASS_MAPPINGS = {
     "LoadImagesFromPath":LoadImagesFromPath,
     "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
-    # "SvgImage":SvgImage,
+    "SvgImage":SvgImage,
     "EmptyLayer":EmptyLayer,
     # "EditLayer":EditLayer,
     "NewLayer":NewLayer,
