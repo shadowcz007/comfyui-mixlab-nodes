@@ -433,6 +433,10 @@ app.registerExtension({
           return onRemoved?.()
         }
 
+        if (this.onResize) {
+          this.onResize(this.size)
+        }
+        
         this.serialize_widgets = true //需要保存参数
       }
     }

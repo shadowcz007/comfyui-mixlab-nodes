@@ -1115,7 +1115,7 @@ class NewLayer:
         return (layer_n,)
 
 
-class EditLayer:
+class ShowLayer:
     @classmethod
     def INPUT_TYPES(s):
         return {
@@ -1159,46 +1159,46 @@ class EditLayer:
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
                 "scale_option": (["width","height",'overall'],),
-                "image": ("IMAGE",),
+                # "image": ("IMAGE",),
             },
              "optional":{
-                    "mask": ("MASK",{"default": None}),
+                    # "mask": ("MASK",{"default": None}),
                     "layers": ("LAYER",{"default": None}), 
                 }
                 }
     
-    RETURN_TYPES = ("LAYER",)
-    RETURN_NAMES = ("layers",)
+    RETURN_TYPES = ( )
+    RETURN_NAMES = ( )
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/layer"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    # OUTPUT_IS_LIST = (True,)
 
-    def run(self,edit,x,y,width,height,z_index,scale_option,image,mask,layers):
+    def run(self,edit,x,y,width,height,z_index,scale_option,layers):
         # print(x,y,width,height,z_index,image,mask)
         
-        if mask==None:
-            im=tensor2pil(image)
-            mask=im.convert('L')
-            mask=pil2tensor(mask)
-        else:
-            mask=mask[0]
+        # if mask==None:
+        #     im=tensor2pil(image)
+        #     mask=im.convert('L')
+        #     mask=pil2tensor(mask)
+        # else:
+        #     mask=mask[0]
 
-        layers[edit[0]]={
-            "x":x[0],
-            "y":y[0],
-            "width":width[0],
-            "height":height[0],
-            "z_index":z_index[0],
-            "scale_option":scale_option[0],
-            "image":image[0],
-            "mask":mask
-        }
+        # layers[edit[0]]={
+        #     "x":x[0],
+        #     "y":y[0],
+        #     "width":width[0],
+        #     "height":height[0],
+        #     "z_index":z_index[0],
+        #     "scale_option":scale_option[0],
+        #     "image":image[0],
+        #     "mask":mask
+        # }
 
-        return (layers,)
+        return ( )
 
 
 class MergeLayers:

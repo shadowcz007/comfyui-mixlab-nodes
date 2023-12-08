@@ -268,7 +268,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,TextImage,SvgImage,EmptyLayer,EditLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,TextImage,SvgImage,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -284,7 +284,7 @@ NODE_CLASS_MAPPINGS = {
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
     "EmptyLayer":EmptyLayer,
-    # "EditLayer":EditLayer,
+    "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
     "MergeLayers":MergeLayers,
     "SplitLongMask":SplitLongMask,

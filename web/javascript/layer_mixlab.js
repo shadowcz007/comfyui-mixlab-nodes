@@ -145,7 +145,7 @@ const parseSvg = async svgContent => {
 }
 
 app.registerExtension({
-  name: 'Mixlab.layer.EditLayer',
+  name: 'Mixlab.layer.ShowLayer',
   async getCustomWidgets (app) {
     return {
       EDIT (node, inputName, inputData, app) {
@@ -159,7 +159,7 @@ app.registerExtension({
             if (this.input)
               Object.assign(
                 this.input.style,
-                get_position_style(ctx, widget_width, 66, node.size[1])
+                get_position_style(ctx, widget_width, 32, node.size[1])
               )
           },
           computeSize (...args) {
@@ -179,16 +179,16 @@ app.registerExtension({
   },
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    if (nodeType.comfyClass == 'EditLayer') {
+    if (nodeType.comfyClass == 'ShowLayer') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
 
         const findNode = nodeId => {
           let node = app.graph._nodes_by_id[nodeId]
-          if (node?.type == 'Reroute'||node?.type == 'EditLayer') {
+          if (node?.type == 'Reroute') {
             
-            let linkId =node.inputs.filter(i=>i.type=='LAYER'||i.type=='*')[0].link
+            let linkId =node.inputs.filter(i=>i.type=='*')[0].link
             nodeId = app.graph.links.filter(link => link.id == linkId)[0]
               ?.origin_id
             return findNode(nodeId)
