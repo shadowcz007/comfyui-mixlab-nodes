@@ -5,7 +5,7 @@ from PIL.PngImagePlugin import PngInfo
 import base64,os
 from io import BytesIO
 import folder_paths
-import json
+import json,io
 from comfy.cli_args import args
 import cv2 
 
@@ -416,6 +416,22 @@ def generate_text_image(text_list, font_path, font_size, text_color, vertical=Tr
     image=image.convert('RGB')
 
     return (image,alpha_image)
+
+
+def base64_to_image(base64_string):
+    # 去除前缀
+    prefix, base64_data = base64_string.split(",", 1)
+    
+    # 从base64字符串中解码图像数据
+    image_data = base64.b64decode(base64_data)
+    
+    # 创建一个内存流对象
+    image_stream = io.BytesIO(image_data)
+    
+    # 使用PIL的Image模块打开图像数据
+    image = Image.open(image_stream)
+    
+    return image
 
 
 
@@ -853,6 +869,49 @@ class TextImage:
 
         return (img,mask,)
 
+
+
+class SvgImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "upload":("SVG",),   },
+                }
+    
+    RETURN_TYPES = ("IMAGE","LAYER")
+    RETURN_NAMES = ("IMAGE","layers",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,True,)
+
+    def run(self,upload):
+        layers=[]
+
+        # print(upload['image'])
+        image = base64_to_image(upload['image'])
+        image=image.convert('RGB')
+        image=pil2tensor(image)
+
+        for layer in upload['data']:
+            # print(layer)
+            # if layer['type']=='base64':
+            #     im=base64_to_image(layer['image'])
+            #     im=im.convert('RGB')
+            #     layer['image']=pil2tensor(im)
+
+            #     mask=base64_to_image(layer['mask'])
+            #     mask=mask.convert('L')
+            #     layer['mask']=pil2tensor(mask)
+
+            layers.append(layer)
+    
+        return (image,layers,)
+
+
 class AreaToMask:
     @classmethod
     def INPUT_TYPES(s):
@@ -968,6 +1027,7 @@ class EmptyLayer:
         }]
         return (layer_n,)
 
+
 class NewLayer:
     @classmethod
     def INPUT_TYPES(s):
@@ -1054,6 +1114,98 @@ class NewLayer:
 
         return (layer_n,)
 
+
+class EditLayer:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            
+            "required": { 
+                "edit_index": ("INT",{
+                    "default": 0, 
+                    "min": 0, #Minimum value
+                    "max": 99, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "x": ("INT",{
+                    "default": 0, 
+                    "min": -100, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "y": ("INT",{
+                    "default": 0, 
+                    "min": 0, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "z_index": ("INT",{
+                    "default": 0, 
+                    "min":0, #Minimum value
+                    "max": 100, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "scale_option": (["width","height",'overall'],),
+                "image": ("IMAGE",),
+            },
+             "optional":{
+                    "mask": ("MASK",{"default": None}),
+                    "layers": ("LAYER",{"default": None}), 
+                }
+                }
+    
+    RETURN_TYPES = ("LAYER",)
+    RETURN_NAMES = ("layers",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/layer"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self,edit_index,x,y,width,height,z_index,scale_option,image,mask,layers):
+        # print(x,y,width,height,z_index,image,mask)
+        
+        if mask==None:
+            im=tensor2pil(image)
+            mask=im.convert('L')
+            mask=pil2tensor(mask)
+        else:
+            mask=mask[0]
+
+        layers[edit_index[0]]={
+            "x":x[0],
+            "y":y[0],
+            "width":width[0],
+            "height":height[0],
+            "z_index":z_index[0],
+            "scale_option":scale_option[0],
+            "image":image[0],
+            "mask":mask
+        }
+
+        return (layers,)
+
+
 class MergeLayers:
     @classmethod
     def INPUT_TYPES(s):
@@ -1081,6 +1233,16 @@ class MergeLayers:
         layers = sorted(layers, key=lambda x: x["z_index"])
      
         for layer in layers:
+            if 'type' in layer and layer['type']=='base64' and type(layer['image']) == str:
+                im=base64_to_image(layer['image'])
+                im=im.convert('RGB')
+                layer['image']=pil2tensor(im)
+
+                mask=base64_to_image(layer['mask'])
+                mask=mask.convert('L')
+                layer['mask']=pil2tensor(mask)
+            
+            
             layer_image=tensor2pil(layer['image'])
             layer_mask=tensor2pil(layer['mask'])
             bg_image=merge_images(bg_image,
