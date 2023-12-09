@@ -843,7 +843,7 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
-                    "text_color":("COLOR",),
+                    "text_color":("TCOLOR",),
                     "vertical":("BOOLEAN", {"default": True},),
                              },
                 }
@@ -1251,6 +1251,15 @@ class MergeLayers:
                                   layer['height'],
                                   layer['scale_option']
                                   )
-
+            
+        mask=bg_image.convert('RGBA')
+        mask=pil2tensor(mask)
+        
+        bg_image=bg_image.convert('RGB')
         bg_image=pil2tensor(bg_image)
-        return (bg_image,)
+
+        channels = ["red", "green", "blue", "alpha"]
+        # print(mask,mask.shape)
+        mask = mask[:, :, :, channels.index("green")]
+        
+        return (bg_image,mask,)

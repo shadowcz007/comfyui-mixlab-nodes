@@ -175,7 +175,7 @@ app.registerExtension({
   name: 'Mixlab.image.TextImage',
   async getCustomWidgets (app) {
     return {
-      COLOR (node, inputName, inputData, app) {
+      TCOLOR (node, inputName, inputData, app) {
         // console.log('##node', node)
         const widget = {
           type: inputData[0], // the type, CHEESE
@@ -319,8 +319,7 @@ app.registerExtension({
             } else {
               return
             }
-          },
-          
+          }
         }
 
         // console.log('##node',node.serialize)
@@ -335,10 +334,10 @@ app.registerExtension({
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'SvgImage') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
-      nodeType.prototype.onNodeCreated =async function () {
+      nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        const uploadWidget=this.widgets.filter(w=>w.name=='upload')[0];
+        const uploadWidget = this.widgets.filter(w => w.name == 'upload')[0]
         // console.log('SvgImage nodeData',await uploadWidget.serializeValue())
 
         const widget = {
@@ -404,9 +403,8 @@ app.registerExtension({
 
               svgContainer.innerHTML = ''
               svgContainer.appendChild(svgElement)
-              
-              uploadWidget.value=await uploadWidget.serializeValue();
 
+              uploadWidget.value = await uploadWidget.serializeValue()
             }
 
             // 以文本形式读取文件
@@ -436,7 +434,8 @@ app.registerExtension({
         if (this.onResize) {
           this.onResize(this.size)
         }
-        
+  
+
         this.serialize_widgets = true //需要保存参数
       }
     }
@@ -444,9 +443,9 @@ app.registerExtension({
   async loadedGraphNode (node, app) {
     // Fires every time a node is constructed
     // You can modify widgets/add handlers/etc here
-    const sleep=(t=1000)=>{
-      return new Promise((res,rej)=>{
-        setTimeout(()=>res(1),t)
+    const sleep = (t = 1000) => {
+      return new Promise((res, rej) => {
+        setTimeout(() => res(1), t)
       })
     }
     if (node.type === 'SvgImage') {
@@ -456,7 +455,7 @@ app.registerExtension({
       let dd = getLocalData('_mixlab_svg_image')
 
       let id = node.id
-      console.log('SvgImage load',node.widgets[0], node.widgets)
+      console.log('SvgImage load', node.widgets[0], node.widgets)
       if (!dd[id]) return
       let dt = await fetch(dd[id])
       let svgStr = await dt.text()
@@ -464,13 +463,22 @@ app.registerExtension({
       const { svgElement, data, image } = await parseSvg(svgStr)
       svgElement.style = `width: 90%;padding: 5%;`
       // 将提取的SVG元素显示在页面上
-    
+
       widget.div.querySelector('.preview').innerHTML = ''
       widget.div.querySelector('.preview').appendChild(svgElement)
 
-      const uploadWidget=node.widgets.filter(w=>w.name=='upload')[0];
-      uploadWidget.value= await uploadWidget.serializeValue();
-     
+      const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
+      uploadWidget.value = await uploadWidget.serializeValue()
+
+            
+      // let h=~~getComputedStyle(widget.div).height.replace('px','');
+      // let w=~~getComputedStyle(widget.div).width.replace('px','');
+      // // console.log('svg', w,h,node.size)
+      // node.setSize([
+      //   w,h
+      // ])
+      // app.graph.setDirtyCanvas(true)
+
       // console.log(node.widgets_values)
     }
   }
