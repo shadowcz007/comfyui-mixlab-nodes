@@ -46,7 +46,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 ![layers](./assets/layers-workflow.svg)
 
-
+![poster](./assets/poster-workflow.svg)
 
 ## Other Nodes
 
