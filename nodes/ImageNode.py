@@ -875,7 +875,7 @@ class SvgImage:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-                    "upload":("SVG",),   },
+                    "upload":("SVG",),},
                 }
     
     RETURN_TYPES = ("IMAGE","LAYER")
@@ -891,25 +891,45 @@ class SvgImage:
     def run(self,upload):
         layers=[]
 
-        # print(upload['image'])
         image = base64_to_image(upload['image'])
         image=image.convert('RGB')
         image=pil2tensor(image)
 
         for layer in upload['data']:
-            # print(layer)
-            # if layer['type']=='base64':
-            #     im=base64_to_image(layer['image'])
-            #     im=im.convert('RGB')
-            #     layer['image']=pil2tensor(im)
-
-            #     mask=base64_to_image(layer['mask'])
-            #     mask=mask.convert('L')
-            #     layer['mask']=pil2tensor(mask)
-
             layers.append(layer)
     
         return (image,layers,)
+
+
+
+class Image3D:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "upload":("THREED",),   },
+                }
+    
+    RETURN_TYPES = ("IMAGE","MASK",)
+    # RETURN_NAMES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,False,)
+
+    def run(self,upload):
+        # print(upload['image'])
+        image = base64_to_image(upload['image'])
+        image=image.convert('RGB')
+        mask=image.convert('L')
+        
+        mask=pil2tensor(mask)
+        image=pil2tensor(image)
+
+        return (image,mask,)
+
 
 
 class AreaToMask:
