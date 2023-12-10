@@ -843,7 +843,7 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
-                    "text_color":("TCOLOR",),
+                    "text_color":("STRING",{"multiline": False,"default": "#000000"}),
                     "vertical":("BOOLEAN", {"default": True},),
                              },
                 }

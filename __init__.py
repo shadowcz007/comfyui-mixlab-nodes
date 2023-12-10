@@ -273,6 +273,7 @@ from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
+from .nodes.Utils import ColorInput,FontInput
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -301,7 +302,9 @@ NODE_CLASS_MAPPINGS = {
     "CombineMasks_":CombineMasks,
     "ChatGPTOpenAI":ChatGPTNode,
     "ShowTextForGPT":ShowTextForGPT,
-    "CharacterInText":CharacterInText
+    "CharacterInText":CharacterInText,
+    "Color":ColorInput,
+    "Font":FontInput
 }
 
 # 一个包含节点友好/可读的标题的字典
