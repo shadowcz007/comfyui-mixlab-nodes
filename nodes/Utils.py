@@ -15,11 +15,14 @@ def get_font_files(directory):
             font_path = os.path.join(directory, file)
             font_files[font_name] = os.path.abspath(font_path)
 
-    font_paths = fm.findSystemFonts()
-    for path in font_paths:
-        font_prop = fm.FontProperties(fname=path)
-        font_name = font_prop.get_name()
-        font_files[font_name] = path
+    try:
+        font_paths = fm.findSystemFonts()
+        for path in font_paths:
+            font_prop = fm.FontProperties(fname=path)
+            font_name = font_prop.get_name()
+            font_files[font_name] = path
+    except ValueError:
+        print("findSystemFonts error")
 
     
     return font_files
