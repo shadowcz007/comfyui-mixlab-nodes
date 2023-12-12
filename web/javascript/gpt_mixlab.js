@@ -192,7 +192,7 @@ app.registerExtension({
 
       let id = node.id
 
-      console.log('ChatGPTOpenAI serialize_widgets', this)
+      // console.log('ChatGPTOpenAI serialize_widgets', this)
 
       widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
       widget.div.querySelector('.URL').value =
@@ -216,12 +216,27 @@ app.registerExtension({
 						this.widgets.length = pos;
 					}
 				}
-        // console.log('ShowTextForGPT',this.widgets.length)
-				for (const list of text) {
+        // console.log('ShowTextForGPT',text)
+				for (let list of text) {
 					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
 					w.inputEl.readOnly = true;
 					w.inputEl.style.opacity = 0.6;
-					w.value = list;
+
+          try {
+            let data=JSON.parse(list);
+            data=Array.from(data,d=>{
+              return {
+                ...d,
+                content:decodeURIComponent(d.content)
+              }
+            })
+            list=JSON.stringify(data,null,2)
+          } catch (error) {
+            // console.log(error)
+          }
+
+					w.value =list;
+        
 				}
         // console.log('ShowTextForGPT',this.widgets.length)
 				requestAnimationFrame(() => {
