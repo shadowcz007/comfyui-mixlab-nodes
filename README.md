@@ -6,8 +6,12 @@ v0.2.7 🚀🚗🚚🏃‍
 - Add random seed control method to the floating window
 - OSupport for calling multiple GPTs
 
-
 ![screenshare](./assets/screenshare.png)
+
+
+### SpeechRecognition & SpeechSynthesis
+![f](./assets/audio-workflow.svg)
+
 
 
 ### ScreenShareNode & FloatingVideoNode

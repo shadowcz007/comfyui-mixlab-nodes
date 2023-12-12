@@ -273,7 +273,9 @@ from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
+from .nodes.Audio import SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import ColorInput,FontInput
+
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -304,6 +306,8 @@ NODE_CLASS_MAPPINGS = {
     "ChatGPTOpenAI":ChatGPTNode,
     "ShowTextForGPT":ShowTextForGPT,
     "CharacterInText":CharacterInText,
+    "SpeechRecognition":SpeechRecognition,
+    "SpeechSynthesis":SpeechSynthesis,
     "Color":ColorInput,
     "Font":FontInput
 }
@@ -318,7 +322,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "FloatingVideo":"FloatingVideo ♾️Mixlab",
     "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
     "ShowTextForGPT":"ShowTextForGPT ♾️Mixlab",
-    "MergeLayers":"MergeLayers ♾️Mixlab"
+    "MergeLayers":"MergeLayers ♾️Mixlab",
+    "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
+    "SpeechRecognition":"SpeechRecognition ♾️Mixlab"
 }
 
 # web ui的节点功能

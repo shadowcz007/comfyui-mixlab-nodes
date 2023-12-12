@@ -1,5 +1,47 @@
 import { app } from '../../../scripts/app.js'
 
+function injectCSS(css) {
+  // 检查页面中是否已经存在具有相同内容的style标签
+  const existingStyle = document.querySelector('style');
+  if (existingStyle && existingStyle.textContent === css) {
+    return; // 如果已经存在相同的样式，则不进行注入
+  }
+
+  // 创建一个新的style标签，并将CSS内容注入其中
+  const style = document.createElement('style');
+  style.textContent = css;
+
+  // 将style标签插入到页面的head元素中
+  const head = document.querySelector('head');
+  head.appendChild(style);
+}
+
+injectCSS(`::-webkit-scrollbar {
+  width: 2px;
+}
+
+@keyframes loading_mixlab {
+  0% {
+    background-color: green;
+  }
+
+  50% {
+    background-color: lightgreen;
+  }
+
+  100% {
+    background-color: green;
+  }
+}
+
+.loading_mixlab {
+  background-color: green;
+  animation-name: loading_mixlab;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}`);
+
+
 async function getCustomnodeMappings (mode = 'url') {
   // mode = "local";
   let api_host = `${window.location.hostname}:${window.location.port}`
@@ -13,7 +55,7 @@ async function getCustomnodeMappings (mode = 'url') {
     for (let url in data) {
       let n = data[url]
       for (let node of n[0]) {
-        if(node=='CLIPSeg')console.log('#CLIPSeg',n)
+        // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
         nodes[node] = { url, title: n[1].title_aux }
       }
     }

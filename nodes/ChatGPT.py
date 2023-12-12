@@ -46,7 +46,7 @@ def chat(client, model_name,messages ):
             except (urllib.error.HTTPError, openai.OpenAIError) as ex:
                 if try_count >= 3:
                     raise ex
-                time.sleep(5)
+                time.sleep(3)
                 continue
 
         finish_reason = response.choices[0].finish_reason

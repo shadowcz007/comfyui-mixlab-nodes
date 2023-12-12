@@ -1,3 +1,6 @@
+#### Thanks:
+# [ComfyUI-CLIPSeg](https://github.com/biegert/ComfyUI-CLIPSeg/tree/main)
+
 from transformers import CLIPSegProcessor, CLIPSegForImageSegmentation
 
 from PIL import Image

@@ -1,3 +1,24 @@
 ::-webkit-scrollbar {
-    width: 2px;
+  width: 2px;
+}
+
+@keyframes loading_mixlab {
+  0% {
+    background-color: green;
   }
+
+  50% {
+    background-color: lightgreen;
+  }
+
+  100% {
+    background-color: green;
+  }
+}
+
+.loading_mixlab {
+  background-color: green;
+  animation-name: loading_mixlab;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
