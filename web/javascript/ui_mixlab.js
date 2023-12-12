@@ -6,14 +6,14 @@ async function getCustomnodeMappings (mode = 'url') {
   let api_base = ''
   let url = `${window.location.protocol}//${api_host}${api_base}`
 
-  const response = await fetch(`${url}/customnode/getmappings?mode=${mode}`)
-  const data = await response.json()
-
   let nodes = {}
   try {
+    const response = await fetch(`${url}/customnode/getmappings?mode=${mode}`)
+    const data = await response.json()
     for (let url in data) {
       let n = data[url]
       for (let node of n[0]) {
+        if(node=='CLIPSeg')console.log('#CLIPSeg',n)
         nodes[node] = { url, title: n[1].title_aux }
       }
     }
@@ -59,9 +59,10 @@ app.showMissingNodesError = async function (
   missingNodeTypes,
   hasAddedNodes = true
 ) {
+
   const nodesMap = await getCustomnodeMappings()
   console.log('#nodesMap', nodesMap)
-  //   console.log('###MIXLAB', missingNodeTypes, hasAddedNodes)
+    console.log('###MIXLAB', missingNodeTypes, hasAddedNodes)
   this.ui.dialog.show(
     `When loading the graph, the following node types were not found: <ul>${missingNodeGithub(
       missingNodeTypes,
