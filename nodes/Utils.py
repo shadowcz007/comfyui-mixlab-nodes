@@ -16,12 +16,14 @@ def get_font_files(directory):
             font_files[font_name] = os.path.abspath(font_path)
 
     try:
-        import matplotlib.font_manager as fm
-        font_paths = fm.findSystemFonts()
-        for path in font_paths:
-            font_prop = fm.FontProperties(fname=path)
-            font_name = font_prop.get_name()
-            font_files[font_name] = path
+        import sys
+        if sys.platform != "darwin":
+            import matplotlib.font_manager as fm
+            font_paths = fm.findSystemFonts()
+            for path in font_paths:
+                font_prop = fm.FontProperties(fname=path)
+                font_name = font_prop.get_name()
+                font_files[font_name] = path
     except ValueError:
         print("findSystemFonts error")
 
