@@ -1,7 +1,7 @@
 import os
 
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
-import matplotlib.font_manager as fm
+
 
 
 
@@ -16,6 +16,7 @@ def get_font_files(directory):
             font_files[font_name] = os.path.abspath(font_path)
 
     try:
+        import matplotlib.font_manager as fm
         font_paths = fm.findSystemFonts()
         for path in font_paths:
             font_prop = fm.FontProperties(fname=path)
