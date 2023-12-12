@@ -168,8 +168,29 @@ def save_workflow_json(data):
         json.dump(data, file)
     return workflow_path
 
+import aiohttp
+
+# 保存原始的 get 方法
+_original_request = aiohttp.ClientSession._request
+
+# 定义新的 get 方法
+async def new_request(self, method, url, *args, **kwargs):
+   # 检查环境变量以确定是否使用代理
+    proxy = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy') 
+    print('Proxy Config:',proxy)
+    if proxy and 'proxy' not in kwargs:
+        kwargs['proxy'] = proxy
+        print('Use Proxy:',proxy)
+    # 调用原始的 _request 方法
+    return await _original_request(self, method, url, *args, **kwargs)
+
+# 应用 Monkey Patch
+aiohttp.ClientSession._request = new_request
+
 # https
 async def new_start(self, address, port, verbose=True, call_on_start=None):
+        
+
         runner = web.AppRunner(self.app, access_log=None)
         await runner.setup()
         site = web.TCPSite(runner, address, port)
