@@ -1,10 +1,16 @@
 ## 
-v0.2.7 🚀🚗🚚🏃‍
+v0.3.0 🚀🚗🚚🏃‍
 
-- [Add getting camera video stream](./workflow/7-camera-workflow.json)
-- Add a slider to the floating window, which can be used as input for denoise
-- Add random seed control method to the floating window
-- OSupport for calling multiple GPTs
+- Added support for setting proxies: HTTP_PROXY, HTTPS_PROXY, http_proxy, https_proxy ✅
+
+- Added a new Speech feature node, enabling the use of a voice assistant: SpeechRecognition & SpeechSynthesis 🎙️
+
+- Added TextImage node, allowing conversion of text into image format 📷
+
+- Added SvgImage node, enabling layout parsing and poster generation in conjunction with the Layer class node 🖼️
+
+- Added an experimental 3DImage node for loading 3D models 🌟
+
 
 ![screenshare](./assets/screenshare.png)
 
