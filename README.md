@@ -18,7 +18,7 @@ v0.3.0 🚀🚗🚚🏃‍
 ### SpeechRecognition & SpeechSynthesis
 ![f](./assets/audio-workflow.svg)
 
-
+[Voice + Real-time Face Swap Workflow](./workflow/语音+实时换脸workflow.json)
 
 ### ScreenShareNode & FloatingVideoNode
 > Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
