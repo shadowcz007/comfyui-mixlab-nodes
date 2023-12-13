@@ -149,3 +149,23 @@ pip3 install -r requirements.txt
 - 音频播放节点：带可视化、支持多音轨、可配置音轨音量
 - vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 
+
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="
+      https://api.star-history.com/svg?repos=shadowcz007/comfyui-mixlab-nodes&type=Date&theme=dark
+    "
+  />
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="
+      https://api.star-history.com/svg?repos=shadowcz007/comfyui-mixlab-nodes&type=Date
+    "
+  />
+  <img
+    alt="Star History Chart"
+    src="https://api.star-history.com/svg?repos=shadowcz007/comfyui-mixlab-nodes&type=Date"
+  />
+</picture>
+
