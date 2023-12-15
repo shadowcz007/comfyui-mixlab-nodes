@@ -63,17 +63,18 @@ const parseSvg = async svgContent => {
   if (!svgElement) return
   // 获取SVG中 rect元素
   var rectElements = svgElement?.querySelectorAll('rect') || []
-
+  // console.log(rectElements,svgElement)
   // 定义一个数组来存储处理后的数据
   var data = []
 
   Array.from(rectElements, (rectElement, i) => {
     // 获取rect元素的属性值
-    var x = rectElement.getAttribute('x')
-    var y = rectElement.getAttribute('y')
-    var width = rectElement.getAttribute('width')
-    var height = rectElement.getAttribute('height')
-    if (x != undefined && y != undefined) {
+    var x = ~~(rectElement.getAttribute('x')||0);
+    var y = ~~(rectElement.getAttribute('y')||0);
+    var width = ~~rectElement.getAttribute('width')
+    var height = ~~rectElement.getAttribute('height')
+    // console.log('rectElements',rectElement,x,y,width,height)
+    if (x != undefined && y != undefined&&width&&height) {
       // 创建一个新的canvas元素
       var canvas = document.createElement('canvas')
       canvas.width = width
@@ -99,7 +100,8 @@ const parseSvg = async svgContent => {
         scale_option: 'width',
         image: base64,
         mask: base64,
-        type: 'base64'
+        type: 'base64',
+        _t:'rect'
       }
 
       // 将处理后的数据添加到数组中
@@ -109,6 +111,15 @@ const parseSvg = async svgContent => {
 
   var svgWidth = svgElement.getAttribute('width')
   var svgHeight = svgElement.getAttribute('height')
+
+  if (!(svgWidth && svgHeight)) {
+    // viewBox
+    let viewBox = svgElement.viewBox.baseVal
+     
+    svgWidth =viewBox.width
+    svgHeight =viewBox.height
+  }
+
   // 创建一个新的canvas元素
   var canvas = document.createElement('canvas')
   canvas.width = svgWidth
@@ -135,12 +146,13 @@ const parseSvg = async svgContent => {
     scale_option: 'width',
     image: base64,
     mask: base64,
-    type: 'base64'
+    type: 'base64',
+    _t:'canvas'
   }
   data.push(rectData)
 
   // 打印处理后的数据
-  console.log({ data, image: base64, svgElement })
+  console.log('layers',{ data, image: base64, svgElement })
   return { data, image: base64, svgElement }
 }
 
@@ -199,11 +211,15 @@ app.registerExtension({
 
         // 获取layers数据
         const getLayers = async () => {
+          console.log('getLayers1',this.inputs.filter(ip => ip.name === 'layers'))
           let linkId = this.inputs.filter(ip => ip.name === 'layers')[0].link
-          let nodeId = app.graph.links.filter(link => link.id == linkId)[0]
-            ?.origin_id
+          let nodeId = app.graph.links?.filter(link => link.id == linkId)[0]
+            ?.origin_id;
 
-          nodeId = findNode(nodeId)
+          if(nodeId){
+            nodeId = findNode(nodeId)
+          }
+          
 
           //   let node = app.graph._nodes_by_id[nodeId]
           //   if (node?.type == 'Reroute') {
@@ -218,8 +234,11 @@ app.registerExtension({
           if (d[nodeId]) {
             let url = d[nodeId]
             let dt = await fetch(url)
+           
             let svgStr = await dt.text()
+           
             const { data } = (await parseSvg(svgStr)) || {}
+            console.log('fetch',data)
             return data
           } else {
             return []

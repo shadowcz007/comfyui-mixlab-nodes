@@ -3,7 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-async function uploadImage (blob,fileType='.svg') {
+async function uploadImage (blob, fileType = '.svg') {
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
   body.append('image', new File([blob], new Date().getTime() + fileType))
@@ -25,9 +25,8 @@ async function uploadImage (blob,fileType='.svg') {
   return src
 }
 
-function base64ToBlobFromURL(base64URL, contentType) {
-  return fetch(base64URL)
-    .then(response => response.blob());
+function base64ToBlobFromURL (base64URL, contentType) {
+  return fetch(base64URL).then(response => response.blob())
 }
 
 function getContentTypeFromBase64 (base64Data) {
@@ -135,17 +134,18 @@ const parseSvg = async svgContent => {
   if (!svgElement) return
   // 获取SVG中 rect元素
   var rectElements = svgElement?.querySelectorAll('rect') || []
-
+  // console.log(rectElements,svgElement)
   // 定义一个数组来存储处理后的数据
   var data = []
 
   Array.from(rectElements, (rectElement, i) => {
     // 获取rect元素的属性值
-    var x = rectElement.getAttribute('x')
-    var y = rectElement.getAttribute('y')
-    var width = rectElement.getAttribute('width')
-    var height = rectElement.getAttribute('height')
-    if (x != undefined && y != undefined) {
+    var x = ~~(rectElement.getAttribute('x')||0);
+    var y = ~~(rectElement.getAttribute('y')||0);
+    var width = ~~rectElement.getAttribute('width')
+    var height = ~~rectElement.getAttribute('height')
+    // console.log('rectElements',rectElement,x,y,width,height)
+    if (x != undefined && y != undefined&&width&&height) {
       // 创建一个新的canvas元素
       var canvas = document.createElement('canvas')
       canvas.width = width
@@ -171,7 +171,8 @@ const parseSvg = async svgContent => {
         scale_option: 'width',
         image: base64,
         mask: base64,
-        type: 'base64'
+        type: 'base64',
+        _t:'rect'
       }
 
       // 将处理后的数据添加到数组中
@@ -181,6 +182,15 @@ const parseSvg = async svgContent => {
 
   var svgWidth = svgElement.getAttribute('width')
   var svgHeight = svgElement.getAttribute('height')
+
+  if (!(svgWidth && svgHeight)) {
+    // viewBox
+    let viewBox = svgElement.viewBox.baseVal
+     
+    svgWidth =viewBox.width
+    svgHeight =viewBox.height
+  }
+
   // 创建一个新的canvas元素
   var canvas = document.createElement('canvas')
   canvas.width = svgWidth
@@ -207,12 +217,13 @@ const parseSvg = async svgContent => {
     scale_option: 'width',
     image: base64,
     mask: base64,
-    type: 'base64'
+    type: 'base64',
+    _t:'canvas'
   }
   data.push(rectData)
 
   // 打印处理后的数据
-  // console.log({ data, image: base64, svgElement })
+  console.log('layers',{ data, image: base64, svgElement })
   return { data, image: base64, svgElement }
 }
 
@@ -540,10 +551,10 @@ app.registerExtension({
 
                 const contentType = getContentTypeFromBase64(base64Data)
 
-                const blob =await base64ToBlobFromURL(base64Data, contentType)
+                const blob = await base64ToBlobFromURL(base64Data, contentType)
 
                 //  const fileBlob = new Blob([e.target.result], { type: file.type });
-                let url = await uploadImage(blob,'.png')
+                let url = await uploadImage(blob, '.png')
                 console.log(url)
 
                 let dd = getLocalData(key)
@@ -608,7 +619,7 @@ app.registerExtension({
       let url = dd[id]
       // let base64 = await parseImage(url)
 
-      widget.div.querySelector('.preview').innerHTML = `<img src="${url}"/>` 
+      widget.div.querySelector('.preview').innerHTML = `<img src="${url}"/>`
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()

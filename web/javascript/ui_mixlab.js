@@ -123,7 +123,7 @@ const missingNodeGithub = (missingNodeTypes, nodesMap) => {
   })
 }
 
-let nodesMap = await getCustomnodeMappings('url')
+let nodesMap
 
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
@@ -161,7 +161,10 @@ app.showMissingNodesError = async function (
   missingNodeTypes,
   hasAddedNodes = true
 ) {
-  // const nodesMap = await getCustomnodeMappings()
+  nodesMap =
+    nodesMap && Object.keys(nodesMap).length > 0
+      ? nodesMap
+      : await getCustomnodeMappings('url')
 
   console.log('#nodesMap', nodesMap)
   console.log('###MIXLAB', missingNodeTypes, hasAddedNodes)
