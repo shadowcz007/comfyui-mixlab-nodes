@@ -453,7 +453,7 @@ app.registerExtension({
       const options = original_getCanvasMenuOptions.apply(this, arguments) // call the original function
       options.push(null) // divider
       options.push({
-        content: `Help ♾️Mixlab`,
+        content: `Find ♾️Mixlab`,
         disabled: false, // or a function determining whether to disable
         callback: async () => {
           nodesMap =
