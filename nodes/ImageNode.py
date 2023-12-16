@@ -906,7 +906,7 @@ class Image3D:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-                    "upload":("THREED",),   },
+                    "upload":("THREED",),   }, 
                 }
     
     RETURN_TYPES = ("IMAGE","MASK",)
@@ -922,8 +922,10 @@ class Image3D:
     def run(self,upload):
         # print(upload['image'])
         image = base64_to_image(upload['image'])
+        mask = image.split()[3]
         image=image.convert('RGB')
-        mask=image.convert('L')
+        
+        mask=mask.convert('L')
         
         mask=pil2tensor(mask)
         image=pil2tensor(image)

@@ -3,10 +3,13 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-async function uploadImage (blob, fileType = '.svg') {
+async function uploadImage (blob, fileType = '.svg', filename) {
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
-  body.append('image', new File([blob], new Date().getTime() + fileType))
+  body.append(
+    'image',
+    new File([blob], (filename || new Date().getTime()) + fileType)
+  )
 
   const resp = await api.fetchApi('/upload/image', {
     method: 'POST',
@@ -504,36 +507,46 @@ app.registerExtension({
           div.appendChild(label)
           div.appendChild(ip)
 
-          let that = this
+          let that = this,
+            filename = new Date().getTime()
 
           ip.addEventListener('change', event => {
             const file = event.target.files[0]
             const reader = new FileReader()
-
+            filename = new Date().getTime()
             // 读取文件内容
             reader.onload = async e => {
               const fileURL = URL.createObjectURL(file)
               // console.log('文件URL: ', fileURL)
-              let html = `<model-viewer 
-              alt="Neil Armstrong's Spacesuit from the Smithsonian Digitization Programs Office and National Air and Space Museum"
-               src="${fileURL}" 
-               ar 
+              let html = `<model-viewer  src="${fileURL}" 
+             
                shadow-intensity="1" 
                camera-controls 
                touch-action="pan-y">
                
                <div class="controls">
-                <div>Variant: <select class="variant"></select></div>
-                <div><button class="capture">Capture</button></div>
+                <div>Variant: <select class="variant"></select></div> 
+                <div><button class="bg">BG</button></div>
               </div></model-viewer>`
 
-              preview.innerHTML = html;
-              that.setSize([that.size[0],that.size[1]+300])
-              app.canvas.draw(true, true)
+              preview.innerHTML = html
+              if (that.size[1] < 400) {
+                that.setSize([that.size[0], that.size[1] + 300])
+                app.canvas.draw(true, true)
+              };
+
+              let m = preview.querySelector('model-viewer')
+              if (m) {
+                m.style.width = `${that.size[0] - 24}px`
+                m.style.height = `${that.size[1] - 48}px`
+              }
+
+              
 
               const modelViewerVariants = preview.querySelector('model-viewer')
               const select = preview.querySelector('.variant')
-              const capture = preview.querySelector('.capture')
+            
+              const bg = preview.querySelector('.bg')
 
               modelViewerVariants.addEventListener('load', () => {
                 const names = modelViewerVariants.availableVariants
@@ -550,26 +563,85 @@ app.registerExtension({
                 select.appendChild(option)
               })
 
+              let previousCameraOrbit = null
+              let timer = null
+              const delay = 800 // 延迟时间，单位为毫秒
+
+              async function checkCameraChange () {
+                 // 在这里触发相机停止变化的事件
+                 let base64Data = modelViewerVariants.toDataURL()
+
+                 const contentType = getContentTypeFromBase64(base64Data)
+
+                 const blob = await base64ToBlobFromURL(
+                   base64Data,
+                   contentType
+                 )
+
+                 //  const fileBlob = new Blob([e.target.result], { type: file.type });
+                 let url = await uploadImage(blob, '.png', filename)
+                 console.log(url)
+
+                 let dd = getLocalData(key)
+                 dd[that.id] = url
+
+                 setLocalDataOfWin(key, dd)
+              }
+
+              function startTimer () {
+                clearTimeout(timer)
+                timer = setTimeout(checkCameraChange, delay)
+              }
+
+              modelViewerVariants.addEventListener('camera-change', startTimer)
+
               select.addEventListener('input', event => {
                 modelViewerVariants.variantName =
                   event.target.value === 'default' ? null : event.target.value
               })
 
-              capture.addEventListener('click', async () => {
-                let base64Data = modelViewerVariants.toDataURL()
+              // capture.addEventListener('click', async () => {
+              //   let base64Data = modelViewerVariants.toDataURL()
 
-                const contentType = getContentTypeFromBase64(base64Data)
+              //   const contentType = getContentTypeFromBase64(base64Data)
 
-                const blob = await base64ToBlobFromURL(base64Data, contentType)
+              //   const blob = await base64ToBlobFromURL(base64Data, contentType)
 
-                //  const fileBlob = new Blob([e.target.result], { type: file.type });
-                let url = await uploadImage(blob, '.png')
-                console.log(url)
+              //   //  const fileBlob = new Blob([e.target.result], { type: file.type });
+              //   let url = await uploadImage(blob, '.png')
+              //   console.log(url)
 
-                let dd = getLocalData(key)
-                dd[that.id] = url
+              //   let dd = getLocalData(key)
+              //   dd[that.id] = url
 
-                setLocalDataOfWin(key, dd)
+              //   setLocalDataOfWin(key, dd)
+              // })
+
+              bg.addEventListener('click', () => {
+                // 创建一个input元素
+                var input = document.createElement('input')
+                input.type = 'file'
+
+                // 监听input的change事件
+                input.addEventListener('change', function () {
+                  // 获取上传的文件
+                  var file = input.files[0]
+
+                  // 创建一个FileReader对象来读取文件
+                  var reader = new FileReader()
+
+                  // 监听FileReader的load事件
+                  reader.addEventListener('load', function () {
+                    // 将读取的文件内容设置为div的背景
+                    preview.style.backgroundImage = 'url(' + reader.result + ')'
+                  })
+
+                  // 读取文件
+                  reader.readAsDataURL(file)
+                })
+
+                // 触发input的点击事件
+                input.click()
               })
 
               uploadWidget.value = await uploadWidget.serializeValue()
@@ -591,17 +663,19 @@ app.registerExtension({
 
         widget.div.appendChild(upload)
         widget.div.appendChild(preview)
-        this.addCustomWidget(widget);
+        this.addCustomWidget(widget)
 
-        const onResize = this.onResize;
-				this.onResize = function () {
-          let m=preview.querySelector('model-viewer')
-          m.style.width=`${this.size[0]-24}px`
-          m.style.height=`${this.size[1]-48}px`
+        const onResize = this.onResize
+        this.onResize = function () {
+          let m = preview.querySelector('model-viewer')
+          if (m) {
+            m.style.width = `${this.size[0] - 24}px`
+            m.style.height = `${this.size[1] - 48}px`
+          }
+
           // console.log(this.size,preview)
-					return onResize?.apply(this, arguments);
-				};
-
+          return onResize?.apply(this, arguments)
+        }
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
