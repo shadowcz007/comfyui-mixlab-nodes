@@ -5,6 +5,7 @@ import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
 
+
 const getLocalData = key => {
   let data = {}
   try {
@@ -45,6 +46,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
     justifyContent: 'space-around'
   }
 }
+
 
 app.registerExtension({
     name: 'Mixlab.utils.Color',
