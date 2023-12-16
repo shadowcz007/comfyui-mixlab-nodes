@@ -519,7 +519,7 @@ app.registerExtension({
               const fileURL = URL.createObjectURL(file)
               // console.log('文件URL: ', fileURL)
               let html = `<model-viewer  src="${fileURL}" 
-             
+              min-field-of-view="0deg" max-field-of-view="180deg"
                shadow-intensity="1" 
                camera-controls 
                touch-action="pan-y">
@@ -535,18 +535,18 @@ app.registerExtension({
                 app.canvas.draw(true, true)
               };
 
-              let m = preview.querySelector('model-viewer')
-              if (m) {
-                m.style.width = `${that.size[0] - 24}px`
-                m.style.height = `${that.size[1] - 48}px`
-              }
-
               
-
-              const modelViewerVariants = preview.querySelector('model-viewer')
+              const modelViewerVariants = preview.querySelector('model-viewer');
               const select = preview.querySelector('.variant')
             
-              const bg = preview.querySelector('.bg')
+              const bg = preview.querySelector('.bg');
+
+            
+              if (modelViewerVariants) {
+                modelViewerVariants.style.width = `${that.size[0] - 24}px`
+                modelViewerVariants.style.height = `${that.size[1] - 48}px`; 
+              }
+
 
               modelViewerVariants.addEventListener('load', () => {
                 const names = modelViewerVariants.availableVariants
