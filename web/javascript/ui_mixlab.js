@@ -448,89 +448,124 @@ app.registerExtension({
     }
   },
   async setup () {
-    const original_getCanvasMenuOptions = app.canvas.getCanvasMenuOptions // save the original function
-    app.canvas.getCanvasMenuOptions = function () {
-      const options = original_getCanvasMenuOptions.apply(this, arguments) // call the original function
-      options.push(null) // divider
-      options.push({
-        content: `Find ♾️Mixlab`,
-        disabled: false, // or a function determining whether to disable
-        callback: async () => {
-          nodesMap =
-            nodesMap && Object.keys(nodesMap).length > 0
-              ? nodesMap
-              : await getCustomnodeMappings('url')
 
-          const nodesDiv = document.createDocumentFragment()
-          const nodes = (await app.graphToPrompt()).output
+    // Add canvas menu options
+			const orig = LGraphCanvas.prototype.getCanvasMenuOptions;
+			LGraphCanvas.prototype.getCanvasMenuOptions = function () {
+				const options = orig.apply(this, arguments);
 
-          // console.log('[Mixlab]', 'loaded graph node: ', app)
-          let div =
-            document.querySelector('#mixlab_find_the_node') ||
-            document.createElement('div')
-          div.id = 'mixlab_find_the_node'
-          div.style = `
-          flex-direction: column;
-    align-items: end;
-    display:flex;position: absolute; 
-    top: 50px; left: 50px; width: 200px; 
-    color: var(--descrip-text);
-    background-color: var(--comfy-menu-bg);
-     padding: 10px; 
-     border: 1px solid black;z-index: 999999999;padding-top: 0;`
-
-          div.innerHTML = ''
-
-          let btn = document.createElement('div')
-          btn.style=`display: flex;
-          width: calc(100% - 24px);
-          justify-content: space-between;
-          align-items: center;
-          padding: 0 12px;
-          height: 32px;`
-          let btnB = document.createElement('button')
-          let textB = document.createElement('p')
-          btn.appendChild(textB)
-          btn.appendChild(btnB)
-          textB.innerText = `find the node`
-
-          btnB.style = `float: right; border: none; color: var(--input-text);
-          background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-          btnB.addEventListener('click', () => {
-            div.style.display = 'none'
-          })
-          btnB.innerText = 'X'
-
-          // 悬浮框拖动事件
-          div.addEventListener('mousedown', function (e) {
-            var startX = e.clientX
-            var startY = e.clientY
-            var offsetX = div.offsetLeft
-            var offsetY = div.offsetTop
-
-            function moveBox (e) {
-              var newX = e.clientX
-              var newY = e.clientY
-              var deltaX = newX - startX
-              var deltaY = newY - startY
-              div.style.left = offsetX + deltaX + 'px'
-              div.style.top = offsetY + deltaY + 'px'
+				options.push(null,  {
+          content: `Find ♾️Mixlab`,
+          disabled: false, // or a function determining whether to disable
+          callback: async () => {
+            nodesMap =
+              nodesMap && Object.keys(nodesMap).length > 0
+                ? nodesMap
+                : await getCustomnodeMappings('url')
+  
+            const nodesDiv = document.createDocumentFragment()
+            const nodes = (await app.graphToPrompt()).output
+  
+            // console.log('[Mixlab]', 'loaded graph node: ', app)
+            let div =
+              document.querySelector('#mixlab_find_the_node') ||
+              document.createElement('div')
+            div.id = 'mixlab_find_the_node'
+            div.style = `
+            flex-direction: column;
+      align-items: end;
+      display:flex;position: absolute; 
+      top: 50px; left: 50px; width: 200px; 
+      color: var(--descrip-text);
+      background-color: var(--comfy-menu-bg);
+       padding: 10px; 
+       border: 1px solid black;z-index: 999999999;padding-top: 0;`
+  
+            div.innerHTML = ''
+  
+            let btn = document.createElement('div')
+            btn.style=`display: flex;
+            width: calc(100% - 24px);
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 12px;
+            height: 32px;`
+            let btnB = document.createElement('button')
+            let textB = document.createElement('p')
+            btn.appendChild(textB)
+            btn.appendChild(btnB)
+            textB.innerText = `find the node`
+  
+            btnB.style = `float: right; border: none; color: var(--input-text);
+            background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+            btnB.addEventListener('click', () => {
+              div.style.display = 'none'
+            })
+            btnB.innerText = 'X'
+  
+            // 悬浮框拖动事件
+            div.addEventListener('mousedown', function (e) {
+              var startX = e.clientX
+              var startY = e.clientY
+              var offsetX = div.offsetLeft
+              var offsetY = div.offsetTop
+  
+              function moveBox (e) {
+                var newX = e.clientX
+                var newY = e.clientY
+                var deltaX = newX - startX
+                var deltaY = newY - startY
+                div.style.left = offsetX + deltaX + 'px'
+                div.style.top = offsetY + deltaY + 'px'
+              }
+  
+              function stopMoving () {
+                document.removeEventListener('mousemove', moveBox)
+                document.removeEventListener('mouseup', stopMoving)
+              }
+  
+              document.addEventListener('mousemove', moveBox)
+              document.addEventListener('mouseup', stopMoving)
+            })
+  
+            div.appendChild(btn)
+  
+            const updateNodes = (ns, nd) => {
+              for (let nodeId in ns) {
+                let n = ns[nodeId].class_type
+                const { url, title } = nodesMap[n]
+                let d = document.createElement('button')
+                d.style = `text-align: left;margin:6px;color: var(--input-text);
+                background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                d.addEventListener('click', () => {
+                  const node = app.graph.getNodeById(nodeId)
+                  if (!node) return
+                  app.canvas.centerOnNode(node)
+                  app.canvas.setZoom(1)
+                })
+                d.addEventListener('mouseover', async () => {
+                  console.log('mouseover')
+                  let n = (await app.graphToPrompt()).output
+                  if (!deepEqual(n, ns)) {
+                    nd.innerHTML = ''
+                    updateNodes(n, nd)
+                  }
+                })
+  
+                d.innerHTML = `
+                <span>${'#' + nodeId} ${n}</span>
+                <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
+                `
+                d.title = title
+  
+                nd.appendChild(d)
+              }
             }
-
-            function stopMoving () {
-              document.removeEventListener('mousemove', moveBox)
-              document.removeEventListener('mouseup', stopMoving)
-            }
-
-            document.addEventListener('mousemove', moveBox)
-            document.addEventListener('mouseup', stopMoving)
-          })
-
-          div.appendChild(btn)
-
-          const updateNodes = (ns, nd) => {
-            for (let nodeId in ns) {
-              let n = ns[nodeId].class_type
+  
+            let nodesDivv = document.createElement('div')
+  
+            for (let nodeId in nodes) {
+              let n = nodes[nodeId].class_type
               const { url, title } = nodesMap[n]
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
@@ -544,65 +579,35 @@ app.registerExtension({
               d.addEventListener('mouseover', async () => {
                 console.log('mouseover')
                 let n = (await app.graphToPrompt()).output
-                if (!deepEqual(n, ns)) {
-                  nd.innerHTML = ''
-                  updateNodes(n, nd)
+                if (!deepEqual(n, nodes)) {
+                  nodesDivv.innerHTML = ''
+                  updateNodes(n, nodesDivv)
                 }
               })
-
+  
               d.innerHTML = `
               <span>${'#' + nodeId} ${n}</span>
               <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
               `
               d.title = title
-
-              nd.appendChild(d)
+  
+              nodesDiv.appendChild(d)
             }
+  
+            nodesDivv.appendChild(nodesDiv)
+            nodesDivv.style=`overflow: scroll;
+            height: 70vh;width: 100%;`
+  
+            div.appendChild(nodesDivv)
+  
+            if (!document.querySelector('#mixlab_find_the_node'))
+              document.body.appendChild(div)
           }
+        });
+				return options;
+			};
 
-          let nodesDivv = document.createElement('div')
 
-          for (let nodeId in nodes) {
-            let n = nodes[nodeId].class_type
-            const { url, title } = nodesMap[n]
-            let d = document.createElement('button')
-            d.style = `text-align: left;margin:6px;color: var(--input-text);
-            background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-            d.addEventListener('click', () => {
-              const node = app.graph.getNodeById(nodeId)
-              if (!node) return
-              app.canvas.centerOnNode(node)
-              app.canvas.setZoom(1)
-            })
-            d.addEventListener('mouseover', async () => {
-              console.log('mouseover')
-              let n = (await app.graphToPrompt()).output
-              if (!deepEqual(n, nodes)) {
-                nodesDivv.innerHTML = ''
-                updateNodes(n, nodesDivv)
-              }
-            })
-
-            d.innerHTML = `
-            <span>${'#' + nodeId} ${n}</span>
-            <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
-            `
-            d.title = title
-
-            nodesDiv.appendChild(d)
-          }
-
-          nodesDivv.appendChild(nodesDiv)
-          nodesDivv.style=`overflow: scroll;
-          height: 70vh;width: 100%;`
-
-          div.appendChild(nodesDivv)
-
-          if (!document.querySelector('#mixlab_find_the_node'))
-            document.body.appendChild(div)
-        }
-      })
-      return options // return the menu options with your custom ones added
-    }
+    
   }
 })

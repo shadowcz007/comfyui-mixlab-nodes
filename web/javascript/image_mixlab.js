@@ -125,6 +125,7 @@ const parseImage = url => {
 }
 
 const parseSvg = async svgContent => {
+  let scale=2;
   // 创建一个临时的DOM元素来解析SVG
   const tempContainer = document.createElement('div')
   tempContainer.innerHTML = svgContent
