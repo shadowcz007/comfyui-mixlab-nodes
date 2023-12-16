@@ -301,7 +301,7 @@ async function fetchReadmeContent (url) {
 
     var readmeResponse = await fetch(readmeUrl)
     var content = await readmeResponse.text()
-    console.log(content) // 在控制台输出readme.md文件的内容
+    // console.log(content) // 在控制台输出readme.md文件的内容
 
     return content
   } catch (error) {
@@ -326,7 +326,6 @@ function createModal (url, markdown,title) {
     left: 0;
     `
 
-
   var modal = document.createElement('div')
 
   div.appendChild(modal)
@@ -348,8 +347,6 @@ function createModal (url, markdown,title) {
   // Create modal content area
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
-  //阻止事件穿透传播
-  modalContent.addEventListener('click',(e)=>e.stopPropagation())
   // Create modal header
   const headerElement =  document.createElement('div')
   headerElement.classList.add('modal-header')
@@ -506,11 +503,11 @@ function createModal (url, markdown,title) {
     document.body.appendChild(div)
   }
   function MixModalEscKeyEvent(event){
-      console.log('close modal',event.key)
       if(event.key == "Escape"){
         closeMixModal()
       }
   }
+  window.removeEventListener('keydown',MixModalEscKeyEvent)
   window.addEventListener('keydown',MixModalEscKeyEvent)
 
   const bgElement = document.createElement('div')
@@ -538,13 +535,10 @@ app.registerExtension({
           ? nodesMap
           : await getCustomnodeMappings('url')
 
-      console.log(node, nodesMap, nodesMap[node.type])
+      console.log('node & node map', node, nodesMap, nodesMap[node.type])
       let repo = nodesMap[node.type]
       if (repo) {
         let markdown = await fetchReadmeContent(repo.url)
-        console.log(markdown)
-        console.log('repo',repo)
-
         createModal(repo.url,markdown,repo.title)
       }
     }
@@ -674,7 +668,7 @@ app.registerExtension({
                   app.canvas.setZoom(1)
                 })
                 d.addEventListener('mouseover', async () => {
-                  console.log('mouseover')
+                  // console.log('mouseover')
                   let n = (await app.graphToPrompt()).output
                   if (!deepEqual(n, ns)) {
                     nd.innerHTML = ''
