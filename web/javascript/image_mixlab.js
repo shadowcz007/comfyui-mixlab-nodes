@@ -125,7 +125,7 @@ const parseImage = url => {
 }
 
 const parseSvg = async svgContent => {
-  let scale=2;
+  let scale = 2
   // 创建一个临时的DOM元素来解析SVG
   const tempContainer = document.createElement('div')
   tempContainer.innerHTML = svgContent
@@ -141,12 +141,12 @@ const parseSvg = async svgContent => {
 
   Array.from(rectElements, (rectElement, i) => {
     // 获取rect元素的属性值
-    var x = ~~(rectElement.getAttribute('x')||0);
-    var y = ~~(rectElement.getAttribute('y')||0);
+    var x = ~~(rectElement.getAttribute('x') || 0)
+    var y = ~~(rectElement.getAttribute('y') || 0)
     var width = ~~rectElement.getAttribute('width')
     var height = ~~rectElement.getAttribute('height')
     // console.log('rectElements',rectElement,x,y,width,height)
-    if (x != undefined && y != undefined&&width&&height) {
+    if (x != undefined && y != undefined && width && height) {
       // 创建一个新的canvas元素
       var canvas = document.createElement('canvas')
       canvas.width = width
@@ -173,7 +173,7 @@ const parseSvg = async svgContent => {
         image: base64,
         mask: base64,
         type: 'base64',
-        _t:'rect'
+        _t: 'rect'
       }
 
       // 将处理后的数据添加到数组中
@@ -187,9 +187,9 @@ const parseSvg = async svgContent => {
   if (!(svgWidth && svgHeight)) {
     // viewBox
     let viewBox = svgElement.viewBox.baseVal
-     
-    svgWidth =viewBox.width
-    svgHeight =viewBox.height
+
+    svgWidth = viewBox.width
+    svgHeight = viewBox.height
   }
 
   // 创建一个新的canvas元素
@@ -219,12 +219,12 @@ const parseSvg = async svgContent => {
     image: base64,
     mask: base64,
     type: 'base64',
-    _t:'canvas'
+    _t: 'canvas'
   }
   data.push(rectData)
 
   // 打印处理后的数据
-  console.log('layers',{ data, image: base64, svgElement })
+  console.log('layers', { data, image: base64, svgElement })
   return { data, image: base64, svgElement }
 }
 
@@ -339,6 +339,12 @@ app.registerExtension({
 
               svgContainer.innerHTML = ''
               svgContainer.appendChild(svgElement)
+              let h = ~~getComputedStyle(svgElement).height.replace('px', '')
+              if (that.size && that.size[1] < h) {
+                that.setSize([that.size[0], that.size[1] + h])
+                app.canvas.draw(true, true)
+              }
+              // console.log(that.size,~~getComputedStyle(svgElement).height.replace('px',''))
 
               uploadWidget.value = await uploadWidget.serializeValue()
             }
@@ -521,7 +527,9 @@ app.registerExtension({
                 <div><button class="capture">Capture</button></div>
               </div></model-viewer>`
 
-              preview.innerHTML = html
+              preview.innerHTML = html;
+              that.setSize([that.size[0],that.size[1]+300])
+              app.canvas.draw(true, true)
 
               const modelViewerVariants = preview.querySelector('model-viewer')
               const select = preview.querySelector('.variant')
@@ -575,13 +583,25 @@ app.registerExtension({
 
         let preview = document.createElement('div')
         preview.className = 'preview'
-        preview.style = `background:#eee;margin-top: 12px;`
+        preview.style = `margin-top: 12px;display: flex;
+        justify-content: center;
+        align-items: center;`
 
         let upload = inputDiv('_mixlab_3d_image', '3D Model', preview)
 
         widget.div.appendChild(upload)
         widget.div.appendChild(preview)
-        this.addCustomWidget(widget)
+        this.addCustomWidget(widget);
+
+        const onResize = this.onResize;
+				this.onResize = function () {
+          let m=preview.querySelector('model-viewer')
+          m.style.width=`${this.size[0]-24}px`
+          m.style.height=`${this.size[1]-48}px`
+          // console.log(this.size,preview)
+					return onResize?.apply(this, arguments);
+				};
+
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {

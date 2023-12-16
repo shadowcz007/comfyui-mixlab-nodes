@@ -90,27 +90,38 @@ async function getCustomnodeMappings (mode = 'url') {
   let url = `${window.location.protocol}//${api_host}${api_base}`
 
   let nodes = {}
-  try {
-    const response = await fetch(`${url}/customnode/getmappings?mode=${mode}`)
-    const data = await response.json()
-    for (let url in data) {
-      let n = data[url]
-      for (let node of n[0]) {
-        // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
-        nodes[node] = { url, title: n[1].title_aux }
-      }
-    }
-  } catch (error) {
-    const data = (await get_nodes_map()).data
 
-    for (let url in data) {
-      let n = data[url]
-      for (let node of n[0]) {
-        // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
-        nodes[node] = { url, title: n[1].title_aux }
-      }
+  const data = (await get_nodes_map()).data
+
+  for (let url in data) {
+    let n = data[url]
+    for (let node of n[0]) {
+      // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
+      nodes[node] = { url, title: n[1].title_aux }
     }
   }
+  
+  // try {
+  //   const response = await fetch(`${url}/customnode/getmappings?mode=${mode}`)
+  //   const data = await response.json()
+  //   for (let url in data) {
+  //     let n = data[url]
+  //     for (let node of n[0]) {
+  //       // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
+  //       nodes[node] = { url, title: n[1].title_aux }
+  //     }
+  //   }
+  // } catch (error) {
+  //   const data = (await get_nodes_map()).data
+
+  //   for (let url in data) {
+  //     let n = data[url]
+  //     for (let node of n[0]) {
+  //       // if(node=='CLIPSeg')console.log('#CLIPSeg',n)
+  //       nodes[node] = { url, title: n[1].title_aux }
+  //     }
+  //   }
+  // }
 
   return nodes
 }
