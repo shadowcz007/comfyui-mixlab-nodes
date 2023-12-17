@@ -1,29 +1,19 @@
 ## 
-v0.3.0 🚀🚗🚚🏃‍
+v0.4.0 🚀🚗🚚🏃‍
+- Add "help" option to the context menu for each node.
+- Add "find the node" option to the global context menu.
+- Optimize the 3D Image node and add workflow.
 
-- Added support for setting proxies: HTTP_PROXY, HTTPS_PROXY, http_proxy, https_proxy ✅
+### 3D
+![](./assets/3dimage.png)
+[workflow](./workflow/3D-workflow.json)
 
-- Added a new Speech feature node, enabling the use of a voice assistant: SpeechRecognition & SpeechSynthesis 🎙️
-
-- Added TextImage node, allowing conversion of text into image format 📷
-
-- Added SvgImage node, enabling layout parsing and poster generation in conjunction with the Layer class node 🖼️
-
-- Added an experimental 3DImage node for loading 3D models 🌟
-
-
-![screenshare](./assets/screenshare.png)
-
-
-### SpeechRecognition & SpeechSynthesis
-![f](./assets/audio-workflow.svg)
-
-[Voice + Real-time Face Swap Workflow](./workflow/语音+实时换脸workflow.json)
 
 ### ScreenShareNode & FloatingVideoNode
 > Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
 
 > 
+![screenshare](./assets/screenshare.png)
 
 https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43e-410a-ab3a-1952b7b4e7da
 
@@ -33,14 +23,10 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 !! Please use the address with HTTPS (https://127.0.0.1).
 
+### SpeechRecognition & SpeechSynthesis
+![f](./assets/audio-workflow.svg)
 
-### LoadImagesFromLocal
-> Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. 
-
-![watch](./assets/4-loadfromlocal-watcher-workflow.svg)
-
-[workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
-
+[Voice + Real-time Face Swap Workflow](./workflow/语音+实时换脸workflow.json)
 
 ### GPT
 > Support for calling multiple GPTs.ChatGPT、ChatGLM3 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 .  Azure OpenAI:https://xxxx.openai.azure.com 
@@ -50,9 +36,13 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-5](./workflow/5-gpt-workflow.json)
 
-### 3D
-![](./assets/3dimage.png)
-[workflow](./workflow/3D-workflow.json)
+### LoadImagesFromLocal
+> Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. 
+
+![watch](./assets/4-loadfromlocal-watcher-workflow.svg)
+
+[workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
+
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
@@ -95,7 +85,13 @@ Add edges to an image.
 
 
 ### Improvement 
+
+- Add "help" option to the context menu for each node.
+- Add "find the node" option to the global context menu.
+
 An improvement has been made to directly redirect to GitHub to search for missing nodes when loading the graph.
+
+![help](./assets/help.png)
 
 ![node-not-found](./assets/node-not-found.png)
 
