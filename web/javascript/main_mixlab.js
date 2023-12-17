@@ -890,6 +890,9 @@ app.registerExtension({
         })
         // console.log('widget.inputEl',widget.inputEl)
 
+        this.setSize([this.size[0],this.size[1]+450])
+        app.canvas.draw(true, true)
+
         /*
               Add the widget, make sure we clean up nicely, and we do not want to be serialized!
               */
