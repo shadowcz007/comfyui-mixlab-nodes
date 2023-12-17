@@ -550,7 +550,8 @@ app.registerExtension({
                touch-action="pan-y">
                
                <div class="controls">
-                <div>Variant: <select class="variant"></select></div> 
+                <div>Variant: <select class="variant"></select></div>
+
                 <div><button class="bg">BG</button></div>
               </div></model-viewer>`
 
@@ -562,7 +563,6 @@ app.registerExtension({
 
               const modelViewerVariants = preview.querySelector('model-viewer')
               const select = preview.querySelector('.variant')
-
               const bg = preview.querySelector('.bg')
 
               if (modelViewerVariants) {
