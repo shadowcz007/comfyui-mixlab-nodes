@@ -50,6 +50,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-5](./workflow/5-gpt-workflow.json)
 
+### 3D
+![](./assets/3dimage.png)
+[workflow](./workflow/3D-workflow.json)
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
