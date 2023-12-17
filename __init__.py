@@ -169,6 +169,22 @@ def save_workflow_json(data):
     return workflow_path
 
 
+def get_nodes_map():
+    # print("#####path::", current_path)
+    data_path=os.path.join(current_path, "data")
+    print('data_path: ',data_path)
+    # if not os.path.exists(data_path):
+    #     # 使用mkdir()方法创建新目录
+    #     os.mkdir(data_path)
+    json_data={}
+    nodes_map=os.path.join(current_path, "data/extension-node-map.json")
+    if os.path.exists(nodes_map):
+        with open(nodes_map) as json_file:
+            json_data = json.load(json_file)
+
+    return json_data
+
+
 # 保存原始的 get 方法
 _original_request = aiohttp.ClientSession._request
 
@@ -253,6 +269,20 @@ async def mixlab_workflow_hander(request):
                 result={
                     'data':get_workflows(),
                     'status':'success',
+                }
+    except Exception as e:
+            print(e)
+
+    return web.json_response(result)
+
+@routes.post('/mixlab/nodes_map')
+async def nodes_map_hander(request):
+    data = await request.json()
+    result={}
+    try: 
+        result={
+            'data':get_nodes_map(),
+            'status':'success',
                 }
     except Exception as e:
             print(e)

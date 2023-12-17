@@ -3,10 +3,15 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-async function uploadImage (blob, fileType = '.svg') {
+
+async function uploadImage (blob, fileType = '.svg', filename) {
+
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
-  body.append('image', new File([blob], new Date().getTime() + fileType))
+  body.append(
+    'image',
+    new File([blob], (filename || new Date().getTime()) + fileType)
+  )
 
   const resp = await api.fetchApi('/upload/image', {
     method: 'POST',
@@ -125,6 +130,7 @@ const parseImage = url => {
 }
 
 const parseSvg = async svgContent => {
+  let scale = 2
   // 创建一个临时的DOM元素来解析SVG
   const tempContainer = document.createElement('div')
   tempContainer.innerHTML = svgContent
@@ -134,17 +140,18 @@ const parseSvg = async svgContent => {
   if (!svgElement) return
   // 获取SVG中 rect元素
   var rectElements = svgElement?.querySelectorAll('rect') || []
-
+  // console.log(rectElements,svgElement)
   // 定义一个数组来存储处理后的数据
   var data = []
 
   Array.from(rectElements, (rectElement, i) => {
     // 获取rect元素的属性值
-    var x = rectElement.getAttribute('x')
-    var y = rectElement.getAttribute('y')
-    var width = rectElement.getAttribute('width')
-    var height = rectElement.getAttribute('height')
-    if (x != undefined && y != undefined) {
+    var x = ~~(rectElement.getAttribute('x') || 0)
+    var y = ~~(rectElement.getAttribute('y') || 0)
+    var width = ~~rectElement.getAttribute('width')
+    var height = ~~rectElement.getAttribute('height')
+    // console.log('rectElements',rectElement,x,y,width,height)
+    if (x != undefined && y != undefined && width && height) {
       // 创建一个新的canvas元素
       var canvas = document.createElement('canvas')
       canvas.width = width
@@ -170,7 +177,8 @@ const parseSvg = async svgContent => {
         scale_option: 'width',
         image: base64,
         mask: base64,
-        type: 'base64'
+        type: 'base64',
+        _t: 'rect'
       }
 
       // 将处理后的数据添加到数组中
@@ -180,6 +188,15 @@ const parseSvg = async svgContent => {
 
   var svgWidth = svgElement.getAttribute('width')
   var svgHeight = svgElement.getAttribute('height')
+
+  if (!(svgWidth && svgHeight)) {
+    // viewBox
+    let viewBox = svgElement.viewBox.baseVal
+
+    svgWidth = viewBox.width
+    svgHeight = viewBox.height
+  }
+
   // 创建一个新的canvas元素
   var canvas = document.createElement('canvas')
   canvas.width = svgWidth
@@ -206,12 +223,13 @@ const parseSvg = async svgContent => {
     scale_option: 'width',
     image: base64,
     mask: base64,
-    type: 'base64'
+    type: 'base64',
+    _t: 'canvas'
   }
   data.push(rectData)
 
   // 打印处理后的数据
-  // console.log({ data, image: base64, svgElement })
+  console.log('layers', { data, image: base64, svgElement })
   return { data, image: base64, svgElement }
 }
 
@@ -345,6 +363,12 @@ app.registerExtension({
 
               svgContainer.innerHTML = ''
               svgContainer.appendChild(svgElement)
+              let h = ~~getComputedStyle(svgElement).height.replace('px', '')
+              if (that.size && that.size[1] < h) {
+                that.setSize([that.size[0], that.size[1] + h])
+                app.canvas.draw(true, true)
+              }
+              // console.log(that.size,~~getComputedStyle(svgElement).height.replace('px',''))
 
               uploadWidget.value = await uploadWidget.serializeValue()
             }
@@ -508,35 +532,33 @@ app.registerExtension({
           div.appendChild(label)
           div.appendChild(ip)
 
-          let that = this
+          let that = this,
+            filename = new Date().getTime()
 
           ip.addEventListener('change', event => {
             const file = event.target.files[0]
             const reader = new FileReader()
-
+            filename = new Date().getTime()
             // 读取文件内容
             reader.onload = async e => {
               const fileURL = URL.createObjectURL(file)
               // console.log('文件URL: ', fileURL)
-              let html = `<model-viewer 
-              alt="Neil Armstrong's Spacesuit from the Smithsonian Digitization Programs Office and National Air and Space Museum"
-               src="${fileURL}" 
-               ar 
+              let html = `<model-viewer  src="${fileURL}" 
+              min-field-of-view="0deg" max-field-of-view="180deg"
                shadow-intensity="1" 
                camera-controls 
                touch-action="pan-y">
                
                <div class="controls">
-                <div>Variant: <select class="variant"></select></div>
-                <div><button class="capture">Capture</button></div>
+                <div>Variant: <select class="variant"></select></div> 
+                <div><button class="bg">BG</button></div>
               </div></model-viewer>`
 
               preview.innerHTML = html
-
               if (that.size[1] < 400) {
                 that.setSize([that.size[0], that.size[1] + 300])
                 app.canvas.draw(true, true)
-              }
+              };
 
               const modelViewerVariants = preview.querySelector('model-viewer')
               const select = preview.querySelector('.variant')
@@ -547,6 +569,7 @@ app.registerExtension({
                 modelViewerVariants.style.width = `${that.size[0] - 24}px`
                 modelViewerVariants.style.height = `${that.size[1] - 48}px`
               }
+
 
               modelViewerVariants.addEventListener('load', () => {
                 const names = modelViewerVariants.availableVariants
@@ -562,6 +585,7 @@ app.registerExtension({
                 option.textContent = 'Default'
                 select.appendChild(option)
               })
+
 
               let timer = null
               const delay = 800 // 延迟时间，单位为毫秒
@@ -663,6 +687,7 @@ app.registerExtension({
                       modelViewerVariants.style.height = `${h}px`
                     }
                     preview.style.width = `${w}px`
+
                   })
 
                   // 读取文件
@@ -713,6 +738,7 @@ app.registerExtension({
 
         const onResize = this.onResize
         this.onResize = function () {
+
           let modelViewerVariants = preview.querySelector('model-viewer')
           if (modelViewerVariants) {
             modelViewerVariants.style.width = `${this.size[0] - 24}px`
@@ -720,6 +746,7 @@ app.registerExtension({
           }
           preview.style.width = `${this.size[0] - 12}px`
           // console.log(widget.div)
+
           return onResize?.apply(this, arguments)
         }
 
@@ -760,12 +787,14 @@ app.registerExtension({
       let { url, bg } = dd[id]
       if (!url) return
       // let base64 = await parseImage(url)
+
       let pre = widget.div.querySelector('.preview')
       pre.style.width = `${node.size[0]}px`
       pre.innerHTML = `
       ${url ? `<img src="${url}" style="width:100%"/>` : ''}
       `
       pre.style.backgroundImage = 'url(' + bg + ')'
+
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
