@@ -923,11 +923,7 @@ class Image3D:
         # print(upload['image'])
         image = base64_to_image(upload['image'])
         image=image.convert('RGB')
-<<<<<<< Updated upstream
-        mask=image.convert('L')
-        
-=======
-        
+
         mask=mask.convert('L')
 
         bg_image=None
@@ -936,7 +932,6 @@ class Image3D:
             bg_image=bg_image.convert('RGB')
             bg_image=pil2tensor(bg_image)
 
->>>>>>> Stashed changes
         mask=pil2tensor(mask)
         image=pil2tensor(image)
         

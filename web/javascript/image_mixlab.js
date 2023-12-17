@@ -3,7 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-async function uploadImage (blob,fileType='.svg') {
+async function uploadImage (blob, fileType = '.svg') {
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
   body.append('image', new File([blob], new Date().getTime() + fileType))
@@ -25,9 +25,8 @@ async function uploadImage (blob,fileType='.svg') {
   return src
 }
 
-function base64ToBlobFromURL(base64URL, contentType) {
-  return fetch(base64URL)
-    .then(response => response.blob());
+function base64ToBlobFromURL (base64URL, contentType) {
+  return fetch(base64URL).then(response => response.blob())
 }
 
 function getContentTypeFromBase64 (base64Data) {
@@ -533,12 +532,7 @@ app.registerExtension({
               </div></model-viewer>`
 
               preview.innerHTML = html
-<<<<<<< Updated upstream
 
-              const modelViewerVariants = preview.querySelector('model-viewer')
-              const select = preview.querySelector('.variant')
-              const capture = preview.querySelector('.capture')
-=======
               if (that.size[1] < 400) {
                 that.setSize([that.size[0], that.size[1] + 300])
                 app.canvas.draw(true, true)
@@ -553,7 +547,6 @@ app.registerExtension({
                 modelViewerVariants.style.width = `${that.size[0] - 24}px`
                 modelViewerVariants.style.height = `${that.size[1] - 48}px`
               }
->>>>>>> Stashed changes
 
               modelViewerVariants.addEventListener('load', () => {
                 const names = modelViewerVariants.availableVariants
@@ -570,32 +563,30 @@ app.registerExtension({
                 select.appendChild(option)
               })
 
-<<<<<<< Updated upstream
-=======
               let timer = null
               const delay = 800 // 延迟时间，单位为毫秒
 
               async function checkCameraChange () {
                 let dd = getLocalData(key)
                 let w, h
-                let base64Data
+                let base64Data = modelViewerVariants.toDataURL()
 
-                if (dd[that.id]) {
-                  w = dd[that.id].bg_w
-                  h = dd[that.id].bg_h
-                }
-                // 在这里触发相机停止变化的事件
-                // console.log('在这里触发相机停止变化的事件')
-                // let base64Data = modelViewerVariants.toDataURL()
-                if (w && h) {
-                  base64Data = await exportModelViewerImage(
-                    modelViewerVariants.displaycanvas,
-                    w,
-                    h
-                  )
-                } else {
-                  base64Data = modelViewerVariants.toDataURL()
-                }
+                // if (dd[that.id]) {
+                //   w = dd[that.id].bg_w
+                //   h = dd[that.id].bg_h
+                // }
+                // // 在这里触发相机停止变化的事件
+                // // console.log('在这里触发相机停止变化的事件')
+                // // let base64Data = modelViewerVariants.toDataURL()
+                // if (w && h) {
+                //   base64Data = await exportModelViewerImage(
+                //     modelViewerVariants.displaycanvas,
+                //     w,
+                //     h
+                //   )
+                // } else {
+
+                // }
 
                 const contentType = getContentTypeFromBase64(base64Data)
 
@@ -618,30 +609,12 @@ app.registerExtension({
 
               modelViewerVariants.addEventListener('camera-change', startTimer)
 
->>>>>>> Stashed changes
               select.addEventListener('input', event => {
                 modelViewerVariants.variantName =
                   event.target.value === 'default' ? null : event.target.value
                 checkCameraChange()
               })
 
-<<<<<<< Updated upstream
-              capture.addEventListener('click', async () => {
-                let base64Data = modelViewerVariants.toDataURL()
-
-                const contentType = getContentTypeFromBase64(base64Data)
-
-                const blob =await base64ToBlobFromURL(base64Data, contentType)
-
-                //  const fileBlob = new Blob([e.target.result], { type: file.type });
-                let url = await uploadImage(blob,'.png')
-                console.log(url)
-
-                let dd = getLocalData(key)
-                dd[that.id] = url
-
-                setLocalDataOfWin(key, dd)
-=======
               bg.addEventListener('click', () => {
                 // 创建一个input元素
                 var input = document.createElement('input')
@@ -698,7 +671,6 @@ app.registerExtension({
 
                 // 触发input的点击事件
                 input.click()
->>>>>>> Stashed changes
               })
 
               uploadWidget.value = await uploadWidget.serializeValue()
@@ -729,13 +701,9 @@ app.registerExtension({
 
         let preview = document.createElement('div')
         preview.className = 'preview'
-<<<<<<< Updated upstream
-        preview.style = `background:#eee;margin-top: 12px;`
-=======
         preview.style = `margin-top: 12px;display: flex;
         justify-content: center;
         align-items: center;background-repeat: no-repeat;background-size: contain;`
->>>>>>> Stashed changes
 
         let upload = inputDiv('_mixlab_3d_image', '3D Model', preview)
 
@@ -743,8 +711,6 @@ app.registerExtension({
         widget.div.appendChild(preview)
         this.addCustomWidget(widget)
 
-<<<<<<< Updated upstream
-=======
         const onResize = this.onResize
         this.onResize = function () {
           let modelViewerVariants = preview.querySelector('model-viewer')
@@ -757,7 +723,6 @@ app.registerExtension({
           return onResize?.apply(this, arguments)
         }
 
->>>>>>> Stashed changes
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           upload.remove()
@@ -795,18 +760,13 @@ app.registerExtension({
       let { url, bg } = dd[id]
       if (!url) return
       // let base64 = await parseImage(url)
-<<<<<<< Updated upstream
-
-      widget.div.querySelector('.preview').innerHTML = `<img src="${url}"/>` 
-
-=======
       let pre = widget.div.querySelector('.preview')
       pre.style.width = `${node.size[0]}px`
       pre.innerHTML = `
       ${url ? `<img src="${url}" style="width:100%"/>` : ''}
       `
       pre.style.backgroundImage = 'url(' + bg + ')'
->>>>>>> Stashed changes
+
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
 
