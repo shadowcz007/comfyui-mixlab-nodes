@@ -909,26 +909,38 @@ class Image3D:
                     "upload":("THREED",),   },
                 }
     
-    RETURN_TYPES = ("IMAGE","MASK",)
-    # RETURN_NAMES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE","MASK","IMAGE",)
+    RETURN_NAMES = ("IMAGE","MASK","BG_IMAGE",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,)
+    OUTPUT_IS_LIST = (False,False,False,)
 
     def run(self,upload):
         # print(upload['image'])
         image = base64_to_image(upload['image'])
         image=image.convert('RGB')
+<<<<<<< Updated upstream
         mask=image.convert('L')
         
+=======
+        
+        mask=mask.convert('L')
+
+        bg_image=None
+        if upload['bg_image']:
+            bg_image = base64_to_image(upload['bg_image'])
+            bg_image=bg_image.convert('RGB')
+            bg_image=pil2tensor(bg_image)
+
+>>>>>>> Stashed changes
         mask=pil2tensor(mask)
         image=pil2tensor(image)
-
-        return (image,mask,)
+        
+        return (image,mask,bg_image,)
 
 
 
