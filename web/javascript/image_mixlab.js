@@ -3,7 +3,9 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
+
 async function uploadImage (blob, fileType = '.svg', filename) {
+
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
   body.append(
@@ -231,6 +233,25 @@ const parseSvg = async svgContent => {
   return { data, image: base64, svgElement }
 }
 
+function exportModelViewerImage (
+  modelViewer,
+  width,
+  height,
+  format = 'image/png',
+  quality = 1.0
+) {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+
+  return new Promise((resolve, reject) => {
+    context.drawImage(modelViewer, 0, 0, width, height)
+
+    resolve(canvas.toDataURL(format, quality))
+  })
+}
+
 app.registerExtension({
   name: 'Mixlab.image.SvgImage',
   async getCustomWidgets (app) {
@@ -444,11 +465,14 @@ app.registerExtension({
           async serializeValue (nodeId, widgetIndex) {
             let d = getLocalData('_mixlab_3d_image')
             // console.log('serializeValue',d)
-            if (d) {
-              let url = d[node.id]
+            if (d && d[node.id]) {
+              let { url, bg } = d[node.id]
               let base64 = await parseImage(url)
+              let bg_base64 = await parseImage(bg)
 
-              return JSON.parse(JSON.stringify({ image: base64 }))
+              return JSON.parse(
+                JSON.stringify({ image: base64, bg_image: bg_base64 })
+              )
             } else {
               return {}
             }
@@ -467,7 +491,7 @@ app.registerExtension({
         orig_nodeCreated?.apply(this, arguments)
 
         const uploadWidget = this.widgets.filter(w => w.name == 'upload')[0]
-        console.log('3d nodeData', this.inputs)
+        // console.log('3d nodeData', this.inputs)
 
         const widget = {
           type: 'div',
@@ -475,12 +499,13 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1])
+              get_position_style(ctx, widget_width, 88, node.size[1])
             )
           }
         }
 
         widget.div = $el('div', {})
+        widget.div.style.width = `120px`
 
         document.body.appendChild(widget.div)
 
@@ -535,16 +560,14 @@ app.registerExtension({
                 app.canvas.draw(true, true)
               };
 
-              
-              const modelViewerVariants = preview.querySelector('model-viewer');
+              const modelViewerVariants = preview.querySelector('model-viewer')
               const select = preview.querySelector('.variant')
-            
-              const bg = preview.querySelector('.bg');
 
-            
+              const bg = preview.querySelector('.bg')
+
               if (modelViewerVariants) {
                 modelViewerVariants.style.width = `${that.size[0] - 24}px`
-                modelViewerVariants.style.height = `${that.size[1] - 48}px`; 
+                modelViewerVariants.style.height = `${that.size[1] - 48}px`
               }
 
 
@@ -563,33 +586,48 @@ app.registerExtension({
                 select.appendChild(option)
               })
 
-              let previousCameraOrbit = null
+
               let timer = null
               const delay = 800 // 延迟时间，单位为毫秒
 
               async function checkCameraChange () {
-                 // 在这里触发相机停止变化的事件
-                 let base64Data = modelViewerVariants.toDataURL()
+                let dd = getLocalData(key)
+                let w, h
+                let base64Data = modelViewerVariants.toDataURL()
 
-                 const contentType = getContentTypeFromBase64(base64Data)
+                // if (dd[that.id]) {
+                //   w = dd[that.id].bg_w
+                //   h = dd[that.id].bg_h
+                // }
+                // // 在这里触发相机停止变化的事件
+                // // console.log('在这里触发相机停止变化的事件')
+                // // let base64Data = modelViewerVariants.toDataURL()
+                // if (w && h) {
+                //   base64Data = await exportModelViewerImage(
+                //     modelViewerVariants.displaycanvas,
+                //     w,
+                //     h
+                //   )
+                // } else {
 
-                 const blob = await base64ToBlobFromURL(
-                   base64Data,
-                   contentType
-                 )
+                // }
 
-                 //  const fileBlob = new Blob([e.target.result], { type: file.type });
-                 let url = await uploadImage(blob, '.png', filename)
-                 console.log(url)
+                const contentType = getContentTypeFromBase64(base64Data)
 
-                 let dd = getLocalData(key)
-                 dd[that.id] = url
+                const blob = await base64ToBlobFromURL(base64Data, contentType)
 
-                 setLocalDataOfWin(key, dd)
+                //  const fileBlob = new Blob([e.target.result], { type: file.type });
+                let url = await uploadImage(blob, '.png')
+                // console.log(url)
+
+                if (!dd[that.id]) dd[that.id] = { url, bg: '' }
+                dd[that.id] = { ...dd[that.id], url }
+
+                setLocalDataOfWin(key, dd)
               }
 
               function startTimer () {
-                clearTimeout(timer)
+                if (timer) clearTimeout(timer)
                 timer = setTimeout(checkCameraChange, delay)
               }
 
@@ -598,24 +636,8 @@ app.registerExtension({
               select.addEventListener('input', event => {
                 modelViewerVariants.variantName =
                   event.target.value === 'default' ? null : event.target.value
+                checkCameraChange()
               })
-
-              // capture.addEventListener('click', async () => {
-              //   let base64Data = modelViewerVariants.toDataURL()
-
-              //   const contentType = getContentTypeFromBase64(base64Data)
-
-              //   const blob = await base64ToBlobFromURL(base64Data, contentType)
-
-              //   //  const fileBlob = new Blob([e.target.result], { type: file.type });
-              //   let url = await uploadImage(blob, '.png')
-              //   console.log(url)
-
-              //   let dd = getLocalData(key)
-              //   dd[that.id] = url
-
-              //   setLocalDataOfWin(key, dd)
-              // })
 
               bg.addEventListener('click', () => {
                 // 创建一个input元素
@@ -631,9 +653,41 @@ app.registerExtension({
                   var reader = new FileReader()
 
                   // 监听FileReader的load事件
-                  reader.addEventListener('load', function () {
+                  reader.addEventListener('load', async () => {
+                    let base64 = reader.result
                     // 将读取的文件内容设置为div的背景
-                    preview.style.backgroundImage = 'url(' + reader.result + ')'
+                    preview.style.backgroundImage = 'url(' + base64 + ')'
+
+                    const contentType = getContentTypeFromBase64(base64)
+
+                    const blob = await base64ToBlobFromURL(base64, contentType)
+
+                    //  const fileBlob = new Blob([e.target.result], { type: file.type });
+                    let bg_url = await uploadImage(blob, '.png')
+                    let bg_img = await createImage(base64)
+
+                    let dd = getLocalData(key)
+                    // console.log(dd[that.id],bg_url)
+                    if (!dd[that.id]) dd[that.id] = { url: '', bg: bg_url }
+                    dd[that.id] = {
+                      ...dd[that.id],
+                      bg: bg_url,
+                      bg_w: bg_img.naturalWidth,
+                      bg_h: bg_img.naturalHeight
+                    }
+
+                    setLocalDataOfWin(key, dd)
+
+                    // 更新尺寸
+                    let w = that.size[0] - 24,
+                      h = (w * bg_img.naturalHeight) / bg_img.naturalWidth
+
+                    if (modelViewerVariants) {
+                      modelViewerVariants.style.width = `${w}px`
+                      modelViewerVariants.style.height = `${h}px`
+                    }
+                    preview.style.width = `${w}px`
+
                   })
 
                   // 读取文件
@@ -645,6 +699,23 @@ app.registerExtension({
               })
 
               uploadWidget.value = await uploadWidget.serializeValue()
+
+              // 更新尺寸
+              let dd = getLocalData(key)
+              // console.log(dd[that.id],bg_url)
+              if (dd[that.id]) {
+                const { bg_w, bg_h } = dd[that.id]
+                if (bg_h && bg_w) {
+                  let w = that.size[0] - 24,
+                    h = (w * bg_h) / bg_w
+
+                  if (modelViewerVariants) {
+                    modelViewerVariants.style.width = `${w}px`
+                    modelViewerVariants.style.height = `${h}px`
+                  }
+                  preview.style.width = `${w}px`
+                }
+              }
             }
 
             // 以文本形式读取文件
@@ -657,7 +728,7 @@ app.registerExtension({
         preview.className = 'preview'
         preview.style = `margin-top: 12px;display: flex;
         justify-content: center;
-        align-items: center;`
+        align-items: center;background-repeat: no-repeat;background-size: contain;`
 
         let upload = inputDiv('_mixlab_3d_image', '3D Model', preview)
 
@@ -667,13 +738,15 @@ app.registerExtension({
 
         const onResize = this.onResize
         this.onResize = function () {
-          let m = preview.querySelector('model-viewer')
-          if (m) {
-            m.style.width = `${this.size[0] - 24}px`
-            m.style.height = `${this.size[1] - 48}px`
-          }
 
-          // console.log(this.size,preview)
+          let modelViewerVariants = preview.querySelector('model-viewer')
+          if (modelViewerVariants) {
+            modelViewerVariants.style.width = `${this.size[0] - 24}px`
+            modelViewerVariants.style.height = `${this.size[1] - 48}px`
+          }
+          preview.style.width = `${this.size[0] - 12}px`
+          // console.log(widget.div)
+
           return onResize?.apply(this, arguments)
         }
 
@@ -708,13 +781,20 @@ app.registerExtension({
       let dd = getLocalData('_mixlab_3d_image')
 
       let id = node.id
-      console.log('3dImage load', node.widgets[0], node.widgets)
+      // console.log('3dImage load', node.widgets[0], node.widgets)
       if (!dd[id]) return
 
-      let url = dd[id]
+      let { url, bg } = dd[id]
+      if (!url) return
       // let base64 = await parseImage(url)
 
-      widget.div.querySelector('.preview').innerHTML = `<img src="${url}"/>`
+      let pre = widget.div.querySelector('.preview')
+      pre.style.width = `${node.size[0]}px`
+      pre.innerHTML = `
+      ${url ? `<img src="${url}" style="width:100%"/>` : ''}
+      `
+      pre.style.backgroundImage = 'url(' + bg + ')'
+
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
