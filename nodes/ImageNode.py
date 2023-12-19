@@ -909,22 +909,23 @@ class Image3D:
                     "upload":("THREED",),   }, 
                 }
     
-    RETURN_TYPES = ("IMAGE","MASK","IMAGE",)
-    RETURN_NAMES = ("IMAGE","MASK","BG_IMAGE",)
+    RETURN_TYPES = ("IMAGE","MASK","IMAGE","IMAGE",)
+    RETURN_NAMES = ("IMAGE","MASK","BG_IMAGE","MATERIAL",)
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/3D"
 
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,False,)
+    OUTPUT_IS_LIST = (False,False,False,False,)
 
     def run(self,upload):
         # print(upload['image'])
         image = base64_to_image(upload['image'])
+        material=base64_to_image(upload['material'])
         mask = image.split()[3]
         image=image.convert('RGB')
-
+        material=material.convert('RGB')
         mask=mask.convert('L')
 
         bg_image=None
@@ -936,9 +937,58 @@ class Image3D:
 
         mask=pil2tensor(mask)
         image=pil2tensor(image)
+        material=pil2tensor(material)
         
-        return (image,mask,bg_image,)
+        return (image,mask,bg_image,material,)
 
+
+
+class SetTexture3D:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "image":("IMAGE",),  
+                     "material_name":("STRING", {"multiline": False,"default": "Mixlab"}),
+                       }, 
+                }
+    
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/3D"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = ()
+
+    def run(self,image,material_name):
+        
+        output_dir = folder_paths.get_temp_directory()
+
+        (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path(material_name, output_dir)
+
+    
+
+        image=tensor2pil(image)
+ 
+        image_file = f"{filename}_{counter:05}.png"
+     
+        image_path=os.path.join(full_output_folder, image_file)
+
+        image.save(image_path,compress_level=4)
+    
+        return {"ui":{"image": {
+                    "filename": image_file,
+                    "subfolder": subfolder,
+                    "type": "temp"
+                },"material_name":material_name}}
 
 
 class AreaToMask:
