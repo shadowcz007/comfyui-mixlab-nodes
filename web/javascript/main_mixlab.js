@@ -485,7 +485,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
     // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
     width: `${widget_width - MARGIN * 2}px`,
     // height: `${node_height - MARGIN * 2}px`,
-    background: '#EEEEEE',
+    // background: '#EEEEEE',
     display: 'flex',
     flexDirection: 'column',
     // alignItems: 'center',
@@ -596,7 +596,7 @@ app.registerExtension({
           type: 'HTML', // whatever
           name: 'sreen_share', // whatever
           draw (ctx, node, widget_width, y, widget_height) {
-            console.log('ScreenSHare', y, widget_height)
+            // console.log('ScreenSHare', y, widget_height)
             Object.assign(
               this.card.style,
               get_position_style(
@@ -609,9 +609,15 @@ app.registerExtension({
           }
         }
 
-        widget.card = $el('div', {})
+        widget.card = $el('div', {
+          color: 'var(--descrip-text)',
+          backgroundColor: 'var(--comfy-input-bg)'
+        })
 
-        widget.previewCard = $el('div', {})
+        widget.previewCard = $el('div', {
+          color: 'var(--descrip-text)',
+          backgroundColor: 'var(--comfy-input-bg)'
+        })
 
         widget.preview = $el('video', {
           style: {
@@ -623,7 +629,10 @@ app.registerExtension({
         })
 
         widget.previewArea = $el('div', {
-          style: {}
+          style: {
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)'
+          }
         })
 
         widget.shareDiv = $el('div', {
@@ -631,7 +640,9 @@ app.registerExtension({
           style: {
             cursor: 'pointer',
             fontWeight: '300',
-            display: 'flex'
+            display: 'flex',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)'
           }
         })
 
@@ -642,7 +653,12 @@ app.registerExtension({
             padding: '8px 0',
             fontWeight: '300',
             margin: '2px',
-            width: '100%'
+            width: '100%',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)',
+            borderRadius: '8px',
+            borderColor: 'var(--border-color)',
+            borderStyle: 'solid'
           }
         })
 
@@ -653,7 +669,12 @@ app.registerExtension({
             padding: '8px 0',
             fontWeight: '300',
             margin: '2px',
-            width: '100%'
+            width: '100%',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)',
+            borderRadius: '8px',
+            borderColor: 'var(--border-color)',
+            borderStyle: 'solid'
           }
         })
 
@@ -663,7 +684,12 @@ app.registerExtension({
             cursor: 'pointer',
             padding: '8px 0',
             fontWeight: '300',
-            margin: '2px'
+            margin: '2px',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)',
+            borderRadius: '8px',
+            borderColor: 'var(--border-color)',
+            borderStyle: 'solid'
           }
         })
 
@@ -671,21 +697,30 @@ app.registerExtension({
           placeholder: '  Refresh rate:200 ms',
           type: 'number',
           min: 100,
-          step: 100,
+          step: 100, 
           style: {
             cursor: 'pointer',
-            padding: '8px 0',
+            padding: '8px 24px',
             fontWeight: '300',
-            margin: '2px'
+            margin: '2px',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)'
           }
-        })
+        });
+        widget.refreshInput.className='comfy-multiline-input'
+        
         widget.liveBtn = $el('button', {
           innerText: 'Live Run',
           style: {
             cursor: 'pointer',
             padding: '8px 0',
             fontWeight: '300',
-            margin: '2px'
+            margin: '2px',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)',
+            borderRadius: '8px',
+            borderColor: 'var(--border-color)',
+            borderStyle: 'solid'
           }
         })
 
@@ -890,7 +925,7 @@ app.registerExtension({
         })
         // console.log('widget.inputEl',widget.inputEl)
 
-        this.setSize([this.size[0],this.size[1]+450])
+        this.setSize([this.size[0], this.size[1] + 450])
         app.canvas.draw(true, true)
 
         /*
@@ -1255,7 +1290,12 @@ app.registerExtension({
             cursor: 'pointer',
             padding: '8px 0',
             fontWeight: '300',
-            margin: '2px'
+            margin: '2px',
+            color: 'var(--descrip-text)',
+            backgroundColor: 'var(--comfy-input-bg)',
+            borderRadius: '8px',
+            borderColor: 'var(--border-color)',
+            borderStyle: 'solid'
           }
         })
 
@@ -1421,7 +1461,8 @@ app.registerExtension({
             )
 
             try {
-              pipWindow.document.querySelector('#info').innerText =window._mixlab_screen_seed_input
+              pipWindow.document.querySelector('#info').innerText =
+                window._mixlab_screen_seed_input
             } catch (error) {
               console.log(error)
             }
