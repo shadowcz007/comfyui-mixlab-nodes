@@ -1115,14 +1115,14 @@ class NewLayer:
             "required": { 
                 "x": ("INT",{
                     "default": 0, 
-                    "min": -100, #Minimum value
+                    "min": -1024, #Minimum value
                     "max": 8192, #Maximum value
                     "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
                 "y": ("INT",{
                     "default": 0, 
-                    "min": 0, #Minimum value
+                    "min": -1024, #Minimum value
                     "max": 8192, #Maximum value
                     "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"

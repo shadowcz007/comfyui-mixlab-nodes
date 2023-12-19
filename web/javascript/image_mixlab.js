@@ -432,16 +432,7 @@ app.registerExtension({
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
-
-      // let h=~~getComputedStyle(widget.div).height.replace('px','');
-      // let w=~~getComputedStyle(widget.div).width.replace('px','');
-      // // console.log('svg', w,h,node.size)
-      // node.setSize([
-      //   w,h
-      // ])
-      // app.graph.setDirtyCanvas(true)
-
-      // console.log(node.widgets_values)
+ 
     }
   }
 })

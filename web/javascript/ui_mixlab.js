@@ -2,6 +2,7 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
+import {closeIcon} from './svg_icons.js'
 
 function deepEqual (obj1, obj2) {
   if (typeof obj1 !== typeof obj2) {
@@ -41,6 +42,17 @@ async function get_nodes_map () {
   })
   return await res.json()
 }
+
+function loadCSS(url) {
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.type = 'text/css';
+  link.href = url;
+  document.getElementsByTagName('head')[0].appendChild(link);
+}
+
+var cssURL = 'https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown-light.min.css';
+loadCSS(cssURL);
 
 function injectCSS (css) {
   // 检查页面中是否已经存在具有相同内容的style标签
@@ -289,7 +301,7 @@ async function fetchReadmeContent (url) {
 
     var readmeResponse = await fetch(readmeUrl)
     var content = await readmeResponse.text()
-    console.log(content) // 在控制台输出readme.md文件的内容
+    // console.log(content) // 在控制台输出readme.md文件的内容
 
     return content
   } catch (error) {
@@ -297,86 +309,136 @@ async function fetchReadmeContent (url) {
   }
 }
 
-function createModal (url, markdown) {
+function createModal (url, markdown,title) {
+  
   // Create modal element
   var div =
     document.querySelector('#mix-modal') || document.createElement('div')
   div.id = 'mix-modal'
   div.innerHTML = ''
-
   div.style.cssText = `width: 100%;
-  z-index: 9990;
-  height: 100vh;display: flex;
-  color: var(--descrip-text);
-  background-color: var(--comfy-menu-bg);
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-  `
+    z-index: 9990;
+    height: 100vh;
+    display: flex;
+    color: var(--descrip-text);
+    position: fixed;
+    top: 0;
+    left: 0;
+    `
 
   var modal = document.createElement('div')
 
   div.appendChild(modal)
-
+  modal.classList.add("modal-body")
   // Set modal styles
   modal.style.cssText = `
     background: white;
     height: 80vh;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    padding: 24px;
     position: fixed;
+    overflow:hidden;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
-  `
+    border-radius: 4px;
+    box-shadow: 4px 4px 14px rgba(255,255,255,0.5);
 
+  `
   // Create modal content area
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
+  // Create modal header
+  const headerElement =  document.createElement('div')
+  headerElement.classList.add('modal-header')
+  headerElement.style.cssText = `
+    display: flex;
+    padding: 20px 24px 8px 24px;
+    justify-content: space-between;
+  `
+  
+  const headTitleElement = document.createElement('a')
+  headTitleElement.classList.add('header-title')
+  headTitleElement.style.cssText=`
+    color: var(--descrip-text);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    overflow: hidden;
+    text-decoration: none;
+    font-weight: bold;
+  `
+  headTitleElement.onmouseenter = function(){
+    headTitleElement.style.color = 'var(--comfy-menu-bg)'
+  }
+  headTitleElement.onmouseleave = function(){
+    headTitleElement.style.color = 'var(--descrip-text)'
+  }
+  headTitleElement.textContent= title ||'';
+  headTitleElement.href = url
+  headTitleElement.target='_blank'
+  const linkIcon = document.createElement('small')
+  linkIcon.textContent = '🔗'
+  headTitleElement.appendChild(linkIcon);
+  headerElement.appendChild(headTitleElement)
+
+  
 
   // Create close button
-  var closeButton = document.createElement('span')
+  const closeButton = document.createElement('span')
   closeButton.classList.add('close')
-  closeButton.innerHTML = '&times;'
-
+  closeButton.innerHTML = closeIcon
   // Set close button styles
   closeButton.style.cssText = `
-  color: var(--input-text);
-  background-color: var(--comfy-input-bg);
-  border-color: var(--border-color);
-padding: 4px;
-/* border-radius: 50%; */
-position: fixed;
-top: 8px;
-right: 8px;
-cursor: pointer;
-width: 32px;
-height: 32px;
-display: flex;
-justify-content: center;
-align-items: center;
-`
+      padding: 4px;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      fill: var(--descrip-text);
+      `
+  closeButton.onmouseenter = function(){
+    closeButton.style.fill = 'var(--comfy-menu-bg)'; 
+  }
+  closeButton.onmouseleave = function(){
+    closeButton.style.fill = 'var(--descrip-text)';
+  }
+
+  headerElement.appendChild(closeButton)
+
+
+  // Click event to close the modal
+  function closeMixModal(){
+    div.style.display = 'none'
+    window.removeEventListener('keydown',MixModalEscKeyEvent)
+  }
+  closeButton.onclick = function () {
+    closeMixModal()
+  }
 
   // Set modal content area styles
   modalContent.style.cssText = `
-position: relative;
-`
-  // Click event to close the modal
-  closeButton.onclick = function () {
-    div.style.display = 'none'
-  }
+    position: relative;
+    padding: 0px;
+    overflow: hidden scroll;;
+    height: 100%;
+    min-width:300px
+    `
 
   // Append close button to modal content area
-  modalContent.appendChild(closeButton)
+  modal.appendChild(headerElement)
 
   // Create element for displaying Markdown content
   var markdownContent = document.createElement('div')
-  markdownContent.classList.add('markdown-content')
+  markdownContent.classList.add('markdown-content','markdown-body')
+  markdownContent.style.cssText = `max-width: 50vw;padding: 0px 24px 100px 24px;`
 
+  showdown.setFlavor('github');
   var converter = new showdown.Converter()
+
   var html = converter.makeHtml(markdown)
 
   // Hide images in the markdown when they fail to load
@@ -405,10 +467,63 @@ position: relative;
   // Append modal content area to modal element
   modal.appendChild(modalContent)
 
+  const footerElement = document.createElement('div')
+  footerElement.style.cssText=`
+      position: absolute;
+      left: 0;
+      right: 0;
+      text-align: right;
+      padding:10px;
+      font-size:12px
+  `
+
+  const footerText = document.createElement('a')
+  footerText.href ="https://github.com/shadowcz007/comfyui-mixlab-nodes"
+  footerText.innerText =  "Support by Mixlab"
+  footerText.style.cssText=`color:inherit`
+  footerText.target = "_blank"
+  footerText.onmouseenter=function(){
+    footerText.style.color = 'var(--input-text)'
+  }
+  footerText.onmouseleave=function(){
+    footerText.style.color = 'inherit'
+  }
+  
+  
+  footerText.onclick = function(e){
+    e.stopPropagation()
+  }
+  footerElement.appendChild(footerText)
+
+  div.appendChild(footerElement)
+
+
   // Append modal element to the page
   if (!document.querySelector('#mix-modal')) {
     document.body.appendChild(div)
   }
+  function MixModalEscKeyEvent(event){
+      if(event.key == "Escape"){
+        closeMixModal()
+      }
+  }
+  window.removeEventListener('keydown',MixModalEscKeyEvent)
+  window.addEventListener('keydown',MixModalEscKeyEvent)
+
+  const bgElement = document.createElement('div')
+  bgElement.classList.add('mix-modal-bg')
+  bgElement.style.cssText = `
+    width:100%;
+    height:100%;
+    background-color: rgba(0,0,0,0.8);
+  `
+  bgElement.onclick =  function( ){   
+    closeMixModal()
+  }
+  
+  div.appendChild(bgElement)
+
+
 }
 
 app.registerExtension({
@@ -420,13 +535,11 @@ app.registerExtension({
           ? nodesMap
           : await getCustomnodeMappings('url')
 
-      console.log(node, nodesMap, nodesMap[node.type])
+      console.log('node & node map', node, nodesMap, nodesMap[node.type])
       let repo = nodesMap[node.type]
       if (repo) {
         let markdown = await fetchReadmeContent(repo.url)
-        console.log(markdown)
-
-        createModal(repo.url, `# [${repo.title}](${repo.url})<br>${markdown}`)
+        createModal(repo.url,markdown,repo.title)
       }
     }
 
@@ -460,7 +573,7 @@ app.registerExtension({
   },
   async setup () {
 
-    // Add canvas menu options
+    // Add canvas menu options 
 			const orig = LGraphCanvas.prototype.getCanvasMenuOptions;
 			LGraphCanvas.prototype.getCanvasMenuOptions = function () {
 				const options = orig.apply(this, arguments);
@@ -483,14 +596,14 @@ app.registerExtension({
               document.createElement('div')
             div.id = 'mixlab_find_the_node'
             div.style = `
-            flex-direction: column;
-      align-items: end;
-      display:flex;position: absolute; 
-      top: 50px; left: 50px; width: 200px; 
-      color: var(--descrip-text);
-      background-color: var(--comfy-menu-bg);
-       padding: 10px; 
-       border: 1px solid black;z-index: 999999999;padding-top: 0;`
+              flex-direction: column;
+              align-items: end;
+              display:flex;position: absolute; 
+              top: 50px; left: 50px; width: 200px; 
+              color: var(--descrip-text);
+              background-color: var(--comfy-menu-bg);
+              padding: 10px; 
+              border: 1px solid black;z-index: 999999999;padding-top: 0;`
   
             div.innerHTML = ''
   
@@ -505,7 +618,7 @@ app.registerExtension({
             let textB = document.createElement('p')
             btn.appendChild(textB)
             btn.appendChild(btnB)
-            textB.innerText = `find the node`
+            textB.innerText = `Find The Node`
   
             btnB.style = `float: right; border: none; color: var(--input-text);
             background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
@@ -555,7 +668,7 @@ app.registerExtension({
                   app.canvas.setZoom(1)
                 })
                 d.addEventListener('mouseover', async () => {
-                  console.log('mouseover')
+                  // console.log('mouseover')
                   let n = (await app.graphToPrompt()).output
                   if (!deepEqual(n, ns)) {
                     nd.innerHTML = ''

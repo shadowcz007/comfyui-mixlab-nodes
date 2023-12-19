@@ -3,7 +3,7 @@ import { app } from '../../../scripts/app.js'
 const repoOwner = 'shadowcz007' // 替换为仓库的所有者
 const repoName = 'comfyui-mixlab-nodes' // 替换为仓库的名称
 
-const version = 'v0.3.1'
+const version = 'v0.4.0'
 
 fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`)
   .then(response => response.json())
