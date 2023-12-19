@@ -588,7 +588,7 @@ app.registerExtension({
 
 
               let timer = null
-              const delay = 800 // 延迟时间，单位为毫秒
+              const delay = 500 // 延迟时间，单位为毫秒
 
               async function checkCameraChange () {
                 let dd = getLocalData(key)
@@ -737,15 +737,27 @@ app.registerExtension({
         this.addCustomWidget(widget)
 
         const onResize = this.onResize
+        let that=this;
         this.onResize = function () {
 
           let modelViewerVariants = preview.querySelector('model-viewer')
-          if (modelViewerVariants) {
-            modelViewerVariants.style.width = `${this.size[0] - 24}px`
-            modelViewerVariants.style.height = `${this.size[1] - 48}px`
-          }
-          preview.style.width = `${this.size[0] - 12}px`
-          // console.log(widget.div)
+
+           // 更新尺寸
+           let dd = getLocalData('_mixlab_3d_image')
+           // console.log(dd[that.id],bg_url)
+           if (dd[that.id]) {
+             const { bg_w, bg_h } = dd[that.id]
+             if (bg_h && bg_w) {
+               let w = that.size[0] - 24,
+                 h = (w * bg_h) / bg_w
+
+               if (modelViewerVariants) {
+                 modelViewerVariants.style.width = `${w}px`
+                 modelViewerVariants.style.height = `${h}px`
+               }
+               preview.style.width = `${w}px`
+             }
+           }
 
           return onResize?.apply(this, arguments)
         }
