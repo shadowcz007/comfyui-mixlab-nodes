@@ -148,6 +148,7 @@ async function extractMaterial (
     const option = document.createElement('option')
     option.value = name.thumbUrl
     option.textContent = name.text
+    option.setAttribute('data-index', index)
     selectMaterial.appendChild(option)
     let img = new Image()
     img.src = name.thumbUrl
@@ -158,6 +159,16 @@ async function extractMaterial (
       material_img.setAttribute('src', name.thumbUrl)
     }
   }
+}
+
+async function changeMaterial (
+  modelViewerVariants,
+  targetMaterial,
+  newImageUrl
+) {
+  const targetTexture = await modelViewerVariants.createTexture(newImageUrl)
+  // 用图片创建纹理
+  targetMaterial.pbrMetallicRoughness.baseColorTexture.setTexture(targetTexture)
 }
 
 app.registerExtension({
@@ -320,7 +331,6 @@ app.registerExtension({
 
               async function checkCameraChange () {
                 let dd = getLocalData(key)
-                let w, h
                 let base64Data = modelViewerVariants.toDataURL()
 
                 const contentType = getContentTypeFromBase64(base64Data)
@@ -336,9 +346,15 @@ app.registerExtension({
                 let tb = await base64ToBlobFromURL(thumbUrl)
                 let tUrl = await uploadImage(tb, '.png')
 
-                console.log(tUrl)
+                // console.log(tUrl)
 
-                if (!dd[that.id]) dd[that.id] = { url, bg: url, material: tUrl }
+                let bg_blob = await base64ToBlobFromURL(
+                  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN88uXrPQAFwwK/6xJ6CQAAAABJRU5ErkJggg=='
+                )
+                let url_bg = await uploadImage(bg_blob, '.png')
+
+                if (!dd[that.id])
+                  dd[that.id] = { url, bg: url_bg, material: tUrl }
                 dd[that.id] = { ...dd[that.id], url, material: tUrl }
 
                 setLocalDataOfWin(key, dd)
@@ -364,7 +380,7 @@ app.registerExtension({
               })
 
               selectMaterial.addEventListener('input', event => {
-                console.log(selectMaterial.value)
+                // console.log(selectMaterial.value)
                 material_img.setAttribute('src', selectMaterial.value)
                 checkCameraChange()
               })
@@ -508,8 +524,11 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         const r = onExecuted?.apply?.(this, arguments)
-
         
+
+        let div = this.widgets.filter(d => d.div)[0]?.div
+        console.log('Test', this.widgets)
+
         let material = message.material[0]
         if (material) {
           const { filename, subfolder, type } = material
@@ -518,7 +537,19 @@ app.registerExtension({
               filename
             )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
           )
-          console.log('Test', this.widgets, src)
+
+          const modelViewerVariants = div.querySelector('model-viewer')
+
+          const selectMaterial = div.querySelector('.material')
+
+          let index =
+            ~~selectMaterial.selectedOptions[0].getAttribute('data-index')
+
+          changeMaterial(
+            modelViewerVariants,
+            modelViewerVariants.model.materials[index],
+            src
+          )
         }
 
         this.onResize?.(this.size)
