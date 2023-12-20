@@ -434,6 +434,32 @@ def base64_to_image(base64_string):
     return image
 
 
+def create_temp_file(image):
+    output_dir = folder_paths.get_temp_directory()
+
+    (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('material', output_dir)
+
+    
+    image=tensor2pil(image)
+ 
+    image_file = f"{filename}_{counter:05}.png"
+     
+    image_path=os.path.join(full_output_folder, image_file)
+
+    image.save(image_path,compress_level=4)
+
+    return [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type": "temp"
+                }]
+
 
 class SmoothMask:
     @classmethod
@@ -906,7 +932,10 @@ class Image3D:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-                    "upload":("THREED",),   }, 
+                    "upload":("THREED",),}, 
+                "optional":{
+                    "material": ("IMAGE",),
+                    }
                 }
     
     RETURN_TYPES = ("IMAGE","MASK","IMAGE","IMAGE",)
@@ -914,18 +943,20 @@ class Image3D:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/3D"
+    CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,False,)
+    OUTPUT_NODE = True
 
-    def run(self,upload):
+    def run(self,upload,material=None):
+        # print('material',material)
         # print(upload['image'])
         image = base64_to_image(upload['image'])
-        material=base64_to_image(upload['material'])
+        mat=base64_to_image(upload['material'])
         mask = image.split()[3]
         image=image.convert('RGB')
-        material=material.convert('RGB')
+        mat=mat.convert('RGB')
         mask=mask.convert('L')
 
         bg_image=None
@@ -937,58 +968,15 @@ class Image3D:
 
         mask=pil2tensor(mask)
         image=pil2tensor(image)
-        material=pil2tensor(material)
+        mat=pil2tensor(mat)
+
+        m=[]
+        if not material is None:
+            m=create_temp_file(material[0])
         
-        return (image,mask,bg_image,material,)
+        return {"ui":{"material": m},"result": (image,mask,bg_image,mat,)}
 
 
-
-class SetTexture3D:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": { 
-                    "image":("IMAGE",),  
-                     "material_name":("STRING", {"multiline": False,"default": "Mixlab"}),
-                       }, 
-                }
-    
-    RETURN_TYPES = ()
-    RETURN_NAMES = ()
-
-    FUNCTION = "run"
-
-    CATEGORY = "♾️Mixlab/3D"
-
-    INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = ()
-
-    def run(self,image,material_name):
-        
-        output_dir = folder_paths.get_temp_directory()
-
-        (
-            full_output_folder,
-            filename,
-            counter,
-            subfolder,
-            _,
-        ) = folder_paths.get_save_image_path(material_name, output_dir)
-
-    
-
-        image=tensor2pil(image)
- 
-        image_file = f"{filename}_{counter:05}.png"
-     
-        image_path=os.path.join(full_output_folder, image_file)
-
-        image.save(image_path,compress_level=4)
-    
-        return {"ui":{"image": {
-                    "filename": image_file,
-                    "subfolder": subfolder,
-                    "type": "temp"
-                },"material_name":material_name}}
 
 
 class AreaToMask:
@@ -1167,7 +1155,7 @@ class NewLayer:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self,x,y,width,height,z_index,scale_option,image,mask,layers):
+    def run(self,x,y,width,height,z_index,scale_option,image,mask=None,layers=None):
         # print(x,y,width,height,z_index,image,mask)
         
         if mask==None:

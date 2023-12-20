@@ -144,7 +144,7 @@ async function extractMaterial (
   material_img.innerHTML = ''
 
   for (let index = 0; index < materialsNames.length; index++) {
-    const name = materialsNames[index];
+    const name = materialsNames[index]
     const option = document.createElement('option')
     option.value = name.thumbUrl
     option.textContent = name.text
@@ -154,11 +154,10 @@ async function extractMaterial (
     // img.setAttribute('data-index',name.index)
     img.style.width = '40px'
     material_img.appendChild(img)
-    if(index==0){
-        material_img.setAttribute('src',name.thumbUrl)
+    if (index == 0) {
+      material_img.setAttribute('src', name.thumbUrl)
     }
   }
- 
 }
 
 app.registerExtension({
@@ -339,7 +338,7 @@ app.registerExtension({
 
                 console.log(tUrl)
 
-                if (!dd[that.id]) dd[that.id] = { url, bg: '', material: tUrl }
+                if (!dd[that.id]) dd[that.id] = { url, bg: url, material: tUrl }
                 dd[that.id] = { ...dd[that.id], url, material: tUrl }
 
                 setLocalDataOfWin(key, dd)
@@ -366,7 +365,7 @@ app.registerExtension({
 
               selectMaterial.addEventListener('input', event => {
                 console.log(selectMaterial.value)
-                material_img.setAttribute('src',selectMaterial.value)
+                material_img.setAttribute('src', selectMaterial.value)
                 checkCameraChange()
               })
 
@@ -502,8 +501,29 @@ app.registerExtension({
         if (this.onResize) {
           this.onResize(this.size)
         }
+        // this.isVirtualNode = true
+        this.serialize_widgets = false //需要保存参数
+      }
 
-        this.serialize_widgets = true //需要保存参数
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        const r = onExecuted?.apply?.(this, arguments)
+
+        
+        let material = message.material[0]
+        if (material) {
+          const { filename, subfolder, type } = material
+          let src = api.apiURL(
+            `/view?filename=${encodeURIComponent(
+              filename
+            )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
+          )
+          console.log('Test', this.widgets, src)
+        }
+
+        this.onResize?.(this.size)
+
+        return r
       }
     }
   },
