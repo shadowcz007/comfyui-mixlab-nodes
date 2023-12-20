@@ -382,6 +382,19 @@ app.registerExtension({
               selectMaterial.addEventListener('input', event => {
                 // console.log(selectMaterial.value)
                 material_img.setAttribute('src', selectMaterial.value)
+
+                if (selectMaterial.getAttribute('data-new-material')) {
+                  let index =
+                    ~~selectMaterial.selectedOptions[0].getAttribute(
+                      'data-index'
+                    )
+                  changeMaterial(
+                    modelViewerVariants,
+                    modelViewerVariants.model.materials[index],
+                    selectMaterial.getAttribute('data-new-material')
+                  )
+                }
+
                 checkCameraChange()
               })
 
@@ -524,7 +537,6 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         const r = onExecuted?.apply?.(this, arguments)
-        
 
         let div = this.widgets.filter(d => d.div)[0]?.div
         console.log('Test', this.widgets)
@@ -544,6 +556,8 @@ app.registerExtension({
 
           let index =
             ~~selectMaterial.selectedOptions[0].getAttribute('data-index')
+
+          selectMaterial.setAttribute('data-new-material', src)
 
           changeMaterial(
             modelViewerVariants,
