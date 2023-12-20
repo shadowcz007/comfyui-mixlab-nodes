@@ -376,6 +376,25 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     return bg_image
 
 
+def resize_image(layer_image,scale_option,width,height):
+    layer_image = layer_image.convert("RGB")
+    if scale_option == "height":
+        # 按照高度比例缩放
+        original_width, original_height = layer_image.size
+        scale = height / original_height
+        new_width = int(original_width * scale)
+        layer_image = layer_image.resize((new_width, height))
+    elif scale_option == "width":
+        # 按照宽度比例缩放
+        original_width, original_height = layer_image.size
+        scale = width / original_width
+        new_height = int(original_height * scale)
+        layer_image = layer_image.resize((width, new_height))
+    elif scale_option == "overall":
+        # 整体缩放
+        layer_image = layer_image.resize((width, height))
+    return layer_image
+
 
 def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
     # Load Chinese font
@@ -845,6 +864,8 @@ class ImageCropByAlpha:
         to_y = h + y
         img = image[:,y:to_y, x:to_x, :]
         return (img,)
+
+
 
 
 
@@ -1330,3 +1351,54 @@ class MergeLayers:
         mask = mask[:, :, :, channels.index("green")]
         
         return (bg_image,mask,)
+    
+
+
+
+class ResizeImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "image": ("IMAGE",),
+
+            "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "scale_option": (["width","height",'overall'],),
+
+                             },
+                }
+    
+    RETURN_TYPES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,image,width,height,scale_option):
+        
+        w=width[0]
+        h=height[0]
+        scale_option=scale_option[0]
+        im=image[0]
+
+        im=tensor2pil(im)
+        im=resize_image(im,scale_option,w,h)
+        im=im.convert('RGB')
+        im=pil2tensor(im)
+        
+        return (im,)

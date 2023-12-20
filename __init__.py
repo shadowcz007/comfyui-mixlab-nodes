@@ -318,7 +318,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,TextImage,SvgImage,Image3D,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import TransparentImage,LoadImagesFromPath,ResizeImage,TextImage,SvgImage,Image3D,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -332,12 +332,12 @@ from .nodes.Utils import ColorInput,FontInput
 NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "TransparentImage":TransparentImage,
+    "ResizeImageMixlab":ResizeImage,
     "LoadImagesFromPath":LoadImagesFromPath,
     "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
     "3DImage":Image3D,
-  
     "EmptyLayer":EmptyLayer,
     "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
@@ -365,6 +365,7 @@ NODE_CLASS_MAPPINGS = {
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
+    "ResizeImageMixlab":"ResizeImage",
     "RandomPrompt": "Random Prompt ♾️Mixlab",
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
