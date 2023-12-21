@@ -105,6 +105,7 @@ const start = (element, id, startBtn) => {
       window.recognition = null;
       startBtn.className=''
       startBtn.innerText = 'START'
+      
 
       timeoutId = null
 
@@ -201,9 +202,12 @@ app.registerExtension({
           margin: 0px 8px 6px;`
 
           startBtn.style = `
-            outline: none;
-            border: none;
-            padding: 4px; `
+          background-color: var(--comfy-input-bg);
+          border-radius: 8px;
+          border-color: var(--border-color);
+          border-style: solid;
+          color: var(--descrip-text);
+          `
 
           startBtn.innerText = 'START'
 
