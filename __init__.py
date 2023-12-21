@@ -338,7 +338,7 @@ NODE_CLASS_MAPPINGS = {
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
     "3DImage":Image3D,
-    "EmptyLayer":EmptyLayer,
+    # "EmptyLayer":EmptyLayer,
     "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
     "MergeLayers":MergeLayers,
