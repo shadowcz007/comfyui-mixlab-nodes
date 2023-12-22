@@ -199,7 +199,7 @@ async function setArea (cw, ch, base64, data, fn) {
   let imgWidth = cw
   let imgHeight = ch
 
-  if (data && data.width > 0 && data.height > 0  ) {
+  if (data && data.width > 0 && data.height > 0) {
     // 相同尺寸窗口，恢复选区
     x = (width * data.x) / imgWidth
     y = (height * data.y) / imgHeight
@@ -530,13 +530,14 @@ app.registerExtension({
                 data.height = widget.value
               }
             }
-
-            let linkId = this.inputs[3].link
-            let nodeId = app.graph.links[linkId].origin_id
-            // console.log(linkId,this.inputs)
-            let im = app.graph.getNodeById(nodeId).imgs[0]
-            let src = im.src
-            setArea(im.naturalWidth, im.naturalHeight, src, data, updateValue)
+            try {
+              let linkId = this.inputs[3].link
+              let nodeId = app.graph.links[linkId].origin_id
+              // console.log(linkId,this.inputs)
+              let im = app.graph.getNodeById(nodeId).imgs[0]
+              let src = im.src
+              setArea(im.naturalWidth, im.naturalHeight, src, data, updateValue)
+            } catch (error) {}
           })
         }
       }
