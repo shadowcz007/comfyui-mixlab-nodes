@@ -1,0 +1,828 @@
+{
+  "last_node_id": 23,
+  "last_link_id": 0,
+  "nodes": [
+    {
+      "id": 7,
+      "type": "ResizeImageMixlab",
+      "pos": [
+        1096.229866976564,
+        731.8207909156248
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ResizeImageMixlab"
+      },
+      "widgets_values": [
+        512,
+        512,
+        "width"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "LoadImagesFromPath",
+      "pos": [
+        1101.229866976564,
+        900.8207909156248
+      ],
+      "size": {
+        "0": 315,
+        "1": 238
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImagesFromPath"
+      },
+      "widgets_values": [
+        "C:\\Users\\38957\\Documents\\GitHub\\extract-anything\\outputs",
+        "disable",
+        "enable",
+        0,
+        "disable",
+        null,
+        null
+      ]
+    },
+    {
+      "id": 3,
+      "type": "ShowTextForGPT",
+      "pos": [
+        1786,
+        252
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 9,
+      "type": "TextImage",
+      "pos": [
+        1448.4608623625004,
+        735.0514200906249
+      ],
+      "size": {
+        "0": 315,
+        "1": 198
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextImage"
+      },
+      "widgets_values": [
+        "龍馬精神迎新歲",
+        "C:\\Users\\38957\\Documents\\ai-lab\\ComfyUI_windows_portable\\ComfyUI\\custom_nodes\\comfyui-mixlab-nodes\\assets\\王汉宗颜楷体繁.ttf",
+        100,
+        12,
+        "#000000",
+        true
+      ]
+    },
+    {
+      "id": 2,
+      "type": "ChatGPTOpenAI",
+      "pos": [
+        1086,
+        235
+      ],
+      "size": {
+        "0": 400,
+        "1": 358
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "messages",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ChatGPTOpenAI"
+      },
+      "widgets_values": [
+        null,
+        null,
+        "",
+        "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+        "gpt-3.5-turbo",
+        0,
+        "randomize",
+        1,
+        null
+      ]
+    },
+    {
+      "id": 16,
+      "type": "SpeechRecognition",
+      "pos": [
+        2892.502226325001,
+        724.176680771093
+      ],
+      "size": {
+        "0": 322.593505859375,
+        "1": 135.22850036621094
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SpeechRecognition"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 17,
+      "type": "SpeechSynthesis",
+      "pos": [
+        2901.502226325001,
+        924.1766807710948
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SpeechSynthesis"
+      },
+      "widgets_values": [
+        ""
+      ]
+    },
+    {
+      "id": 18,
+      "type": "ShowLayer",
+      "pos": [
+        2157.913220668749,
+        232.7887044208986
+      ],
+      "size": {
+        "0": 315,
+        "1": 226
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowLayer"
+      }
+    },
+    {
+      "id": 19,
+      "type": "NewLayer",
+      "pos": [
+        2494.913220668749,
+        232.7887044208986
+      ],
+      "size": {
+        "0": 315,
+        "1": 218
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": null
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        0,
+        0,
+        512,
+        512,
+        0,
+        "width"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "MergeLayers",
+      "pos": [
+        2163.913220668749,
+        515.7887044208991
+      ],
+      "size": {
+        "0": 315.47509765625,
+        "1": 69.53152465820312
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MergeLayers"
+      }
+    },
+    {
+      "id": 4,
+      "type": "CharacterInText",
+      "pos": [
+        1778,
+        386
+      ],
+      "size": {
+        "0": 319.45068359375,
+        "1": 194.45606994628906
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CharacterInText"
+      },
+      "widgets_values": [
+        "",
+        "",
+        1
+      ]
+    },
+    {
+      "id": 21,
+      "type": "Note",
+      "pos": [
+        2507.333181606249,
+        517.1286262958992
+      ],
+      "size": {
+        "0": 210,
+        "1": 58
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "TODO：可视化操作"
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 22,
+      "type": "Note",
+      "pos": [
+        1533,
+        347
+      ],
+      "size": {
+        "0": 210,
+        "1": 58
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "funtion call"
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 11,
+      "type": "3DImage",
+      "pos": [
+        1794.6918193937495,
+        724.2820719460937
+      ],
+      "size": {
+        "0": 309.2974548339844,
+        "1": 433.12554931640625
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "material",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "BG_IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "MATERIAL",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "3DImage"
+      }
+    },
+    {
+      "id": 13,
+      "type": "ScreenShare",
+      "pos": [
+        2138.691819393749,
+        728.2820719460937
+      ],
+      "size": {
+        "0": 322.9458923339844,
+        "1": 594.0604858398438
+      },
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "PROMPT",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ScreenShare"
+      },
+      "widgets_values": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "id": 14,
+      "type": "FloatingVideo",
+      "pos": [
+        2486.691819393749,
+        726.2820719460937
+      ],
+      "size": {
+        "0": 302.3232421875,
+        "1": 303.61279296875
+      },
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "FloatingVideo"
+      },
+      "widgets_values": [
+        null
+      ]
+    },
+    {
+      "id": 6,
+      "type": "TransparentImage",
+      "pos": [
+        2496.691819393749,
+        1157.2820719460938
+      ],
+      "size": {
+        "0": 315,
+        "1": 146
+      },
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TransparentImage"
+      },
+      "widgets_values": [
+        "yes",
+        "yes",
+        "Mixlab_save"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "ImageCropByAlpha",
+      "pos": [
+        1806.6918193937495,
+        1240.2820719460938
+      ],
+      "size": {
+        "0": 289.27215576171875,
+        "1": 46
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageCropByAlpha"
+      }
+    },
+    {
+      "id": 5,
+      "type": "EnhanceImage",
+      "pos": [
+        1098.6918193937504,
+        1217.2820719460938
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EnhanceImage"
+      },
+      "widgets_values": [
+        0.5
+      ]
+    },
+    {
+      "id": 10,
+      "type": "SvgImage",
+      "pos": [
+        1454.6918193937504,
+        1074.2820719460938
+      ],
+      "size": {
+        "0": 315,
+        "1": 170
+      },
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SvgImage"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    }
+  ],
+  "links": [],
+  "groups": [
+    {
+      "title": "GPT",
+      "bounding": [
+        1083,
+        157,
+        1039,
+        450
+      ],
+      "color": "#b06634",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Image",
+      "bounding": [
+        1086,
+        650,
+        1735,
+        682
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Audio",
+      "bounding": [
+        2882,
+        650,
+        344,
+        342
+      ],
+      "color": "#8A8",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Layer",
+      "bounding": [
+        2148,
+        158,
+        672,
+        437
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "locked": false
+    }
+  ],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}

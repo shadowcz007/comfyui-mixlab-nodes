@@ -376,6 +376,25 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     return bg_image
 
 
+def resize_image(layer_image,scale_option,width,height):
+    layer_image = layer_image.convert("RGB")
+    if scale_option == "height":
+        # 按照高度比例缩放
+        original_width, original_height = layer_image.size
+        scale = height / original_height
+        new_width = int(original_width * scale)
+        layer_image = layer_image.resize((new_width, height))
+    elif scale_option == "width":
+        # 按照宽度比例缩放
+        original_width, original_height = layer_image.size
+        scale = width / original_width
+        new_height = int(original_height * scale)
+        layer_image = layer_image.resize((width, new_height))
+    elif scale_option == "overall":
+        # 整体缩放
+        layer_image = layer_image.resize((width, height))
+    return layer_image
+
 
 def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
     # Load Chinese font
@@ -433,6 +452,32 @@ def base64_to_image(base64_string):
     
     return image
 
+
+def create_temp_file(image):
+    output_dir = folder_paths.get_temp_directory()
+
+    (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('material', output_dir)
+
+    
+    image=tensor2pil(image)
+ 
+    image_file = f"{filename}_{counter:05}.png"
+     
+    image_path=os.path.join(full_output_folder, image_file)
+
+    image.save(image_path,compress_level=4)
+
+    return [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type": "temp"
+                }]
 
 
 class SmoothMask:
@@ -659,7 +704,7 @@ class TransparentImage:
         
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
-        print('TransparentImage',len(images_rgb))
+        # print('TransparentImage',len(images_rgb))
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_rgb,images_rgba)}
         
 
@@ -822,6 +867,8 @@ class ImageCropByAlpha:
 
 
 
+
+
 class TextImage:
     @classmethod
     def INPUT_TYPES(s):
@@ -906,25 +953,31 @@ class Image3D:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-                    "upload":("THREED",),   }, 
+                    "upload":("THREED",),}, 
+                "optional":{
+                    "material": ("IMAGE",),
+                    }
                 }
     
-    RETURN_TYPES = ("IMAGE","MASK","IMAGE",)
-    RETURN_NAMES = ("IMAGE","MASK","BG_IMAGE",)
+    RETURN_TYPES = ("IMAGE","MASK","IMAGE","IMAGE",)
+    RETURN_NAMES = ("IMAGE","MASK","BG_IMAGE","MATERIAL",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,False,)
+    OUTPUT_IS_LIST = (False,False,False,False,)
+    OUTPUT_NODE = True
 
-    def run(self,upload):
+    def run(self,upload,material=None):
+        # print('material',material)
         # print(upload['image'])
         image = base64_to_image(upload['image'])
+        mat=base64_to_image(upload['material'])
         mask = image.split()[3]
         image=image.convert('RGB')
-
+        mat=mat.convert('RGB')
         mask=mask.convert('L')
 
         bg_image=None
@@ -936,8 +989,14 @@ class Image3D:
 
         mask=pil2tensor(mask)
         image=pil2tensor(image)
+        mat=pil2tensor(mat)
+
+        m=[]
+        if not material is None:
+            m=create_temp_file(material[0])
         
-        return (image,mask,bg_image,)
+        return {"ui":{"material": m},"result": (image,mask,bg_image,mat,)}
+
 
 
 
@@ -1104,6 +1163,7 @@ class NewLayer:
              "optional":{
                     "mask": ("MASK",{"default": None}),
                     "layers": ("LAYER",{"default": None}), 
+                    "canvas": ("IMAGE",{"default": None}), 
                 }
                 }
     
@@ -1117,16 +1177,16 @@ class NewLayer:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self,x,y,width,height,z_index,scale_option,image,mask,layers):
+    def run(self,x,y,width,height,z_index,scale_option,image,mask=None,layers=None,canvas=None):
         # print(x,y,width,height,z_index,image,mask)
         
         if mask==None:
-            im=tensor2pil(image)
+            im=tensor2pil(image[0])
             mask=im.convert('L')
             mask=pil2tensor(mask)
         else:
             mask=mask[0]
-
+        
         layer_n=[{
             "x":x[0],
             "y":y[0],
@@ -1142,7 +1202,6 @@ class NewLayer:
             layer_n=layer_n+layers
 
         return (layer_n,)
-
 
 class ShowLayer:
     @classmethod
@@ -1292,3 +1351,54 @@ class MergeLayers:
         mask = mask[:, :, :, channels.index("green")]
         
         return (bg_image,mask,)
+    
+
+
+
+class ResizeImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "image": ("IMAGE",),
+
+            "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1, #Minimum value
+                    "max": 8192, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "scale_option": (["width","height",'overall'],),
+
+                             },
+                }
+    
+    RETURN_TYPES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,image,width,height,scale_option):
+        
+        w=width[0]
+        h=height[0]
+        scale_option=scale_option[0]
+        im=image[0]
+
+        im=tensor2pil(im)
+        im=resize_image(im,scale_option,w,h)
+        im=im.convert('RGB')
+        im=pil2tensor(im)
+        
+        return (im,)

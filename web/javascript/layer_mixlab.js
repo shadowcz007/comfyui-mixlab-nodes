@@ -69,12 +69,12 @@ const parseSvg = async svgContent => {
 
   Array.from(rectElements, (rectElement, i) => {
     // 获取rect元素的属性值
-    var x = ~~(rectElement.getAttribute('x')||0);
-    var y = ~~(rectElement.getAttribute('y')||0);
+    var x = ~~(rectElement.getAttribute('x') || 0)
+    var y = ~~(rectElement.getAttribute('y') || 0)
     var width = ~~rectElement.getAttribute('width')
     var height = ~~rectElement.getAttribute('height')
     // console.log('rectElements',rectElement,x,y,width,height)
-    if (x != undefined && y != undefined&&width&&height) {
+    if (x != undefined && y != undefined && width && height) {
       // 创建一个新的canvas元素
       var canvas = document.createElement('canvas')
       canvas.width = width
@@ -101,7 +101,7 @@ const parseSvg = async svgContent => {
         image: base64,
         mask: base64,
         type: 'base64',
-        _t:'rect'
+        _t: 'rect'
       }
 
       // 将处理后的数据添加到数组中
@@ -115,9 +115,9 @@ const parseSvg = async svgContent => {
   if (!(svgWidth && svgHeight)) {
     // viewBox
     let viewBox = svgElement.viewBox.baseVal
-     
-    svgWidth =viewBox.width
-    svgHeight =viewBox.height
+
+    svgWidth = viewBox.width
+    svgHeight = viewBox.height
   }
 
   // 创建一个新的canvas元素
@@ -147,13 +147,144 @@ const parseSvg = async svgContent => {
     image: base64,
     mask: base64,
     type: 'base64',
-    _t:'canvas'
+    _t: 'canvas'
   }
   data.push(rectData)
 
   // 打印处理后的数据
-  console.log('layers',{ data, image: base64, svgElement })
+  console.log('layers', { data, image: base64, svgElement })
   return { data, image: base64, svgElement }
+}
+
+async function setArea (cw, ch, base64, data, fn) {
+  let displayHeight = Math.round(window.screen.availHeight * 0.6)
+  let div = document.createElement('div')
+  div.innerHTML = `
+    <div id='ml_overlay' style='position: absolute;top:0;background: #251f1fc4;
+    height: 100vh;
+    z-index:999999;
+    width: 100%;'>
+      <img id='ml_video' style='position: absolute; 
+      height: ${displayHeight}px;user-select: none; 
+      -webkit-user-drag: none;
+      outline: 2px solid #eaeaea;
+      box-shadow: 8px 9px 17px #575757;' />
+      <div id='ml_selection' style='position: absolute; 
+      border: 2px dashed red; 
+      pointer-events: none;'></div>
+    </div>`
+  // document.body.querySelector('#ml_overlay')
+  document.body.appendChild(div)
+
+  // let canvas = document.createElement('canvas')
+  // canvas.width = cw
+  // canvas.height = ch
+
+  let img = div.querySelector('#ml_video')
+  let overlay = div.querySelector('#ml_overlay')
+  let selection = div.querySelector('#ml_selection')
+  let startX, startY, endX, endY
+  let start = false
+  // Set video source
+  img.src = base64
+  // canvas.toDataURL();
+
+  // init area
+  // const data = getSetAreaData()
+  let x = 0,
+    y = 0,
+    width = (cw * displayHeight) / ch,
+    height = displayHeight
+
+  let imgWidth = cw
+  let imgHeight = ch
+
+  if (data && data.width > 0 && data.height > 0) {
+    // 相同尺寸窗口，恢复选区
+    x = (width * data.x) / imgWidth
+    y = (height * data.y) / imgHeight
+    width = (width * data.width) / imgWidth
+    height = (height * data.height) / imgHeight
+  }
+
+  selection.style.left = x + 'px'
+  selection.style.top = y + 'px'
+  selection.style.width = width + 'px'
+  selection.style.height = height + 'px'
+
+  // Add mouse events
+  img.addEventListener('mousedown', startSelection)
+  img.addEventListener('mousemove', updateSelection)
+  img.addEventListener('mouseup', endSelection)
+  overlay.addEventListener('click', remove)
+
+  function remove () {
+    overlay.removeEventListener('click', remove)
+    img.removeEventListener('mousedown', startSelection)
+    img.removeEventListener('mousemove', updateSelection)
+    img.removeEventListener('mouseup', endSelection)
+    div.remove()
+  }
+
+  function startSelection (event) {
+    if (start == false) {
+      startX = event.clientX
+      startY = event.clientY
+      updateSelection(event)
+      start = true
+    } else {
+    }
+  }
+
+  function updateSelection (event) {
+    endX = event.clientX
+    endY = event.clientY
+
+    // Calculate width, height, and coordinates
+    let width = Math.abs(endX - startX)
+    let height = Math.abs(endY - startY)
+    let left = Math.min(startX, endX)
+    let top = Math.min(startY, endY)
+
+    // Set selection style
+    selection.style.left = left + 'px'
+    selection.style.top = top + 'px'
+    selection.style.width = width + 'px'
+    selection.style.height = height + 'px'
+  }
+
+  function endSelection (event) {
+    endX = event.clientX
+    endY = event.clientY
+
+    // 获取img元素的真实宽度和高度
+    let imgWidth = img.naturalWidth
+    let imgHeight = img.naturalHeight
+
+    // 换算起始坐标
+    let realStartX = (startX / img.offsetWidth) * imgWidth
+    let realStartY = (startY / img.offsetHeight) * imgHeight
+
+    // 换算起始坐标
+    let realEndX = (endX / img.offsetWidth) * imgWidth
+    let realEndY = (endY / img.offsetHeight) * imgHeight
+
+    startX = realStartX
+    startY = realStartY
+    endX = realEndX
+    endY = realEndY
+    // Calculate width, height, and coordinates
+    let width = Math.round(Math.abs(endX - startX))
+    let height = Math.round(Math.abs(endY - startY))
+    let left = Math.round(Math.min(startX, endX))
+    let top = Math.round(Math.min(startY, endY))
+
+    if (width <= 0 && height <= 0) return remove()
+
+    if (fn) fn(left, top, width, height)
+
+    remove()
+  }
 }
 
 app.registerExtension({
@@ -199,8 +330,7 @@ app.registerExtension({
         const findNode = nodeId => {
           let node = app.graph._nodes_by_id[nodeId]
           if (node?.type == 'Reroute') {
-            
-            let linkId =node.inputs.filter(i=>i.type=='*')[0].link
+            let linkId = node.inputs.filter(i => i.type == '*')[0].link
             nodeId = app.graph.links.filter(link => link.id == linkId)[0]
               ?.origin_id
             return findNode(nodeId)
@@ -211,15 +341,17 @@ app.registerExtension({
 
         // 获取layers数据
         const getLayers = async () => {
-          console.log('getLayers1',this.inputs.filter(ip => ip.name === 'layers'))
+          console.log(
+            'getLayers1',
+            this.inputs.filter(ip => ip.name === 'layers')
+          )
           let linkId = this.inputs.filter(ip => ip.name === 'layers')[0].link
           let nodeId = app.graph.links?.filter(link => link.id == linkId)[0]
-            ?.origin_id;
+            ?.origin_id
 
-          if(nodeId){
+          if (nodeId) {
             nodeId = findNode(nodeId)
           }
-          
 
           //   let node = app.graph._nodes_by_id[nodeId]
           //   if (node?.type == 'Reroute') {
@@ -227,18 +359,18 @@ app.registerExtension({
           //     nodeId = app.graph.links.filter(link => link.id == linkId)[0]
           //       ?.origin_id
           //   }
-         
+
           let d = getLocalData('_mixlab_svg_image')
-          console.log('test',d[nodeId])
+          console.log('test', d[nodeId])
 
           if (d[nodeId]) {
             let url = d[nodeId]
             let dt = await fetch(url)
-           
+
             let svgStr = await dt.text()
-           
+
             const { data } = (await parseSvg(svgStr)) || {}
-            console.log('fetch',data)
+            console.log('fetch', data)
             return data
           } else {
             return []
@@ -347,6 +479,81 @@ app.registerExtension({
       let id = node.id
 
       // widget.div.querySelector('.Svg').value = data[id] || '#000000'
+    }
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.layer.NewLayer',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeData.name === 'NewLayer') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = async function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        let b = this.widgets.filter(w => w.type === 'button')[0]
+        // const [w, h, base64] = canvas
+
+        if (!b) {
+          const updateValue = (x1, y1, w1, h1) => {
+            if (this.widgets) {
+              for (const widget of this.widgets) {
+                if (widget.name === 'x') {
+                  widget.value = x1
+                }
+                if (widget.name === 'y') {
+                  widget.value = y1
+                }
+                if (widget.name === 'width') {
+                  widget.value = w1
+                }
+                if (widget.name === 'height') {
+                  widget.value = h1
+                }
+              }
+            }
+          }
+
+          this.addWidget('button', 'Set Area', '', () => {
+            let data = {}
+            for (const widget of this.widgets) {
+              if (widget.name === 'x') {
+                data.x = widget.value
+              }
+              if (widget.name === 'y') {
+                data.y = widget.value
+              }
+              if (widget.name === 'width') {
+                data.width = widget.value
+              }
+              if (widget.name === 'height') {
+                data.height = widget.value
+              }
+            }
+            try {
+              let linkId = this.inputs[3].link
+              let nodeId = app.graph.links[linkId].origin_id
+              // console.log(linkId,this.inputs)
+              let im = app.graph.getNodeById(nodeId).imgs[0]
+              let src = im.src
+              setArea(im.naturalWidth, im.naturalHeight, src, data, updateValue)
+            } catch (error) {}
+          })
+        }
+      }
+
+      const onRemoved = this.onRemoved
+      this.onRemoved = () => {
+        // let b = this.widgets.filter(w => w.type === 'button')[0];
+
+        return onRemoved?.()
+      }
+
+      if (this.onResize) {
+        this.onResize(this.size)
+      }
+
+      this.serialize_widgets = true //需要保存参数
     }
   }
 })
