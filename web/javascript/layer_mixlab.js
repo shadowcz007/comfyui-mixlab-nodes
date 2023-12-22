@@ -156,7 +156,7 @@ const parseSvg = async svgContent => {
   return { data, image: base64, svgElement }
 }
 
-async function setArea (cw, ch, fn) {
+async function setArea (cw, ch, base64, data, fn) {
   let displayHeight = Math.round(window.screen.availHeight * 0.6)
   let div = document.createElement('div')
   div.innerHTML = `
@@ -176,9 +176,9 @@ async function setArea (cw, ch, fn) {
   // document.body.querySelector('#ml_overlay')
   document.body.appendChild(div)
 
-  let canvas = document.createElement('canvas')
-  canvas.width = cw
-  canvas.height = ch
+  // let canvas = document.createElement('canvas')
+  // canvas.width = cw
+  // canvas.height = ch
 
   let img = div.querySelector('#ml_video')
   let overlay = div.querySelector('#ml_overlay')
@@ -186,7 +186,8 @@ async function setArea (cw, ch, fn) {
   let startX, startY, endX, endY
   let start = false
   // Set video source
-  img.src = canvas.toDataURL()
+  img.src = base64
+  // canvas.toDataURL();
 
   // init area
   // const data = getSetAreaData()
@@ -194,6 +195,17 @@ async function setArea (cw, ch, fn) {
     y = 0,
     width = (cw * displayHeight) / ch,
     height = displayHeight
+
+  let imgWidth = cw
+  let imgHeight = ch
+
+  if (data && data.width > 0 && data.height > 0  ) {
+    // 相同尺寸窗口，恢复选区
+    x = (width * data.x) / imgWidth
+    y = (height * data.y) / imgHeight
+    width = (width * data.width) / imgWidth
+    height = (height * data.height) / imgHeight
+  }
 
   selection.style.left = x + 'px'
   selection.style.top = y + 'px'
@@ -475,11 +487,14 @@ app.registerExtension({
   name: 'Mixlab.layer.NewLayer',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeData.name === 'NewLayer') {
-      function populate (canvas) {
-        console.log(canvas, this.widgets)
-        let b=this.widgets.filter(w=>w.type==='button')[0]
-        const [w, h] = canvas
-        if (w > 0 && h > 0&&!b) {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = async function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        let b = this.widgets.filter(w => w.type === 'button')[0]
+        // const [w, h, base64] = canvas
+
+        if (!b) {
           const updateValue = (x1, y1, w1, h1) => {
             if (this.widgets) {
               for (const widget of this.widgets) {
@@ -500,30 +515,41 @@ app.registerExtension({
           }
 
           this.addWidget('button', 'Set Area', '', () => {
-            // console.log('click')
-            setArea(w, h, updateValue)
+            let data = {}
+            for (const widget of this.widgets) {
+              if (widget.name === 'x') {
+                data.x = widget.value
+              }
+              if (widget.name === 'y') {
+                data.y = widget.value
+              }
+              if (widget.name === 'width') {
+                data.width = widget.value
+              }
+              if (widget.name === 'height') {
+                data.height = widget.value
+              }
+            }
+
+            let linkId = this.inputs[3].link
+            let nodeId = app.graph.links[linkId].origin_id
+            // console.log(linkId,this.inputs)
+            let im = app.graph.getNodeById(nodeId).imgs[0]
+            let src = im.src
+            setArea(im.naturalWidth, im.naturalHeight, src, data, updateValue)
           })
         }
-
-        // console.log('ShowTextForGPT',this.widgets.length)
-        requestAnimationFrame(() => {
-          const sz = this.computeSize()
-          if (sz[0] < this.size[0]) {
-            sz[0] = this.size[0]
-          }
-          if (sz[1] < this.size[1]) {
-            sz[1] = this.size[1]
-          }
-          this.onResize?.(sz)
-          app.graph.setDirtyCanvas(true, false)
-        })
       }
 
-      // When the node is executed we will be sent the input text, display this in the widget
-      const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
-        onExecuted?.apply(this, arguments)
-        populate.call(this, message.canvas)
+      const onRemoved = this.onRemoved
+      this.onRemoved = () => {
+        // let b = this.widgets.filter(w => w.type === 'button')[0];
+
+        return onRemoved?.()
+      }
+
+      if (this.onResize) {
+        this.onResize(this.size)
       }
 
       this.serialize_widgets = true //需要保存参数

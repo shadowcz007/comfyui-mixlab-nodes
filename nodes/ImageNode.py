@@ -1186,18 +1186,7 @@ class NewLayer:
             mask=pil2tensor(mask)
         else:
             mask=mask[0]
-
-        canvas_h=0
-        canvas_w=0
-        canvas_base64=""
-        if canvas!=None: 
-            c=tensor2pil(canvas[0])
-            w, h = c.size
-            canvas_h=h
-            canvas_w=w
-            canvas_base64 = base64.b64encode(c.tobytes()).decode('utf-8')
         
-
         layer_n=[{
             "x":x[0],
             "y":y[0],
@@ -1212,8 +1201,7 @@ class NewLayer:
         if layers!=None:
             layer_n=layer_n+layers
 
-        return {"ui":{"canvas": [canvas_w,canvas_h,canvas_base64]},"result": (layer_n,)}
-
+        return (layer_n,)
 
 class ShowLayer:
     @classmethod
