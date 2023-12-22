@@ -704,7 +704,7 @@ class TransparentImage:
         
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
-        print('TransparentImage',len(images_rgb))
+        # print('TransparentImage',len(images_rgb))
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_rgb,images_rgba)}
         
 
@@ -1163,6 +1163,7 @@ class NewLayer:
              "optional":{
                     "mask": ("MASK",{"default": None}),
                     "layers": ("LAYER",{"default": None}), 
+                    "canvas": ("IMAGE",{"default": None}), 
                 }
                 }
     
@@ -1176,15 +1177,26 @@ class NewLayer:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self,x,y,width,height,z_index,scale_option,image,mask=None,layers=None):
+    def run(self,x,y,width,height,z_index,scale_option,image,mask=None,layers=None,canvas=None):
         # print(x,y,width,height,z_index,image,mask)
         
         if mask==None:
-            im=tensor2pil(image)
+            im=tensor2pil(image[0])
             mask=im.convert('L')
             mask=pil2tensor(mask)
         else:
             mask=mask[0]
+
+        canvas_h=0
+        canvas_w=0
+        canvas_base64=""
+        if canvas!=None: 
+            c=tensor2pil(canvas[0])
+            w, h = c.size
+            canvas_h=h
+            canvas_w=w
+            canvas_base64 = base64.b64encode(c.tobytes()).decode('utf-8')
+        
 
         layer_n=[{
             "x":x[0],
@@ -1200,7 +1212,7 @@ class NewLayer:
         if layers!=None:
             layer_n=layer_n+layers
 
-        return (layer_n,)
+        return {"ui":{"canvas": [canvas_w,canvas_h,canvas_base64]},"result": (layer_n,)}
 
 
 class ShowLayer:

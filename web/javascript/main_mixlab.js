@@ -1036,6 +1036,7 @@ async function setArea (src) {
   div.innerHTML = `
     <div id='ml_overlay' style='position: absolute;top:0;background: #251f1fc4;
     height: 100vh;
+    z-index:999999;
     width: 100%;'>
       <img id='ml_video' style='position: absolute; 
       height: ${displayHeight}px;user-select: none; 
@@ -1067,12 +1068,7 @@ async function setArea (src) {
     height = displayHeight
   let imgWidth = im.naturalWidth
   let imgHeight = im.naturalHeight
-  // console.log(
-  //   '#screen_share::使用上一次选区 selection',
-  //   data,
-  //   imgWidth,
-  //   img.width
-  // )
+
   if (
     data &&
     data.width > 0 &&
@@ -1086,9 +1082,6 @@ async function setArea (src) {
     y = (img.height * data.y) / data.imgHeight
     width = (img.width * data.width) / data.imgWidth
     height = (img.height * data.height) / data.imgHeight
-    // imgWidth = data.imgWidth
-    // imgHeight = data.imgHeight;
-    // console.log('#screen_share::使用上一次选区 selection', x, y, width, height)
   }
 
   selection.style.left = x + 'px'
@@ -1153,9 +1146,6 @@ async function setArea (src) {
     let realEndX = (endX / img.offsetWidth) * imgWidth
     let realEndY = (endY / img.offsetHeight) * imgHeight
 
-    // 输出结果到控制台
-    // console.log('真实宽度: ' + realWidth)
-    // console.log('真实高度: ' + realHeight)
     startX = realStartX
     startY = realStartY
     endX = realEndX
@@ -1165,19 +1155,6 @@ async function setArea (src) {
     let height = Math.abs(endY - startY)
     let left = Math.min(startX, endX)
     let top = Math.min(startY, endY)
-    // Output results to console
-    // console.log('坐标位置: (' + left + ', ' + top + ')')
-    // console.log('宽度: ' + width)
-    // console.log('高度: ' + height)
-
-    // img.removeEventListener('mousedown', startSelection)
-    // img.removeEventListener('mousemove', updateSelection)
-    // img.removeEventListener('mouseup', endSelection)
-
-    // window._mixlab_screen_x = left
-    // window._mixlab_screen_y = top
-    // window._mixlab_screen_width = width
-    // window._mixlab_screen_height = height
 
     if (width <= 0 && height <= 0) return remove()
 
@@ -1189,7 +1166,6 @@ async function setArea (src) {
       window._mixlab_screen_webcamVideo,
       !window._mixlab_screen_live
     )
-
     remove()
   }
 }
