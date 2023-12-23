@@ -419,33 +419,99 @@ def resize_image(layer_image,scale_option,width,height):
     return layer_image
 
 
-def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
-    # Load Chinese font
-    font = ImageFont.truetype(font_path, font_size)
+# def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
+#     # Load Chinese font
+#     font = ImageFont.truetype(font_path, font_size)
 
-    # Calculate image size based on the number of characters and orientation
+#     # Calculate image size based on the number of characters and orientation
+#     if vertical:
+#         width = font_size + 100
+#         height = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
+#     else:
+#         width = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
+#         height = font_size + 100
+
+#     # Create a blank image
+#     image = Image.new('RGBA', (width, height), (255, 255, 255,0))
+#     draw = ImageDraw.Draw(image)
+
+#     # Draw text
+#     if vertical:
+#         for i, char in enumerate(text_list):
+#             char_position = (50, 50 + i * font_size)
+#             draw.text(char_position, char, font=font, fill=text_color)
+#     else:
+#         for i, char in enumerate(text_list):
+#             char_position = (50 + i * (font_size + spacing), 50)
+#             draw.text(char_position, char, font=font, fill=text_color)
+
+#     # Save the image
+#     # image.save(output_image_path)
+
+#     # 分离alpha通道
+#     alpha_channel = image.split()[3]
+
+#     # 创建一个只有alpha通道的新图像
+#     alpha_image = Image.new('L', image.size)
+#     alpha_image.putdata(alpha_channel.getdata())
+
+#     image=image.convert('RGB')
+
+#     return (image,alpha_image)
+
+def generate_text_image(text, font_path, font_size, text_color, vertical=True, spacing=0):
+    # Split text into lines based on line breaks
+    lines = text.split("\n")
+
+    # 1. Determine layout direction
     if vertical:
-        width = font_size + 100
-        height = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
+        layout = "vertical"
     else:
-        width = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
-        height = font_size + 100
+        layout = "horizontal"
 
-    # Create a blank image
+    # 2. Calculate absolute coordinates for each character
+    char_coordinates = []
+    if layout == "vertical":
+        x = 0
+        y = 0
+        for i in range(len(lines)):
+            line=lines[i]
+            for char in line:
+                char_coordinates.append((x, y))
+                y += font_size + spacing
+            x += font_size + spacing
+            y = 0
+        print(char_coordinates)
+    else:
+        x = 0
+        y = 0
+        for line in lines:
+            for char in line:
+                char_coordinates.append((x, y))
+                x += font_size + spacing
+            y += font_size + spacing
+            x = 0
+
+    # 3. Calculate image width and height
+    if layout == "vertical":
+        width = (len(lines) * (font_size + spacing)) - spacing
+        height = (len(max(lines, key=len)) * (font_size + spacing)) - spacing
+    else:
+        width = (len(max(lines, key=len)) * (font_size + spacing)) - spacing
+        height = (len(lines) * (font_size + spacing)) - spacing
+
+    # 4. Draw each character on the image
     image = Image.new('RGBA', (width, height), (255, 255, 255,0))
     draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype(font_path, font_size)
+    
+    index=0
+    for i, line in enumerate(lines):
+        for j, char in enumerate(line):
+            x, y = char_coordinates[index]
+            draw.text((x, y), char, font=font, fill=text_color)
+            index+=1
 
-    # Draw text
-    if vertical:
-        for i, char in enumerate(text_list):
-            char_position = (50, 50 + i * font_size)
-            draw.text(char_position, char, font=font, fill=text_color)
-    else:
-        for i, char in enumerate(text_list):
-            char_position = (50 + i * (font_size + spacing), 50)
-            draw.text(char_position, char, font=font, fill=text_color)
-
-    # Save the image
     # image.save(output_image_path)
 
     # 分离alpha通道
@@ -458,7 +524,6 @@ def generate_text_image(text_list, font_path, font_size, text_color, vertical=Tr
     image=image.convert('RGB')
 
     return (image,alpha_image)
-
 
 def base64_to_image(base64_string):
     # 去除前缀
@@ -897,7 +962,7 @@ class TextImage:
     def INPUT_TYPES(s):
         return {"required": { 
             
-                    "text": ("STRING",{"multiline": False,"default": "龍馬精神迎新歲"}),
+                    "text": ("STRING",{"multiline": True,"default": "龍馬精神迎新歲"}),
                     "font_path": ("STRING",{"multiline": False,"default": FONT_PATH}),
                     "font_size": ("INT",{
                                 "default":100, 
@@ -932,7 +997,7 @@ class TextImage:
         
         text_list=list(text)
 
-        img,mask=generate_text_image(text_list,font_path,font_size,text_color,vertical,spacing)
+        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,spacing)
         
         img=pil2tensor(img)
         mask=pil2tensor(mask)
