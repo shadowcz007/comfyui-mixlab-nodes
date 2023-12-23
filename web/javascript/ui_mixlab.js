@@ -2,7 +2,12 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
-import {closeIcon} from './svg_icons.js'
+import { closeIcon } from './svg_icons.js'
+
+import {
+  GroupNodeConfig,
+  GroupNodeHandler
+} from '../../../extensions/core/groupNode.js'
 
 function deepEqual (obj1, obj2) {
   if (typeof obj1 !== typeof obj2) {
@@ -43,16 +48,17 @@ async function get_nodes_map () {
   return await res.json()
 }
 
-function loadCSS(url) {
-  var link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.type = 'text/css';
-  link.href = url;
-  document.getElementsByTagName('head')[0].appendChild(link);
+function loadCSS (url) {
+  var link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.type = 'text/css'
+  link.href = url
+  document.getElementsByTagName('head')[0].appendChild(link)
 }
 
-var cssURL = 'https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown-light.min.css';
-loadCSS(cssURL);
+var cssURL =
+  'https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown-light.min.css'
+loadCSS(cssURL)
 
 function injectCSS (css) {
   // 检查页面中是否已经存在具有相同内容的style标签
@@ -112,7 +118,7 @@ async function getCustomnodeMappings (mode = 'url') {
       nodes[node] = { url, title: n[1].title_aux }
     }
   }
-  
+
   // try {
   //   const response = await fetch(`${url}/customnode/getmappings?mode=${mode}`)
   //   const data = await response.json()
@@ -309,8 +315,7 @@ async function fetchReadmeContent (url) {
   }
 }
 
-function createModal (url, markdown,title) {
-  
+function createModal (url, markdown, title) {
   // Create modal element
   var div =
     document.querySelector('#mix-modal') || document.createElement('div')
@@ -329,7 +334,7 @@ function createModal (url, markdown,title) {
   var modal = document.createElement('div')
 
   div.appendChild(modal)
-  modal.classList.add("modal-body")
+  modal.classList.add('modal-body')
   // Set modal styles
   modal.style.cssText = `
     background: white;
@@ -348,17 +353,17 @@ function createModal (url, markdown,title) {
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
   // Create modal header
-  const headerElement =  document.createElement('div')
+  const headerElement = document.createElement('div')
   headerElement.classList.add('modal-header')
   headerElement.style.cssText = `
     display: flex;
     padding: 20px 24px 8px 24px;
     justify-content: space-between;
   `
-  
+
   const headTitleElement = document.createElement('a')
   headTitleElement.classList.add('header-title')
-  headTitleElement.style.cssText=`
+  headTitleElement.style.cssText = `
     color: var(--descrip-text);
     font-size: 18px;
     display: flex;
@@ -368,21 +373,19 @@ function createModal (url, markdown,title) {
     text-decoration: none;
     font-weight: bold;
   `
-  headTitleElement.onmouseenter = function(){
+  headTitleElement.onmouseenter = function () {
     headTitleElement.style.color = 'var(--comfy-menu-bg)'
   }
-  headTitleElement.onmouseleave = function(){
+  headTitleElement.onmouseleave = function () {
     headTitleElement.style.color = 'var(--descrip-text)'
   }
-  headTitleElement.textContent= title ||'';
+  headTitleElement.textContent = title || ''
   headTitleElement.href = url
-  headTitleElement.target='_blank'
+  headTitleElement.target = '_blank'
   const linkIcon = document.createElement('small')
   linkIcon.textContent = '🔗'
-  headTitleElement.appendChild(linkIcon);
+  headTitleElement.appendChild(linkIcon)
   headerElement.appendChild(headTitleElement)
-
-  
 
   // Create close button
   const closeButton = document.createElement('span')
@@ -400,20 +403,19 @@ function createModal (url, markdown,title) {
       user-select: none;
       fill: var(--descrip-text);
       `
-  closeButton.onmouseenter = function(){
-    closeButton.style.fill = 'var(--comfy-menu-bg)'; 
+  closeButton.onmouseenter = function () {
+    closeButton.style.fill = 'var(--comfy-menu-bg)'
   }
-  closeButton.onmouseleave = function(){
-    closeButton.style.fill = 'var(--descrip-text)';
+  closeButton.onmouseleave = function () {
+    closeButton.style.fill = 'var(--descrip-text)'
   }
 
   headerElement.appendChild(closeButton)
 
-
   // Click event to close the modal
-  function closeMixModal(){
+  function closeMixModal () {
     div.style.display = 'none'
-    window.removeEventListener('keydown',MixModalEscKeyEvent)
+    window.removeEventListener('keydown', MixModalEscKeyEvent)
   }
   closeButton.onclick = function () {
     closeMixModal()
@@ -433,10 +435,10 @@ function createModal (url, markdown,title) {
 
   // Create element for displaying Markdown content
   var markdownContent = document.createElement('div')
-  markdownContent.classList.add('markdown-content','markdown-body')
+  markdownContent.classList.add('markdown-content', 'markdown-body')
   markdownContent.style.cssText = `max-width: 50vw;padding: 0px 24px 100px 24px;`
 
-  showdown.setFlavor('github');
+  showdown.setFlavor('github')
   var converter = new showdown.Converter()
 
   var html = converter.makeHtml(markdown)
@@ -468,7 +470,7 @@ function createModal (url, markdown,title) {
   modal.appendChild(modalContent)
 
   const footerElement = document.createElement('div')
-  footerElement.style.cssText=`
+  footerElement.style.cssText = `
       position: absolute;
       left: 0;
       right: 0;
@@ -478,37 +480,35 @@ function createModal (url, markdown,title) {
   `
 
   const footerText = document.createElement('a')
-  footerText.href ="https://github.com/shadowcz007/comfyui-mixlab-nodes"
-  footerText.innerText =  "Support by Mixlab"
-  footerText.style.cssText=`color:inherit`
-  footerText.target = "_blank"
-  footerText.onmouseenter=function(){
+  footerText.href = 'https://github.com/shadowcz007/comfyui-mixlab-nodes'
+  footerText.innerText = 'Support by Mixlab'
+  footerText.style.cssText = `color:inherit`
+  footerText.target = '_blank'
+  footerText.onmouseenter = function () {
     footerText.style.color = 'var(--input-text)'
   }
-  footerText.onmouseleave=function(){
+  footerText.onmouseleave = function () {
     footerText.style.color = 'inherit'
   }
-  
-  
-  footerText.onclick = function(e){
+
+  footerText.onclick = function (e) {
     e.stopPropagation()
   }
   footerElement.appendChild(footerText)
 
   div.appendChild(footerElement)
 
-
   // Append modal element to the page
   if (!document.querySelector('#mix-modal')) {
     document.body.appendChild(div)
   }
-  function MixModalEscKeyEvent(event){
-      if(event.key == "Escape"){
-        closeMixModal()
-      }
+  function MixModalEscKeyEvent (event) {
+    if (event.key == 'Escape') {
+      closeMixModal()
+    }
   }
-  window.removeEventListener('keydown',MixModalEscKeyEvent)
-  window.addEventListener('keydown',MixModalEscKeyEvent)
+  window.removeEventListener('keydown', MixModalEscKeyEvent)
+  window.addEventListener('keydown', MixModalEscKeyEvent)
 
   const bgElement = document.createElement('div')
   bgElement.classList.add('mix-modal-bg')
@@ -517,13 +517,11 @@ function createModal (url, markdown,title) {
     height:100%;
     background-color: rgba(0,0,0,0.8);
   `
-  bgElement.onclick =  function( ){   
+  bgElement.onclick = function () {
     closeMixModal()
   }
-  
+
   div.appendChild(bgElement)
-
-
 }
 
 app.registerExtension({
@@ -539,7 +537,7 @@ app.registerExtension({
       let repo = nodesMap[node.type]
       if (repo) {
         let markdown = await fetchReadmeContent(repo.url)
-        createModal(repo.url,markdown,repo.title)
+        createModal(repo.url, markdown, repo.title)
       }
     }
 
@@ -548,17 +546,7 @@ app.registerExtension({
       // replace it
       const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
       node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
-      // options.splice(
-      //   options.length - 1,
-      //   0, // splice a new option in at the end
-      //   {
-      //     content: '♾️Mixlab', // with a name
-      //     callback: () => {
-      //       LGraphCanvas.prototype.helpAboutNode(node)
-      //     } // and the callback
-      //   },
-      //   null // a divider
-      // )
+
       return [
         {
           content: 'Help ♾️Mixlab', // with a name
@@ -570,32 +558,140 @@ app.registerExtension({
         ...options
       ] // and return the options
     }
+
+    const getGroupMenuOptions = LGraphCanvas.prototype.getGroupMenuOptions // store the existing method
+    LGraphCanvas.prototype.getGroupMenuOptions = function (node) {
+      // replace it
+      const options = getGroupMenuOptions.apply(this, arguments) // start by calling the stored one
+      node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
+
+      // templete
+      const key = 'Comfy.NodeTemplates'
+      let templates = localStorage.getItem(key)
+      if (templates) {
+        templates = JSON.parse(templates)
+      } else {
+        templates = []
+      }
+      const store = () => localStorage.setItem(key, JSON.stringify(templates))
+
+      return [
+        {
+          content: 'Clone Group ♾️Mixlab', // with a name
+          callback: async (value, opts, e, menu, group) => {
+            const clipboardAction = async cb => {
+              // We use the clipboard functions but dont want to overwrite the current user clipboard
+              // Restore it after we've run our callback
+              const old = localStorage.getItem('litegrapheditor_clipboard')
+              await cb()
+              localStorage.setItem('litegrapheditor_clipboard', old)
+            }
+
+            clipboardAction(async () => {
+              let name = group.title
+              let nodes = group._nodes
+
+              app.canvas.copyToClipboard(nodes)
+              let data = localStorage.getItem('litegrapheditor_clipboard')
+              data = JSON.parse(data)
+
+              for (let i = 0; i < nodes.length; i++) {
+                const node = app.graph.getNodeById(nodes[i].id)
+                const nodeData = node.serialize()
+
+                let groupData = GroupNodeHandler.getGroupData(node)
+                if (groupData) {
+                  groupData = groupData.nodeData
+                  if (!data.groupNodes) {
+                    data.groupNodes = {}
+                  }
+                  data.groupNodes[nodeData.name] = groupData
+                  data.nodes[i].type = nodeData.name
+                }
+              }
+
+              await GroupNodeConfig.registerFromWorkflow(data.groupNodes, {})
+              localStorage.setItem(
+                'litegrapheditor_clipboard',
+                JSON.stringify(data)
+              )
+              app.canvas.pasteFromClipboard()
+            })
+          } // and the callback
+        },
+        {
+          content: 'Save Group as Template ♾️Mixlab', // with a name
+          callback: async (value, opts, e, menu, group) => {
+            // console.log(options)
+
+            const clipboardAction = async cb => {
+              // We use the clipboard functions but dont want to overwrite the current user clipboard
+              // Restore it after we've run our callback
+              const old = localStorage.getItem('litegrapheditor_clipboard')
+              await cb()
+              localStorage.setItem('litegrapheditor_clipboard', old)
+            }
+
+            clipboardAction(() => {
+              let name = group.title+' ♾️Mixlab'
+              let nodes = group._nodes
+
+              app.canvas.copyToClipboard(nodes)
+              let data = localStorage.getItem('litegrapheditor_clipboard')
+              data = JSON.parse(data)
+
+              for (let i = 0; i < nodes.length; i++) {
+                const node = app.graph.getNodeById(nodes[i].id)
+                const nodeData = node.serialize()
+
+                let groupData = GroupNodeHandler.getGroupData(node)
+                if (groupData) {
+                  groupData = groupData.nodeData
+                  if (!data.groupNodes) {
+                    data.groupNodes = {}
+                  }
+                  data.groupNodes[nodeData.name] = groupData
+                  data.nodes[i].type = nodeData.name
+                }
+              }
+
+              templates.push({
+                name,
+                data: JSON.stringify(data)
+              })
+              store()
+            })
+          } // and the callback
+        },
+        null,
+        ...options
+      ] // and return the options
+    }
   },
   async setup () {
+    // Add canvas menu options
+    const orig = LGraphCanvas.prototype.getCanvasMenuOptions
+    LGraphCanvas.prototype.getCanvasMenuOptions = function () {
+      const options = orig.apply(this, arguments)
 
-    // Add canvas menu options 
-			const orig = LGraphCanvas.prototype.getCanvasMenuOptions;
-			LGraphCanvas.prototype.getCanvasMenuOptions = function () {
-				const options = orig.apply(this, arguments);
+      options.push(null, {
+        content: `Find ♾️Mixlab`,
+        disabled: false, // or a function determining whether to disable
+        callback: async () => {
+          nodesMap =
+            nodesMap && Object.keys(nodesMap).length > 0
+              ? nodesMap
+              : await getCustomnodeMappings('url')
 
-				options.push(null,  {
-          content: `Find ♾️Mixlab`,
-          disabled: false, // or a function determining whether to disable
-          callback: async () => {
-            nodesMap =
-              nodesMap && Object.keys(nodesMap).length > 0
-                ? nodesMap
-                : await getCustomnodeMappings('url')
-  
-            const nodesDiv = document.createDocumentFragment()
-            const nodes = (await app.graphToPrompt()).output
-  
-            // console.log('[Mixlab]', 'loaded graph node: ', app)
-            let div =
-              document.querySelector('#mixlab_find_the_node') ||
-              document.createElement('div')
-            div.id = 'mixlab_find_the_node'
-            div.style = `
+          const nodesDiv = document.createDocumentFragment()
+          const nodes = (await app.graphToPrompt()).output
+
+          // console.log('[Mixlab]', 'loaded graph node: ', app)
+          let div =
+            document.querySelector('#mixlab_find_the_node') ||
+            document.createElement('div')
+          div.id = 'mixlab_find_the_node'
+          div.style = `
               flex-direction: column;
               align-items: end;
               display:flex;position: absolute; 
@@ -604,96 +700,63 @@ app.registerExtension({
               background-color: var(--comfy-menu-bg);
               padding: 10px; 
               border: 1px solid black;z-index: 999999999;padding-top: 0;`
-  
-            div.innerHTML = ''
-  
-            let btn = document.createElement('div')
-            btn.style=`display: flex;
+
+          div.innerHTML = ''
+
+          let btn = document.createElement('div')
+          btn.style = `display: flex;
             width: calc(100% - 24px);
             justify-content: space-between;
             align-items: center;
             padding: 0 12px;
             height: 32px;`
-            let btnB = document.createElement('button')
-            let textB = document.createElement('p')
-            btn.appendChild(textB)
-            btn.appendChild(btnB)
-            textB.innerText = `Find The Node`
-  
-            btnB.style = `float: right; border: none; color: var(--input-text);
+          let btnB = document.createElement('button')
+          let textB = document.createElement('p')
+          btn.appendChild(textB)
+          btn.appendChild(btnB)
+          textB.innerText = `Find The Node`
+
+          btnB.style = `float: right; border: none; color: var(--input-text);
             background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-            btnB.addEventListener('click', () => {
-              div.style.display = 'none'
-            })
-            btnB.innerText = 'X'
-  
-            // 悬浮框拖动事件
-            div.addEventListener('mousedown', function (e) {
-              var startX = e.clientX
-              var startY = e.clientY
-              var offsetX = div.offsetLeft
-              var offsetY = div.offsetTop
-  
-              function moveBox (e) {
-                var newX = e.clientX
-                var newY = e.clientY
-                var deltaX = newX - startX
-                var deltaY = newY - startY
-                div.style.left = offsetX + deltaX + 'px'
-                div.style.top = offsetY + deltaY + 'px'
-              }
-  
-              function stopMoving () {
-                document.removeEventListener('mousemove', moveBox)
-                document.removeEventListener('mouseup', stopMoving)
-              }
-  
-              document.addEventListener('mousemove', moveBox)
-              document.addEventListener('mouseup', stopMoving)
-            })
-  
-            div.appendChild(btn)
-  
-            const updateNodes = (ns, nd) => {
-              for (let nodeId in ns) {
-                let n = ns[nodeId].class_type
-                const { url, title } = nodesMap[n]
-                let d = document.createElement('button')
-                d.style = `text-align: left;margin:6px;color: var(--input-text);
-                background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-                d.addEventListener('click', () => {
-                  const node = app.graph.getNodeById(nodeId)
-                  if (!node) return
-                  app.canvas.centerOnNode(node)
-                  app.canvas.setZoom(1)
-                })
-                d.addEventListener('mouseover', async () => {
-                  // console.log('mouseover')
-                  let n = (await app.graphToPrompt()).output
-                  if (!deepEqual(n, ns)) {
-                    nd.innerHTML = ''
-                    updateNodes(n, nd)
-                  }
-                })
-  
-                d.innerHTML = `
-                <span>${'#' + nodeId} ${n}</span>
-                <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
-                `
-                d.title = title
-  
-                nd.appendChild(d)
-              }
+          btnB.addEventListener('click', () => {
+            div.style.display = 'none'
+          })
+          btnB.innerText = 'X'
+
+          // 悬浮框拖动事件
+          div.addEventListener('mousedown', function (e) {
+            var startX = e.clientX
+            var startY = e.clientY
+            var offsetX = div.offsetLeft
+            var offsetY = div.offsetTop
+
+            function moveBox (e) {
+              var newX = e.clientX
+              var newY = e.clientY
+              var deltaX = newX - startX
+              var deltaY = newY - startY
+              div.style.left = offsetX + deltaX + 'px'
+              div.style.top = offsetY + deltaY + 'px'
             }
-  
-            let nodesDivv = document.createElement('div')
-  
-            for (let nodeId in nodes) {
-              let n = nodes[nodeId].class_type
+
+            function stopMoving () {
+              document.removeEventListener('mousemove', moveBox)
+              document.removeEventListener('mouseup', stopMoving)
+            }
+
+            document.addEventListener('mousemove', moveBox)
+            document.addEventListener('mouseup', stopMoving)
+          })
+
+          div.appendChild(btn)
+
+          const updateNodes = (ns, nd) => {
+            for (let nodeId in ns) {
+              let n = ns[nodeId].class_type
               const { url, title } = nodesMap[n]
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
-              background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
               d.addEventListener('click', () => {
                 const node = app.graph.getNodeById(nodeId)
                 if (!node) return
@@ -701,37 +764,67 @@ app.registerExtension({
                 app.canvas.setZoom(1)
               })
               d.addEventListener('mouseover', async () => {
-                console.log('mouseover')
+                // console.log('mouseover')
                 let n = (await app.graphToPrompt()).output
-                if (!deepEqual(n, nodes)) {
-                  nodesDivv.innerHTML = ''
-                  updateNodes(n, nodesDivv)
+                if (!deepEqual(n, ns)) {
+                  nd.innerHTML = ''
+                  updateNodes(n, nd)
                 }
               })
-  
+
               d.innerHTML = `
+                <span>${'#' + nodeId} ${n}</span>
+                <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
+                `
+              d.title = title
+
+              nd.appendChild(d)
+            }
+          }
+
+          let nodesDivv = document.createElement('div')
+
+          for (let nodeId in nodes) {
+            let n = nodes[nodeId].class_type
+            const { url, title } = nodesMap[n]
+            let d = document.createElement('button')
+            d.style = `text-align: left;margin:6px;color: var(--input-text);
+              background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+            d.addEventListener('click', () => {
+              const node = app.graph.getNodeById(nodeId)
+              if (!node) return
+              app.canvas.centerOnNode(node)
+              app.canvas.setZoom(1)
+            })
+            d.addEventListener('mouseover', async () => {
+              console.log('mouseover')
+              let n = (await app.graphToPrompt()).output
+              if (!deepEqual(n, nodes)) {
+                nodesDivv.innerHTML = ''
+                updateNodes(n, nodesDivv)
+              }
+            })
+
+            d.innerHTML = `
               <span>${'#' + nodeId} ${n}</span>
               <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
               `
-              d.title = title
-  
-              nodesDiv.appendChild(d)
-            }
-  
-            nodesDivv.appendChild(nodesDiv)
-            nodesDivv.style=`overflow: scroll;
-            height: 70vh;width: 100%;`
-  
-            div.appendChild(nodesDivv)
-  
-            if (!document.querySelector('#mixlab_find_the_node'))
-              document.body.appendChild(div)
+            d.title = title
+
+            nodesDiv.appendChild(d)
           }
-        });
-				return options;
-			};
 
+          nodesDivv.appendChild(nodesDiv)
+          nodesDivv.style = `overflow: scroll;
+            height: 70vh;width: 100%;`
 
-    
+          div.appendChild(nodesDivv)
+
+          if (!document.querySelector('#mixlab_find_the_node'))
+            document.body.appendChild(div)
+        }
+      })
+      return options
+    }
   }
 })

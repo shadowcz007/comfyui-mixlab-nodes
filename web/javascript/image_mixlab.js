@@ -193,6 +193,11 @@ const parseSvg = async svgContent => {
 
     svgWidth = viewBox.width
     svgHeight = viewBox.height
+  } else {
+    try {
+      svgWidth = ~~svgWidth.replace('px', '')
+      svgHeight = ~~svgHeight.replace('px', '')
+    } catch (error) {}
   }
 
   // 创建一个新的canvas元素
@@ -356,7 +361,7 @@ app.registerExtension({
               setLocalDataOfWin(key, dd)
               // console.log(this.id, ip.value.trim())
 
-              svgElement.style = `width: 90%;padding: 5%;`
+              svgElement.style = `width: 90%;padding: 5%;height: auto;`
               // 将提取的SVG元素显示在页面上
 
               svgContainer.innerHTML = ''
@@ -424,7 +429,7 @@ app.registerExtension({
       let svgStr = await dt.text()
 
       const { svgElement, data, image } = await parseSvg(svgStr)
-      svgElement.style = `width: 90%;padding: 5%;`
+      svgElement.style = `width: 90%;padding: 5%;height:auto`
       // 将提取的SVG元素显示在页面上
 
       widget.div.querySelector('.preview').innerHTML = ''
@@ -432,7 +437,6 @@ app.registerExtension({
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
- 
     }
   }
 })
