@@ -1800,11 +1800,15 @@ const updateUI = node => {
     pw.inputEl.title = `Total of ${prompts.length} prompts`
   } else {
     // 动态添加
+    console.log('ComfyWidgets',ComfyWidgets.STRING(
+      node,
+      'prompts',
+      ['STRING', { multiline: true }]
+    ))
     const w = ComfyWidgets.STRING(
       node,
       'prompts',
-      ['STRING', { multiline: true }],
-      app
+      ['STRING', { multiline: true }]
     ).widget
     w.inputEl.readOnly = true
     w.inputEl.style.opacity = 0.6
