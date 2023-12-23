@@ -159,6 +159,28 @@ class DynamicDelayProcessor:
                 }
             }
   
+    @classmethod
+    def calculate_words_length(cls,text):
+        chinese_char_pattern = re.compile(r'[\u4e00-\u9fff]')
+        english_word_pattern = re.compile(r'\b[a-zA-Z]+\b')
+        number_pattern = re.compile(r'\b[0-9]+\b')
+
+        words_length = 0
+        for segment in text.split():
+            if chinese_char_pattern.search(segment):
+                # 中文字符，每个字符计为 1
+                words_length += len(segment)
+            elif number_pattern.match(segment):
+                # 数字，每个字符计为 1
+                words_length += len(segment)
+            elif english_word_pattern.match(segment):
+                # 英文单词，整个单词计为 1
+                words_length += 1
+
+        return words_length
+
+
+
     FUNCTION = "run"
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ('output')
@@ -170,31 +192,12 @@ class DynamicDelayProcessor:
         start_time = time.time()
 
         # 计算延迟时间
-        if delay_by_text:
-            # 初始化长度为 0
-            words_length = 0
-
-            # 使用正则表达式分割文本为单词和非空格字符
-            for word in re.findall(r'\b\w+\b|[\u4e00-\u9fff]|[0-9]+', delay_by_text):
-                if re.search("[\u4e00-\u9fff]", word):
-                    # 中文字符，每个字符计为 1
-                    words_length += len(word)
-                elif re.search("[0-9]+", word):
-                    # 数字，按字符计数
-                    words_length += len(word)
-                else:
-                    # 英文单词，整个单词计为 1
-                    words_length += 1
-
+        delay_time = delay_seconds
+        if delay_by_text and isinstance(delay_by_text, str) and words_per_seconds > 0:
+            words_length = self.calculate_words_length(delay_by_text)
             print(f"Delay text: {delay_by_text}, Length: {words_length}")
-            # 避免除以零
-            if words_per_seconds > 0:
-                delay_time = words_length / words_per_seconds
-            else:
-                delay_time = delay_seconds
-        else:
-            delay_time = delay_seconds
-
+            delay_time += words_length / words_per_seconds
+            
         # 延迟执行
         time.sleep(delay_time)
 
@@ -204,8 +207,5 @@ class DynamicDelayProcessor:
         print(f"实际延迟时间: {elapsed_time} 秒")        
 
         # 根据 replace_output 决定输出值
-        if replace_output == "enable":
-            return (max(0, replace_value),)  # 确保返回值不小于0
-        else:
-            return (any_input,)
+        return (max(0, replace_value),) if replace_output == "enable" else (any_input,)
         
