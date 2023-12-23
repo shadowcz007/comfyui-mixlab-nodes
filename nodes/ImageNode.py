@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
-import base64,os
+import base64,os,random
 from io import BytesIO
 import folder_paths
 import json,io
@@ -235,7 +235,30 @@ def get_images_filepath(f,white_bg=False):
 
     return images
 
+# 创建噪声图像
+def create_noisy_image(width, height, mode="RGB", noise_level=128):
+    # 创建空白图像
+    image = Image.new(mode, (width, height))
 
+    # 遍历每个像素，并随机设置像素值
+    pixels = image.load()
+    for i in range(width):
+        for j in range(height):
+            # 随机生成噪声值
+            noise_r = random.randint(-noise_level, noise_level)
+            noise_g = random.randint(-noise_level, noise_level)
+            noise_b = random.randint(-noise_level, noise_level)
+
+            # 像素值加上噪声值，并限制在0-255的范围内
+            r = max(0, min(pixels[i, j][0] + noise_r, 255))
+            g = max(0, min(pixels[i, j][1] + noise_g, 255))
+            b = max(0, min(pixels[i, j][2] + noise_b, 255))
+
+            # 设置像素值
+            pixels[i, j] = (r, g, b)
+
+    image=image.convert(mode)
+    return image
 
 
 # 对轮廓进行平滑
@@ -1354,13 +1377,87 @@ class MergeLayers:
     
 
 
+class NoiseImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, # 最小值
+                    "max": 8192, # 最大值
+                    "step": 1, # 间隔
+                    "display": "number" # 控件类型： 输入框 number、滑块 slider
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1,
+                    "max": 8192,
+                    "step": 1,
+                    "display": "number"
+                }),
+                "noise_level": ("INT",{
+                    "default": 128, 
+                    "min": 0,
+                    "max": 8192,
+                    "step": 1,
+                    "display": "slider"
+                }),
+
+                },
+                }
+    
+    # 输出的数据类型
+    RETURN_TYPES = ("IMAGE",)
+
+    # 运行时方法名称
+    FUNCTION = "run"
+
+    # 右键菜单目录
+    CATEGORY = "♾️Mixlab/image"
+
+    # 输入是否为列表
+    INPUT_IS_LIST = False
+
+    # 输出是否为列表
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,width,height,noise_level):
+        # 创建噪声图像
+        im=create_noisy_image(width,height,"RGB",noise_level)
+        
+        #获取临时目录：temp
+        output_dir = folder_paths.get_temp_directory()
+
+        (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('tmp_', output_dir)
+        
+        image_file = f"{filename}_{counter:05}.png"
+
+        image_path=os.path.join(full_output_folder, image_file)
+        # 保存图片
+        im.save(image_path,compress_level=6)
+
+        # 把PIL数据类型转为tensor
+        im=pil2tensor(im)
+
+        # 定义ui字段，数据将回传到web前端的 nodeType.prototype.onExecuted
+        # result是节点的输出
+        return {"ui":{"images": [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type":"temp"
+            }]},"result": (im,)}
+
 
 class ResizeImage:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "image": ("IMAGE",),
-
             "width": ("INT",{
                     "default": 512, 
                     "min": 1, #Minimum value
@@ -1378,6 +1475,10 @@ class ResizeImage:
                 "scale_option": (["width","height",'overall'],),
 
                              },
+
+            "optional":{
+                    "image": ("IMAGE",),
+            }
                 }
     
     RETURN_TYPES = ("IMAGE",)
@@ -1389,16 +1490,20 @@ class ResizeImage:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,image,width,height,scale_option):
+    def run(self,width,height,scale_option,image=None):
         
         w=width[0]
         h=height[0]
         scale_option=scale_option[0]
-        im=image[0]
 
-        im=tensor2pil(im)
-        im=resize_image(im,scale_option,w,h)
-        im=im.convert('RGB')
+        if image==None:
+            im=create_noisy_image(w,h,"RGB")
+        else:
+            im=image[0]
+            im=tensor2pil(im)
+            im=resize_image(im,scale_option,w,h)
+            im=im.convert('RGB')
+
         im=pil2tensor(im)
         
         return (im,)
