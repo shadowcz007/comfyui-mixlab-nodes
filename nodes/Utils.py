@@ -1,5 +1,5 @@
 import os
-
+import re,random
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 
 import matplotlib.font_manager as fm
@@ -81,3 +81,41 @@ class FontInput:
     def run(self,font):
 
         return (font_files[font],)
+    
+class TextToNumber:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "text": ("STRING",{"multiline": False,"default": "1"}),
+                    "random_number": (["enable", "disable"],),
+                    "number":("INT", {
+                        "default": 0, 
+                        "min": 0, #Minimum value
+                        "max": 10000000000, #Maximum value
+                        "step": 1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                             },
+                }
+    
+    RETURN_TYPES = ("INT",)
+    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,text,random_number,number):
+        
+        numbers = re.findall(r'\d+', text)
+        result=0
+        for n in numbers:
+            result = int(n)
+            print(result)
+        
+        if random_number=='enable' and result>0:
+            result= random.randint(1, 10000000000)
+        return {"ui": {"text": [text],"num":[result]}, "result": (result,)}

@@ -323,8 +323,8 @@ from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
-from .nodes.Audio import SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import ColorInput,FontInput
+from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
+from .nodes.Utils import ColorInput,FontInput,TextToNumber
 
 
 # 要导出的所有节点及其名称的字典
@@ -359,7 +359,9 @@ NODE_CLASS_MAPPINGS = {
     "SpeechRecognition":SpeechRecognition,
     "SpeechSynthesis":SpeechSynthesis,
     "Color":ColorInput,
-    "Font":FontInput
+    "Font":FontInput,
+    "TextToNumber":TextToNumber
+    # "GamePal":GamePal
 }
 
 # 一个包含节点友好/可读的标题的字典
@@ -376,7 +378,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MergeLayers":"MergeLayers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
-    "3DImage":"3DImage ♾️Mixlab"
+    "3DImage":"3DImage ♾️Mixlab",
+    # "GamePal":"GamePal ♾️Mixlab"
 }
 
 # web ui的节点功能

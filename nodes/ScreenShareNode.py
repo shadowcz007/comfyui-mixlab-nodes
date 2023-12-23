@@ -79,7 +79,7 @@ class ScreenShareNode:
     def INPUT_TYPES(s):
         return { "required":{
             "image_base64": ("CHEESE",),
-            "refresh_rate": ("INT", {"default": 500, "min": 0, "max": 0xffffffffffffffff}),
+            "refresh_rate": ("INT", {"default": 500, "min": 0,"step": 50, "max": 0xffffffffffffffff}),
         },
           "optional":{
               "prompt": ("PROMPT",),
