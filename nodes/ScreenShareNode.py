@@ -79,11 +79,13 @@ class ScreenShareNode:
     def INPUT_TYPES(s):
         return { "required":{
             "image_base64": ("CHEESE",),
+            "refresh_rate": ("INT", {"default": 500, "min": 0, "max": 0xffffffffffffffff}),
         },
           "optional":{
               "prompt": ("PROMPT",),
               "slide": ("SLIDE",),
               "seed": ("SEED",),
+              
             #   "seed": ("INT", {"default": 1, "min": 0, "max": 0xffffffffffffffff}),
                 } }
     
@@ -97,11 +99,11 @@ class ScreenShareNode:
     OUTPUT_IS_LIST = (False,False,False,False)
   
     # 运行的函数
-    def run(self,image_base64,prompt,slide,seed):
+    def run(self,image_base64,refresh_rate ,prompt,slide,seed):
         im,mask=base64_save(image_base64)
         # print('##########prompt',prompt)
-        return (im,prompt,slide,seed)
-    
+        return {"ui":{"refresh_rate": [refresh_rate]},"result": (im,prompt,slide,seed,)}
+
 
 class FloatingVideo:
     @classmethod

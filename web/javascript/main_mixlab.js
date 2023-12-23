@@ -461,7 +461,7 @@ async function requestCamera () {
 /* 
 A method that returns the required style for the html 
 */
-function get_position_style (ctx, widget_width, y, node_height) {
+function get_position_style (ctx, widget_width, y, node_height, top) {
   const MARGIN = 4 // the margin around the html element
 
   /* Create a transform that deals with all the scrolling and zooming */
@@ -478,7 +478,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
     transformOrigin: '0 0',
     transform: transform,
     left: `0`,
-    top: `0`,
+    top: `${top}px`,
     cursor: 'pointer',
     position: 'absolute',
     maxWidth: `${widget_width - MARGIN * 2}px`,
@@ -585,9 +585,6 @@ app.registerExtension({
   },
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'ScreenShare') {
-      /* 
-          Hijack the onNodeCreated call to add our widget
-          */
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
@@ -603,7 +600,8 @@ app.registerExtension({
                 ctx,
                 widget_width,
                 widget_height * 5,
-                node.size[1]
+                node.size[1],
+                40
               )
             )
           }
@@ -693,22 +691,22 @@ app.registerExtension({
           }
         })
 
-        widget.refreshInput = $el('input', {
-          placeholder: '  Refresh rate:200 ms',
-          type: 'number',
-          min: 100,
-          step: 100, 
-          style: {
-            cursor: 'pointer',
-            padding: '8px 24px',
-            fontWeight: '300',
-            margin: '2px',
-            color: 'var(--descrip-text)',
-            backgroundColor: 'var(--comfy-input-bg)'
-          }
-        });
-        widget.refreshInput.className='comfy-multiline-input'
-        
+        // widget.refreshInput = $el('input', {
+        //   placeholder: '  Refresh rate:200 ms',
+        //   type: 'number',
+        //   min: 100,
+        //   step: 100,
+        //   style: {
+        //     cursor: 'pointer',
+        //     padding: '8px 24px',
+        //     fontWeight: '300',
+        //     margin: '2px',
+        //     color: 'var(--descrip-text)',
+        //     backgroundColor: 'var(--comfy-input-bg)'
+        //   }
+        // });
+        // widget.refreshInput.className='comfy-multiline-input'
+
         widget.liveBtn = $el('button', {
           innerText: 'Live Run',
           style: {
@@ -734,7 +732,7 @@ app.registerExtension({
         widget.shareDiv.appendChild(widget.shareBtn)
         widget.shareDiv.appendChild(widget.shareOfWebCamBtn)
         widget.card.appendChild(widget.openFloatingWinBtn)
-        widget.card.appendChild(widget.refreshInput)
+        // widget.card.appendChild(widget.refreshInput)
         widget.card.appendChild(widget.liveBtn)
 
         const toggleShare = async (isCamera = false) => {
@@ -894,11 +892,11 @@ app.registerExtension({
           toggleShare()
         })
 
-        widget.refreshInput.addEventListener('change', async () => {
-          window._mixlab_screen_refresh_rate = Math.round(
-            widget.refreshInput.value
-          )
-        })
+        // widget.refreshInput.addEventListener('change', async () => {
+        //   window._mixlab_screen_refresh_rate = Math.round(
+        //     widget.refreshInput.value
+        //   )
+        // })
 
         widget.liveBtn.addEventListener('click', async () => {
           if (window._mixlab_stopLive) {
@@ -939,11 +937,20 @@ app.registerExtension({
           widget.shareBtn.remove()
           widget.liveBtn.remove()
           widget.card.remove()
-          widget.refreshInput.remove()
+          // widget.refreshInput.remove()
           widget.previewArea.remove()
           widget.previewCard.remove()
         }
         this.serialize_widgets = true
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        // console.log('###ScreenShare', this, message.refresh_rate)
+        window._mixlab_screen_refresh_rate = Math.round(
+          message.refresh_rate[0] || 500
+        )
       }
     }
   }
@@ -1214,7 +1221,7 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.card.style,
-              get_position_style(ctx, widget_width, y, node.size[1])
+              get_position_style(ctx, widget_width, y, node.size[1], 0)
             )
           }
         }
