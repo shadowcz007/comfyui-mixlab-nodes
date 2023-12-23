@@ -69,8 +69,7 @@ function speakText (text) {
 //                      #MixCopilot
 
 const start = (element, id, startBtn) => {
-
-  startBtn.className='loading_mixlab'
+  startBtn.className = 'loading_mixlab'
 
   window.recognition = new webkitSpeechRecognition()
 
@@ -95,17 +94,16 @@ const start = (element, id, startBtn) => {
     localStorage.setItem('_mixlab_speech_recognition', JSON.stringify(data))
 
     if (timeoutId) clearTimeout(timeoutId)
-   
+
     if (!window.recognition) return
 
     timeoutId = setTimeout(function () {
       console.log('结果传递：：', result)
       app.queuePrompt(0, 1)
       window.recognition?.stop()
-      window.recognition = null;
-      startBtn.className=''
+      window.recognition = null
+      startBtn.className = ''
       startBtn.innerText = 'START'
-      
 
       timeoutId = null
 
@@ -202,6 +200,7 @@ app.registerExtension({
           margin: 0px 8px 6px;`
 
           startBtn.style = `
+          margin-top:48px;
           background-color: var(--comfy-input-bg);
           border-radius: 8px;
           border-color: var(--border-color);
@@ -219,7 +218,7 @@ app.registerExtension({
               window.recognition.stop()
               window.recognition = null
               startBtn.innerText = 'START'
-              startBtn.className=''
+              startBtn.className = ''
             } else {
               start(textArea, this.id, startBtn)
               startBtn.innerText = 'STOP'
@@ -243,16 +242,70 @@ app.registerExtension({
 
         this.serialize_widgets = true //需要保存参数
       }
+
+      
+
+      // const onGraphConfigured=nodeType.prototype.onGraphConfigured;
+      // nodeType.prototype.onGraphConfigured = function (message) {
+      //   onGraphConfigured?.apply(this, arguments)
+      //   console.log('###SpeechRecognition onGraphConfigured',this,message)
+      // }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        
+        try {
+          let open = message.start_by[0] > 0
+          if (open) {
+            const div = this.widgets.filter(w => w.name == 'chatgptdiv')[0].div
+            const startBtn = div.querySelector('button')
+            let textArea= div.querySelector('textarea')
+            if (open && !window.recognition) {
+              start(textArea, this.id, startBtn)
+              startBtn.innerText = 'STOP'
+            } else if (!open && window.recognition) {
+              window.recognition.stop()
+              window.recognition = null
+              startBtn.innerText = 'START'
+              startBtn.className = ''
+            }
+          }
+        } catch (error) {
+          console.log('###SpeechRecognition', error)
+        }
+      }
     }
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'SpeechRecognition') {
       let data = getLocalData('_mixlab_speech_recognition')
-      // console.log('_mixlab_speech_recognition', node.widgets)
+      // console.log('_mixlab_speech_recognition', node )
       let div = node.widgets.filter(f => f.type === 'div')[0]
       if (div && data[node.id]) {
         div.div.querySelector('textarea').value = data[node.id]
+      };
+
+      try {
+        let open = node.widgets_values[1] > 0
+        if (open) {
+          const div = node.widgets.filter(w => w.name == 'chatgptdiv')[0].div
+          const startBtn = div.querySelector('button')
+          let textArea= div.querySelector('textarea')
+          if (open && !window.recognition) {
+            start(textArea, node.id, startBtn)
+            startBtn.innerText = 'STOP'
+          } else if (!open && window.recognition) {
+            window.recognition.stop()
+            window.recognition = null
+            startBtn.innerText = 'START'
+            startBtn.className = ''
+          }
+        }
+      } catch (error) {
+        console.log('###SpeechRecognition', error)
       }
+ 
     }
   }
 })

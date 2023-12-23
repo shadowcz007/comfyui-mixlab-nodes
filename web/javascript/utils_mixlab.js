@@ -1,10 +1,8 @@
-
 import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
-
-
+import { addValueControlWidget } from "../../../scripts/widgets.js";
 
 const getLocalData = key => {
   let data = {}
@@ -47,122 +45,137 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
-
 app.registerExtension({
-    name: 'Mixlab.utils.Color',
-    async getCustomWidgets (app) {
-      return {
-        TCOLOR (node, inputName, inputData, app) {
-          // console.log('##node', node)
-          const widget = {
-            type: inputData[0], // the type, CHEESE
-            name: inputName, // the name, slice
-            size: [128, 32], // a default size
-            draw (ctx, node, width, y) {},
-            computeSize (...args) {
-              return [128, 32] // a method to compute the current size of the widget
-            },
-            async serializeValue (nodeId, widgetIndex) {
-              let data = getLocalData('_mixlab_utils_color')
-              return data[node.id] || '#000000'
-            }
+  name: 'Mixlab.utils.Color',
+  async getCustomWidgets (app) {
+    return {
+      TCOLOR (node, inputName, inputData, app) {
+        // console.log('##node', node)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 32], // a default size
+          draw (ctx, node, width, y) {},
+          computeSize (...args) {
+            return [128, 32] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            let data = getLocalData('_mixlab_utils_color')
+            return data[node.id] || '#000000'
           }
-          //  widget.something = something;          // maybe adds stuff to it
-          node.addCustomWidget(widget) // adds it to the node
-          return widget // and returns it.
         }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
       }
-    },
-  
-    async beforeRegisterNodeDef (nodeType, nodeData, app) {
-      if (nodeType.comfyClass == 'Color') {
-        const orig_nodeCreated = nodeType.prototype.onNodeCreated
-        nodeType.prototype.onNodeCreated = function () {
-          orig_nodeCreated?.apply(this, arguments)
-  
-          console.log('Color nodeData', this.widgets)
-   
-          const widget = {
-            type: 'div',
-            name: 'input_color',
-            draw (ctx, node, widget_width, y, widget_height) {
-              Object.assign(
-                this.div.style,
-                get_position_style(
-                  ctx,
-                  widget_width,
-                  44,
-                  node.size[1]
-                )
-              )
-            }
+    }
+  },
+
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'Color') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        console.log('Color nodeData', this.widgets)
+
+        const widget = {
+          type: 'div',
+          name: 'input_color',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, 44, node.size[1])
+            )
           }
-  
-          widget.div = $el('div', {})
-  
-          document.body.appendChild(widget.div)
-  
-          const inputDiv = (key, placeholder, value) => {
-            let div = document.createElement('div')
-            const ip = document.createElement('input')
-            ip.type = 'color'
-            ip.className = `${'comfy-multiline-input'} ${placeholder}`
-            div.style = `display: flex;
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+
+        const inputDiv = (key, placeholder, value) => {
+          let div = document.createElement('div')
+          const ip = document.createElement('input')
+          ip.type = 'color'
+          ip.className = `${'comfy-multiline-input'} ${placeholder}`
+          div.style = `display: flex;
             align-items: center; 
             margin: 6px 8px;
             margin-top: 0;`
-            ip.placeholder = placeholder
-            ip.value = value
-  
-            ip.style = `outline: none;
+          ip.placeholder = placeholder
+          ip.value = value
+
+          ip.style = `outline: none;
             border: none;
             padding: 4px;
             width: 100%;cursor: pointer;
             height: 32px;`
-            const label = document.createElement('label')
-            label.style = 'font-size: 10px;min-width:32px'
-            label.innerText = placeholder
-            div.appendChild(label)
-            div.appendChild(ip)
-  
-            ip.addEventListener('change', () => {
-              let data = getLocalData(key)
-              data[this.id] = ip.value.trim()
-              localStorage.setItem(key, JSON.stringify(data))
-              // console.log(this.id, ip.value.trim())
-            })
-            return div
-          }
-  
-          let inputColor = inputDiv('_mixlab_utils_color', 'Color', '#000000')
-  
-          widget.div.appendChild(inputColor)
-  
-          this.addCustomWidget(widget)
-  
-          const onRemoved = this.onRemoved
-          this.onRemoved = () => {
-            inputColor.remove()
-            widget.div.remove()
-            return onRemoved?.()
-          }
-  
-          this.serialize_widgets = true //需要保存参数
+          const label = document.createElement('label')
+          label.style = 'font-size: 10px;min-width:32px'
+          label.innerText = placeholder
+          div.appendChild(label)
+          div.appendChild(ip)
+
+          ip.addEventListener('change', () => {
+            let data = getLocalData(key)
+            data[this.id] = ip.value.trim()
+            localStorage.setItem(key, JSON.stringify(data))
+            // console.log(this.id, ip.value.trim())
+          })
+          return div
         }
-      }
-    },
-    async loadedGraphNode (node, app) {
-      // Fires every time a node is constructed
-      // You can modify widgets/add handlers/etc here
-  
-      if (node.type === 'Color') {
-        let widget = node.widgets.filter(w => w.div)[0]
-  
-        let data = getLocalData('_mixlab_utils_color')
-  
-        let id = node.id
-  
-        widget.div.querySelector('.Color').value = data[id] || '#000000'
+
+        let inputColor = inputDiv('_mixlab_utils_color', 'Color', '#000000')
+
+        widget.div.appendChild(inputColor)
+
+        this.addCustomWidget(widget)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          inputColor.remove()
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        this.serialize_widgets = true //需要保存参数
       }
     }
-  })
+  },
+  async loadedGraphNode (node, app) {
+    // Fires every time a node is constructed
+    // You can modify widgets/add handlers/etc here
+
+    if (node.type === 'Color') {
+      let widget = node.widgets.filter(w => w.div)[0]
+
+      let data = getLocalData('_mixlab_utils_color')
+
+      let id = node.id
+
+      widget.div.querySelector('.Color').value = data[id] || '#000000'
+    }
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.utils.TextToNumber',
+
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'TextToNumber') {
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        const random_number=this.widgets.filter(w=>w.name==='random_number')[0]
+        if(random_number.value==='enable'){
+          const n=this.widgets.filter(w=>w.name==='number')[0]
+          n.value=message.num[0]
+        }
+        
+        console.log('TextToNumber', random_number.value)
+      }
+    }
+  }
+})
