@@ -183,7 +183,7 @@ class DynamicDelayProcessor:
 
     FUNCTION = "run"
     RETURN_TYPES = (any_type,)
-    RETURN_NAMES = ('output')
+    RETURN_NAMES = ('output',)
 
     CATEGORY = "♾️Mixlab/utils"
     def run(self,any_input,delay_seconds,delay_by_text,words_per_seconds,replace_output,replace_value):
