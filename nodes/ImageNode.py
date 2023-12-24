@@ -1402,49 +1402,55 @@ class MergeLayers:
         bg_images=[]
         masks=[]
  
-        for bg_image in images[0]:
-            # bg_image=image[0]
-            bg_image=tensor2pil(bg_image)
-            # 按z-index排序
-            layers_new = sorted(layers, key=lambda x: x["z_index"])
-        
-            for layer in layers_new:
-                image=layer['image']
-                mask=layer['mask']
-                if 'type' in layer and layer['type']=='base64' and type(image) == str:
-                    im=base64_to_image(image)
-                    im=im.convert('RGB')
-                    image=pil2tensor(im)
+        # print(len(images),images[0].shape)
+        # 1  torch.Size([2, 512, 512, 3])
+        # 4  torch.Size([1, 1024, 768, 3])
 
-                    mask=base64_to_image(mask)
-                    mask=mask.convert('L')
-                    mask=pil2tensor(mask)
-                
-                
-                layer_image=tensor2pil(image)
-                layer_mask=tensor2pil(mask)
-                bg_image=merge_images(bg_image,
-                                    layer_image,
-                                    layer_mask,
-                                    layer['x'],
-                                    layer['y'],
-                                    layer['width'],
-                                    layer['height'],
-                                    layer['scale_option']
-                                    )
-                
-            mask=bg_image.convert('RGBA')
-            mask=pil2tensor(mask)
+        for img in images:
+
+            for bg_image in img:
+                # bg_image=image[0]
+                bg_image=tensor2pil(bg_image)
+                # 按z-index排序
+                layers_new = sorted(layers, key=lambda x: x["z_index"])
             
-            bg_image=bg_image.convert('RGB')
-            bg_image=pil2tensor(bg_image)
+                for layer in layers_new:
+                    image=layer['image']
+                    mask=layer['mask']
+                    if 'type' in layer and layer['type']=='base64' and type(image) == str:
+                        im=base64_to_image(image)
+                        im=im.convert('RGB')
+                        image=pil2tensor(im)
 
-            channels = ["red", "green", "blue", "alpha"]
-            # print(mask,mask.shape)
-            mask = mask[:, :, :, channels.index("green")]
+                        mask=base64_to_image(mask)
+                        mask=mask.convert('L')
+                        mask=pil2tensor(mask)
+                    
+                    
+                    layer_image=tensor2pil(image)
+                    layer_mask=tensor2pil(mask)
+                    bg_image=merge_images(bg_image,
+                                        layer_image,
+                                        layer_mask,
+                                        layer['x'],
+                                        layer['y'],
+                                        layer['width'],
+                                        layer['height'],
+                                        layer['scale_option']
+                                        )
+                    
+                mask=bg_image.convert('RGBA')
+                mask=pil2tensor(mask)
+                
+                bg_image=bg_image.convert('RGB')
+                bg_image=pil2tensor(bg_image)
 
-            bg_images.append(bg_image)
-            masks.append(mask)
+                channels = ["red", "green", "blue", "alpha"]
+                # print(mask,mask.shape)
+                mask = mask[:, :, :, channels.index("green")]
+
+                bg_images.append(bg_image)
+                masks.append(mask)
         
         bg_images=torch.cat(bg_images, dim=0)
         masks=torch.cat(masks, dim=0)
