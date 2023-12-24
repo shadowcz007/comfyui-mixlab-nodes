@@ -114,7 +114,7 @@ class TextToNumber:
         result=0
         for n in numbers:
             result = int(n)
-            print(result)
+            # print(result)
         
         if random_number=='enable' and result>0:
             result= random.randint(1, 10000000000)
@@ -199,6 +199,7 @@ class DynamicDelayProcessor:
             delay_time += words_length / words_per_seconds
             
         # 延迟执行
+        print(f"延迟执行: {delay_time}")
         time.sleep(delay_time)
 
         # 获取结束时间戳并计算间隔
