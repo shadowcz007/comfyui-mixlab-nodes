@@ -187,7 +187,7 @@ class DynamicDelayProcessor:
 
     CATEGORY = "♾️Mixlab/utils"
     def run(self,any_input,delay_seconds,delay_by_text,words_per_seconds,replace_output,replace_value):
-    
+        # print(f"Delay text:",delay_by_text )
         # 获取开始时间戳
         start_time = time.time()
 

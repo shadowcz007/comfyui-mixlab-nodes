@@ -68,7 +68,7 @@ function speakText (text) {
 // speakText('Hello, how are you?');
 //                      #MixCopilot
 
-const start = (element, id, startBtn) => {
+const start = (element, id, startBtn, node) => {
   startBtn.className = 'loading_mixlab'
 
   window.recognition = new webkitSpeechRecognition()
@@ -99,6 +99,17 @@ const start = (element, id, startBtn) => {
 
     timeoutId = setTimeout(function () {
       console.log('结果传递：：', result)
+
+      // 把数据发送到chatgpt的输入prompt里
+      try {
+        const sendToId = node.widgets.filter(
+          w => w.name === 'Send to ChatGPT #'
+        )[0].value
+        app.graph
+          .getNodeById(sendToId)
+          .widgets.filter(w => w.name === 'prompt')[0].value = result
+      } catch (error) {}
+
       app.queuePrompt(0, 1)
       window.recognition?.stop()
       window.recognition = null
@@ -113,7 +124,7 @@ const start = (element, id, startBtn) => {
           !window.recognition &&
           window._mixlab_speech_synthesis_onend
         ) {
-          start(element, id, startBtn)
+          start(element, id, startBtn, node)
           startBtn.innerText = 'STOP'
           if (intervalId) {
             clearInterval(intervalId)
@@ -170,13 +181,21 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
+        const sendTo = ComfyWidgets.INT(
+          this,
+          'Send to ChatGPT #',
+          ['INT', { default: 0 }],
+          app
+        )
+        // console.log('sendTo',sendTo)
+
         const widget = {
           type: 'div',
           name: 'chatgptdiv',
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1])
+              get_position_style(ctx, widget_width, 78, node.size[1])
             )
           }
         }
@@ -188,7 +207,14 @@ app.registerExtension({
         const inputDiv = (key, placeholder) => {
           let div = document.createElement('div')
           const startBtn = document.createElement('button')
+
           const textArea = document.createElement('textarea')
+          textArea.placeholder = 'speak text'
+          // sendTo.type='range';
+          // sendTo.min=0;
+          // sendTo.max=2000;
+          // sendTo.step=1;
+          // sendTo.className='comfy-multiline-input'
 
           textArea.className = `${'comfy-multiline-input'} ${placeholder}`
 
@@ -211,6 +237,7 @@ app.registerExtension({
           startBtn.innerText = 'START'
 
           div.appendChild(startBtn)
+          // div.appendChild(sendTo);
           div.appendChild(textArea)
 
           startBtn.addEventListener('click', () => {
@@ -220,10 +247,14 @@ app.registerExtension({
               startBtn.innerText = 'START'
               startBtn.className = ''
             } else {
-              start(textArea, this.id, startBtn)
+              start(textArea, this.id, startBtn, this)
               startBtn.innerText = 'STOP'
             }
           })
+
+          // sendTo.addEventListener('change',()=>{
+          //   console.log(sendTo.value)
+          // })
 
           return div
         }
@@ -243,8 +274,6 @@ app.registerExtension({
         this.serialize_widgets = true //需要保存参数
       }
 
-      
-
       // const onGraphConfigured=nodeType.prototype.onGraphConfigured;
       // nodeType.prototype.onGraphConfigured = function (message) {
       //   onGraphConfigured?.apply(this, arguments)
@@ -254,15 +283,17 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        
+        // console.log('this.widgets', this.widgets)
+
         try {
+          // 是否根据start by 开启
           let open = message.start_by[0] > 0
           if (open) {
             const div = this.widgets.filter(w => w.name == 'chatgptdiv')[0].div
             const startBtn = div.querySelector('button')
-            let textArea= div.querySelector('textarea')
+            let textArea = div.querySelector('textarea')
             if (open && !window.recognition) {
-              start(textArea, this.id, startBtn)
+              start(textArea, this.id, startBtn,this)
               startBtn.innerText = 'STOP'
             } else if (!open && window.recognition) {
               window.recognition.stop()
@@ -284,16 +315,16 @@ app.registerExtension({
       let div = node.widgets.filter(f => f.type === 'div')[0]
       if (div && data[node.id]) {
         div.div.querySelector('textarea').value = data[node.id]
-      };
+      }
 
       try {
         let open = node.widgets_values[1] > 0
         if (open) {
           const div = node.widgets.filter(w => w.name == 'chatgptdiv')[0].div
           const startBtn = div.querySelector('button')
-          let textArea= div.querySelector('textarea')
+          let textArea = div.querySelector('textarea')
           if (open && !window.recognition) {
-            start(textArea, node.id, startBtn)
+            start(textArea, node.id, startBtn,node)
             startBtn.innerText = 'STOP'
           } else if (!open && window.recognition) {
             window.recognition.stop()
@@ -305,7 +336,6 @@ app.registerExtension({
       } catch (error) {
         console.log('###SpeechRecognition', error)
       }
- 
     }
   }
 })

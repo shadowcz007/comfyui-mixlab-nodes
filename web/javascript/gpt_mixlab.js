@@ -61,7 +61,7 @@ app.registerExtension({
   async getCustomWidgets (app) {
     return {
       KEY (node, inputName, inputData, app) {
-        // console.log('##node', node)
+        console.log('##inputData', inputData)
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
