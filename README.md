@@ -1,8 +1,20 @@
 ## 
-v0.4.0 🚀🚗🚚🏃‍
-- Add "help" option to the context menu for each node.
-- Add "find the node" option to the global context menu.
-- Optimize the 3D Image node and add workflow.
+v0.5.0 🚀🚗🚚🏃‍
+- Added video composition support to the MergeLayers.
+- Enhanced visual selection support for the NewLayer node.
+- Introduced the NoiseImage node and ResizeImage node.
+- Improved compatibility for TextImage with line breaks.
+- Optimized the 3DImage node to export textures for modification.
+- [Added DynamicDelayByText, enabling delayed execution based on input text length.](./workflow/audio-chatgpt-workflow.json)
+
+
+- 为MergeLayers添加了视频合成功能。
+- NewLayer节点增加了视觉选择支持。
+- 添加了NoiseImage节点和ResizeImage节点。
+- 支持带有换行的文本图像。
+- 对3D节点进行了优化，支持导出纹理以进行修改。
+- [添加了DynamicDelayByText功能，可以根据输入文本的长度进行延迟执行。](./workflow/audio-chatgpt-workflow.json)
+
 
 ### 3D
 ![](./assets/3dimage.png)
@@ -50,6 +62,11 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ![layers](./assets/layers-workflow.svg)
 
 ![poster](./assets/poster-workflow.svg)
+
+## Utils
+> The Color node provides a color picker for easy color selection, the Font node offers built-in font selection for use with TextImage to generate text images, and the DynamicDelayByText node allows delayed execution based on the length of the input text.
+
+
 
 ## Other Nodes
 

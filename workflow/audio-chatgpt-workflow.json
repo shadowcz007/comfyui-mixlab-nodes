@@ -42,7 +42,7 @@
         "Node name for S&R": "SpeechSynthesis"
       },
       "widgets_values": [
-        "如果您想购买工程车，您需要考虑以下几个因素：\n\n1. 预算：确定您有多少钱可以用来购买工程车。\n\n2. 用途：确定您购买工程车的目的，这将帮助您选择合适的车型和配置。\n\n3. 品牌和型号：选择一个知名品牌和适合您需求的型号。\n\n4. 购买地点：考虑在哪个地区购买，这将影响价格和可用性。\n\n5. 保养和维修：考虑车辆的保养和维修成本，以确保购买后的维护成本合理。\n\n请告诉我您需要更多的哪方面的信息，我将能更好地帮助您。"
+        "作为一个人工智能助手，我没有性别，也无法进行社交互动。我的主要任务是为用户提供帮助和信息。请问有什么问题我可以为您解答吗？"
       ]
     },
     {
@@ -133,10 +133,10 @@
       "widgets_values": [
         null,
         null,
-        "买",
+        "跟你一样泡妞",
         "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
         "gpt-3.5-turbo",
-        8034,
+        354,
         "randomize",
         1,
         null
@@ -178,7 +178,7 @@
         "Node name for S&R": "ShowTextForGPT"
       },
       "widgets_values": [
-        "工程车子什么"
+        "纽斯"
       ]
     },
     {
@@ -227,7 +227,7 @@
       "widgets_values": [
         1,
         "",
-        0.5,
+        2.5,
         "enable",
         1
       ]
