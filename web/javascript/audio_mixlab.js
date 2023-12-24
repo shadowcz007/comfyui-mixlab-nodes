@@ -110,7 +110,7 @@ const start = (element, id, startBtn, node) => {
           .widgets.filter(w => w.name === 'prompt')[0].value = result
       } catch (error) {}
 
-      app.queuePrompt(0, 1)
+      setTimeout(() => app.queuePrompt(0, 1), 100)
       window.recognition?.stop()
       window.recognition = null
       startBtn.className = ''
@@ -293,7 +293,7 @@ app.registerExtension({
             const startBtn = div.querySelector('button')
             let textArea = div.querySelector('textarea')
             if (open && !window.recognition) {
-              start(textArea, this.id, startBtn,this)
+              start(textArea, this.id, startBtn, this)
               startBtn.innerText = 'STOP'
             } else if (!open && window.recognition) {
               window.recognition.stop()
@@ -324,7 +324,7 @@ app.registerExtension({
           const startBtn = div.querySelector('button')
           let textArea = div.querySelector('textarea')
           if (open && !window.recognition) {
-            start(textArea, node.id, startBtn,node)
+            start(textArea, node.id, startBtn, node)
             startBtn.innerText = 'STOP'
           } else if (!open && window.recognition) {
             window.recognition.stop()

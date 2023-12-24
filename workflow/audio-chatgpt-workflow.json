@@ -1,0 +1,314 @@
+{
+  "last_node_id": 10,
+  "last_link_id": 16,
+  "nodes": [
+    {
+      "id": 9,
+      "type": "SpeechSynthesis",
+      "pos": [
+        40,
+        356
+      ],
+      "size": {
+        "0": 352.8227844238281,
+        "1": 95.3553237915039
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 12,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            13,
+            16
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SpeechSynthesis"
+      },
+      "widgets_values": [
+        "如果您想购买工程车，您需要考虑以下几个因素：\n\n1. 预算：确定您有多少钱可以用来购买工程车。\n\n2. 用途：确定您购买工程车的目的，这将帮助您选择合适的车型和配置。\n\n3. 品牌和型号：选择一个知名品牌和适合您需求的型号。\n\n4. 购买地点：考虑在哪个地区购买，这将影响价格和可用性。\n\n5. 保养和维修：考虑车辆的保养和维修成本，以确保购买后的维护成本合理。\n\n请告诉我您需要更多的哪方面的信息，我将能更好地帮助您。"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "SpeechRecognition",
+      "pos": [
+        537,
+        321
+      ],
+      "size": {
+        "0": 228.5580291748047,
+        "1": 239.85951232910156
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "start_by",
+          "type": "INT",
+          "link": 14,
+          "widget": {
+            "name": "start_by"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            15
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SpeechRecognition"
+      },
+      "widgets_values": [
+        null,
+        1,
+        4,
+        null
+      ]
+    },
+    {
+      "id": 4,
+      "type": "ChatGPTOpenAI",
+      "pos": [
+        -403,
+        14
+      ],
+      "size": {
+        "0": 400,
+        "1": 358
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            12
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "messages",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ChatGPTOpenAI"
+      },
+      "widgets_values": [
+        null,
+        null,
+        "买",
+        "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+        "gpt-3.5-turbo",
+        8034,
+        "randomize",
+        1,
+        null
+      ]
+    },
+    {
+      "id": 10,
+      "type": "ShowTextForGPT",
+      "pos": [
+        867,
+        349
+      ],
+      "size": {
+        "0": 315,
+        "1": 76.00000762939453
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 15,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "工程车子什么"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "DynamicDelayProcessor",
+      "pos": [
+        496,
+        4
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "any_input",
+          "type": "*",
+          "link": 13
+        },
+        {
+          "name": "delay_by_text",
+          "type": "STRING",
+          "link": 16,
+          "widget": {
+            "name": "delay_by_text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": [
+            14
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DynamicDelayProcessor"
+      },
+      "widgets_values": [
+        1,
+        "",
+        0.5,
+        "enable",
+        1
+      ]
+    }
+  ],
+  "links": [
+    [
+      4,
+      2,
+      0,
+      5,
+      0,
+      "*"
+    ],
+    [
+      7,
+      4,
+      0,
+      6,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      6,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      9,
+      5,
+      0,
+      7,
+      0,
+      "INT"
+    ],
+    [
+      12,
+      4,
+      0,
+      9,
+      0,
+      "STRING"
+    ],
+    [
+      13,
+      9,
+      0,
+      5,
+      0,
+      "*"
+    ],
+    [
+      14,
+      5,
+      0,
+      8,
+      0,
+      "INT"
+    ],
+    [
+      15,
+      8,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      16,
+      9,
+      0,
+      5,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
