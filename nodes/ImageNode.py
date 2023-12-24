@@ -1069,7 +1069,7 @@ class Image3D:
         mask=mask.convert('L')
 
         bg_image=None
-        if upload['bg_image']:
+        if 'bg_image' in upload:
             bg_image = base64_to_image(upload['bg_image'])
             bg_image=bg_image.convert('RGB')
             bg_image=pil2tensor(bg_image)
