@@ -281,6 +281,8 @@ app.registerExtension({
                   <div>Material: <select class="material"></select></div>
                   <div>Material: <div class="material_img"> </div></div>
                   <div><button class="bg">BG</button></div>
+                  <div><button class="export">Export GLB</button></div>
+                  
                 </div></model-viewer>`
 
               preview.innerHTML = html
@@ -294,6 +296,7 @@ app.registerExtension({
               const selectMaterial = preview.querySelector('.material')
               const material_img = preview.querySelector('.material_img')
               const bg = preview.querySelector('.bg')
+              const exportGLB = preview.querySelector('.export')
 
               if (modelViewerVariants) {
                 modelViewerVariants.style.width = `${that.size[0] - 24}px`
@@ -454,6 +457,15 @@ app.registerExtension({
 
                 // 触发input的点击事件
                 input.click()
+              })
+
+              exportGLB.addEventListener('click', async () => {
+                const glTF = await modelViewerVariants.exportScene()
+                const file = new File([glTF], 'export.glb')
+                const link = document.createElement('a')
+                link.download = file.name
+                link.href = URL.createObjectURL(file)
+                link.click()
               })
 
               uploadWidget.value = await uploadWidget.serializeValue()
