@@ -187,20 +187,22 @@ app.registerExtension({
           },
           async serializeValue (nodeId, widgetIndex) {
             let d = getLocalData('_mixlab_3d_image')
-            console.log('serializeValue', node)
+            // console.log('serializeValue', node)
             if (d && d[node.id]) {
               let { url, bg, material } = d[node.id]
-              let base64 = await parseImage(url)
-              let bg_base64 = await parseImage(bg)
-              let material_base64 = await parseImage(material)
+              let data = {}
+              if (url) {
+                data.image = await parseImage(url)
+              }
+              if (bg) {
+                data.bg_image = await parseImage(bg)
+              }
 
-              return JSON.parse(
-                JSON.stringify({
-                  image: base64,
-                  bg_image: bg_base64,
-                  material: material_base64
-                })
-              )
+              if (material) {
+                data.material = await parseImage(material)
+              }
+
+              return JSON.parse(JSON.stringify(data))
             } else {
               return {}
             }
@@ -344,21 +346,26 @@ app.registerExtension({
                 let url = await uploadImage(blob, '.png')
                 // console.log(url)
 
-                //  材质贴图
-                let thumbUrl = material_img.getAttribute('src')
-                let tb = await base64ToBlobFromURL(thumbUrl)
-                let tUrl = await uploadImage(tb, '.png')
-
-                // console.log(tUrl)
-
                 let bg_blob = await base64ToBlobFromURL(
                   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN88uXrPQAFwwK/6xJ6CQAAAABJRU5ErkJggg=='
                 )
                 let url_bg = await uploadImage(bg_blob, '.png')
+                // console.log('url_bg',url_bg)
 
-                if (!dd[that.id])
-                  dd[that.id] = { url, bg: url_bg, material: tUrl }
-                dd[that.id] = { ...dd[that.id], url, material: tUrl }
+                if (!dd[that.id]) {
+                  dd[that.id] = { url, bg: url_bg }
+                } else {
+                  dd[that.id] = { ...dd[that.id], url }
+                }
+
+                //  材质贴图
+                let thumbUrl = material_img.getAttribute('src')
+                if (thumbUrl) {
+                  let tb = await base64ToBlobFromURL(thumbUrl)
+                  let tUrl = await uploadImage(tb, '.png')
+                  // console.log('材质贴图', tUrl, thumbUrl)
+                  dd[that.id].material = tUrl
+                }
 
                 setLocalDataOfWin(key, dd)
               }
@@ -370,11 +377,11 @@ app.registerExtension({
 
               modelViewerVariants.addEventListener('camera-change', startTimer)
 
-              select.addEventListener('input', event => {
+              select.addEventListener('input', async event => {
                 modelViewerVariants.variantName =
                   event.target.value === 'default' ? null : event.target.value
                 // 材质
-                extractMaterial(
+                await extractMaterial(
                   modelViewerVariants,
                   selectMaterial,
                   material_img

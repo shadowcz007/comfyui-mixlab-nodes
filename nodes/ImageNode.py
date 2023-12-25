@@ -1060,16 +1060,22 @@ class Image3D:
 
     def run(self,upload,material=None):
         # print('material',material)
-        # print(upload['image'])
+        # print(upload )
         image = base64_to_image(upload['image'])
-        mat=base64_to_image(upload['material'])
+
+        mat=None
+        if 'material' in upload and upload['material']:
+            mat=base64_to_image(upload['material'])
+            mat=mat.convert('RGB')
+            mat=pil2tensor(mat)
+
         mask = image.split()[3]
         image=image.convert('RGB')
-        mat=mat.convert('RGB')
+        
         mask=mask.convert('L')
 
         bg_image=None
-        if 'bg_image' in upload:
+        if 'bg_image' in upload and upload['bg_image']:
             bg_image = base64_to_image(upload['bg_image'])
             bg_image=bg_image.convert('RGB')
             bg_image=pil2tensor(bg_image)
@@ -1077,8 +1083,7 @@ class Image3D:
 
         mask=pil2tensor(mask)
         image=pil2tensor(image)
-        mat=pil2tensor(mat)
-
+        
         m=[]
         if not material is None:
             m=create_temp_file(material[0])
