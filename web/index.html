@@ -70,8 +70,8 @@
         }
 
         .card img {
-            width: 200px;
-            
+            width: 100%;
+            margin-top: 12px;
         }
 
         .run_btn {
@@ -83,6 +83,12 @@
             bottom: 72px;
             left: calc(50% - 44px);
             border-radius: 100%;
+            cursor: pointer;
+            border: 3px solid;
+        }
+        .run_btn:hover{
+            border-color: yellow;
+            color: yellow;
         }
 
         .link {
@@ -334,6 +340,8 @@
             mainDiv.className = 'app'
             leftDiv.className = 'panel'
             rightDiv.className = 'panel'
+            leftDiv.style.flex=0.4
+            rightDiv.style.flex=0.6
 
             // 创建标题
             var title = document.createElement('h1');
