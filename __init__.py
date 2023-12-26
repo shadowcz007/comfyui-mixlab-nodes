@@ -162,12 +162,29 @@ def get_workflows():
     workflows=read_workflow_json_files(workflow_path)
     return workflows
 
+def get_my_workflow_for_app():
+    # print("#####path::", current_path)
+    workflow_path=os.path.join(current_path, "workflow/my_workflow_app.json")
+    print('workflow_path: ',workflow_path)
+    json_data={}
+    try:
+        with open(workflow_path) as json_file:
+            json_data = json.load(json_file)
+    except:
+        print('-')
+    return json_data
+
 def save_workflow_json(data):
     workflow_path=os.path.join(current_path, "workflow/my_workflow.json")
     with open(workflow_path, 'w') as file:
         json.dump(data, file)
     return workflow_path
 
+def save_workflow_for_app(data):
+    workflow_path=os.path.join(current_path, "workflow/my_workflow_app.json")
+    with open(workflow_path, 'w') as file:
+        json.dump(data, file)
+    return workflow_path
 
 def get_nodes_map():
     # print("#####path::", current_path)
@@ -253,6 +270,18 @@ async def mixlab_hander(request):
             print(e)
     return web.json_response(data)
 
+
+@routes.get('/mixlab/app')
+async def mixlab_app_handler(request):
+    html_file = os.path.join(current_path, "web/index.html")
+    if os.path.exists(html_file):
+        with open(html_file, 'r') as f:
+            html_data = f.read()
+            return web.Response(text=html_data, content_type='text/html')
+    else:
+        return web.Response(text="HTML file not found", status=404)
+    
+
 @routes.post('/mixlab/workflow')
 async def mixlab_workflow_hander(request):
     data = await request.json()
@@ -264,6 +293,17 @@ async def mixlab_workflow_hander(request):
                 result={
                     'status':'success',
                     'file_path':file_path
+                }
+            elif data['task']=='save_app':
+                file_path=save_workflow_for_app(data['data'])
+                result={
+                    'status':'success',
+                    'file_path':file_path
+                }
+            elif data['task']=='my_app':
+                result={
+                    'data':get_my_workflow_for_app(),
+                    'status':'success',
                 }
             elif data['task']=='list':
                 result={
@@ -289,6 +329,7 @@ async def nodes_map_hander(request):
 
     return web.json_response(result)
 
+# 把插件自定义的路由添加到comfyui server里
 def new_add_routes(self):
         import nodes
         self.app.add_routes(routes)

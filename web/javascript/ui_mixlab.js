@@ -211,6 +211,53 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
+async function drawImageToCanvas (imageUrl) {
+  var canvas = document.createElement('canvas')
+  var ctx = canvas.getContext('2d')
+  var img = new Image()
+
+  await new Promise((resolve, reject) => {
+    img.onload = function () {
+      var scaleFactor = 320 / img.width
+      var canvasWidth = img.width * scaleFactor
+      var canvasHeight = img.height * scaleFactor
+
+      canvas.width = canvasWidth
+      canvas.height = canvasHeight
+
+      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
+
+      resolve()
+    }
+
+    img.onerror = function () {
+      reject(new Error('Failed to load image'))
+    }
+
+    img.src = imageUrl
+  })
+
+  var base64 = canvas.toDataURL('image/jpeg')
+  // console.log(base64); // 输出Base64数据
+  return base64
+  // 可以在这里执行其他操作，比如将Base64数据保存到服务器或显示在页面上
+}
+
+async function save_app (json) {
+  let api_host = `${window.location.hostname}:${window.location.port}`
+  let api_base = ''
+  let url = `${window.location.protocol}//${api_host}${api_base}`
+
+  const res = await fetch(`${url}/mixlab/workflow`, {
+    method: 'POST',
+    body: JSON.stringify({
+      data: json,
+      task: 'save_app'
+    })
+  })
+  return await res.json()
+}
+
 app.showMissingNodesError = async function (
   missingNodeTypes,
   hasAddedNodes = true
@@ -633,7 +680,7 @@ app.registerExtension({
             }
 
             clipboardAction(() => {
-              let name = group.title+' ♾️Mixlab'
+              let name = group.title + ' ♾️Mixlab'
               let nodes = group._nodes
 
               app.canvas.copyToClipboard(nodes)
@@ -822,6 +869,27 @@ app.registerExtension({
 
           if (!document.querySelector('#mixlab_find_the_node'))
             document.body.appendChild(div)
+        }
+      })
+
+      options.push({
+        content: `Save For App ♾️Mixlab`,
+        disabled: false, // or a function determining whether to disable
+        callback: async () => {
+          let data = await app.graphToPrompt()
+
+          try {
+            let imgurl =
+              app.graph._nodes_in_order[app.graph._nodes_in_order.length - 1]
+                .imgs[0].src
+            data.icon = await drawImageToCanvas(imgurl)
+          } catch (error) {}
+
+          // let http_workflow = app.graph.serialize()
+          await save_app(data)
+          window.alert(
+            'You can now access the standalone application on a new page!'
+          )
         }
       })
       return options

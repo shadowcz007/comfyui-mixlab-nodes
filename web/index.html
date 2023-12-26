@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixlab APP</title>
+
+</head>
+
+<body>
+    <div>hello mixlab</div>
+    <div></div>
+    <script>
+        const base64Df =
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
+
+        function get_url() {
+            let api_host = `${window.location.hostname}:${window.location.port}`
+            let api_base = ''
+            let url = `${window.location.protocol}//${api_host}${api_base}`
+            return url
+        }
+
+        function queuePrompt(promptWorkflow) {
+            let url = get_url()
+            const data = JSON.stringify({ prompt: promptWorkflow });
+            fetch(`${url}/prompt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: data,
+            })
+                .then(response => {
+                    // Handle response here
+                    console.log(response)
+                })
+                .catch(error => {
+                    // Handle error here
+                });
+        }
+
+        async function get_my_app() {
+
+            let url = get_url()
+
+            const res = await fetch(`${url}/mixlab/workflow`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    task: 'my_app'
+                })
+            })
+            let result = await res.json()
+            return result.data
+        }
+
+        function createUI() {
+            // 创建标题
+            var title = document.createElement('h1');
+            title.textContent = 'My Application';
+
+            // 创建应用图标
+            var icon = document.createElement('img');
+            icon.style.width = '98px';
+            // icon.style.height = '98px';
+            icon.src = base64Df;
+
+            // 创建状态标签
+            var status = document.createElement('div');
+            status.textContent = 'Status';
+
+            // 创建输入框
+            var input1 = document.createElement('input');
+            input1.type = 'file'; // 用于上传图片
+            var input2 = document.createElement('textarea'); // 用于输入多行文本
+
+            // 创建提交按钮
+            var submitButton = document.createElement('button');
+            submitButton.textContent = '提交';
+
+            // 将所有UI元素添加到页面中
+            document.body.appendChild(title);
+            document.body.appendChild(icon);
+            document.body.appendChild(status);
+            document.body.appendChild(input1);
+            document.body.appendChild(input2);
+            document.body.appendChild(submitButton);
+
+            // 返回每个UI元素的引用和对应的更新方法
+            return {
+                title: {
+                    element: title,
+                    update: function (newTitle) {
+                        title.textContent = newTitle;
+                    }
+                },
+                icon: {
+                    element: icon,
+                    update: function (newIconPath) {
+                        icon.src= newIconPath;
+                    }
+                },
+                status: {
+                    element: status,
+                    update: function (newStatus) {
+                        status.textContent = newStatus;
+                    }
+                },
+                input1: {
+                    element: input1,
+                    update: function () {
+                        // 可以在这里添加上传图片的逻辑
+                    }
+                },
+                input2: {
+                    element: input2,
+                    update: function () {
+                        // 可以在这里添加输入多行文本的逻辑
+                    }
+                },
+                submitButton: {
+                    element: submitButton,
+                    update: function (callback) {
+                        submitButton.addEventListener('click', callback);
+                    }
+                }
+            };
+        }
+
+
+
+
+        async function init_app() {
+            const appData = await get_my_app();
+            console.log(appData)
+            window._appData=appData
+            // 使用示例：
+            var ui = createUI();
+
+            // 更新标题
+            ui.title.update('New Title');
+
+            // 更新应用图标
+            ui.icon.update(appData.icon ? appData.icon : base64Df);
+
+            // 更新状态标签
+            ui.status.update(appData ? 'READY' : '-');
+
+            // 添加提交按钮点击事件
+            ui.submitButton.update(function () {
+                // 在提交按钮点击时执行的逻辑
+            });
+
+            // queuePrompt(appData.output)
+            // try {
+            //     let workflow = wfs.filter(w => w.filename == "my_workflow.json")[0].data;
+
+            // } catch (error) {
+
+            // }
+
+
+
+        }
+
+        init_app()
+    </script>
+</body>
+
+</html>
