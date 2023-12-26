@@ -211,53 +211,6 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
-async function drawImageToCanvas (imageUrl) {
-  var canvas = document.createElement('canvas')
-  var ctx = canvas.getContext('2d')
-  var img = new Image()
-
-  await new Promise((resolve, reject) => {
-    img.onload = function () {
-      var scaleFactor = 320 / img.width
-      var canvasWidth = img.width * scaleFactor
-      var canvasHeight = img.height * scaleFactor
-
-      canvas.width = canvasWidth
-      canvas.height = canvasHeight
-
-      ctx.drawImage(img, 0, 0, canvasWidth, canvasHeight)
-
-      resolve()
-    }
-
-    img.onerror = function () {
-      reject(new Error('Failed to load image'))
-    }
-
-    img.src = imageUrl
-  })
-
-  var base64 = canvas.toDataURL('image/jpeg')
-  // console.log(base64); // 输出Base64数据
-  return base64
-  // 可以在这里执行其他操作，比如将Base64数据保存到服务器或显示在页面上
-}
-
-async function save_app (json) {
-  let api_host = `${window.location.hostname}:${window.location.port}`
-  let api_base = ''
-  let url = `${window.location.protocol}//${api_host}${api_base}`
-
-  const res = await fetch(`${url}/mixlab/workflow`, {
-    method: 'POST',
-    body: JSON.stringify({
-      data: json,
-      task: 'save_app'
-    })
-  })
-  return await res.json()
-}
-
 app.showMissingNodesError = async function (
   missingNodeTypes,
   hasAddedNodes = true
@@ -800,6 +753,42 @@ app.registerExtension({
           const updateNodes = (ns, nd) => {
             for (let nodeId in ns) {
               let n = ns[nodeId].class_type
+              if (nodesMap[n]) {
+                const { url, title } = nodesMap[n]
+                let d = document.createElement('button')
+                d.style = `text-align: left;margin:6px;color: var(--input-text);
+                  background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                d.addEventListener('click', () => {
+                  const node = app.graph.getNodeById(nodeId)
+                  if (!node) return
+                  app.canvas.centerOnNode(node)
+                  app.canvas.setZoom(1)
+                })
+                d.addEventListener('mouseover', async () => {
+                  // console.log('mouseover')
+                  let n = (await app.graphToPrompt()).output
+                  if (!deepEqual(n, ns)) {
+                    nd.innerHTML = ''
+                    updateNodes(n, nd)
+                  }
+                })
+
+                d.innerHTML = `
+                  <span>${'#' + nodeId} ${n}</span>
+                  <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
+                  `
+                d.title = title
+
+                nd.appendChild(d)
+              }
+            }
+          }
+
+          let nodesDivv = document.createElement('div')
+
+          for (let nodeId in nodes) {
+            let n = nodes[nodeId].class_type
+            if (nodesMap[n]) {
               const { url, title } = nodesMap[n]
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
@@ -811,11 +800,11 @@ app.registerExtension({
                 app.canvas.setZoom(1)
               })
               d.addEventListener('mouseover', async () => {
-                // console.log('mouseover')
+                console.log('mouseover')
                 let n = (await app.graphToPrompt()).output
-                if (!deepEqual(n, ns)) {
-                  nd.innerHTML = ''
-                  updateNodes(n, nd)
+                if (!deepEqual(n, nodes)) {
+                  nodesDivv.innerHTML = ''
+                  updateNodes(n, nodesDivv)
                 }
               })
 
@@ -825,40 +814,8 @@ app.registerExtension({
                 `
               d.title = title
 
-              nd.appendChild(d)
+              nodesDiv.appendChild(d)
             }
-          }
-
-          let nodesDivv = document.createElement('div')
-
-          for (let nodeId in nodes) {
-            let n = nodes[nodeId].class_type
-            const { url, title } = nodesMap[n]
-            let d = document.createElement('button')
-            d.style = `text-align: left;margin:6px;color: var(--input-text);
-              background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-            d.addEventListener('click', () => {
-              const node = app.graph.getNodeById(nodeId)
-              if (!node) return
-              app.canvas.centerOnNode(node)
-              app.canvas.setZoom(1)
-            })
-            d.addEventListener('mouseover', async () => {
-              console.log('mouseover')
-              let n = (await app.graphToPrompt()).output
-              if (!deepEqual(n, nodes)) {
-                nodesDivv.innerHTML = ''
-                updateNodes(n, nodesDivv)
-              }
-            })
-
-            d.innerHTML = `
-              <span>${'#' + nodeId} ${n}</span>
-              <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
-              `
-            d.title = title
-
-            nodesDiv.appendChild(d)
           }
 
           nodesDivv.appendChild(nodesDiv)
@@ -872,26 +829,13 @@ app.registerExtension({
         }
       })
 
-      options.push({
-        content: `Save For App ♾️Mixlab`,
-        disabled: false, // or a function determining whether to disable
-        callback: async () => {
-          let data = await app.graphToPrompt()
+      // options.push({
+      //   content: `Save For App ♾️Mixlab`,
+      //   disabled: false, // or a function determining whether to disable
+      //   callback: async () => {
 
-          try {
-            let imgurl =
-              app.graph._nodes_in_order[app.graph._nodes_in_order.length - 1]
-                .imgs[0].src
-            data.icon = await drawImageToCanvas(imgurl)
-          } catch (error) {}
-
-          // let http_workflow = app.graph.serialize()
-          await save_app(data)
-          window.alert(
-            'You can now access the standalone application on a new page!'
-          )
-        }
-      })
+      //   }
+      // })
       return options
     }
   }

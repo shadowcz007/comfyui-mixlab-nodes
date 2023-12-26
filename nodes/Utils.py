@@ -1,8 +1,40 @@
 import os
 import re,random
+from PIL import Image
+import numpy as np
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
-
+import folder_paths
 import matplotlib.font_manager as fm
+
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
+
+def create_temp_file(image):
+    output_dir = folder_paths.get_temp_directory()
+
+    (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('tmp', output_dir)
+
+    
+    image=tensor2pil(image)
+ 
+    image_file = f"{filename}_{counter:05}.png"
+     
+    image_path=os.path.join(full_output_folder, image_file)
+
+    image.save(image_path,compress_level=4)
+
+    return [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type": "temp"
+                }]
 
 def get_font_files(directory):
     font_files = {}
@@ -141,7 +173,7 @@ class DynamicDelayProcessor:
 
     @classmethod
     def INPUT_TYPES(cls):
-        print("print INPUT_TYPES",cls)
+        # print("print INPUT_TYPES",cls)
         return {
             "required":{
                     "delay_seconds":("INT",{
@@ -210,3 +242,50 @@ class DynamicDelayProcessor:
         # 根据 replace_output 决定输出值
         return (max(0, replace_value),) if replace_output == "enable" else (any_input,)
         
+
+
+
+# app 配置节点
+class AppInfo:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "name": ("STRING",{"multiline": False,"default": "Mixlab-App"}),
+                    "image": ("IMAGE",),
+                    "input_ids":("STRING",{"multiline": True,"default": "\n".join(["1","2","3"])}),
+                    "output_ids":("STRING",{"multiline": True,"default": "\n".join(["5","9"])}),
+                             },
+
+                "optional":{
+                    "description":("STRING",{"multiline": True,"default": ""}),
+                    "version":("INT", {
+                        "default": 1, 
+                        "min": 1, 
+                        "max": 10000, 
+                        "step": 1, 
+                        "display": "number"  
+                    }),
+                }
+
+                }
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,name,image,input_ids,output_ids,description,version):
+
+        im=create_temp_file(image)
+        
+        return {"ui": {"json": [name,im,input_ids,output_ids,description,version]}, "result": (image,)}
+    
+
+    
+
+

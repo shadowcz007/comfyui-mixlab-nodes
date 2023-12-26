@@ -365,12 +365,14 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import ColorInput,FontInput,TextToNumber,DynamicDelayProcessor
+from .nodes.Utils import AppInfo,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor
 
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
 NODE_CLASS_MAPPINGS = {
+    "AppInfo":AppInfo,
+   
     "RandomPrompt":RandomPrompt,
     "NoiseImage":NoiseImage,
     "TransparentImage":TransparentImage,
@@ -409,7 +411,8 @@ NODE_CLASS_MAPPINGS = {
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "ResizeImageMixlab":"ResizeImage",
+    "AppInfo":"AppInfo ♾️Mixlab",
+    "ResizeImageMixlab":"ResizeImage ♾️Mixlab",
     "RandomPrompt": "Random Prompt ♾️Mixlab",
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
