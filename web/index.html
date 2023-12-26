@@ -46,6 +46,7 @@
 
         .panel img {
             width: 100%;
+            height: fit-content;
         }
 
         .input_card {
@@ -70,6 +71,7 @@
 
         .card img {
             width: 200px;
+            
         }
 
         .run_btn {
@@ -248,6 +250,7 @@
                     // Create an input field for the image name
                     const nameInput = document.createElement("input");
                     nameInput.type = "file";
+                    nameInput.style=`width: 88px;`
                     uploadContainer.appendChild(nameInput);
 
                     // Create an image element to display the uploaded image
@@ -344,7 +347,7 @@
             icon.src = base64Df;
 
             var des = document.createElement('p');
-            des.style = `margin-left: 12px;`
+            des.style = `margin-left: 12px; font-size: 14px;`
             iconDes.appendChild(icon)
             iconDes.appendChild(des);
             iconDes.className = 'description'
@@ -415,7 +418,7 @@
                     element: output,
                     update: function (url, id) {
                         console.log(url, id)
-                        output.querySelector(`#output_${id}`).src = url
+                        if(output.querySelector(`#output_${id}`))  output.querySelector(`#output_${id}`).src = url
 
                     }
                 },
