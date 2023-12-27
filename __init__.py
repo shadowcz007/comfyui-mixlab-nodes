@@ -275,7 +275,7 @@ async def mixlab_hander(request):
 async def mixlab_app_handler(request):
     html_file = os.path.join(current_path, "web/index.html")
     if os.path.exists(html_file):
-        with open(html_file, 'r') as f:
+        with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
             html_data = f.read()
             return web.Response(text=html_data, content_type='text/html')
     else:
