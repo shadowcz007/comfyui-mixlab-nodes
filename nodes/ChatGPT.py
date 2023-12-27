@@ -83,7 +83,7 @@ class ChatGPTNode:
                                        }),
                 "model": (["gpt-3.5-turbo","gpt-35-turbo","gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
                           {"default": "gpt-3.5-turbo"}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 10000, "step": 1}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
                 "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
             },
              "hidden": {

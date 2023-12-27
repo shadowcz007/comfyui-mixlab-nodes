@@ -254,7 +254,7 @@ class TextInput:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-                    "text": ("STRING",{"multiline": True,"default": "1"}),
+                    "text": ("STRING",{"multiline": True,"default": ""}),
                              },
                 }
     

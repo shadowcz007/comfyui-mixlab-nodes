@@ -11,9 +11,10 @@ Example:
 APP-JSON:
 - [text-to-image](./app/text-to-image_1_Wed%20Dec%2027%202023.json)
 - [image-to-image](./app/image-to-image_1_Wed%20Dec%2027%202023.json)
+- text-to-text
 
 > 暂时支持4种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider
-> 输出节点：Preview Image、Load Image
+> 输出节点：PreviewImage 、SaveImage、ShowTextForGPT
 
 
 ### 3D

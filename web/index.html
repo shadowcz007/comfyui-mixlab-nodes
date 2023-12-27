@@ -60,6 +60,7 @@
         }
 
         .output_card {
+            width: 100%;
             box-shadow: 0px 0px 8px 3px #e6e7e7;
         }
 
@@ -124,6 +125,15 @@
         .upload_btn:hover {
             outline: 4px solid yellow;
             color: yellow;
+        }
+
+        .show_text {
+            font-size: 14px;
+            /* display: inline-block; */
+            /* margin: 13px; */
+            padding: 32px;
+            background: #242424;
+            color: white;
         }
 
         .link {
@@ -247,10 +257,21 @@
             container.className = 'output_card'
 
             for (const node of outputData) {
-                let img = new Image();
-                img.id = `output_${node.id}`;
-                img.src = base64Df;
-                container.appendChild(img);
+                console.log('output', node)
+                if (node.class_type == "ShowTextForGPT") {
+                    let div = document.createElement('div');
+                    div.className = "show_text"
+                    div.id = `output_${node.id}`;
+                    div.innerText = node.inputs.text[0]
+                    container.appendChild(div);
+                };
+                if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
+                    let img = new Image();
+                    img.id = `output_${node.id}`;
+                    img.src = base64Df;
+                    container.appendChild(img);
+                }
+
             }
             return container
         }
@@ -297,7 +318,7 @@
                     // Create an image element to display the uploaded image
                     const imageElement = document.createElement("img");
                     imageElement.src = base64Df
-                    imageElement.style.maxWidth='200px'
+                    imageElement.style.maxWidth = '200px'
 
                     nameInput.addEventListener('change', (event) => {
 
@@ -341,7 +362,7 @@
                 }
 
                 // Check if the class_type is "CLIPTextEncode"
-                if (["TextInput_","CLIPTextEncode"].includes(data.class_type)) {
+                if (["TextInput_", "CLIPTextEncode"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
@@ -381,8 +402,8 @@
             slider.type = "range";
             slider.min = minValue;
             slider.max = maxValue;
-            slider.step=0.01
-            slider.value=value;
+            slider.step = 0.01
+            slider.value = value;
 
             // 创建标签元素
             var label = document.createElement("label");
@@ -392,7 +413,7 @@
             var container = document.createElement("div");
             container.appendChild(label);
             container.appendChild(slider);
-            container.className='card'
+            container.className = 'card'
 
             // 添加change事件监听器
             slider.addEventListener("change", function (event) {
@@ -434,9 +455,9 @@
             rightDiv.className = 'panel'
             leftDiv.style.flex = 0.4
             rightDiv.style.flex = 0.6
-    //         rightDiv.style=`position: fixed;
-    // right: 0;
-    // top: 12px;flex:0.6`
+            //         rightDiv.style=`position: fixed;
+            // right: 0;
+            // top: 12px;flex:0.6`
 
             // 创建标题
             var title = document.createElement('h1');
@@ -519,9 +540,11 @@
                 },
                 output: {
                     element: output,
-                    update: function (url, id) {
-                        console.log(url, id)
-                        if (output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).src = url
+                    update: function (type = "image", val, id) {
+                        console.log(val, id)
+                        if (type == "image" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).src = val;
+
+                        if (type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
 
                     }
                 },
@@ -617,7 +640,7 @@
 
             const show = (src, id) => {
                 // console.log(src)
-                ui.output.update(src, id)
+                ui.output.update("image", src, id)
             };
 
             api.addEventListener("status", ({ detail }) => {
@@ -643,11 +666,18 @@
                 console.log("executed", detail)
                 // if (!enabled) return;
                 const images = detail?.output?.images;
-                if (!images) return;
+                if (images) {
+                    // if (!images) return; 
+                    const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type
+                        }&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
+                    show(src, detail.node);
+                };
 
-                const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type
-                    }&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
-                show(src, detail.node);
+                const text = detail?.output?.text;
+                if (text && text[0]) {
+                    ui.output.update("text", text[0], detail.node)
+                }
+
 
                 try {
                     ui.status.update(`executed_#${detail.node}`);
@@ -675,7 +705,6 @@
             const type = getTypeFromUrl(location.href);
             if (type === 'new') {
                 createUploadJson();
-
             } else {
                 appData = await get_my_app();
                 // console.log(appData)
