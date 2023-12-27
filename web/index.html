@@ -8,6 +8,9 @@
     <style>
         .app {
             display: flex;
+            width: 90%;
+            min-width: 400px;
+            margin-left: 5%;
         }
 
 
@@ -36,6 +39,8 @@
             background: #eee;
             margin: 24px;
             flex: 1;
+            align-items: center;
+            justify-content: center;
         }
 
         .panel h1 {
@@ -51,8 +56,12 @@
 
         .input_card {
             display: flex;
+            flex-direction: column;
         }
 
+        .output_card {
+            box-shadow: 0px 0px 8px 3px #e6e7e7;
+        }
 
         .card {
             background-color: #eee;
@@ -66,7 +75,7 @@
             width: 100%;
             height: 200px;
             /* min-width: 300px; */
-            margin: 12px;
+            margin-top: 12px;
         }
 
         .card img {
@@ -86,8 +95,34 @@
             cursor: pointer;
             border: 3px solid;
         }
-        .run_btn:hover{
+
+        .run_btn:hover {
             border-color: yellow;
+            color: yellow;
+        }
+
+        .disabled {
+            background-color: #eee !important;
+            color: #4a4a4a !important;
+        }
+
+        .upload_btn {
+            width: 188px;
+            cursor: pointer;
+            height: 188px;
+            background: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 14px;
+            margin-left: calc(50% - 94px);
+            margin-top: calc(30vh - 94px);
+        }
+
+        .upload_btn:hover {
+            outline: 4px solid yellow;
             color: yellow;
         }
 
@@ -107,13 +142,13 @@
     padding: 24px;
     color: #4a4a4a;">Explore your creative potential with <a class="link"
             href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
-    <br>
+        <br>
         <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
     </div>
     <div></div>
     <script type="module">
         import { api } from "../../../scripts/api.js";
-        console.log('api', api)
+        // console.log('api', api)
         const base64Df =
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
@@ -256,12 +291,13 @@
                     // Create an input field for the image name
                     const nameInput = document.createElement("input");
                     nameInput.type = "file";
-                    nameInput.style=`width: 88px;`
+                    nameInput.style = `width: 88px;`
                     uploadContainer.appendChild(nameInput);
 
                     // Create an image element to display the uploaded image
                     const imageElement = document.createElement("img");
                     imageElement.src = base64Df
+                    imageElement.style.maxWidth='200px'
 
                     nameInput.addEventListener('change', (event) => {
 
@@ -296,6 +332,14 @@
                     container.appendChild(uploadContainer);
                 }
 
+                if (data.class_type === 'FloatSlider') {
+                    // 滑块输入
+                    let silde = createFloatSlide(data.title, data.inputs.number, (v) => {
+                        window._appData.data[data.id].inputs.number = v;
+                    })
+                    container.appendChild(silde);
+                }
+
                 // Check if the class_type is "CLIPTextEncode"
                 if (data.class_type === "CLIPTextEncode") {
                     // Create a container for the upload control
@@ -322,12 +366,59 @@
                     // Append the upload container to the main container
                     container.appendChild(uploadContainer);
                 }
+
+
+
+
             });
             return container
         }
 
+        function createFloatSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1) {
+
+            // 创建滑块输入元素
+            var slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = minValue;
+            slider.max = maxValue;
+            slider.step=0.01
+            slider.value=value;
+
+            // 创建标签元素
+            var label = document.createElement("label");
+            label.innerHTML = labelText;
+
+            // 创建容器元素，并将滑块输入和标签添加到容器中
+            var container = document.createElement("div");
+            container.appendChild(label);
+            container.appendChild(slider);
+            container.className='card'
+
+            // 添加change事件监听器
+            slider.addEventListener("change", function (event) {
+                var value = event.target.value;
+                console.log("滑块输入的值为：" + value);
+                // 在这里可以执行其他操作，根据需要进行相应的处理
+                callback && callback(value)
+            });
+
+            // 返回容器元素
+            return container;
+
+        }
 
 
+        function getTypeFromUrl(url) {
+            const queryString = url.split('?')[1];
+            if (!queryString) {
+                return null;
+            }
+
+            const params = new URLSearchParams(queryString);
+            const type = params.get('type');
+
+            return type;
+        }
 
 
 
@@ -339,9 +430,13 @@
 
             mainDiv.className = 'app'
             leftDiv.className = 'panel'
+            leftDiv.style.alignItems = 'flex-start';
             rightDiv.className = 'panel'
-            leftDiv.style.flex=0.4
-            rightDiv.style.flex=0.6
+            leftDiv.style.flex = 0.4
+            rightDiv.style.flex = 0.6
+    //         rightDiv.style=`position: fixed;
+    // right: 0;
+    // top: 12px;flex:0.6`
 
             // 创建标题
             var title = document.createElement('h1');
@@ -350,7 +445,7 @@
             let iconDes = document.createElement('div');
             // 创建应用图标
             var icon = document.createElement('img');
-            icon.style.width = '98px';
+            icon.style.width = '48px';
             // icon.style.height = '98px';
             icon.src = base64Df;
 
@@ -426,27 +521,79 @@
                     element: output,
                     update: function (url, id) {
                         console.log(url, id)
-                        if(output.querySelector(`#output_${id}`))  output.querySelector(`#output_${id}`).src = url
+                        if (output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).src = url
 
                     }
                 },
                 submitButton: {
                     element: submitButton,
                     update: function (callback) {
-                        submitButton.addEventListener('click', callback);
+                        submitButton.addEventListener('dblclick', (e) => {
+                            submitButton.classList.remove('disabled');
+                        });
+                        submitButton.addEventListener('click', (e) => {
+
+                            if (!submitButton.classList.contains('disabled')) {
+                                callback && callback();
+                                submitButton.classList.add('disabled');
+                                setTimeout(() => submitButton.classList.remove('disabled'), 500)
+                            }
+
+                        });
                     }
                 }
             };
         }
 
+        function createUploadJson() {
+
+            // 创建一个div元素
+            var div = document.createElement('div');
+            div.className = 'upload_btn'
+            div.textContent = '点击上传JSON文件';
+            div.addEventListener('click', function () {
+                document.getElementById('jsonFileInput').click();
+            });
+
+            // 创建一个input元素
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'jsonFileInput';
+            input.style.display = 'none';
+            input.addEventListener('change', function (event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var contents = e.target.result;
+                    var jsonData = JSON.parse(contents);
+                    setTimeout(() => {
+                        div.remove();
+                        input.remove();
+                    }, 500);
+
+                    let { output, app } = jsonData;
+
+                    window._appData = {
+                        ...app,
+                        data: output
+                    };
+
+                    createApp(window._appData);
+
+                    // res(jsonData);
+                };
+                reader.readAsText(file);
+            });
+
+            // 将div和input元素添加到body中
+            document.body.appendChild(div);
+            document.body.appendChild(input);
 
 
+        }
 
-        async function init_app() {
 
-            const appData = await get_my_app();
-            // console.log(appData)
-            window._appData = appData
+        async function createApp(appData) {
             // 使用示例：
             var ui = createUI(appData.input, appData.output);
 
@@ -485,7 +632,6 @@
 
             api.addEventListener("progress", ({ detail }) => {
                 console.log("progress", detail);
-
                 try {
                     ui.status.update(`${detail.value}/${detail.max}`);
                 } catch (error) {
@@ -519,6 +665,25 @@
 
             api.api_base = ""
             api.init();
+        }
+
+
+        async function init_app() {
+
+            let appData = {}
+
+            const type = getTypeFromUrl(location.href);
+            if (type === 'new') {
+                createUploadJson();
+
+            } else {
+                appData = await get_my_app();
+                // console.log(appData)
+                window._appData = appData;
+
+                createApp(appData);
+            }
+
 
         };
 

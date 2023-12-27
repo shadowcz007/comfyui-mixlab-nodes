@@ -675,7 +675,7 @@ app.registerExtension({
       const options = orig.apply(this, arguments)
 
       options.push(null, {
-        content: `Find ♾️Mixlab`,
+        content: `Nodes Map ♾️Mixlab`,
         disabled: false, // or a function determining whether to disable
         callback: async () => {
           nodesMap =
@@ -709,12 +709,13 @@ app.registerExtension({
             justify-content: space-between;
             align-items: center;
             padding: 0 12px;
-            height: 32px;`
+            height: 44px;`
           let btnB = document.createElement('button')
           let textB = document.createElement('p')
           btn.appendChild(textB)
           btn.appendChild(btnB)
-          textB.innerText = `Find The Node`
+          textB.style.fontSize='12px';
+          textB.innerText = `Locate and navigate nodes ♾️Mixlab`
 
           btnB.style = `float: right; border: none; color: var(--input-text);
             background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`

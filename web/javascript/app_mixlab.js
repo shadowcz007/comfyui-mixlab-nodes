@@ -30,7 +30,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
     display: 'flex',
     flexDirection: 'row',
     // alignItems: 'center',
-    justifyContent: 'space-around'
+    justifyContent: 'flex-start'
   }
 }
 
@@ -75,11 +75,13 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
     if (data.hasOwnProperty(id)) {
       if (inputIds.includes(id)) {
         let node = app.graph.getNodeById(id)
-        input.push({ ...data[id], title: node.title,id })
+        input[inputIds.indexOf(id)] = { ...data[id], title: node.title, id }
+        // input.push()
       }
       if (outputIds.includes(id)) {
         let node = app.graph.getNodeById(id)
-        output.push({ ...data[id], title: node.title,id })
+        // output.push()
+        output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
       }
     }
   }
@@ -87,10 +89,15 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
   return { input, output }
 }
 
-async function save_app (json) {
+function getUrl () {
   let api_host = `${window.location.hostname}:${window.location.port}`
   let api_base = ''
   let url = `${window.location.protocol}//${api_host}${api_base}`
+  return url
+}
+
+async function save_app (json) {
+  let url = getUrl()
 
   const res = await fetch(`${url}/mixlab/workflow`, {
     method: 'POST',
@@ -102,12 +109,28 @@ async function save_app (json) {
   return await res.json()
 }
 
-async function save (json) {
+function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
+  const dataString = JSON.stringify(jsonData)
+  const blob = new Blob([dataString], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = fileName
+  link.click()
+
+  // 释放URL对象
+  setTimeout(() => {
+    URL.revokeObjectURL(url)
+  }, 0)
+}
+
+async function save (json, download = false) {
   const name = json[0],
     version = json[5],
     description = json[4],
-    inputIds = json[2].split('\n'),
-    outputIds = json[3].split('\n')
+    inputIds = json[2].split('\n').filter(f => f),
+    outputIds = json[3].split('\n').filter(f => f)
 
   const iconData = json[1][0]
   let { filename, subfolder, type } = iconData
@@ -137,10 +160,26 @@ async function save (json) {
     try {
       data.app.icon = await drawImageToCanvas(iconUrl)
     } catch (error) {}
-    console.log(data.app)
+    // console.log(data.app)
     // let http_workflow = app.graph.serialize()
-    await save_app(data)
-    window.alert('You can now access the standalone application on a new page!')
+
+    if (download) {
+      await downloadJsonFile(
+        data,
+        `${data.app.name}_${data.app.version}_${new Date().toDateString()}.json`
+      )
+      let open = window.confirm(
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?type=new`
+      )
+      if (open) window.open(`${getUrl()}/mixlab/app?type=new`)
+    } else {
+      await save_app(data)
+
+      let open = window.confirm(
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app`
+      )
+      if (open) window.open(`${getUrl()}/mixlab/app`)
+    }
   } catch (error) {
     console.log('###SpeechRecognition', error)
   }
@@ -153,13 +192,13 @@ app.registerExtension({
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
-        console.log(this)
+        // console.log(this)
         const widget = {
           type: 'div',
           name: 'AppInfoRun',
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
-              this.button.style,
+              this.div.style,
               get_position_style(
                 ctx,
                 widget_width,
@@ -170,17 +209,21 @@ app.registerExtension({
           }
         }
 
-        widget.button = $el('button', {})
-        widget.button.innerText = 'Save For App ♾️Mixlab'
-        widget.button.style = `
-          flex-direction: row;
-          background-color: var(--comfy-input-bg);
-          border-radius: 8px;
-          border-color: var(--border-color);
-          border-style: solid;
-          color: var(--descrip-text);
-          `
-        widget.button.addEventListener('click', () => {
+        const style = `
+        flex-direction: row;
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;
+        color: var(--descrip-text);`
+
+        widget.div = $el('div', {})
+
+        const btn = document.createElement('button')
+        btn.innerText = 'Save For App'
+        btn.style = style
+
+        btn.addEventListener('click', () => {
           //   console.log('hahhah')
           if (window._mixlab_app_json) {
             save(window._mixlab_app_json)
@@ -190,13 +233,30 @@ app.registerExtension({
           }
         })
 
-        document.body.appendChild(widget.button)
+        const download = document.createElement('button')
+        download.innerText = 'Download For App'
+        download.style = style
+        download.style.marginLeft = '12px'
+
+        download.addEventListener('click', () => {
+          //   console.log('hahhah')
+          if (window._mixlab_app_json) {
+            save(window._mixlab_app_json, true)
+          } else {
+            alert('Please run the workflow before saving')
+            // app.queuePrompt(0, 1)
+          }
+        })
+
+        document.body.appendChild(widget.div)
+        widget.div.appendChild(btn)
+        widget.div.appendChild(download)
 
         this.addCustomWidget(widget)
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
-          widget.button.remove()
+          widget.div.remove()
           return onRemoved?.()
         }
 
@@ -207,9 +267,15 @@ app.registerExtension({
       nodeType.prototype.onExecuted = async function (message) {
         onExecuted?.apply(this, arguments)
         // console.log(this.widgets)
-        const button = this.widgets.filter(w => w.button)[0].button
+
         window._mixlab_app_json = message.json
-        button.style.outline = '1px solid red'
+        try {
+          const div = this.widgets.filter(w => w.div)[0].div
+          Array.from(
+            div.querySelectorAll('button'),
+            b => (b.style.background = 'yellow')
+          )
+        } catch (error) {}
       }
     }
   }

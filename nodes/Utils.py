@@ -6,6 +6,18 @@ import numpy as np
 import folder_paths
 import matplotlib.font_manager as fm
 
+# import json
+# import hashlib
+
+
+# def get_json_hash(json_content):
+#     json_string = json.dumps(json_content, sort_keys=True)
+#     hash_object = hashlib.sha256(json_string.encode())
+#     hash_value = hash_object.hexdigest()
+#     return hash_value
+    
+
+
 def tensor2pil(image):
     return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
 
@@ -152,6 +164,35 @@ class TextToNumber:
             result= random.randint(1, 10000000000)
         return {"ui": {"text": [text],"num":[result]}, "result": (result,)}
     
+
+   
+class FloatSlider:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "number":("FLOAT", {
+                        "default": 0, 
+                        "min": 0, #Minimum value
+                        "max": 1, #Maximum value
+                        "step": 0.01, #Slider's step
+                        "display": "slider" # Cosmetic only: display as "number" or "slider"
+                    }),
+                             },
+                }
+    
+    RETURN_TYPES = ("FLOAT",) 
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,number):
+       
+        return (number,)
+    
 # 接收一个值，然后根据字符串或数值长度计算延迟时间，用户可以自定义延迟"字/s"，延迟之后将转化
 
 import comfy.samplers
@@ -274,7 +315,7 @@ class AppInfo:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -283,6 +324,8 @@ class AppInfo:
 
         im=create_temp_file(image)
         
+        # id=get_json_hash([name,im,input_ids,output_ids,description,version])
+
         return {"ui": {"json": [name,im,input_ids,output_ids,description,version]}, "result": (image,)}
     
 
