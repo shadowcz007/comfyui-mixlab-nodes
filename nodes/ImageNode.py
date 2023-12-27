@@ -495,10 +495,10 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
     # 3. Calculate image width and height
     if layout == "vertical":
         width = (len(lines) * (font_size + spacing)) - spacing
-        height = (len(max(lines, key=len)) * (font_size + spacing)) - spacing
+        height = (len(max(lines, key=len)) * (font_size + spacing)) + spacing
     else:
         width = (len(max(lines, key=len)) * (font_size + spacing)) - spacing
-        height = (len(lines) * (font_size + spacing)) - spacing
+        height = (len(lines) * (font_size + spacing)) + spacing
 
     # 4. Draw each character on the image
     image = Image.new('RGBA', (width, height), (255, 255, 255,0))
