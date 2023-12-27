@@ -156,7 +156,7 @@ const parseSvg = async svgContent => {
   return { data, image: base64, svgElement }
 }
 
-async function setArea (cw, ch, base64, data, fn) {
+async function setArea (cw, ch, topBase64, base64, data, fn) {
   let displayHeight = Math.round(window.screen.availHeight * 0.6)
   let div = document.createElement('div')
   div.innerHTML = `
@@ -170,8 +170,13 @@ async function setArea (cw, ch, base64, data, fn) {
       outline: 2px solid #eaeaea;
       box-shadow: 8px 9px 17px #575757;' />
       <div id='ml_selection' style='position: absolute; 
-      border: 2px dashed red; 
-      pointer-events: none;'></div>
+      border: 2px dashed red;
+      pointer-events: none;
+      background-image: url("${topBase64}");
+            background-repeat: no-repeat;
+            background-size: cover;
+            '></div>
+      <div class="mx_close"> X </div>
     </div>`
   // document.body.querySelector('#ml_overlay')
   document.body.appendChild(div)
@@ -181,13 +186,25 @@ async function setArea (cw, ch, base64, data, fn) {
   // canvas.height = ch
 
   let img = div.querySelector('#ml_video')
-  let overlay = div.querySelector('#ml_overlay')
+  // let overlay = div.querySelector('#ml_overlay')
   let selection = div.querySelector('#ml_selection')
+  let close = div.querySelector('.mx_close')
   let startX, startY, endX, endY
   let start = false
+  let setDone = false
   // Set video source
   img.src = base64
   // canvas.toDataURL();
+  close.style = `cursor: pointer;
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 99999999;
+  background: black;
+  width: 44px;
+  height: 44px;
+  text-align: center;
+  line-height: 44px;`
 
   // init area
   // const data = getSetAreaData()
@@ -216,14 +233,37 @@ async function setArea (cw, ch, base64, data, fn) {
   img.addEventListener('mousedown', startSelection)
   img.addEventListener('mousemove', updateSelection)
   img.addEventListener('mouseup', endSelection)
-  overlay.addEventListener('click', remove)
 
-  function remove () {
-    overlay.removeEventListener('click', remove)
+  const removeDiv = () => {
+    div.remove()
+    close.removeEventListener('click', removeDiv)
     img.removeEventListener('mousedown', startSelection)
     img.removeEventListener('mousemove', updateSelection)
     img.removeEventListener('mouseup', endSelection)
-    div.remove()
+    img.removeEventListener('mousedown', setDoneCheck)
+  }
+  close.addEventListener('click', removeDiv)
+
+  const setDoneCheck = event => {
+    console.log(setDone)
+    if (setDone) {
+      img.addEventListener('mousedown', startSelection)
+      img.addEventListener('mousemove', updateSelection)
+      img.addEventListener('mouseup', endSelection)
+      setDone = false
+      start = false
+      startX = event.clientX
+      startY = event.clientY
+    }
+  }
+  img.addEventListener('mousedown', setDoneCheck)
+
+  function remove () {
+    img.removeEventListener('mousedown', startSelection)
+    img.removeEventListener('mousemove', updateSelection)
+    img.removeEventListener('mouseup', endSelection)
+    setDone = true
+    // div.remove()
   }
 
   function startSelection (event) {
@@ -531,12 +571,24 @@ app.registerExtension({
               }
             }
             try {
+              console.log('this.inputs', this.inputs)
+              let topLinkId = this.inputs[0].link
+              let topNodeId = app.graph.links[topLinkId].origin_id
+              let topIm = app.graph.getNodeById(topNodeId).imgs[0]
+
               let linkId = this.inputs[3].link
               let nodeId = app.graph.links[linkId].origin_id
               // console.log(linkId,this.inputs)
               let im = app.graph.getNodeById(nodeId).imgs[0]
-              let src = im.src
-              setArea(im.naturalWidth, im.naturalHeight, src, data, updateValue)
+              // let src = im.src
+              setArea(
+                im.naturalWidth,
+                im.naturalHeight,
+                topIm.src,
+                im.src,
+                data,
+                updateValue
+              )
             } catch (error) {}
           })
         }
