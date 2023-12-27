@@ -4763,6 +4763,8 @@
         [
             "3DImage",
             "AppInfo",
+            "IntNumber",
+            "FloatSlider",
             "ResizeImage",
             "NoiseImage",
             "AreaToMask",
@@ -4794,6 +4796,7 @@
             "VAEDecodeConsistencyDecoder",
             "VAELoaderConsistencyDecoder",
             "TextToNumber",
+            "TextInput_",
             "DynamicDelayProcessor"
         ],
         {

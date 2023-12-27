@@ -174,7 +174,7 @@ class FloatSlider:
                         "default": 0, 
                         "min": 0, #Minimum value
                         "max": 1, #Maximum value
-                        "step": 0.01, #Slider's step
+                        "step": 0.001, #Slider's step
                         "display": "slider" # Cosmetic only: display as "number" or "slider"
                     }),
                              },
@@ -192,6 +192,84 @@ class FloatSlider:
     def run(self,number):
        
         return (number,)
+    
+  
+class IntNumber:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "number":("INT", {
+                        "default": 0, 
+                        "min": -1, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                             },
+                }
+    
+    RETURN_TYPES = ("INT",) 
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,number):
+       
+        return (number,)
+
+class MultiplicationNode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "numberA":(any_type,),
+                    "numberB":("FLOAT", {
+                        "default": 0, 
+                        "min": -1, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 0.1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    })
+                             },
+                }
+    
+    RETURN_TYPES = ("FLOAT","INT",) 
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,False,)
+
+    def run(self,numberA,numberB):
+        b=int(numberA*numberB)
+        a=float(numberA*numberB)
+        return (a,b,) 
+
+class TextInput:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "text": ("STRING",{"multiline": True,"default": "1"}),
+                             },
+                }
+    
+    RETURN_TYPES = ("STRING",) 
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,text):
+       
+        return (text,)
     
 # 接收一个值，然后根据字符串或数值长度计算延迟时间，用户可以自定义延迟"字/s"，延迟之后将转化
 

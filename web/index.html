@@ -341,7 +341,7 @@
                 }
 
                 // Check if the class_type is "CLIPTextEncode"
-                if (data.class_type === "CLIPTextEncode") {
+                if (["TextInput_","CLIPTextEncode"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
