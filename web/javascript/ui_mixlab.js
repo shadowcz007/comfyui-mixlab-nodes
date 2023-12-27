@@ -633,7 +633,7 @@ app.registerExtension({
             }
 
             clipboardAction(() => {
-              let name = group.title+' ♾️Mixlab'
+              let name = group.title + ' ♾️Mixlab'
               let nodes = group._nodes
 
               app.canvas.copyToClipboard(nodes)
@@ -675,7 +675,7 @@ app.registerExtension({
       const options = orig.apply(this, arguments)
 
       options.push(null, {
-        content: `Find ♾️Mixlab`,
+        content: `Nodes Map ♾️Mixlab`,
         disabled: false, // or a function determining whether to disable
         callback: async () => {
           nodesMap =
@@ -709,12 +709,13 @@ app.registerExtension({
             justify-content: space-between;
             align-items: center;
             padding: 0 12px;
-            height: 32px;`
+            height: 44px;`
           let btnB = document.createElement('button')
           let textB = document.createElement('p')
           btn.appendChild(textB)
           btn.appendChild(btnB)
-          textB.innerText = `Find The Node`
+          textB.style.fontSize='12px';
+          textB.innerText = `Locate and navigate nodes ♾️Mixlab`
 
           btnB.style = `float: right; border: none; color: var(--input-text);
             background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
@@ -753,6 +754,42 @@ app.registerExtension({
           const updateNodes = (ns, nd) => {
             for (let nodeId in ns) {
               let n = ns[nodeId].class_type
+              if (nodesMap[n]) {
+                const { url, title } = nodesMap[n]
+                let d = document.createElement('button')
+                d.style = `text-align: left;margin:6px;color: var(--input-text);
+                  background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                d.addEventListener('click', () => {
+                  const node = app.graph.getNodeById(nodeId)
+                  if (!node) return
+                  app.canvas.centerOnNode(node)
+                  app.canvas.setZoom(1)
+                })
+                d.addEventListener('mouseover', async () => {
+                  // console.log('mouseover')
+                  let n = (await app.graphToPrompt()).output
+                  if (!deepEqual(n, ns)) {
+                    nd.innerHTML = ''
+                    updateNodes(n, nd)
+                  }
+                })
+
+                d.innerHTML = `
+                  <span>${'#' + nodeId} ${n}</span>
+                  <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
+                  `
+                d.title = title
+
+                nd.appendChild(d)
+              }
+            }
+          }
+
+          let nodesDivv = document.createElement('div')
+
+          for (let nodeId in nodes) {
+            let n = nodes[nodeId].class_type
+            if (nodesMap[n]) {
               const { url, title } = nodesMap[n]
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
@@ -764,11 +801,11 @@ app.registerExtension({
                 app.canvas.setZoom(1)
               })
               d.addEventListener('mouseover', async () => {
-                // console.log('mouseover')
+                console.log('mouseover')
                 let n = (await app.graphToPrompt()).output
-                if (!deepEqual(n, ns)) {
-                  nd.innerHTML = ''
-                  updateNodes(n, nd)
+                if (!deepEqual(n, nodes)) {
+                  nodesDivv.innerHTML = ''
+                  updateNodes(n, nodesDivv)
                 }
               })
 
@@ -778,40 +815,8 @@ app.registerExtension({
                 `
               d.title = title
 
-              nd.appendChild(d)
+              nodesDiv.appendChild(d)
             }
-          }
-
-          let nodesDivv = document.createElement('div')
-
-          for (let nodeId in nodes) {
-            let n = nodes[nodeId].class_type
-            const { url, title } = nodesMap[n]
-            let d = document.createElement('button')
-            d.style = `text-align: left;margin:6px;color: var(--input-text);
-              background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-            d.addEventListener('click', () => {
-              const node = app.graph.getNodeById(nodeId)
-              if (!node) return
-              app.canvas.centerOnNode(node)
-              app.canvas.setZoom(1)
-            })
-            d.addEventListener('mouseover', async () => {
-              console.log('mouseover')
-              let n = (await app.graphToPrompt()).output
-              if (!deepEqual(n, nodes)) {
-                nodesDivv.innerHTML = ''
-                updateNodes(n, nodesDivv)
-              }
-            })
-
-            d.innerHTML = `
-              <span>${'#' + nodeId} ${n}</span>
-              <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
-              `
-            d.title = title
-
-            nodesDiv.appendChild(d)
           }
 
           nodesDivv.appendChild(nodesDiv)
@@ -824,6 +829,14 @@ app.registerExtension({
             document.body.appendChild(div)
         }
       })
+
+      // options.push({
+      //   content: `Save For App ♾️Mixlab`,
+      //   disabled: false, // or a function determining whether to disable
+      //   callback: async () => {
+
+      //   }
+      // })
       return options
     }
   }

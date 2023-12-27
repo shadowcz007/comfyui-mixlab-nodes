@@ -1,20 +1,16 @@
 ## 
-v0.5.0 🚀🚗🚚🏃‍
-- Added video composition support to the MergeLayers.
-- Enhanced visual selection support for the NewLayer node.
-- Introduced the NoiseImage node and ResizeImage node.
-- Improved compatibility for TextImage with line breaks.
-- Optimized the 3DImage node to export textures for modification.
-- [Added DynamicDelayByText, enabling delayed execution based on input text length.](./workflow/audio-chatgpt-workflow.json)
+v0.6.0 🚀🚗🚚🏃‍ Workflow-to-APP
+- 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
+- Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.
 
+![](./assets/appinfo-readme.png)
+Example:
+- workflow
+![APP info](./workflow/appinfo-workflow.svg)
 
-- 为MergeLayers添加了视频合成功能。
-- NewLayer节点增加了视觉选择支持。
-- 添加了NoiseImage节点和ResizeImage节点。
-- 支持带有换行的文本图像。
-- 对3D节点进行了优化，支持导出纹理以进行修改。
-- [添加了DynamicDelayByText功能，可以根据输入文本的长度进行延迟执行。](./workflow/audio-chatgpt-workflow.json)
-
+APP-JSON:
+- [text-to-image](./app/text-to-image_1_Wed%20Dec%2027%202023.json)
+- [image-to-image](./app/image-to-image_1_Wed%20Dec%2027%202023.json)
 
 ### 3D
 ![](./assets/3dimage.png)
@@ -66,7 +62,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ## Utils
 > The Color node provides a color picker for easy color selection, the Font node offers built-in font selection for use with TextImage to generate text images, and the DynamicDelayByText node allows delayed execution based on the length of the input text.
 
+- [添加了DynamicDelayByText功能，可以根据输入文本的长度进行延迟执行。](./workflow/audio-chatgpt-workflow.json)
 
+- [Added DynamicDelayByText, enabling delayed execution based on input text length.](./workflow/audio-chatgpt-workflow.json)
 
 ## Other Nodes
 
@@ -104,7 +102,7 @@ Add edges to an image.
 ### Improvement 
 
 - Add "help" option to the context menu for each node.
-- Add "find the node" option to the global context menu.
+- Add "Nodes Map" option to the global context menu.
 
 An improvement has been made to directly redirect to GitHub to search for missing nodes when loading the graph.
 

@@ -4762,15 +4762,15 @@
     "https://github.com/shadowcz007/comfyui-mixlab-nodes": [
         [
             "3DImage",
+            "AppInfo",
+            "ResizeImage",
+            "NoiseImage",
             "AreaToMask",
-            "CLIPSeg",
             "CLIPSeg_",
             "CharacterInText",
             "ChatGPTOpenAI",
             "Color",
             "CombineMasks_",
-            "CombineSegMasks",
-            "EmptyLayer",
             "EnhanceImage",
             "FaceToMask",
             "FeatheredMask",
@@ -4792,10 +4792,12 @@
             "TextImage",
             "TransparentImage",
             "VAEDecodeConsistencyDecoder",
-            "VAELoaderConsistencyDecoder"
+            "VAELoaderConsistencyDecoder",
+            "TextToNumber",
+            "DynamicDelayProcessor"
         ],
         {
-            "title_aux": "comfyui-mixlab-nodes [WIP]"
+            "title_aux": "comfyui-mixlab-nodes"
         }
     ],
     "https://github.com/shiimizu/ComfyUI_smZNodes": [

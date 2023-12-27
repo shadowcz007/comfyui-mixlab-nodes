@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixlab APP</title>
+    <style>
+        .app {
+            display: flex;
+            width: 90%;
+            min-width: 400px;
+            margin-left: 5%;
+        }
+
+
+
+        .status {
+            background: black;
+            color: white;
+            display: flex;
+            width: fit-content;
+            padding: 4px;
+            font-size: 12px;
+            margin: 12px;
+        }
+
+        .description {
+            display: flex;
+            margin: 12px;
+            background: white;
+            padding: 8px;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+            background: #eee;
+            margin: 24px;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .panel h1 {
+            padding: 0 12px;
+            margin-top: 12px;
+            margin-bottom: 0;
+        }
+
+        .panel img {
+            width: 100%;
+            height: fit-content;
+        }
+
+        .input_card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output_card {
+            box-shadow: 0px 0px 8px 3px #e6e7e7;
+        }
+
+        .card {
+            background-color: #eee;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            font-size: 12px;
+        }
+
+        .card textarea {
+            width: 100%;
+            height: 200px;
+            /* min-width: 300px; */
+            margin-top: 12px;
+        }
+
+        .card img {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .run_btn {
+            background: black;
+            color: white;
+            width: 88px;
+            height: 88px;
+            position: fixed;
+            bottom: 72px;
+            left: calc(50% - 44px);
+            border-radius: 100%;
+            cursor: pointer;
+            border: 3px solid;
+        }
+
+        .run_btn:hover {
+            border-color: yellow;
+            color: yellow;
+        }
+
+        .disabled {
+            background-color: #eee !important;
+            color: #4a4a4a !important;
+        }
+
+        .upload_btn {
+            width: 188px;
+            cursor: pointer;
+            height: 188px;
+            background: black;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 14px;
+            margin-left: calc(50% - 94px);
+            margin-top: calc(30vh - 94px);
+        }
+
+        .upload_btn:hover {
+            outline: 4px solid yellow;
+            color: yellow;
+        }
+
+        .link {
+            text-decoration: none;
+            color: gray;
+            font-size: 12px;
+            font-weight: 300;
+        }
+    </style>
+    <!-- <script src="../../../scripts/api.js" type="module"></script> -->
+</head>
+
+<body>
+    <div style="margin: 24px;
+    background: #eee;
+    padding: 24px;
+    color: #4a4a4a;">Explore your creative potential with <a class="link"
+            href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
+        <br>
+        <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
+    </div>
+    <div></div>
+    <script type="module">
+        import { api } from "../../../scripts/api.js";
+        // console.log('api', api)
+        const base64Df =
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
+
+        function get_url() {
+            let api_host = `${window.location.hostname}:${window.location.port}`
+            let api_base = ''
+            let url = `${window.location.protocol}//${api_host}${api_base}`
+            return url
+        }
+
+        async function uploadImage(blob, fileType = '.png', filename) {
+            const body = new FormData()
+            body.append(
+                'image',
+                new File([blob], (filename || new Date().getTime()) + fileType)
+            )
+
+            const url = get_url()
+
+            const resp = await fetch(`${url}/upload/image`, {
+                method: 'POST',
+                body
+            })
+
+            // console.log(resp)
+            let data = await resp.json()
+            let { name, subfolder } = data
+            let src = `${url}/view?filename=${encodeURIComponent(
+                name
+            )}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+
+            return { url: src, name }
+
+        }
+
+
+        function randomSeed(data) {
+            for (const key in data) {
+                if (data[key].inputs.seed != undefined) {
+                    data[key].inputs.seed = Math.round(Math.random() * 1849378600828930)
+                    console.log('new Seed', data[key])
+                }
+            }
+            return data
+        }
+
+
+        function queuePrompt(promptWorkflow, client_id) {
+
+            // 随机seed
+            promptWorkflow = randomSeed(promptWorkflow);
+
+            let url = get_url()
+            const data = JSON.stringify({ prompt: promptWorkflow, client_id });
+            fetch(`${url}/prompt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: data,
+            })
+                .then(response => {
+                    // Handle response here
+                    console.log(response)
+                })
+                .catch(error => {
+                    // Handle error here
+                });
+        }
+
+        async function get_my_app() {
+
+            let url = get_url()
+
+            const res = await fetch(`${url}/mixlab/workflow`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    task: 'my_app'
+                })
+            })
+            let result = await res.json();
+
+            let { output, app } = result.data
+
+            return {
+                ...app,
+                data: output
+            }
+        }
+
+
+        function createOutputs(outputData) {
+            // Array.from( window._appData.output,n=>n.id)
+            const container = document.createElement("div");
+            container.className = 'output_card'
+
+            for (const node of outputData) {
+                let img = new Image();
+                img.id = `output_${node.id}`;
+                img.src = base64Df;
+                container.appendChild(img);
+            }
+            return container
+        }
+
+        function createInputs(inputData) {
+            // Assuming you have an HTML element with the id "container" to hold the UI
+            const container = document.createElement("div");
+            container.className = 'input_card'
+
+            // const inputData = [
+            //     {
+            //         inputs: {
+            //             image: "1703554480406.png",
+            //             upload: "image"
+            //         },
+            //         class_type: "LoadImage"
+            //     },
+            //     {
+            //         inputs: {
+            //             image: "6b7f3c570ee13ef22aad3d26dcc7414.png",
+            //             upload: "image"
+            //         },
+            //         class_type: "LoadImage"
+            //     }
+            // ];
+            inputData.forEach(data => {
+                // Check if the class_type is "LoadImage"
+                if (data.class_type === "LoadImage") {
+                    // Create a container for the upload control
+                    const uploadContainer = document.createElement("div");
+                    uploadContainer.className = 'card';
+
+                    // Create a label for the upload control
+                    const nameLabel = document.createElement("label");
+                    nameLabel.textContent = data.title || "LoadImage: ";
+                    uploadContainer.appendChild(nameLabel);
+
+                    // Create an input field for the image name
+                    const nameInput = document.createElement("input");
+                    nameInput.type = "file";
+                    nameInput.style = `width: 88px;`
+                    uploadContainer.appendChild(nameInput);
+
+                    // Create an image element to display the uploaded image
+                    const imageElement = document.createElement("img");
+                    imageElement.src = base64Df
+                    imageElement.style.maxWidth='200px'
+
+                    nameInput.addEventListener('change', (event) => {
+
+                        // 获取用户选择的文件
+                        const file = event.target.files[0];
+
+                        // 创建一个 FileReader 对象
+                        const reader = new FileReader();
+
+                        // 读取文件并在读取完成后执行回调函数
+                        reader.onloadend = async function () {
+                            // 获取读取的文件内容，即 Blob 对象
+                            const fileBlob = new Blob([reader.result], { type: file.type });
+                            let { url, name } = await uploadImage(fileBlob)
+                            // 在这里可以对 Blob 对象进行进一步处理
+                            imageElement.src = url;
+                            window._appData.data[data.id].inputs.image = name;
+
+                            console.log("上传的文件：", url, data.id, name);
+                        };
+
+                        // 开始读取文件
+                        reader.readAsArrayBuffer(file);
+
+
+                    })
+
+                    // imageElement.src = `${get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
+                    uploadContainer.appendChild(imageElement);
+
+                    // Append the upload container to the main container
+                    container.appendChild(uploadContainer);
+                }
+
+                if (data.class_type === 'FloatSlider') {
+                    // 滑块输入
+                    let silde = createFloatSlide(data.title, data.inputs.number, (v) => {
+                        window._appData.data[data.id].inputs.number = v;
+                    })
+                    container.appendChild(silde);
+                }
+
+                // Check if the class_type is "CLIPTextEncode"
+                if (data.class_type === "CLIPTextEncode") {
+                    // Create a container for the upload control
+                    const uploadContainer = document.createElement("div");
+                    uploadContainer.className = 'card';
+
+                    // Create a label for the upload control
+                    const nameLabel = document.createElement("label");
+                    nameLabel.textContent = data.title || "CLIPTextEncode: ";
+                    uploadContainer.appendChild(nameLabel);
+
+                    // Create an input field for the image name
+                    const nameInput = document.createElement("textarea");
+                    // nameInput.type = "text";
+                    nameInput.value = data.inputs.text;
+                    uploadContainer.appendChild(nameInput);
+
+
+                    nameInput.addEventListener('input', (event) => {
+                        console.log(nameInput.value)
+                        window._appData.data[data.id].inputs.text = nameInput.value;
+                    })
+
+                    // Append the upload container to the main container
+                    container.appendChild(uploadContainer);
+                }
+
+
+
+
+            });
+            return container
+        }
+
+        function createFloatSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1) {
+
+            // 创建滑块输入元素
+            var slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = minValue;
+            slider.max = maxValue;
+            slider.step=0.01
+            slider.value=value;
+
+            // 创建标签元素
+            var label = document.createElement("label");
+            label.innerHTML = labelText;
+
+            // 创建容器元素，并将滑块输入和标签添加到容器中
+            var container = document.createElement("div");
+            container.appendChild(label);
+            container.appendChild(slider);
+            container.className='card'
+
+            // 添加change事件监听器
+            slider.addEventListener("change", function (event) {
+                var value = event.target.value;
+                console.log("滑块输入的值为：" + value);
+                // 在这里可以执行其他操作，根据需要进行相应的处理
+                callback && callback(value)
+            });
+
+            // 返回容器元素
+            return container;
+
+        }
+
+
+        function getTypeFromUrl(url) {
+            const queryString = url.split('?')[1];
+            if (!queryString) {
+                return null;
+            }
+
+            const params = new URLSearchParams(queryString);
+            const type = params.get('type');
+
+            return type;
+        }
+
+
+
+        function createUI(inputData, outputData) {
+
+            let mainDiv = document.createElement('div');
+            let leftDiv = document.createElement('div');
+            let rightDiv = document.createElement('div');
+
+            mainDiv.className = 'app'
+            leftDiv.className = 'panel'
+            leftDiv.style.alignItems = 'flex-start';
+            rightDiv.className = 'panel'
+            leftDiv.style.flex = 0.4
+            rightDiv.style.flex = 0.6
+    //         rightDiv.style=`position: fixed;
+    // right: 0;
+    // top: 12px;flex:0.6`
+
+            // 创建标题
+            var title = document.createElement('h1');
+            title.textContent = 'My Application';
+
+            let iconDes = document.createElement('div');
+            // 创建应用图标
+            var icon = document.createElement('img');
+            icon.style.width = '48px';
+            // icon.style.height = '98px';
+            icon.src = base64Df;
+
+            var des = document.createElement('p');
+            des.style = `margin-left: 12px; font-size: 14px;`
+            iconDes.appendChild(icon)
+            iconDes.appendChild(des);
+            iconDes.className = 'description'
+
+            // 创建状态标签
+            var status = document.createElement('div');
+            status.textContent = 'Status';
+            status.className = 'status';
+
+            // 创建输入框
+            var input1 = createInputs(inputData)
+
+            var output = createOutputs(outputData)
+
+            // 创建提交按钮
+            var submitButton = document.createElement('button');
+            submitButton.textContent = 'Create';
+            submitButton.className = 'run_btn'
+
+            // 将所有UI元素添加到页面中
+            leftDiv.appendChild(title);
+            leftDiv.appendChild(iconDes);
+            // leftDiv.appendChild(des);
+            leftDiv.appendChild(status);
+            leftDiv.appendChild(input1);
+            leftDiv.appendChild(submitButton);
+
+            rightDiv.appendChild(output);
+
+            mainDiv.appendChild(leftDiv);
+            mainDiv.appendChild(rightDiv);
+
+            document.body.appendChild(mainDiv)
+
+            // 返回每个UI元素的引用和对应的更新方法
+            return {
+                title: {
+                    element: title,
+                    update: function (newTitle) {
+                        title.textContent = newTitle;
+                    }
+                },
+                icon: {
+                    element: icon,
+                    update: function (newIconPath) {
+                        icon.src = newIconPath;
+                    }
+                },
+                des: {
+                    element: des,
+                    update: function (text) {
+                        des.textContent = text;
+                    }
+                },
+                status: {
+                    element: status,
+                    update: function (newStatus) {
+                        status.textContent = newStatus;
+                    }
+                },
+                input1: {
+                    element: input1,
+                    update: function () {
+                        // 可以在这里添加上传图片的逻辑
+                    }
+                },
+                output: {
+                    element: output,
+                    update: function (url, id) {
+                        console.log(url, id)
+                        if (output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).src = url
+
+                    }
+                },
+                submitButton: {
+                    element: submitButton,
+                    update: function (callback) {
+                        submitButton.addEventListener('dblclick', (e) => {
+                            submitButton.classList.remove('disabled');
+                        });
+                        submitButton.addEventListener('click', (e) => {
+
+                            if (!submitButton.classList.contains('disabled')) {
+                                callback && callback();
+                                submitButton.classList.add('disabled');
+                                setTimeout(() => submitButton.classList.remove('disabled'), 500)
+                            }
+
+                        });
+                    }
+                }
+            };
+        }
+
+        function createUploadJson() {
+
+            // 创建一个div元素
+            var div = document.createElement('div');
+            div.className = 'upload_btn'
+            div.textContent = '点击上传JSON文件';
+            div.addEventListener('click', function () {
+                document.getElementById('jsonFileInput').click();
+            });
+
+            // 创建一个input元素
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'jsonFileInput';
+            input.style.display = 'none';
+            input.addEventListener('change', function (event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var contents = e.target.result;
+                    var jsonData = JSON.parse(contents);
+                    setTimeout(() => {
+                        div.remove();
+                        input.remove();
+                    }, 500);
+
+                    let { output, app } = jsonData;
+
+                    window._appData = {
+                        ...app,
+                        data: output
+                    };
+
+                    createApp(window._appData);
+
+                    // res(jsonData);
+                };
+                reader.readAsText(file);
+            });
+
+            // 将div和input元素添加到body中
+            document.body.appendChild(div);
+            document.body.appendChild(input);
+
+
+        }
+
+
+        async function createApp(appData) {
+            // 使用示例：
+            var ui = createUI(appData.input, appData.output);
+
+            // 更新标题
+            ui.title.update(appData.name || 'Mixlab APP');
+
+            // 更新应用图标
+            ui.icon.update(appData.icon || base64Df);
+
+            ui.des.update(appData.description || '-');
+
+            // 更新状态标签
+            ui.status.update(appData ? 'READY' : '-');
+
+            // 添加提交按钮点击事件
+            ui.submitButton.update(function () {
+                // 在提交按钮点击时执行的逻辑
+                queuePrompt(window._appData.data, api.clientId)
+            });
+
+
+            const show = (src, id) => {
+                // console.log(src)
+                ui.output.update(src, id)
+            };
+
+            api.addEventListener("status", ({ detail }) => {
+                console.log("status", detail);
+                try {
+                    ui.status.update(`queue#${detail.exec_info.queue_remaining}`);
+                } catch (error) {
+
+                }
+
+            });
+
+            api.addEventListener("progress", ({ detail }) => {
+                console.log("progress", detail);
+                try {
+                    ui.status.update(`${detail.value}/${detail.max}`);
+                } catch (error) {
+
+                }
+            });
+
+            api.addEventListener("executed", ({ detail }) => {
+                console.log("executed", detail)
+                // if (!enabled) return;
+                const images = detail?.output?.images;
+                if (!images) return;
+
+                const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type
+                    }&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
+                show(src, detail.node);
+
+                try {
+                    ui.status.update(`executed_#${detail.node}`);
+                } catch (error) {
+
+                }
+
+            });
+
+            api.addEventListener("b_preview", ({ detail }) => {
+                // if (!enabled) return;
+                console.log("b_preview", detail)
+                show(URL.createObjectURL(detail));
+            });
+
+            api.api_base = ""
+            api.init();
+        }
+
+
+        async function init_app() {
+
+            let appData = {}
+
+            const type = getTypeFromUrl(location.href);
+            if (type === 'new') {
+                createUploadJson();
+
+            } else {
+                appData = await get_my_app();
+                // console.log(appData)
+                window._appData = appData;
+
+                createApp(appData);
+            }
+
+
+        };
+
+        init_app()
+    </script>
+</body>
+
+</html>
