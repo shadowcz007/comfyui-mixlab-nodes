@@ -12,6 +12,9 @@ APP-JSON:
 - [text-to-image](./app/text-to-image_1_Wed%20Dec%2027%202023.json)
 - [image-to-image](./app/image-to-image_1_Wed%20Dec%2027%202023.json)
 
+> 暂时支持3种节点作为界面上的输入控件：Load Image、CLIPTextEncode、FloatSlider
+
+
 ### 3D
 ![](./assets/3dimage.png)
 [workflow](./workflow/3D-workflow.json)
