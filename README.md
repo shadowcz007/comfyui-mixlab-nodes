@@ -14,6 +14,7 @@ APP-JSON:
 - text-to-text
 
 > 暂时支持4种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider
+
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT
 
 
