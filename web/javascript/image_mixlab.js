@@ -406,7 +406,9 @@ app.registerExtension({
 
         this.serialize_widgets = true //需要保存参数
       }
-    }
+    };
+
+ 
   },
   async loadedGraphNode (node, app) {
     // Fires every time a node is constructed

@@ -1,4 +1,5 @@
 import numpy as np
+import requests
 import torch
 from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
@@ -196,6 +197,21 @@ def load_image(fp,white_bg=False):
         })
         
     return images
+
+def load_image_and_mask_from_url(url, timeout=10):
+    # Load the image from the URL
+    response = requests.get(url, timeout=timeout)
+    image = Image.open(BytesIO(response.content))
+
+    # Create a mask from the image's alpha channel
+    mask = image.convert('RGBA').split()[-1]
+
+    # Convert the mask to a black and white image
+    mask = mask.convert('L')
+
+    image=image.convert('RGB')
+
+    return image, mask
 
 
 # 获取图片s
@@ -869,7 +885,7 @@ class LoadImagesFromPath:
                 }
             }
     
-    RETURN_TYPES = ('IMAGE','MASK','STRING')
+    RETURN_TYPES = ('IMAGE','MASK','STRING',)
 
     FUNCTION = "run"
 
@@ -902,6 +918,11 @@ class LoadImagesFromPath:
 
         images=get_images_filepath(file_path,white_bg=='enable')
 
+        # 当开启了监听，则取最新的，第一个文件
+        if watcher=='enable':
+            index_variable=0
+            newest_files='enable'
+
         # 排序
         sorted_files = sorted(images, key=lambda x: os.path.getmtime(x['file_path']), reverse=(newest_files=='enable'))
 
@@ -913,9 +934,13 @@ class LoadImagesFromPath:
             masks.append(im['mask'])
         
         # print('index_variable',index_variable)
-        if index_variable!=-1:
-            imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
-            masks=[masks[index_variable]] if index_variable < len(masks) else None
+        
+        try:
+            if index_variable!=-1:
+                imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
+                masks=[masks[index_variable]] if index_variable < len(masks) else None
+        except Exception as e:
+            print("发生了一个未知的错误：", str(e))
 
         # print('#prompt::::',prompt)
         return (imgs,masks,prompt,)
@@ -983,7 +1008,7 @@ class TextImage:
                              },
                 }
     
-    RETURN_TYPES = ("IMAGE","MASK")
+    RETURN_TYPES = ("IMAGE","MASK",)
     # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
 
     FUNCTION = "run"
@@ -1003,6 +1028,52 @@ class TextImage:
         mask=pil2tensor(mask)
 
         return (img,mask,)
+
+class LoadImagesFromURL:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "url": ("STRING",{"multiline": True,"default": "https://","dynamicPrompts": False}),
+                             },
+                }
+    
+    RETURN_TYPES = ("IMAGE","MASK",)
+    RETURN_NAMES = ("images","masks",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (True,True,)
+
+    def run(self,url):
+        # print(url)
+        def filter_http_urls(urls):
+            filtered_urls = []
+            for url in urls.split('\n'):
+                if url.startswith('http'):
+                    filtered_urls.append(url)
+            return filtered_urls
+
+        filtered_urls = filter_http_urls(url)
+
+        images=[]
+        masks=[]
+
+        for u in filtered_urls:
+            try:
+                img,mask=load_image_and_mask_from_url(u)
+                img=pil2tensor(img)
+                mask=pil2tensor(mask)
+
+                images.append(img)
+                masks.append(mask)
+            except Exception as e:
+                print("发生了一个未知的错误：", str(e))
+            
+        return (images,masks,)
+
 
 
 
