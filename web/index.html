@@ -163,6 +163,8 @@
             font-size: 12px;
             font-weight: 300;
         }
+
+       
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
 </head>
@@ -313,6 +315,48 @@
             return container
         }
 
+
+        async function calculateImageHash(blob) {
+            const buffer = await blob.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        async function handleClipboardImage(imageElement, data) {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                    for (const type of clipboardItem.types) {
+
+                        if (type.startsWith('image/')) {
+                            const fileBlob = await clipboardItem.getType(type);
+                            // // 获取读取的文件内容，即 Blob 对象
+                            let hashId = await calculateImageHash(fileBlob)
+
+                            if (hashId == window._appData.data[data.id].hashId) return
+
+                            let { url, name } = await uploadImage(fileBlob);
+                            // 在这里可以对 Blob 对象进行进一步处理
+                            imageElement.src = url;
+                            window._appData.data[data.id].inputs.image = name;
+                            window._appData.data[data.id].hashId = hashId;
+
+                            console.log("上传的文件：", url, data.id, name);
+
+                            // const img = document.createElement('img');
+                            // img.src = URL.createObjectURL(blob);
+                            // document.body.appendChild(img);
+                            // console.log( URL.createObjectURL(blob));
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('无法读取剪贴板中的图片:', error);
+            }
+        }
+
         function createInputs(inputData) {
             // Assuming you have an HTML element with the id "container" to hold the UI
             const container = document.createElement("div");
@@ -346,18 +390,40 @@
                     nameLabel.textContent = data.title || "LoadImage: ";
                     uploadContainer.appendChild(nameLabel);
 
+                    let actionDiv = document.createElement('div');
+
                     // Create an input field for the image name
-                    const nameInput = document.createElement("input");
-                    nameInput.type = "file";
-                    nameInput.style = `width: 88px;`
-                    uploadContainer.appendChild(nameInput);
+                    const uploadImageInput = document.createElement("button");
+                    uploadImageInput.style = `width: 88px;`;
+                    uploadImageInput.innerText = 'upload'
+                    const uploadImageInputHide=document.createElement('input');
+                    uploadImageInputHide.type = "file"; 
+                    uploadImageInputHide.style.display="none"
+                    actionDiv.appendChild(uploadImageInput);
+                    actionDiv.appendChild(uploadImageInputHide);
+
+                    const btnFromClipboard = document.createElement("button");
+                    btnFromClipboard.style = `width: 156px;
+                    height: 24px;
+                    margin-left: 18px;`
+                    btnFromClipboard.innerText = 'paste from clipboard'
+                    actionDiv.appendChild(btnFromClipboard);
+
+                    uploadContainer.appendChild(actionDiv)
 
                     // Create an image element to display the uploaded image
                     const imageElement = document.createElement("img");
                     imageElement.src = base64Df
-                    imageElement.style.maxWidth = '200px'
+                    imageElement.style.maxWidth = '200px';
 
-                    nameInput.addEventListener('change', (event) => {
+
+                    btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
+
+                    
+                    uploadImageInput.addEventListener('click', (event) => {
+                        uploadImageInputHide.click()
+                    })
+                    uploadImageInputHide.addEventListener('change', (event) => {
 
                         // 获取用户选择的文件
                         const file = event.target.files[0];
@@ -369,10 +435,16 @@
                         reader.onloadend = async function () {
                             // 获取读取的文件内容，即 Blob 对象
                             const fileBlob = new Blob([reader.result], { type: file.type });
+
+                            let hashId = await calculateImageHash(fileBlob)
+
+                            if (hashId == window._appData.data[data.id].hashId) return
+
                             let { url, name } = await uploadImage(fileBlob)
                             // 在这里可以对 Blob 对象进行进一步处理
                             imageElement.src = url;
                             window._appData.data[data.id].inputs.image = name;
+                            window._appData.data[data.id].hashId = hashId;
 
                             console.log("上传的文件：", url, data.id, name);
                         };
@@ -410,15 +482,15 @@
                     uploadContainer.appendChild(nameLabel);
 
                     // Create an input field for the image name
-                    const nameInput = document.createElement("textarea");
-                    // nameInput.type = "text";
-                    nameInput.value = data.inputs.text;
-                    uploadContainer.appendChild(nameInput);
+                    const uploadImageInput = document.createElement("textarea");
+                    // uploadImageInput.type = "text";
+                    uploadImageInput.value = data.inputs.text;
+                    uploadContainer.appendChild(uploadImageInput);
 
 
-                    nameInput.addEventListener('input', (event) => {
-                        console.log(nameInput.value)
-                        window._appData.data[data.id].inputs.text = nameInput.value;
+                    uploadImageInput.addEventListener('input', (event) => {
+                        console.log(uploadImageInput.value)
+                        window._appData.data[data.id].inputs.text = uploadImageInput.value;
                     })
 
                     // Append the upload container to the main container
