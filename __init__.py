@@ -365,7 +365,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,MultiplicationNode
+from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
 
 
 # 要导出的所有节点及其名称的字典
@@ -409,7 +409,10 @@ NODE_CLASS_MAPPINGS = {
     "Font":FontInput,
     "TextToNumber":TextToNumber,
     "DynamicDelayProcessor":DynamicDelayProcessor,
-    "MultiplicationNode":MultiplicationNode
+    "MultiplicationNode":MultiplicationNode,
+    "GetImageSize_":GetImageSize_,
+    "SwitchByIndex":SwitchByIndex,
+    "LimitNumber":LimitNumber
     # "GamePal":GamePal
 }
 

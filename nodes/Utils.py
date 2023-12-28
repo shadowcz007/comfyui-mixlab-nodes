@@ -409,4 +409,117 @@ class AppInfo:
 
     
 
+class GetImageSize_:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+            }
+        }
 
+    RETURN_TYPES = ("INT", "INT")
+    RETURN_NAMES = ("width", "height")
+
+    FUNCTION = "get_size"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    def get_size(self, image):
+        _, height, width, _ = image.shape
+        return (width, height)
+
+
+
+class SwitchByIndex:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "A":(any_type,),
+                "B":(any_type,),
+                "index":("INT", {
+                        "default": -1, 
+                        "min": -1, 
+                        "max": 1000, 
+                        "step": 1, 
+                        "display": "number"  
+                    }),
+            }
+        }
+
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("C",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self, A,B,index):
+        C=[]
+        index=index[0]
+        for a in A:
+            C.append(a)
+        for b in B:
+            C.append(b)
+        if index>-1:
+            try:
+                C=[C[index]]
+            except Exception as e:
+                C=[]
+        return (C,)
+
+
+
+class LimitNumber:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "number":(any_type,),
+                "min_value":("INT", {
+                        "default": 0, 
+                        "min": 0, 
+                        "max": 0xffffffffffffffff,
+                        "step": 1, 
+                        "display": "number"  
+                    }),
+                "max_value":("INT", {
+                        "default": 1, 
+                        "min": 1, 
+                        "max": 0xffffffffffffffff,
+                        "step": 1, 
+                        "display": "number"  
+                    }),
+            }
+        }
+
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("number",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/utils"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self, number, min_value, max_value):
+        nn=number
+
+        if isinstance(number, int):
+            min_value=int(min_value)
+            max_value=int(max_value)
+        if isinstance(number, float):
+            min_value=float(min_value)
+            max_value=float(max_value)
+
+        if number < min_value:
+            nn= min_value
+        elif number > max_value:
+            nn= max_value
+        
+        return (nn,)
