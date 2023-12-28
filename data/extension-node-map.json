@@ -4780,6 +4780,7 @@
             "Font",
             "ImageCropByAlpha",
             "LoadImagesFromPath",
+            "LoadImagesFromURL",
             "MergeLayers",
             "NewLayer",
             "RandomPrompt",

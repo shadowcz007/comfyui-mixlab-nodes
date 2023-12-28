@@ -35,6 +35,16 @@ if not os.path.exists(clipseg_model_dir):
 
 """Helper methods for CLIPSeg nodes"""
 
+
+# Tensor to PIL
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
+# Convert PIL to Tensor
+def pil2tensor(image):
+    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
+
+
 def tensor_to_numpy(tensor: torch.Tensor) -> np.ndarray:
     """Convert a tensor to a numpy array and scale its values to 0-255."""
     array = tensor.numpy().squeeze()
@@ -107,7 +117,7 @@ class CLIPSeg:
     RETURN_NAMES = ("Mask","Heatmap Mask", "BW Mask")
 
     # INPUT_IS_LIST = True
-    # OUTPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (False,False,False,)
 
     FUNCTION = "segment_image"
     def segment_image(self, image: torch.Tensor, text: str, blur: float, threshold: float, dilation_factor: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
@@ -180,12 +190,13 @@ class CLIPSeg:
         binary_mask_image = Image.fromarray(binary_mask_resized[..., 0])
 
         # convert PIL image to numpy array
-        tensor_bw = binary_mask_image.convert("RGB")
-        tensor_bw = np.array(tensor_bw).astype(np.float32) / 255.0
-        tensor_bw = torch.from_numpy(tensor_bw)[None,]
-        tensor_bw = tensor_bw.squeeze(0)[..., 0]
+        tensor_bw = binary_mask_image.convert("L")
+        tensor_bw=pil2tensor(tensor_bw)
+        # tensor_bw = np.array(tensor_bw).astype(np.float32) / 255.0
+        # tensor_bw = torch.from_numpy(tensor_bw)[None,]
+        # tensor_bw = tensor_bw.squeeze(0)[..., 0]
 
-        return tensor_bw, image_out_heatmap, image_out_binary
+        return (tensor_bw, image_out_heatmap, image_out_binary,)
 
     #OUTPUT_NODE = False
 
