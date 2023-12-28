@@ -55,9 +55,12 @@
             margin-bottom: 0;
         }
 
-        .panel img {
-            width: 100%;
+        .panel img,
+        video {
             height: fit-content;
+            width: fit-content;
+            max-width: 100%;
+            margin-left: 12px;
         }
 
         .input_card {
@@ -66,8 +69,20 @@
         }
 
         .output_card {
+            height: 100%;
             width: 100%;
             box-shadow: 0px 0px 8px 3px #e6e7e7;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+        }
+
+        .output_card img,
+        video {
+            min-width: 200px;
         }
 
         .card {
@@ -276,6 +291,22 @@
                     img.id = `output_${node.id}`;
                     img.src = base64Df;
                     container.appendChild(img);
+                }
+
+                // video ,gif
+                if (["VHS_VideoCombine"].includes(node.class_type)) {
+                    let v = document.createElement('div');
+                    let video = document.createElement('video'), img = new Image();
+                    video.style.display = 'none'
+                    video.controls = 'true'
+                    video.autoplay = 'true'
+                    video.loop = 'true'
+                    v.id = `output_${node.id}`;
+                    img.src = base64Df;
+
+                    v.appendChild(video);
+                    v.appendChild(img);
+                    container.appendChild(v);
                 }
 
             }
@@ -548,7 +579,22 @@
                     element: output,
                     update: function (type = "image", val, id) {
                         console.log(val, id)
-                        if (type == "image" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).src = val;
+                        if (type == "image" && output.querySelector(`#output_${id}`)) {
+                            if (output.querySelector(`#output_${id} img`)) {
+                                output.querySelector(`#output_${id} img`).src = val;
+                            } else {
+                                output.querySelector(`#output_${id}`).src = val;
+                            }
+
+                        }
+
+                        if (type == "video" && output.querySelector(`#output_${id}`)) {
+                            let video = output.querySelector(`#output_${id} video`);
+                            let img = output.querySelector(`#output_${id} img`);
+                            img.style.display = 'none';
+                            video.style.display = 'block';
+                            video.src = val;
+                        }
 
                         if (type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
 
@@ -644,9 +690,9 @@
             });
 
 
-            const show = (src, id) => {
+            const show = (src, id, type = "image") => {
                 // console.log(src)
-                ui.output.update("image", src, id)
+                ui.output.update(type, src, id)
             };
 
             api.addEventListener("status", ({ detail }) => {
@@ -672,16 +718,21 @@
                 console.log("executed", detail)
                 // if (!enabled) return;
                 const images = detail?.output?.images;
+                const text = detail?.output?.text;
+                const gifs = detail?.output?.gifs;
+
                 if (images) {
                     // if (!images) return; 
-                    const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type
-                        }&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
-                    show(src, detail.node);
-                };
-
-                const text = detail?.output?.text;
-                if (text && text[0]) {
+                    const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
+                    show(src, detail.node, 'image');
+                } else if (text && text[0]) {
                     ui.output.update("text", text[0], detail.node)
+                } else if (gifs && gifs[0]) {
+                    // if (!images) return; 
+                    const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
+                        }&&format=${gifs[0].format}&t=${+new Date()}`;
+
+                    show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
                 }
 
 

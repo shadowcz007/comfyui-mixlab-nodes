@@ -214,7 +214,7 @@ def load_image_and_mask_from_url(url, timeout=10):
 
     image=image.convert('RGB')
 
-    return image, mask
+    return (image, mask)
 
 
 # 获取图片s
@@ -1050,8 +1050,13 @@ class LoadImagesFromURL:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (True,True,)
 
+
+    global urls_image
+    urls_image={}
+
     def run(self,url):
-        # print(url)
+        global urls_image
+        print(urls_image)
         def filter_http_urls(urls):
             filtered_urls = []
             for url in urls.split('\n'):
@@ -1064,14 +1069,19 @@ class LoadImagesFromURL:
         images=[]
         masks=[]
 
-        for u in filtered_urls:
+        for img_url in filtered_urls:
             try:
-                img,mask=load_image_and_mask_from_url(u)
-                img=pil2tensor(img)
-                mask=pil2tensor(mask)
+                if img_url in urls_image:
+                    img,mask=urls_image[img_url]
+                else:
+                    img,mask=load_image_and_mask_from_url(img_url)
+                    urls_image[img_url]=(img,mask)
 
-                images.append(img)
-                masks.append(mask)
+                img1=pil2tensor(img)
+                mask1=pil2tensor(mask)
+
+                images.append(img1)
+                masks.append(mask1)
             except Exception as e:
                 print("发生了一个未知的错误：", str(e))
             
