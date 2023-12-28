@@ -56,6 +56,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
 
+### LoadImagesFromURL
+> Conveniently load images from a fixed address on the internet to ensure that default images in the workflow can be executed.
+
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.

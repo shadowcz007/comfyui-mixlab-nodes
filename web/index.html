@@ -30,6 +30,12 @@
             margin: 12px;
             background: white;
             padding: 8px;
+            width: 80%;
+        }
+
+        .description p {
+            max-width: 200px;
+            word-wrap: break-word;
         }
 
         .panel {
@@ -40,7 +46,7 @@
             margin: 24px;
             flex: 1;
             align-items: center;
-            justify-content: center;
+            /* justify-content: center; */
         }
 
         .panel h1 {
@@ -353,7 +359,7 @@
                     container.appendChild(uploadContainer);
                 }
 
-                if (data.class_type === 'FloatSlider') {
+                if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
                     // 滑块输入
                     let silde = createFloatSlide(data.title, data.inputs.number, (v) => {
                         window._appData.data[data.id].inputs.number = v;

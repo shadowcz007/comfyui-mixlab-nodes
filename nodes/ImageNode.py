@@ -201,6 +201,9 @@ def load_image(fp,white_bg=False):
 def load_image_and_mask_from_url(url, timeout=10):
     # Load the image from the URL
     response = requests.get(url, timeout=timeout)
+
+    content_type = response.headers.get('Content-Type')
+    
     image = Image.open(BytesIO(response.content))
 
     # Create a mask from the image's alpha channel
