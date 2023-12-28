@@ -75,14 +75,15 @@
 
             display: flex;
 
-            justify-content: center;
-            align-items: center;
+            /* justify-content: center;
+            align-items: center; */
 
         }
 
         .output_card img,
         video {
-            min-width: 200px;
+            max-width: 400px;
+            max-height: 600px;
         }
 
         .card {
@@ -163,8 +164,6 @@
             font-size: 12px;
             font-weight: 300;
         }
-
-       
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
 </head>
@@ -396,9 +395,9 @@
                     const uploadImageInput = document.createElement("button");
                     uploadImageInput.style = `width: 88px;`;
                     uploadImageInput.innerText = 'upload'
-                    const uploadImageInputHide=document.createElement('input');
-                    uploadImageInputHide.type = "file"; 
-                    uploadImageInputHide.style.display="none"
+                    const uploadImageInputHide = document.createElement('input');
+                    uploadImageInputHide.type = "file";
+                    uploadImageInputHide.style.display = "none"
                     actionDiv.appendChild(uploadImageInput);
                     actionDiv.appendChild(uploadImageInputHide);
 
@@ -419,7 +418,7 @@
 
                     btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
 
-                    
+
                     uploadImageInput.addEventListener('click', (event) => {
                         uploadImageInputHide.click()
                     })
@@ -563,7 +562,8 @@
             leftDiv.style.alignItems = 'flex-start';
             rightDiv.className = 'panel'
             leftDiv.style.flex = 0.4
-            rightDiv.style.flex = 0.6
+            rightDiv.style.flex = 0.6;
+            // rightDiv.style.height='70vh'
             //         rightDiv.style=`position: fixed;
             // right: 0;
             // top: 12px;flex:0.6`

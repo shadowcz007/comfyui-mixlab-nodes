@@ -157,7 +157,7 @@ const parseSvg = async svgContent => {
 }
 
 async function setArea (cw, ch, topBase64, base64, data, fn) {
-  let displayHeight = Math.round(window.screen.availHeight * 0.6)
+  let displayHeight = Math.round(window.screen.availHeight * 0.8)
   let div = document.createElement('div')
   div.innerHTML = `
     <div id='ml_overlay' style='position: absolute;top:0;background: #251f1fc4;
