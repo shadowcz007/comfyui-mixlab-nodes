@@ -560,7 +560,7 @@ def base64_to_image(base64_string):
     return image
 
 
-def create_temp_file(image):
+def create_temp_file(image,fn='material'):
     output_dir = folder_paths.get_temp_directory()
 
     (
@@ -569,7 +569,7 @@ def create_temp_file(image):
             counter,
             subfolder,
             _,
-        ) = folder_paths.get_save_image_path('material', output_dir)
+        ) = folder_paths.get_save_image_path(fn, output_dir)
 
     
     image=tensor2pil(image)
@@ -585,6 +585,42 @@ def create_temp_file(image):
                 "subfolder": subfolder,
                 "type": "temp"
                 }]
+
+def create_temp_file_for_upload(image,fn='tmp'):
+    output_dir = folder_paths.get_temp_directory()
+
+    (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path(fn, output_dir)
+
+    
+    image=tensor2pil(image)
+ 
+    image_file = f"{filename}_{counter:05}.png"
+     
+    image_path=os.path.join(full_output_folder, image_file)
+
+    image.save(image_path,compress_level=4)
+
+    return image_path
+
+
+def upload_smms(fp,token):
+    # print(json.dumps(res, indent=4))
+    image_url=''
+    try:
+        headers = {'Authorization': token}
+        files = {'smfile': open(fp, 'rb')}
+        url = 'https://sm.ms/api/v2/upload'
+        res = requests.post(url, files=files, headers=headers).json()
+        image_url=res['data']['url']
+    except:
+        print('upload error')
+    return image_url
 
 
 class SmoothMask:
@@ -1677,3 +1713,59 @@ class ResizeImage:
         im=pil2tensor(im)
         
         return (im,)
+    
+
+
+
+class UploadImageForSMMS:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "image": ("IMAGE",),
+            "token": ("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
+                             }, 
+                }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("url",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,image,token):
+        # print(image,token)
+        fp=create_temp_file_for_upload(image)
+
+        url=upload_smms(fp,token)
+        
+        return (url,)
+    
+
+# 压缩到5M
+# from PIL import Image
+# import os
+
+# def compress_image(input_image_path, output_image_path):
+#     image = Image.open(input_image_path)
+#     image.save(output_image_path, optimize=True, quality=50)
+
+# def get_image_size(image_path):
+#     return os.path.getsize(image_path) / (1024 * 1024)  # 将文件大小从字节转换为兆字节
+
+# def compress_to_5mb(input_image_path, output_image_path):
+#     compress_image(input_image_path, output_image_path)
+#     max_iterations = 10  # 设置最大循环次数
+#     iterations = 0
+#     while get_image_size(output_image_path) > 5 and iterations < max_iterations:
+#         compress_image(output_image_path, output_image_path)
+#         iterations += 1
+
+# # 示例用法
+# input_image_path = "input.jpg"
+# output_image_path = "output.jpg"
+# compress_to_5mb(input_image_path, output_image_path)
+

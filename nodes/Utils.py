@@ -397,6 +397,7 @@ class AppInfo:
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
+    OUTPUT_NODE = True
 
     def run(self,name,image,input_ids,output_ids,description,version):
 
@@ -524,3 +525,5 @@ class LimitNumber:
         
         return (nn,)
 
+
+ 

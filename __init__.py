@@ -359,14 +359,14 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,UploadImageForSMMS,ResizeImage,TextImage,SvgImage,Image3D,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
-
+from .nodes.ShareNode import ShareToWeibo
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -413,6 +413,8 @@ NODE_CLASS_MAPPINGS = {
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
+    # "UploadImageForSMMS":UploadImageForSMMS,
+    "ShareToWeibo":ShareToWeibo
     # "GamePal":GamePal
 }
 

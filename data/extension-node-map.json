@@ -4798,7 +4798,13 @@
             "VAELoaderConsistencyDecoder",
             "TextToNumber",
             "TextInput_",
-            "DynamicDelayProcessor"
+            "DynamicDelayProcessor",
+            "MultiplicationNode",
+            "ShareToWeibo",
+            "LimitNumber",
+            "SwitchByIndex",
+            "UploadImageForSMMS",
+            "GetImageSize_"
         ],
         {
             "title_aux": "comfyui-mixlab-nodes"
