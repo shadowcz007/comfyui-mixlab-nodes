@@ -615,7 +615,7 @@ def upload_smms(fp,token):
     try:
         headers = {'Authorization': token}
         files = {'smfile': open(fp, 'rb')}
-        url = 'https://sm.ms/api/v2/upload'
+        url = 'https://smms.app/api/v2/upload'
         res = requests.post(url, files=files, headers=headers).json()
         image_url=res['data']['url']
     except:

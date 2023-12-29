@@ -4,4 +4,4 @@ watchdog
 opencv-python-headless
 matplotlib
 openai
-playwright
+# playwright
