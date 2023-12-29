@@ -202,6 +202,18 @@ def get_nodes_map():
     return json_data
 
 
+from playwright.sync_api import sync_playwright
+
+def test_auto():
+    with sync_playwright() as p:
+        for browser_type in [p.chromium, p.firefox, p.webkit]:
+            browser = browser_type.launch()
+            page = browser.new_page()
+            page.goto('https://github.com/shadowcz007/comfyui-mixlab-nodes')
+            page.screenshot(path=f'example-{browser_type.name}.png')
+            browser.close()
+
+
 # 保存原始的 get 方法
 _original_request = aiohttp.ClientSession._request
 
@@ -270,6 +282,10 @@ async def mixlab_hander(request):
             print(e)
     return web.json_response(data)
 
+@routes.post('/test')
+async def mixlab_hander(request):
+    test_auto()
+    return web.Response(text="test", status=200)
 
 @routes.get('/mixlab/app')
 async def mixlab_app_handler(request):
