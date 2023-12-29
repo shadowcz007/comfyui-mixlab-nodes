@@ -41,7 +41,7 @@
         .panel {
             display: flex;
             flex-direction: column;
-            min-width: 300px;
+            min-width: 400px;
             background: #eee;
             margin: 24px;
             flex: 1;
@@ -96,13 +96,19 @@
 
         .card textarea {
             width: 100%;
-            height: 200px;
+            /* height: 200px; */
             /* min-width: 300px; */
             margin-top: 12px;
+            resize: vertical;
+            overflow: hidden;
         }
 
         .card img {
             width: 100%;
+            margin-top: 12px;
+        }
+
+        .card .select {
             margin-top: 12px;
         }
 
@@ -481,15 +487,20 @@
                     uploadContainer.appendChild(nameLabel);
 
                     // Create an input field for the image name
-                    const uploadImageInput = document.createElement("textarea");
+                    const textInput = document.createElement("textarea");
                     // uploadImageInput.type = "text";
-                    uploadImageInput.value = data.inputs.text;
-                    uploadContainer.appendChild(uploadImageInput);
+                    textInput.value = data.inputs.text;
+                    uploadContainer.appendChild(textInput);
 
+                    function autoResize(textarea) {
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                    }
 
-                    uploadImageInput.addEventListener('input', (event) => {
-                        console.log(uploadImageInput.value)
-                        window._appData.data[data.id].inputs.text = uploadImageInput.value;
+                    textInput.addEventListener('input', (event) => {
+                        // console.log(textInput.value)
+                        autoResize(textInput);
+                        window._appData.data[data.id].inputs.text = textInput.value;
                     })
 
                     // Append the upload container to the main container
@@ -497,6 +508,29 @@
                 }
 
 
+                if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
+                    let value = data.inputs.ckpt_name || data.inputs.lora_name;
+
+                    let [div, selectDom] = createSelectWithOptions(data.title, Array.from(data.options, o => {
+                        return {
+                            value: o,
+                            text: o
+                        }
+                    }), value);
+
+                    selectDom.addEventListener('change', e => {
+                        e.preventDefault();
+                        // console.log(selectDom.value)
+                        if (data.class_type === 'CheckpointLoaderSimple') {
+                            window._appData.data[data.id].inputs.ckpt_name = selectDom.value;
+                        }
+                        if (data.class_type === 'LoraLoader') {
+                            window._appData.data[data.id].inputs.lora_name = selectDom.value;
+                        }
+                    })
+
+                    container.appendChild(div);
+                }
 
 
             });
@@ -536,6 +570,34 @@
 
         }
 
+        function createSelectWithOptions(title, options, defaultValue) {
+
+            const div = document.createElement("div");
+            div.className = 'card';
+
+            // Create a label for the upload control
+            const nameLabel = document.createElement("label");
+            nameLabel.textContent = title;
+            div.appendChild(nameLabel);
+
+            var selectElement = document.createElement("select");
+            selectElement.className = "select"
+
+            // 循环遍历选项数组
+            for (var i = 0; i < options.length; i++) {
+                var option = document.createElement("option");
+                option.value = options[i].value;
+                option.text = options[i].text;
+                selectElement.appendChild(option);
+            }
+
+            // 设置默认值
+            selectElement.value = defaultValue;
+
+            div.appendChild(selectElement)
+
+            return [div, selectElement];
+        }
 
         function getTypeFromUrl(url) {
             const queryString = url.split('?')[1];

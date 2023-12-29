@@ -75,7 +75,23 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
     if (data.hasOwnProperty(id)) {
       if (inputIds.includes(id)) {
         let node = app.graph.getNodeById(id)
-        input[inputIds.indexOf(id)] = { ...data[id], title: node.title, id }
+        let options = []
+        // 模型
+        try {
+          if (node.type === 'CheckpointLoaderSimple') {
+            options = node.widgets.filter(w => w.name === 'ckpt_name')[0]
+              .options.values
+          }else if(node.type === 'LoraLoader'){
+            options =node.widgets.filter(w=>w.name==='lora_name')[0].options.values
+          }
+        } catch (error) {}
+
+        input[inputIds.indexOf(id)] = {
+          ...data[id],
+          title: node.title,
+          id,
+          options
+        }
         // input.push()
       }
       if (outputIds.includes(id)) {

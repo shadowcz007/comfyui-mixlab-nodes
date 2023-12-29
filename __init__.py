@@ -412,7 +412,7 @@ NODE_CLASS_MAPPINGS = {
     "MultiplicationNode":MultiplicationNode,
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
-    "LimitNumber":LimitNumber
+    "LimitNumber":LimitNumber, 
     # "GamePal":GamePal
 }
 
