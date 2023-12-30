@@ -363,13 +363,13 @@
             copyHTML.innerText = 'copy as html'
             action.appendChild(copyHTML)
 
-            const copyImages = document.createElement('button');
-            copyImages.innerText = 'copy images'
-            action.appendChild(copyImages)
-            copyImages.style.marginLeft = '18px';
+            const copyImage = document.createElement('button');
+            copyImage.innerText = 'copy image'
+            action.appendChild(copyImage)
+            copyImage.style.marginLeft = '18px';
 
             const copyText = document.createElement('button');
-            copyText.innerText = 'copy text'
+            copyText.innerText = 'copy text for share'
             action.appendChild(copyText)
             copyText.style.marginLeft = '18px';
 
@@ -386,19 +386,19 @@
 
             copyText.addEventListener('click', e => {
                 e.preventDefault();
-                copyTextToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy text'))
+                copyTextToClipboard((window._appData.share_prefix||'')+" "+output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
 
             })
 
-            copyImages.addEventListener('click', e => {
+            copyImage.addEventListener('click', e => {
                 e.preventDefault();
                 // copyHtmlWithImagesToClipboard(output_card.outerHTML)
-                copyImagesToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy images'))
+                copyImagesToClipboard(output_card.outerHTML, (r) => success(r, copyImage, 'copy image'))
                 // copyTextToClipboard()
             })
             copyHTML.addEventListener('click', e => {
                 e.preventDefault();
-                copyHtmlWithImagesToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy as html'))
+                copyHtmlWithImagesToClipboard((window._appData.share_prefix||'')+" "+output_card.outerHTML, (r) => success(r, copyHTML, 'copy as html'))
                 // copyImagesToClipboard(output_card.outerHTML)
             })
 

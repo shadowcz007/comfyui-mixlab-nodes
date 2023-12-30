@@ -186,7 +186,7 @@ async function save (json, download = false) {
 
     if (download) {
        await save_app(data)
-      await downloadJsonFile(data, data.app.filename)
+       await downloadJsonFile(data, data.app.filename)
       let open = window.confirm(
         `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(data.app.filename)}`
       )
