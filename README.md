@@ -1,20 +1,25 @@
 ## 
-v0.6.0 🚀🚗🚚🏃‍ Workflow-to-APP
+v0.7.0 🚀🚗🚚🏃‍ Workflow-to-APP
+- 支持多个web app 切换
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
+- Support multiple web app switching.
 - Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.
 
+![](./assets/0-m-app.png)
+
 ![](./assets/appinfo-readme.png)
+
 Example:
 - workflow
 ![APP info](./workflow/appinfo-workflow.svg)
-![text-to-image](./workflow/Text-to-Image-app.json)
+[text-to-image](./workflow/Text-to-Image-app.json)
 
 APP-JSON:
 - [text-to-image](./example/text-to-image_1_Wed%20Dec%2027%202023.json)
 - [image-to-image](./example/image-to-image_1_Wed%20Dec%2027%202023.json)
 - text-to-text
 
-> 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、CheckpointLoaderSimple、LoraLoader
+> 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
 
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
 
