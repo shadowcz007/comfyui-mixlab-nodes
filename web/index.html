@@ -1019,12 +1019,12 @@
             };
         }
 
-        function createUploadJson() {
+        function createUploadJson(detail) {
 
             // 创建一个div元素
             var div = document.createElement('div');
             div.className = 'upload_btn card'
-            div.textContent = '点击上传JSON文件';
+            div.textContent = '上传并运行你的JSON文件';
             div.addEventListener('click', function () {
                 document.getElementById('jsonFileInput').click();
             });
@@ -1040,10 +1040,11 @@
                 reader.onload = function (e) {
                     var contents = e.target.result;
                     var jsonData = JSON.parse(contents);
-                    // setTimeout(() => {
-                    //     div.remove();
-                    //     input.remove();
-                    // }, 500);
+                    
+                    
+                    Array.from(detail.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    div.className = 'upload_btn card selected'
+
 
                     let { output, app } = jsonData;
 
@@ -1201,7 +1202,7 @@
                 // console.log(div)
             };
 
-            let uploadApp = createUploadJson();
+            let uploadApp = createUploadJson(details);
             div.appendChild(uploadApp);
 
             document.body.appendChild(details);

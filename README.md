@@ -7,6 +7,7 @@ v0.6.0 🚀🚗🚚🏃‍ Workflow-to-APP
 Example:
 - workflow
 ![APP info](./workflow/appinfo-workflow.svg)
+![text-to-image](./workflow/Text-to-Image-app.json)
 
 APP-JSON:
 - [text-to-image](./example/text-to-image_1_Wed%20Dec%2027%202023.json)
