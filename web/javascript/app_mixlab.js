@@ -146,6 +146,7 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
 async function save (json, download = false) {
   const name = json[0],
     version = json[5],
+    share_prefix = json[6], //用于分享的功能扩展
     description = json[4],
     inputIds = json[2].split('\n').filter(f => f),
     outputIds = json[3].split('\n').filter(f => f)
@@ -173,6 +174,7 @@ async function save (json, download = false) {
       version,
       input,
       output,
+      share_prefix,
       filename: `${name}_${version}_${new Date().toDateString()}.json`
     }
 
@@ -183,11 +185,15 @@ async function save (json, download = false) {
     // let http_workflow = app.graph.serialize()
 
     if (download) {
+      const { filename } = await save_app(data)
       await downloadJsonFile(data, data.app.filename)
       let open = window.confirm(
         `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?type=new`
       )
-      if (open) window.open(`${getUrl()}/mixlab/app?type=new`)
+      if (open)
+        window.open(
+          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(filename)}`
+        )
     } else {
       await save_app(data)
 

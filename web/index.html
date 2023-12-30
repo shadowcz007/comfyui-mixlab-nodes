@@ -329,7 +329,7 @@
             try {
                 for (const res of result.data) {
                     let { output, app } = res.data;
-                    if(app.filename) data.push({
+                    if (app.filename) data.push({
                         ...app,
                         data: output,
                         date: res.date
@@ -664,16 +664,16 @@
             return [div, selectElement];
         }
 
-        function getTypeFromUrl(url) {
+        function getFilenameFromUrl(url) {
             const queryString = url.split('?')[1];
             if (!queryString) {
                 return null;
             }
 
             const params = new URLSearchParams(queryString);
-            const type = params.get('type');
+            const filename = decodeURIComponent(params.get('filename'));
 
-            return type;
+            return filename;
         }
 
 
@@ -1009,19 +1009,17 @@
 
         async function init_app() {
 
-            const type = getTypeFromUrl(location.href);
-            if (type === 'new') {
-
+            const filename = getFilenameFromUrl(location.href);
+            if (filename) {
+                window._apps = await get_my_app(filename);
             } else {
                 window._apps = await get_my_app();
-                window._appData = window._apps[0];
-                createAppList(window._apps);
-                createApp(window._appData);
-                // console.log(appData)
-
             }
 
-
+            window._appData = window._apps[0];
+            createAppList(window._apps);
+            createApp(window._appData);
+       
         };
 
         init_app()

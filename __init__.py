@@ -4,7 +4,7 @@ import subprocess
 import importlib.util
 import sys,json
 import urllib
-
+import hashlib
 import datetime
 
 
@@ -77,6 +77,13 @@ install_openai()
 
 
 current_path = os.path.abspath(os.path.dirname(__file__))
+
+
+
+def calculate_md5(string):
+    encoded_string = string.encode()
+    md5_hash = hashlib.md5(encoded_string).hexdigest()
+    return md5_hash
 
 
 def create_key(key_p,crt_p):
@@ -221,9 +228,17 @@ def save_workflow_for_app(data,filename="my_workflow_app.json"):
     if not os.path.exists(app_path):
         os.mkdir(app_path)
     app_workflow_path=os.path.join(app_path, filename)
+ 
+    try:
+        output_str = json.dumps(data['output'])
+        data['app']['id']=calculate_md5(output_str)
+        # id=data['app']['id']
+    except Exception as e:
+        print("发生异常：", str(e))
+    
     with open(app_workflow_path, 'w') as file:
         json.dump(data, file)
-    return app_workflow_path
+    return filename
 
 def get_nodes_map():
     # print("#####path::", current_path)
