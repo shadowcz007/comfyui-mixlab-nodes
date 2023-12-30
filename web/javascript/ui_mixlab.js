@@ -714,7 +714,7 @@ app.registerExtension({
           let textB = document.createElement('p')
           btn.appendChild(textB)
           btn.appendChild(btnB)
-          textB.style.fontSize='12px';
+          textB.style.fontSize = '12px'
           textB.innerText = `Locate and navigate nodes ♾️Mixlab`
 
           btnB.style = `float: right; border: none; color: var(--input-text);
@@ -790,7 +790,8 @@ app.registerExtension({
           for (let nodeId in nodes) {
             let n = nodes[nodeId].class_type
             if (nodesMap[n]) {
-              const { url, title } = nodesMap[n]
+              const { url, title: _title } = nodesMap[n]
+              let title = app.graph.getNodeById(nodeId).title || _title
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
                 background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
@@ -810,10 +811,10 @@ app.registerExtension({
               })
 
               d.innerHTML = `
-                <span>${'#' + nodeId} ${n}</span>
+                <span>${'#' + nodeId} ${title}</span>
                 <a href="${url}" target="_blank" style="text-decoration: none;">🔗</a>
                 `
-              d.title = title
+              d.title = n
 
               nodesDiv.appendChild(d)
             }
