@@ -15,7 +15,7 @@ APP-JSON:
 
 > 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、CheckpointLoaderSimple、LoraLoader
 
-> 输出节点：PreviewImage 、SaveImage、ShowTextForGPT
+> 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
 
 
 ### 3D
