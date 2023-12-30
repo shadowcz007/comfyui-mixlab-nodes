@@ -187,7 +187,7 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
                             "app":{
                                 "description":x['app']['description'],
                                 "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
-                                "icon":x['app']['icon'],
+                                "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
                                 "name":x['app']['name'],
                                 "version":x['app']['version'],
                             }
@@ -206,8 +206,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
                     'filename':filename,
                     'data':json.load(json_file)
                 }]
-        except:
-            print('-')
+        except Exception as e:
+            print("发生异常：", str(e))
     return apps
 
 def save_workflow_json(data):

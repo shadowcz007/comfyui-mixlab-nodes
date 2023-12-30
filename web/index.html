@@ -328,8 +328,8 @@
             let data = [];
             try {
                 for (const res of result.data) {
-                    let { output, app } = res.data
-                    data.push({
+                    let { output, app } = res.data;
+                    if(app.filename) data.push({
                         ...app,
                         data: output,
                         date: res.date
@@ -851,7 +851,7 @@
                         ...app,
                         data: output
                     };
-                    document.body.querySelector('.app').remove()
+                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
                     // res(jsonData);
@@ -867,6 +867,7 @@
 
 
         async function createApp(appData) {
+            console.log(appData)
             // 使用示例：
             var ui = createUI(appData.input, appData.output);
 
@@ -958,7 +959,7 @@
             let details = document.createElement('details');
             details.className = 'apps';
 
-            details.innerHTML = `<summary>APPs</summary>
+            details.innerHTML = `<summary>APPs #${apps.length}</summary>
                 <div class="content"> </div>`
 
             let div = details.querySelector('div');
@@ -971,7 +972,7 @@
                 dd.className = 'card' + (index == 0 ? ' selected' : '')
                 dd.innerHTML = ` 
                         <div class="item">
-                            <img src="${app.icon}"/>
+                            <img src="${app.icon || base64Df}"/>
                         </div>
                         <div class="item">
                             <div>
@@ -993,7 +994,7 @@
                     // console.log(app.filename)
 
                     window._appData = (await get_my_app(app.filename))[0];
-                    document.body.querySelector('.app').remove()
+                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
                 })
