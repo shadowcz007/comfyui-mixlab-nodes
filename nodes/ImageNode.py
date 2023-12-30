@@ -506,6 +506,7 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
         y = 0
         for line in lines:
             for char in line:
+                #print('char',char)
                 char_coordinates.append((x, y))
                 x += font_size + spacing
             y += font_size + spacing
@@ -990,8 +991,8 @@ class TextImage:
     def INPUT_TYPES(s):
         return {"required": { 
             
-                    "text": ("STRING",{"multiline": True,"default": "龍馬精神迎新歲"}),
-                    "font_path": ("STRING",{"multiline": False,"default": FONT_PATH}),
+                    "text": ("STRING",{"multiline": True,"default": "龍馬精神迎新歲","dynamicPrompts": False}),
+                    "font_path": ("STRING",{"multiline": False,"default": FONT_PATH,"dynamicPrompts": False}),
                     "font_size": ("INT",{
                                 "default":100, 
                                 "min": 100, #Minimum value
@@ -1006,7 +1007,7 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
-                    "text_color":("STRING",{"multiline": False,"default": "#000000"}),
+                    "text_color":("STRING",{"multiline": False,"default": "#000000","dynamicPrompts": False}),
                     "vertical":("BOOLEAN", {"default": True},),
                              },
                 }
