@@ -687,7 +687,7 @@
                     // Create a label for the upload control
                     const nameLabel = document.createElement("label");
                     nameLabel.textContent = data.title || "LoadImage: ";
-                    nameLabel.style.marginBottom='12px'
+                    nameLabel.style.marginBottom = '12px'
                     uploadContainer.appendChild(nameLabel);
 
                     let actionDiv = document.createElement('div');
@@ -914,7 +914,7 @@
 
 
 
-        function createUI(inputData, outputData) {
+        function createUI(inputData, outputData, share = true) {
 
             let mainDiv = document.createElement('div');
             let leftDiv = document.createElement('div');
@@ -937,17 +937,20 @@
 
             var title = document.createElement('h1');
             title.textContent = 'My Application';
-
-            const shareBtn = document.createElement('button');
-            shareBtn.innerText = 'copy url';
-            shareBtn.addEventListener('click', e => {
-                e.preventDefault();
-                let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
-                copyTextToClipboard(url,success(e,shareBtn,'copy url'));
-            })
-
             titleDiv.appendChild(title);
-            titleDiv.appendChild(shareBtn);
+
+            if (share) {
+                const shareBtn = document.createElement('button');
+                shareBtn.innerText = 'copy url';
+                shareBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
+                    copyTextToClipboard(url, success(e, shareBtn, 'copy url'));
+                })
+
+                titleDiv.appendChild(shareBtn);
+            }
+
 
 
             let iconDes = document.createElement('div');
@@ -1104,7 +1107,7 @@
                         data: output
                     };
                     if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
-                    createApp(window._appData);
+                    createApp(window._appData, false);
 
                     // res(jsonData);
                 };
@@ -1118,10 +1121,10 @@
         }
 
 
-        async function createApp(appData) {
+        async function createApp(appData, share = true) {
             console.log(appData)
             // 使用示例：
-            var ui = createUI(appData.input, appData.output);
+            var ui = createUI(appData.input, appData.output, share);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
