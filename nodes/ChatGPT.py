@@ -75,11 +75,11 @@ class ChatGPTNode:
             "required": {
                 "api_key":("KEY", {"default": "", "multiline": True}),
                 "api_url":("URL", {"default": "", "multiline": True}),
-                "prompt": ("STRING", {"multiline": True}),
+                "prompt": ("STRING", {"multiline": True,"dynamicPrompts": False}),
                 "system_content": ("STRING", 
                                    {
                                        "default": "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.", 
-                                       "multiline": True
+                                       "multiline": True,"dynamicPrompts": False
                                        }),
                 "model": (["gpt-3.5-turbo","gpt-35-turbo","gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
                           {"default": "gpt-3.5-turbo"}),
@@ -167,7 +167,7 @@ class ShowTextForGPT:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "text": ("STRING", {"forceInput": True}),
+                "text": ("STRING", {"forceInput": True,"dynamicPrompts": False}),
             }
         }
 
@@ -189,8 +189,8 @@ class CharacterInText:
     def INPUT_TYPES(s):
         return {
             "required": {
-                 "text": ("STRING", {"multiline": True}),
-                 "character": ("STRING", {"multiline": True}),
+                 "text": ("STRING", {"multiline": True,"dynamicPrompts": False}),
+                 "character": ("STRING", {"multiline": True,"dynamicPrompts": False}),
                  "start_index": ("INT", {
                     "default": 1,
                     "min": 0, #Minimum value

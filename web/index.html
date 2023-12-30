@@ -13,7 +13,77 @@
             margin-left: 5%;
         }
 
+        .apps {
+            margin: 0 32px;
+            background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+        }
 
+        .apps .content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+
+        .apps .card {
+            width: 200px;
+            margin: 12px;
+            display: flex;
+            flex-direction: row;
+            background: #f8f8f8;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .apps .selected {
+            box-shadow: 0px 0px 10px 10px #fbe9f0
+        }
+
+        .apps .card:hover {
+            box-shadow: 0px 0px 10px 10px #e9fbfa
+        }
+
+        .apps .card h5 {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .apps .card p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .apps .card img {
+            width: auto;
+            height: 100%;
+
+            margin: 0px;
+        }
+
+        .apps .card .item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .apps .card .icon {
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            background: #e3e3e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+        .apps .card .version {
+            font-size: 12px;
+
+        }
 
         .status {
             background: black;
@@ -42,17 +112,24 @@
             display: flex;
             flex-direction: column;
             min-width: 400px;
-            background: #eee;
+            /* background: #eee; */
             margin: 24px;
             flex: 1;
             align-items: center;
             /* justify-content: center; */
         }
 
+        .panel .header {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
         .panel h1 {
             padding: 0 12px;
-            margin-top: 12px;
-            margin-bottom: 0;
+            margin: 0;
         }
 
         .panel img,
@@ -68,13 +145,18 @@
             flex-direction: column;
         }
 
+        .output {
+            width: 90%;
+            margin: 12px;
+        }
+
         .output_card {
             height: 100%;
             width: 100%;
-            box-shadow: 0px 0px 8px 3px #e6e7e7;
-
+            box-shadow: 0px 0px 20px 7px #e6e7e7;
+            margin-top: 24px;
             display: flex;
-
+            flex-wrap: wrap;
             /* justify-content: center;
             align-items: center; */
 
@@ -84,6 +166,8 @@
         video {
             max-width: 400px;
             max-height: 600px;
+            margin: 8px;
+            min-width: 200px;
         }
 
         .card {
@@ -125,7 +209,7 @@
             border: 3px solid;
         }
 
-        .run_btn:hover {
+        button:hover {
             border-color: yellow;
             color: yellow;
         }
@@ -138,28 +222,28 @@
         .upload_btn {
             width: 188px;
             cursor: pointer;
-            height: 188px;
-            background: black;
+            /* height: 188px; */
+            /* background: black; */
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
             font-size: 14px;
-            margin-left: calc(50% - 94px);
-            margin-top: calc(30vh - 94px);
+            color: black;
         }
 
-        .upload_btn:hover {
+        /* .upload_btn:hover {
             outline: 4px solid yellow;
             color: yellow;
-        }
+        } */
 
         .show_text {
             font-size: 14px;
             /* display: inline-block; */
-            /* margin: 13px; */
+            margin: 8px;
             padding: 32px;
+            min-width: 200px;
             background: #242424;
             color: white;
         }
@@ -170,15 +254,39 @@
             font-size: 12px;
             font-weight: 300;
         }
+
+        label::after {
+            content: attr(data-content);
+            /* Set the initial content using the data-content attribute */
+            /* position: absolute; */
+            /* top: 100%;
+            left: 0; */
+            margin-left: 4px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        select,
+        button,
+        input {
+            height: 32px;
+            cursor: pointer;
+            background: #000000bf;
+            color: white;
+            outline: none;
+            border: none;
+            border-radius: 4px;
+        }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
 </head>
 
 <body>
-    <div style="margin: 24px;
-    background: #eee;
-    padding: 24px;
-    color: #4a4a4a;">Explore your creative potential with <a class="link"
+    <div style="margin: 0 24px;
+    margin-bottom: 24px;
+    padding: 8px;
+    color: #4a4a4a;
+    border-bottom: 1px dashed #595959;">Explore your creative potential with <a class="link"
             href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
         <br>
         <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
@@ -258,46 +366,104 @@
                 });
         }
 
-        async function get_my_app() {
+
+        function success(isSuccess, btn, text) {
+            isSuccess ? btn.innerText = 'success' : text;
+            setTimeout(() => {
+                btn.innerText = text;
+            }, 5000)
+        }
+
+        async function get_my_app(filename = null) {
 
             let url = get_url()
 
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    task: 'my_app'
+                    task: 'my_app',
+                    filename
                 })
             })
             let result = await res.json();
+            let data = [];
+            try {
+                for (const res of result.data) {
+                    let { output, app } = res.data;
+                    if (app.filename) data.push({
+                        ...app,
+                        data: output,
+                        date: res.date
+                    })
+                }
+            } catch (error) {
 
-            let { output, app } = result.data
-
-            return {
-                ...app,
-                data: output
             }
+
+
+            return data
         }
 
 
         function createOutputs(outputData) {
-            // Array.from( window._appData.output,n=>n.id)
-            const container = document.createElement("div");
-            container.className = 'output_card'
+            const container = document.createElement('div');
+            container.className = "output";
+
+            const action = document.createElement('div');
+            container.appendChild(action)
+
+            const copyHTML = document.createElement('button');
+            copyHTML.innerText = 'copy as html'
+            action.appendChild(copyHTML)
+
+            const copyImage = document.createElement('button');
+            copyImage.innerText = 'copy image'
+            action.appendChild(copyImage)
+            copyImage.style.marginLeft = '18px';
+
+            const copyText = document.createElement('button');
+            copyText.innerText = 'copy text for share'
+            action.appendChild(copyText)
+            copyText.style.marginLeft = '18px';
+
+            const output_card = document.createElement("div");
+            output_card.className = 'output_card'
+            container.appendChild(output_card)
+
+
+
+            copyText.addEventListener('click', e => {
+                e.preventDefault();
+                copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
+
+            })
+
+            copyImage.addEventListener('click', e => {
+                e.preventDefault();
+                // copyHtmlWithImagesToClipboard(output_card.outerHTML)
+                copyImagesToClipboard(output_card.outerHTML, (r) => success(r, copyImage, 'copy image'))
+                // copyTextToClipboard()
+            })
+            copyHTML.addEventListener('click', e => {
+                e.preventDefault();
+                copyHtmlWithImagesToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyHTML, 'copy as html'))
+                // copyImagesToClipboard(output_card.outerHTML)
+            })
 
             for (const node of outputData) {
-                console.log('output', node)
+                // console.log('output', node)
                 if (node.class_type == "ShowTextForGPT") {
                     let div = document.createElement('div');
                     div.className = "show_text"
                     div.id = `output_${node.id}`;
-                    div.innerText = node.inputs.text[0]
-                    container.appendChild(div);
+                    div.innerText = Array.isArray(node.inputs.text) ? node.inputs.text[0] : node.inputs.text
+                    output_card.appendChild(div);
                 };
                 if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
                     let img = new Image();
                     img.id = `output_${node.id}`;
                     img.src = base64Df;
-                    container.appendChild(img);
+                    output_card.appendChild(img);
                 }
 
                 // video ,gif
@@ -313,7 +479,7 @@
 
                     v.appendChild(video);
                     v.appendChild(img);
-                    container.appendChild(v);
+                    output_card.appendChild(v);
                 }
 
             }
@@ -362,6 +528,134 @@
             }
         }
 
+
+        function copyHtmlWithImagesToClipboard(data, cb) {
+            // 创建一个临时div元素
+            const tempDiv = document.createElement('div');
+
+            // 将HTML字符串赋值给div的innerHTML属性
+            tempDiv.innerHTML = data;
+
+            // 获取div中的所有图像元素
+            const images = tempDiv.getElementsByTagName('img');
+
+            // 遍历图像元素，并将图像数据转换为Base64编码
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                // 设置canvas尺寸与图像尺寸相同
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                // 在canvas上绘制图像
+                context.drawImage(image, 0, 0);
+
+                // 将canvas转换为Base64编码
+                const imageData = canvas.toDataURL();
+
+                // 将Base64编码替换图像元素的src属性
+                image.src = imageData;
+            }
+
+
+            let richText = tempDiv.innerHTML;
+
+            // 创建一个新的Blob对象，并将富文本字符串作为数据传递进去
+            const blob = new Blob([richText], { type: 'text/html' });
+
+            // 创建一个ClipboardItem对象，并将Blob对象添加到其中
+            const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+            // 使用Clipboard API将内容复制到剪贴板
+            navigator.clipboard.write([clipboardItem])
+                .then(() => {
+                    console.log('富文本已成功复制到剪贴板');
+                    tempDiv.remove()
+                    if (cb) cb(true)
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    tempDiv.remove()
+                    if (cb) cb(false)
+                });
+
+        }
+
+        // const htmlWithImages = "<p>这是要复制的HTML内容</p><img src='data:image/png;base64,iVBORw0KG...'>"
+        // copyHtmlWithImagesToClipboard(htmlWithImages);
+
+        function copyImagesToClipboard(html, cb) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const images = tempDiv.querySelectorAll('img');
+            const promises = Array.from(images).map((image) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = image.src;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        context.drawImage(img, 0, 0);
+                        canvas.toBlob((blob) => {
+                            const clipboardItem = new ClipboardItem({ 'image/png': blob });
+                            navigator.clipboard.write([clipboardItem])
+                                .then(() => {
+                                    resolve();
+                                    tempDiv.remove()
+                                    if (cb) cb(true)
+                                })
+                                .catch((error) => {
+                                    reject(error);
+                                    tempDiv.remove()
+                                    if (cb) cb(false)
+                                });
+                        });
+                    };
+                });
+            });
+            Promise.all([...promises])
+                .then(() => {
+                    console.log('所有图片已成功复制到剪贴板');
+                    if (cb) cb(true)
+                    tempDiv.remove()
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    if (cb) cb(false)
+                    tempDiv.remove()
+                });
+        }
+
+        function copyTextToClipboard(html, cb) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const text = tempDiv.innerText;
+            const textData = new ClipboardItem({ 'text/plain': new Blob([text], { type: 'text/plain' }) });
+
+            navigator.clipboard.write([textData])
+                .then(() => {
+                    console.log('所有文本已成功复制到剪贴板', text);
+                    if (cb) cb(true)
+                    tempDiv.remove()
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    if (cb) cb(false)
+                    tempDiv.remove()
+                });
+        }
+
+
+        // const htmlString = "<p>这是要复制的HTML内容</p><img src='url'><img src='url'>";
+        // copyImagesToClipboard(htmlString);
+
+
+
         function createInputs(inputData) {
             // Assuming you have an HTML element with the id "container" to hold the UI
             const container = document.createElement("div");
@@ -393,6 +687,7 @@
                     // Create a label for the upload control
                     const nameLabel = document.createElement("label");
                     nameLabel.textContent = data.title || "LoadImage: ";
+                    nameLabel.style.marginBottom = '12px'
                     uploadContainer.appendChild(nameLabel);
 
                     let actionDiv = document.createElement('div');
@@ -408,9 +703,7 @@
                     actionDiv.appendChild(uploadImageInputHide);
 
                     const btnFromClipboard = document.createElement("button");
-                    btnFromClipboard.style = `width: 156px;
-                    height: 24px;
-                    margin-left: 18px;`
+                    btnFromClipboard.style = `width: 156px; margin-left: 18px;`
                     btnFromClipboard.innerText = 'paste from clipboard'
                     actionDiv.appendChild(btnFromClipboard);
 
@@ -469,9 +762,14 @@
 
                 if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
                     // 滑块输入
-                    let silde = createFloatSlide(data.title, data.inputs.number, (v) => {
-                        window._appData.data[data.id].inputs.number = v;
-                    })
+                    let silde = createNumSlide(data.title,
+                        data.inputs.number,
+                        (v) => {
+                            window._appData.data[data.id].inputs.number = v;
+                        },
+                        0,
+                        data.class_type === 'IntNumber' ? 6000 : 1,
+                        data.class_type === 'IntNumber' ? 'int' : 'float')
                     container.appendChild(silde);
                 }
 
@@ -537,19 +835,20 @@
             return container
         }
 
-        function createFloatSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1) {
+        function createNumSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1, type = 'float') {
 
             // 创建滑块输入元素
             var slider = document.createElement("input");
             slider.type = "range";
             slider.min = minValue;
             slider.max = maxValue;
-            slider.step = 0.01
+            slider.step = type == 'float' ? 0.01 : 1
             slider.value = value;
 
             // 创建标签元素
             var label = document.createElement("label");
             label.innerHTML = labelText;
+            label.setAttribute('data-content', value);
 
             // 创建容器元素，并将滑块输入和标签添加到容器中
             var container = document.createElement("div");
@@ -558,9 +857,11 @@
             container.className = 'card'
 
             // 添加change事件监听器
-            slider.addEventListener("change", function (event) {
+            slider.addEventListener("input", function (event) {
                 var value = event.target.value;
+                value = type == 'float' ? value : Math.round(value)
                 console.log("滑块输入的值为：" + value);
+                label.setAttribute('data-content', value);
                 // 在这里可以执行其他操作，根据需要进行相应的处理
                 callback && callback(value)
             });
@@ -599,21 +900,21 @@
             return [div, selectElement];
         }
 
-        function getTypeFromUrl(url) {
+        function getFilenameFromUrl(url) {
             const queryString = url.split('?')[1];
             if (!queryString) {
                 return null;
             }
 
             const params = new URLSearchParams(queryString);
-            const type = params.get('type');
+            const filename = decodeURIComponent(params.get('filename'));
 
-            return type;
+            return filename;
         }
 
 
 
-        function createUI(inputData, outputData) {
+        function createUI(inputData, outputData, share = true) {
 
             let mainDiv = document.createElement('div');
             let leftDiv = document.createElement('div');
@@ -631,8 +932,26 @@
             // top: 12px;flex:0.6`
 
             // 创建标题
+            let titleDiv = document.createElement('div');
+            titleDiv.className = 'header'
+
             var title = document.createElement('h1');
             title.textContent = 'My Application';
+            titleDiv.appendChild(title);
+
+            if (share) {
+                const shareBtn = document.createElement('button');
+                shareBtn.innerText = 'copy url';
+                shareBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
+                    copyTextToClipboard(url, success(e, shareBtn, 'copy url'));
+                })
+
+                titleDiv.appendChild(shareBtn);
+            }
+
+
 
             let iconDes = document.createElement('div');
             // 创建应用图标
@@ -663,7 +982,7 @@
             submitButton.className = 'run_btn'
 
             // 将所有UI元素添加到页面中
-            leftDiv.appendChild(title);
+            leftDiv.appendChild(titleDiv);
             leftDiv.appendChild(iconDes);
             // leftDiv.appendChild(des);
             leftDiv.appendChild(status);
@@ -750,16 +1069,16 @@
 
                         });
                     }
-                }
+                },
             };
         }
 
-        function createUploadJson() {
+        function createUploadJson(detail) {
 
             // 创建一个div元素
             var div = document.createElement('div');
-            div.className = 'upload_btn'
-            div.textContent = '点击上传JSON文件';
+            div.className = 'upload_btn card'
+            div.textContent = '上传并运行你的JSON文件';
             div.addEventListener('click', function () {
                 document.getElementById('jsonFileInput').click();
             });
@@ -775,10 +1094,11 @@
                 reader.onload = function (e) {
                     var contents = e.target.result;
                     var jsonData = JSON.parse(contents);
-                    setTimeout(() => {
-                        div.remove();
-                        input.remove();
-                    }, 500);
+
+
+                    Array.from(detail.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    div.className = 'upload_btn card selected'
+
 
                     let { output, app } = jsonData;
 
@@ -786,8 +1106,8 @@
                         ...app,
                         data: output
                     };
-
-                    createApp(window._appData);
+                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                    createApp(window._appData, false);
 
                     // res(jsonData);
                 };
@@ -795,16 +1115,16 @@
             });
 
             // 将div和input元素添加到body中
-            document.body.appendChild(div);
+            // document.body.appendChild(div);
             document.body.appendChild(input);
-
-
+            return div
         }
 
 
-        async function createApp(appData) {
+        async function createApp(appData, share = true) {
+            console.log(appData)
             // 使用示例：
-            var ui = createUI(appData.input, appData.output);
+            var ui = createUI(appData.input, appData.output, share);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
@@ -859,8 +1179,8 @@
                     // if (!images) return; 
                     const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
                     show(src, detail.node, 'image');
-                } else if (text && text[0]) {
-                    ui.output.update("text", text[0], detail.node)
+                } else if (text) {
+                    ui.output.update("text", Array.isArray(text) ? text[0] : text, detail.node)
                 } else if (gifs && gifs[0]) {
                     // if (!images) return; 
                     const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
@@ -886,24 +1206,72 @@
 
             api.api_base = ""
             api.init();
+
         }
 
+        // 创建app的选择菜单
+        function createAppList(apps = []) {
+            let details = document.createElement('details');
+            details.className = 'apps';
+
+            details.innerHTML = `<summary>ComfyUI APP Store / ${apps.length}</summary>
+                <div class="content"> </div>`
+
+            let div = details.querySelector('div');
+
+            for (let index = 0; index < apps.length; index++) {
+                const app = apps[index];
+                let d = document.createDocumentFragment();
+                let dd = document.createElement('div');
+                d.appendChild(dd);
+                dd.className = 'card' + (index == 0 ? ' selected' : '')
+                dd.innerHTML = ` 
+                        <div class="item icon">
+                            <img src="${app.icon || base64Df}"/>
+                        </div>
+                        <div class="item" style="margin-left: 24px;">
+                            <div>
+                                <h5>${app.name}</h5>
+                                <p>${app.description}</p>
+                            </div>
+                            <div >
+                                <p class="version">version: ${app.version}</p>
+                                
+                            </div>
+                        </div>
+                      `
+
+                div.appendChild(d);
+                dd.addEventListener('click', async e => {
+                    e.preventDefault();
+                    Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    dd.className = 'card selected'
+                    // console.log(app.filename)
+
+                    window._appData = (await get_my_app(app.filename))[0];
+                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                    createApp(window._appData);
+
+                })
+                // console.log(div)
+            };
+
+            let uploadApp = createUploadJson(details);
+            div.appendChild(uploadApp);
+
+            document.body.appendChild(details);
+        }
 
         async function init_app() {
 
-            let appData = {}
+            const filename = getFilenameFromUrl(location.href);
+            window._apps = await get_my_app(filename);
 
-            const type = getTypeFromUrl(location.href);
-            if (type === 'new') {
-                createUploadJson();
-            } else {
-                appData = await get_my_app();
-                // console.log(appData)
-                window._appData = appData;
+            window._appData = window._apps[0];
 
-                createApp(appData);
-            }
+            createAppList(window._apps);
 
+            createApp(window._appData);
 
         };
 

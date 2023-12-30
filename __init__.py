@@ -4,7 +4,7 @@ import subprocess
 import importlib.util
 import sys,json
 import urllib
-
+import hashlib
 import datetime
 
 
@@ -77,6 +77,13 @@ install_openai()
 
 
 current_path = os.path.abspath(os.path.dirname(__file__))
+
+
+
+def calculate_md5(string):
+    encoded_string = string.encode()
+    md5_hash = hashlib.md5(encoded_string).hexdigest()
+    return md5_hash
 
 
 def create_key(key_p,crt_p):
@@ -162,17 +169,75 @@ def get_workflows():
     workflows=read_workflow_json_files(workflow_path)
     return workflows
 
-def get_my_workflow_for_app():
-    # print("#####path::", current_path)
-    workflow_path=os.path.join(current_path, "workflow/my_workflow_app.json")
-    print('workflow_path: ',workflow_path)
-    json_data={}
-    try:
-        with open(workflow_path) as json_file:
-            json_data = json.load(json_file)
-    except:
-        print('-')
-    return json_data
+def get_my_workflow_for_app(filename="my_workflow_app.json"):
+    app_path=os.path.join(current_path, "app")
+    if not os.path.exists(app_path):
+        os.mkdir(app_path)
+
+    apps=[]
+    if filename==None:
+        data=read_workflow_json_files(app_path)
+        i=0
+        for item in data:
+            try:
+                x=item["data"]
+                if i==0:
+                    apps.append({
+                        "filename":item["filename"],
+                        "data":x,
+                        "date":item["date"]
+                    })
+                else:
+                    apps.append({
+                        "filename":item["filename"],
+                        "data":{
+                            "app":{
+                                "description":x['app']['description'],
+                                "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
+                                "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
+                                "name":x['app']['name'],
+                                "version":x['app']['version'],
+                            }
+                        },
+                        "date":item["date"]
+                    })
+                i+=1
+            except Exception as e:
+                print("发生异常：", str(e))
+    else:
+        app_workflow_path=os.path.join(app_path, filename)
+        # print('app_workflow_path: ',app_workflow_path)
+        try:
+            with open(app_workflow_path) as json_file:
+                apps = [{
+                    'filename':filename,
+                    'data':json.load(json_file)
+                }]
+        except Exception as e:
+            print("发生异常：", str(e))
+        
+        if len(apps)==1:
+            data=read_workflow_json_files(app_path)
+            
+            for item in data:
+                x=item["data"]
+                print(apps[0]['filename'] ,item["filename"])
+                if apps[0]['filename']!=item["filename"]:
+                    apps.append({
+                        "filename":item["filename"],
+                        "data":{
+                            "app":{
+                                "description":x['app']['description'],
+                                "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
+                                "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
+                                "name":x['app']['name'],
+                                "version":x['app']['version'],
+                            }
+                        },
+                        "date":item["date"]
+                    })
+
+    return apps
 
 def save_workflow_json(data):
     workflow_path=os.path.join(current_path, "workflow/my_workflow.json")
@@ -180,11 +245,22 @@ def save_workflow_json(data):
         json.dump(data, file)
     return workflow_path
 
-def save_workflow_for_app(data):
-    workflow_path=os.path.join(current_path, "workflow/my_workflow_app.json")
-    with open(workflow_path, 'w') as file:
+def save_workflow_for_app(data,filename="my_workflow_app.json"):
+    app_path=os.path.join(current_path, "app")
+    if not os.path.exists(app_path):
+        os.mkdir(app_path)
+    app_workflow_path=os.path.join(app_path, filename)
+ 
+    try:
+        output_str = json.dumps(data['output'])
+        data['app']['id']=calculate_md5(output_str)
+        # id=data['app']['id']
+    except Exception as e:
+        print("发生异常：", str(e))
+    
+    with open(app_workflow_path, 'w') as file:
         json.dump(data, file)
-    return workflow_path
+    return filename
 
 def get_nodes_map():
     # print("#####path::", current_path)
@@ -295,14 +371,17 @@ async def mixlab_workflow_hander(request):
                     'file_path':file_path
                 }
             elif data['task']=='save_app':
-                file_path=save_workflow_for_app(data['data'])
+                file_path=save_workflow_for_app(data['data'],data['filename'])
                 result={
                     'status':'success',
                     'file_path':file_path
                 }
             elif data['task']=='my_app':
+                filename=None
+                if 'filename' in data:
+                    filename=data['filename']
                 result={
-                    'data':get_my_workflow_for_app(),
+                    'data':get_my_workflow_for_app(filename),
                     'status':'success',
                 }
             elif data['task']=='list':
@@ -359,7 +438,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt
-from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,EmptyLayer,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
