@@ -215,6 +215,27 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
                 }]
         except Exception as e:
             print("发生异常：", str(e))
+        
+        if len(apps)==1:
+            data=read_workflow_json_files(app_path)
+            
+            for item in data:
+                x=item["data"]
+                if apps[0]['filename']!=item["filename"]:
+                    apps.append({
+                        "filename":item["filename"],
+                        "data":{
+                            "app":{
+                                "description":x['app']['description'],
+                                "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
+                                "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
+                                "name":x['app']['name'],
+                                "version":x['app']['version'],
+                            }
+                        },
+                        "date":item["date"]
+                    })
+
     return apps
 
 def save_workflow_json(data):

@@ -23,6 +23,7 @@
 
         .apps .content {
             display: flex;
+            flex-wrap: wrap;
         }
 
 
@@ -270,20 +271,22 @@
         input {
             height: 32px;
             cursor: pointer;
-            background: #5c5c5c;
+            background: #000000bf;
             color: white;
             outline: none;
             border: none;
+            border-radius: 4px;
         }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
 </head>
 
 <body>
-    <div style="margin: 24px;
-    background: #eee;
-    padding: 24px;
-    color: #4a4a4a;">Explore your creative potential with <a class="link"
+    <div style="margin: 0 24px;
+    margin-bottom: 24px;
+    padding: 8px;
+    color: #4a4a4a;
+    border-bottom: 1px dashed #595959;">Explore your creative potential with <a class="link"
             href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
         <br>
         <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
@@ -684,6 +687,7 @@
                     // Create a label for the upload control
                     const nameLabel = document.createElement("label");
                     nameLabel.textContent = data.title || "LoadImage: ";
+                    nameLabel.style.marginBottom='12px'
                     uploadContainer.appendChild(nameLabel);
 
                     let actionDiv = document.createElement('div');
@@ -699,9 +703,7 @@
                     actionDiv.appendChild(uploadImageInputHide);
 
                     const btnFromClipboard = document.createElement("button");
-                    btnFromClipboard.style = `width: 156px;
-                    height: 24px;
-                    margin-left: 18px;`
+                    btnFromClipboard.style = `width: 156px; margin-left: 18px;`
                     btnFromClipboard.innerText = 'paste from clipboard'
                     actionDiv.appendChild(btnFromClipboard);
 
@@ -937,11 +939,11 @@
             title.textContent = 'My Application';
 
             const shareBtn = document.createElement('button');
-            shareBtn.innerText = 'share';
+            shareBtn.innerText = 'copy url';
             shareBtn.addEventListener('click', e => {
                 e.preventDefault();
-                let url = `${get_url}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
-                copyTextToClipboard(url,success(e,shareBtn,'share'));
+                let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
+                copyTextToClipboard(url,success(e,shareBtn,'copy url'));
             })
 
             titleDiv.appendChild(title);
@@ -1260,15 +1262,11 @@
         async function init_app() {
 
             const filename = getFilenameFromUrl(location.href);
-            if (filename) {
-                window._apps = await get_my_app(filename);
-            } else {
-                window._apps = await get_my_app();
-            }
+            window._apps = await get_my_app(filename);
 
             window._appData = window._apps[0];
 
-            if (!filename) { createAppList(window._apps); }
+            createAppList(window._apps);
 
             createApp(window._appData);
 
