@@ -81,8 +81,9 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           if (node.type === 'CheckpointLoaderSimple') {
             options = node.widgets.filter(w => w.name === 'ckpt_name')[0]
               .options.values
-          }else if(node.type === 'LoraLoader'){
-            options =node.widgets.filter(w=>w.name==='lora_name')[0].options.values
+          } else if (node.type === 'LoraLoader') {
+            options = node.widgets.filter(w => w.name === 'lora_name')[0]
+              .options.values
           }
         } catch (error) {}
 
@@ -119,7 +120,8 @@ async function save_app (json) {
     method: 'POST',
     body: JSON.stringify({
       data: json,
-      task: 'save_app'
+      task: 'save_app',
+      filename: json.app.filename
     })
   })
   return await res.json()
@@ -170,7 +172,8 @@ async function save (json, download = false) {
       description,
       version,
       input,
-      output
+      output,
+      filename: `${name}_${version}_${new Date().toDateString()}.json`
     }
 
     try {
@@ -180,10 +183,7 @@ async function save (json, download = false) {
     // let http_workflow = app.graph.serialize()
 
     if (download) {
-      await downloadJsonFile(
-        data,
-        `${data.app.name}_${data.app.version}_${new Date().toDateString()}.json`
-      )
+      await downloadJsonFile(data, data.app.filename)
       let open = window.confirm(
         `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?type=new`
       )
@@ -208,7 +208,7 @@ app.registerExtension({
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
-        // console.log(this)
+        console.log('#orig_nodeCreated', this)
         const widget = {
           type: 'div',
           name: 'AppInfoRun',
@@ -218,7 +218,7 @@ app.registerExtension({
               get_position_style(
                 ctx,
                 widget_width,
-                node.widgets[4].last_y + 24,
+                node.size[1] - widget_height,
                 node.size[1]
               )
             )
@@ -236,7 +236,7 @@ app.registerExtension({
         widget.div = $el('div', {})
 
         const btn = document.createElement('button')
-        btn.innerText = 'Save For App'
+        btn.innerText = 'Save & Open'
         btn.style = style
 
         btn.addEventListener('click', () => {
@@ -246,6 +246,7 @@ app.registerExtension({
           } else {
             alert('Please run the workflow before saving')
             // app.queuePrompt(0, 1)
+            this.widgets.filter(w => w.name === 'version')[0].value += 1
           }
         })
 
@@ -261,6 +262,7 @@ app.registerExtension({
           } else {
             alert('Please run the workflow before saving')
             // app.queuePrompt(0, 1)
+            this.widgets.filter(w => w.name === 'version')[0].value += 1
           }
         })
 
@@ -282,7 +284,7 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = async function (message) {
         onExecuted?.apply(this, arguments)
-        // console.log(this.widgets)
+        console.log(message.json)
 
         window._mixlab_app_json = message.json
         try {

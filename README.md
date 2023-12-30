@@ -9,8 +9,8 @@ Example:
 ![APP info](./workflow/appinfo-workflow.svg)
 
 APP-JSON:
-- [text-to-image](./app/text-to-image_1_Wed%20Dec%2027%202023.json)
-- [image-to-image](./app/image-to-image_1_Wed%20Dec%2027%202023.json)
+- [text-to-image](./example/text-to-image_1_Wed%20Dec%2027%202023.json)
+- [image-to-image](./example/image-to-image_1_Wed%20Dec%2027%202023.json)
 - text-to-text
 
 > 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、CheckpointLoaderSimple、LoraLoader

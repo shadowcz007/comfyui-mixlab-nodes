@@ -13,7 +13,63 @@
             margin-left: 5%;
         }
 
+        .apps {
+            margin: 0 32px;
+            background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+        }
 
+        .apps .content {
+            display: flex;
+        }
+
+        .apps .card {
+            width: 200px;
+            margin: 12px;
+            display: flex;
+            flex-direction: row;
+            background: #f8f8f8;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .apps .selected {
+            box-shadow: 0px 0px 10px 10px #fbe9f0
+        }
+
+        .apps .card:hover {
+            box-shadow: 0px 0px 10px 10px #e9fbfa
+        }
+
+        .apps .card h5 {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .apps .card p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .apps .card img {
+            width: 100px;
+            height: fit-content;
+            margin-right: 12px;
+        }
+
+        .apps .card .item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .apps .card .version {
+            font-size: 12px;
+
+        }
 
         .status {
             background: black;
@@ -138,22 +194,21 @@
         .upload_btn {
             width: 188px;
             cursor: pointer;
-            height: 188px;
-            background: black;
+            /* height: 188px; */
+            /* background: black; */
             color: white;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
             font-size: 14px;
-            margin-left: calc(50% - 94px);
-            margin-top: calc(30vh - 94px);
+            color: black;
         }
 
-        .upload_btn:hover {
+        /* .upload_btn:hover {
             outline: 4px solid yellow;
             color: yellow;
-        }
+        } */
 
         .show_text {
             font-size: 14px;
@@ -258,24 +313,34 @@
                 });
         }
 
-        async function get_my_app() {
+        async function get_my_app(filename = null) {
 
             let url = get_url()
 
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    task: 'my_app'
+                    task: 'my_app',
+                    filename
                 })
             })
             let result = await res.json();
+            let data = [];
+            try {
+                for (const res of result.data) {
+                    let { output, app } = res.data
+                    data.push({
+                        ...app,
+                        data: output,
+                        date: res.date
+                    })
+                }
+            } catch (error) {
 
-            let { output, app } = result.data
-
-            return {
-                ...app,
-                data: output
             }
+
+
+            return data
         }
 
 
@@ -750,7 +815,7 @@
 
                         });
                     }
-                }
+                },
             };
         }
 
@@ -758,7 +823,7 @@
 
             // 创建一个div元素
             var div = document.createElement('div');
-            div.className = 'upload_btn'
+            div.className = 'upload_btn card'
             div.textContent = '点击上传JSON文件';
             div.addEventListener('click', function () {
                 document.getElementById('jsonFileInput').click();
@@ -775,10 +840,10 @@
                 reader.onload = function (e) {
                     var contents = e.target.result;
                     var jsonData = JSON.parse(contents);
-                    setTimeout(() => {
-                        div.remove();
-                        input.remove();
-                    }, 500);
+                    // setTimeout(() => {
+                    //     div.remove();
+                    //     input.remove();
+                    // }, 500);
 
                     let { output, app } = jsonData;
 
@@ -786,7 +851,7 @@
                         ...app,
                         data: output
                     };
-
+                    document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
                     // res(jsonData);
@@ -795,10 +860,9 @@
             });
 
             // 将div和input元素添加到body中
-            document.body.appendChild(div);
+            // document.body.appendChild(div);
             document.body.appendChild(input);
-
-
+            return div
         }
 
 
@@ -886,22 +950,74 @@
 
             api.api_base = ""
             api.init();
+
         }
 
+        // 创建app的选择菜单
+        function createAppList(apps = []) {
+            let details = document.createElement('details');
+            details.className = 'apps';
+
+            details.innerHTML = `<summary>APPs</summary>
+                <div class="content"> </div>`
+
+            let div = details.querySelector('div');
+
+            for (let index = 0; index < apps.length; index++) {
+                const app = apps[index];
+                let d = document.createDocumentFragment();
+                let dd = document.createElement('div');
+                d.appendChild(dd);
+                dd.className = 'card' + (index == 0 ? ' selected' : '')
+                dd.innerHTML = ` 
+                        <div class="item">
+                            <img src="${app.icon}"/>
+                        </div>
+                        <div class="item">
+                            <div>
+                                <h5>${app.name}</h5>
+                                <p>${app.description}</p>
+                            </div>
+                            <div >
+                                <p class="version">version: ${app.version}</p>
+                                
+                            </div>
+                        </div>
+                      `
+
+                div.appendChild(d);
+                dd.addEventListener('click', async e => {
+                    e.preventDefault();
+                    Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    dd.className = 'card selected'
+                    // console.log(app.filename)
+
+                    window._appData = (await get_my_app(app.filename))[0];
+                    document.body.querySelector('.app').remove()
+                    createApp(window._appData);
+
+                })
+                // console.log(div)
+            };
+
+            let uploadApp = createUploadJson();
+            div.appendChild(uploadApp);
+
+            document.body.appendChild(details);
+        }
 
         async function init_app() {
 
-            let appData = {}
-
             const type = getTypeFromUrl(location.href);
             if (type === 'new') {
-                createUploadJson();
-            } else {
-                appData = await get_my_app();
-                // console.log(appData)
-                window._appData = appData;
 
-                createApp(appData);
+            } else {
+                window._apps = await get_my_app();
+                window._appData = window._apps[0];
+                createAppList(window._apps);
+                createApp(window._appData);
+                // console.log(appData)
+
             }
 
 

@@ -369,14 +369,14 @@ class AppInfo:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-                    "name": ("STRING",{"multiline": False,"default": "Mixlab-App"}),
+                    "name": ("STRING",{"multiline": False,"default": "Mixlab-App","dynamicPrompts": False}),
                     "image": ("IMAGE",),
-                    "input_ids":("STRING",{"multiline": True,"default": "\n".join(["1","2","3"])}),
-                    "output_ids":("STRING",{"multiline": True,"default": "\n".join(["5","9"])}),
+                    "input_ids":("STRING",{"multiline": True,"default": "\n".join(["1","2","3"]),"dynamicPrompts": False}),
+                    "output_ids":("STRING",{"multiline": True,"default": "\n".join(["5","9"]),"dynamicPrompts": False}),
                              },
 
                 "optional":{
-                    "description":("STRING",{"multiline": True,"default": ""}),
+                    "description":("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
                     "version":("INT", {
                         "default": 1, 
                         "min": 1, 
@@ -384,6 +384,7 @@ class AppInfo:
                         "step": 1, 
                         "display": "number"  
                     }),
+                    "share_prefix":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                 }
 
                 }
@@ -398,13 +399,13 @@ class AppInfo:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,name,image,input_ids,output_ids,description,version):
+    def run(self,name,image,input_ids,output_ids,description,version,share_prefix):
 
         im=create_temp_file(image)
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])
 
-        return {"ui": {"json": [name,im,input_ids,output_ids,description,version]}, "result": (image,)}
+        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix]}, "result": (image,)}
     
 
     
