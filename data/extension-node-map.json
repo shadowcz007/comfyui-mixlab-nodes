@@ -4793,6 +4793,7 @@
             "SplitLongMask",
             "SvgImage",
             "TextImage",
+            "ResizeImageMixlab",
             "TransparentImage",
             "VAEDecodeConsistencyDecoder",
             "VAELoaderConsistencyDecoder",
