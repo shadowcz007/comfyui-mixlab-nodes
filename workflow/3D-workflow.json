@@ -1,6 +1,6 @@
 {
-  "last_node_id": 60,
-  "last_link_id": 118,
+  "last_node_id": 65,
+  "last_link_id": 143,
   "nodes": [
     {
       "id": 9,
@@ -52,7 +52,7 @@
         "1": 246
       },
       "flags": {},
-      "order": 31,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -77,7 +77,7 @@
         "1": 26
       },
       "flags": {},
-      "order": 20,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -168,8 +168,7 @@
           "name": "VAE",
           "type": "VAE",
           "links": [
-            11,
-            23
+            11
           ],
           "slot_index": 2
         }
@@ -220,70 +219,6 @@
       ]
     },
     {
-      "id": 2,
-      "type": "PreviewImage",
-      "pos": [
-        673.0796203613281,
-        734.9191284179688
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 76
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
-    },
-    {
-      "id": 17,
-      "type": "VAEEncode",
-      "pos": [
-        673.0796203613281,
-        1110.9191284179688
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 9,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "pixels",
-          "type": "IMAGE",
-          "link": 77
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 23
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEEncode"
-      }
-    },
-    {
       "id": 43,
       "type": "IPAdapterModelLoader",
       "pos": [
@@ -328,7 +263,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 35,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -368,13 +303,13 @@
         "1": 106
       },
       "flags": {},
-      "order": 15,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
           "name": "width",
           "type": "INT",
-          "link": 26,
+          "link": 120,
           "widget": {
             "name": "width"
           },
@@ -383,7 +318,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 27,
+          "link": 121,
           "widget": {
             "name": "height"
           }
@@ -420,7 +355,7 @@
         "1": 26
       },
       "flags": {},
-      "order": 26,
+      "order": 24,
       "mode": 0,
       "inputs": [
         {
@@ -454,7 +389,7 @@
         "1": 58
       },
       "flags": {},
-      "order": 21,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -494,18 +429,18 @@
         "1": 130
       },
       "flags": {},
-      "order": 17,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 82
+          "link": 137
         },
         {
           "name": "width",
           "type": "INT",
-          "link": 46,
+          "link": 124,
           "widget": {
             "name": "width"
           }
@@ -513,7 +448,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 47,
+          "link": 125,
           "widget": {
             "name": "height"
           }
@@ -550,7 +485,7 @@
         "1": 246
       },
       "flags": {},
-      "order": 25,
+      "order": 23,
       "mode": 0,
       "inputs": [
         {
@@ -575,13 +510,13 @@
         "1": 130
       },
       "flags": {},
-      "order": 18,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
           "name": "width",
           "type": "INT",
-          "link": 102,
+          "link": 126,
           "widget": {
             "name": "width"
           }
@@ -589,7 +524,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 97,
+          "link": 127,
           "widget": {
             "name": "height"
           }
@@ -616,199 +551,6 @@
       ]
     },
     {
-      "id": 50,
-      "type": "PreviewImage",
-      "pos": [
-        673.0796203613281,
-        1698.9191284179688
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 87
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
-    },
-    {
-      "id": 20,
-      "type": "MergeLayers",
-      "pos": [
-        1613.3576354980469,
-        694
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 23,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "layers",
-          "type": "LAYER",
-          "link": 103,
-          "slot_index": 0
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 110
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            34,
-            36
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "MergeLayers"
-      }
-    },
-    {
-      "id": 22,
-      "type": "NewLayer",
-      "pos": [
-        1198.3576354980469,
-        366
-      ],
-      "size": {
-        "0": 315,
-        "1": 234
-      },
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 74
-        },
-        {
-          "name": "mask",
-          "type": "MASK",
-          "link": 75
-        },
-        {
-          "name": "layers",
-          "type": "LAYER",
-          "link": null,
-          "slot_index": 2
-        },
-        {
-          "name": "width",
-          "type": "INT",
-          "link": 30,
-          "widget": {
-            "name": "width"
-          }
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "link": 31,
-          "widget": {
-            "name": "height"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "layers",
-          "type": "LAYER",
-          "links": [
-            103
-          ],
-          "shape": 6,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "NewLayer"
-      },
-      "widgets_values": [
-        0,
-        0,
-        512,
-        512,
-        2,
-        "width",
-        ""
-      ]
-    },
-    {
-      "id": 18,
-      "type": "GetImageSize",
-      "pos": [
-        673.0796203613281,
-        1286.9191284179688
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 78
-        }
-      ],
-      "outputs": [
-        {
-          "name": "width",
-          "type": "INT",
-          "links": [
-            26,
-            30,
-            46,
-            102,
-            106
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "links": [
-            27,
-            31,
-            47,
-            97,
-            107
-          ],
-          "shape": 3,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GetImageSize"
-      }
-    },
-    {
       "id": 57,
       "type": "PreviewImage",
       "pos": [
@@ -820,7 +562,7 @@
         "1": 246
       },
       "flags": {},
-      "order": 22,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -845,7 +587,7 @@
         "1": 82
       },
       "flags": {},
-      "order": 24,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -886,7 +628,7 @@
         "1": 309.7566223144531
       },
       "flags": {},
-      "order": 29,
+      "order": 25,
       "mode": 0,
       "inputs": [
         {
@@ -911,7 +653,7 @@
         "1": 98
       },
       "flags": {},
-      "order": 33,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -961,13 +703,13 @@
         "1": 529.5877685546875
       },
       "flags": {},
-      "order": 28,
+      "order": 26,
       "mode": 0,
       "inputs": [
         {
           "name": "images",
           "type": "IMAGE",
-          "link": 36
+          "link": 142
         }
       ],
       "properties": {
@@ -986,13 +728,13 @@
         "1": 26
       },
       "flags": {},
-      "order": 13,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
           "name": "mask",
           "type": "MASK",
-          "link": 80
+          "link": 136
         }
       ],
       "outputs": [
@@ -1012,174 +754,6 @@
       }
     },
     {
-      "id": 26,
-      "type": "CannyEdgePreprocessor",
-      "pos": [
-        673.0796203613281,
-        1462.9191284179688
-      ],
-      "size": {
-        "0": 315,
-        "1": 106
-      },
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 79
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            40
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "CannyEdgePreprocessor"
-      },
-      "widgets_values": [
-        126,
-        200,
-        512
-      ]
-    },
-    {
-      "id": 56,
-      "type": "ImageScale",
-      "pos": [
-        1198.3576354980469,
-        1234
-      ],
-      "size": {
-        "0": 315,
-        "1": 130
-      },
-      "flags": {},
-      "order": 19,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 108
-        },
-        {
-          "name": "width",
-          "type": "INT",
-          "link": 106,
-          "widget": {
-            "name": "width"
-          }
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "link": 107,
-          "widget": {
-            "name": "height"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            109,
-            110,
-            117
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "ImageScale"
-      },
-      "widgets_values": [
-        "nearest-exact",
-        512,
-        512,
-        "disabled"
-      ]
-    },
-    {
-      "id": 42,
-      "type": "IPAdapterApply",
-      "pos": [
-        673.0796203613281,
-        2230.9191284179688
-      ],
-      "size": {
-        "0": 315,
-        "1": 258
-      },
-      "flags": {},
-      "order": 14,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "ipadapter",
-          "type": "IPADAPTER",
-          "link": 67,
-          "slot_index": 0
-        },
-        {
-          "name": "clip_vision",
-          "type": "CLIP_VISION",
-          "link": 68,
-          "slot_index": 1
-        },
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 83,
-          "slot_index": 2
-        },
-        {
-          "name": "model",
-          "type": "MODEL",
-          "link": 70
-        },
-        {
-          "name": "attn_mask",
-          "type": "MASK",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            71
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "IPAdapterApply"
-      },
-      "widgets_values": [
-        0.9,
-        0,
-        "linear",
-        0,
-        0.886,
-        false
-      ]
-    },
-    {
       "id": 27,
       "type": "ControlNetApply",
       "pos": [
@@ -1191,7 +765,7 @@
         "1": 98
       },
       "flags": {},
-      "order": 32,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -1311,7 +885,7 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 34
+          "link": 143
         },
         {
           "name": "mask",
@@ -1347,7 +921,7 @@
         "1": 98
       },
       "flags": {},
-      "order": 30,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -1398,7 +972,7 @@
         "1": 262
       },
       "flags": {},
-      "order": 34,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -1447,16 +1021,267 @@
       ]
     },
     {
-      "id": 45,
-      "type": "3DImage",
+      "id": 61,
+      "type": "GetImageSize_",
       "pos": [
-        -981,
-        1174
+        575,
+        1151
       ],
       "size": {
-        "0": 473.0796203613281,
-        "1": 451.867919921875
+        "0": 210,
+        "1": 46
       },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 133
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            120,
+            122,
+            124,
+            126,
+            128
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            121,
+            123,
+            125,
+            127,
+            129
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 56,
+      "type": "ImageScale",
+      "pos": [
+        1167,
+        1211
+      ],
+      "size": {
+        "0": 315,
+        "1": 130
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 138
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 128,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 129,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            109,
+            117,
+            141
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "nearest-exact",
+        512,
+        512,
+        "disabled"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "NewLayer",
+      "pos": [
+        1198,
+        366
+      ],
+      "size": {
+        "0": 315,
+        "1": 234
+      },
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 132
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 135
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null,
+          "slot_index": 2
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 122,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 123,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            140
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        0,
+        0,
+        512,
+        512,
+        2,
+        "width",
+        ""
+      ]
+    },
+    {
+      "id": 64,
+      "type": "PreviewImage",
+      "pos": [
+        630,
+        674
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 131
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 26,
+      "type": "CannyEdgePreprocessor",
+      "pos": [
+        673.0796203613281,
+        1462.9191284179688
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 134
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            40
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CannyEdgePreprocessor"
+      },
+      "widgets_values": [
+        126,
+        200,
+        512
+      ]
+    },
+    {
+      "id": 63,
+      "type": "3DImage",
+      "pos": [
+        -707,
+        963
+      ],
+      "size": [
+        315,
+        486
+      ],
       "flags": {},
       "order": 5,
       "mode": 0,
@@ -1472,12 +1297,10 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            74,
-            76,
-            77,
-            78,
-            79,
-            87
+            131,
+            132,
+            133,
+            134
           ],
           "shape": 3,
           "slot_index": 0
@@ -1486,8 +1309,8 @@
           "name": "MASK",
           "type": "MASK",
           "links": [
-            75,
-            80
+            135,
+            136
           ],
           "shape": 3,
           "slot_index": 1
@@ -1496,9 +1319,9 @@
           "name": "BG_IMAGE",
           "type": "IMAGE",
           "links": [
-            82,
-            83,
-            108
+            137,
+            138,
+            139
           ],
           "shape": 3,
           "slot_index": 2
@@ -1515,18 +1338,60 @@
       }
     },
     {
+      "id": 65,
+      "type": "MergeLayers",
+      "pos": [
+        1651,
+        674
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 140
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 141
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            142,
+            143
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MergeLayers"
+      }
+    },
+    {
       "id": 15,
       "type": "PreviewImage",
       "pos": [
         -456,
-        1945
+        1756
       ],
       "size": {
         "0": 439.2066345214844,
         "1": 539.8549194335938
       },
       "flags": {},
-      "order": 36,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -1538,6 +1403,73 @@
       "properties": {
         "Node name for S&R": "PreviewImage"
       }
+    },
+    {
+      "id": 42,
+      "type": "IPAdapterApply",
+      "pos": [
+        658,
+        2189
+      ],
+      "size": {
+        "0": 315,
+        "1": 258
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "ipadapter",
+          "type": "IPADAPTER",
+          "link": 67,
+          "slot_index": 0
+        },
+        {
+          "name": "clip_vision",
+          "type": "CLIP_VISION",
+          "link": 68,
+          "slot_index": 1
+        },
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 139,
+          "slot_index": 2
+        },
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 70
+        },
+        {
+          "name": "attn_mask",
+          "type": "MASK",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            71
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "IPAdapterApply"
+      },
+      "widgets_values": [
+        0.9,
+        0,
+        "linear",
+        0,
+        0.886,
+        false
+      ]
     }
   ],
   "links": [
@@ -1606,68 +1538,12 @@
       "CONTROL_NET"
     ],
     [
-      23,
-      6,
-      2,
-      17,
-      1,
-      "VAE"
-    ],
-    [
       25,
       19,
       0,
       5,
       3,
       "LATENT"
-    ],
-    [
-      26,
-      18,
-      0,
-      19,
-      0,
-      "INT"
-    ],
-    [
-      27,
-      18,
-      1,
-      19,
-      1,
-      "INT"
-    ],
-    [
-      30,
-      18,
-      0,
-      22,
-      3,
-      "INT"
-    ],
-    [
-      31,
-      18,
-      1,
-      22,
-      4,
-      "INT"
-    ],
-    [
-      34,
-      20,
-      0,
-      14,
-      0,
-      "IMAGE"
-    ],
-    [
-      36,
-      20,
-      0,
-      24,
-      0,
-      "IMAGE"
     ],
     [
       40,
@@ -1684,22 +1560,6 @@
       27,
       0,
       "CONDITIONING"
-    ],
-    [
-      46,
-      18,
-      0,
-      29,
-      1,
-      "INT"
-    ],
-    [
-      47,
-      18,
-      1,
-      29,
-      2,
-      "INT"
     ],
     [
       50,
@@ -1790,90 +1650,10 @@
       "MODEL"
     ],
     [
-      74,
-      45,
-      0,
-      22,
-      0,
-      "IMAGE"
-    ],
-    [
-      75,
-      45,
-      1,
-      22,
-      1,
-      "MASK"
-    ],
-    [
-      76,
-      45,
-      0,
-      2,
-      0,
-      "IMAGE"
-    ],
-    [
-      77,
-      45,
-      0,
-      17,
-      0,
-      "IMAGE"
-    ],
-    [
-      78,
-      45,
-      0,
-      18,
-      0,
-      "IMAGE"
-    ],
-    [
-      79,
-      45,
-      0,
-      26,
-      0,
-      "IMAGE"
-    ],
-    [
-      80,
-      45,
-      1,
-      25,
-      0,
-      "MASK"
-    ],
-    [
-      82,
-      45,
-      2,
-      29,
-      0,
-      "IMAGE"
-    ],
-    [
-      83,
-      45,
-      2,
-      42,
-      2,
-      "IMAGE"
-    ],
-    [
       85,
       10,
       0,
       15,
-      0,
-      "IMAGE"
-    ],
-    [
-      87,
-      45,
-      0,
-      50,
       0,
       "IMAGE"
     ],
@@ -1886,14 +1666,6 @@
       "IMAGE"
     ],
     [
-      97,
-      18,
-      1,
-      53,
-      1,
-      "INT"
-    ],
-    [
       99,
       52,
       0,
@@ -1902,59 +1674,11 @@
       "MASK"
     ],
     [
-      102,
-      18,
-      0,
-      53,
-      0,
-      "INT"
-    ],
-    [
-      103,
-      22,
-      0,
-      20,
-      0,
-      "LAYER"
-    ],
-    [
-      106,
-      18,
-      0,
-      56,
-      1,
-      "INT"
-    ],
-    [
-      107,
-      18,
-      1,
-      56,
-      2,
-      "INT"
-    ],
-    [
-      108,
-      45,
-      2,
-      56,
-      0,
-      "IMAGE"
-    ],
-    [
       109,
       56,
       0,
       57,
       0,
-      "IMAGE"
-    ],
-    [
-      110,
-      56,
-      0,
-      20,
-      1,
       "IMAGE"
     ],
     [
@@ -1988,6 +1712,190 @@
       27,
       1,
       "CONTROL_NET"
+    ],
+    [
+      120,
+      61,
+      0,
+      19,
+      0,
+      "INT"
+    ],
+    [
+      121,
+      61,
+      1,
+      19,
+      1,
+      "INT"
+    ],
+    [
+      122,
+      61,
+      0,
+      22,
+      3,
+      "INT"
+    ],
+    [
+      123,
+      61,
+      1,
+      22,
+      4,
+      "INT"
+    ],
+    [
+      124,
+      61,
+      0,
+      29,
+      1,
+      "INT"
+    ],
+    [
+      125,
+      61,
+      1,
+      29,
+      2,
+      "INT"
+    ],
+    [
+      126,
+      61,
+      0,
+      53,
+      0,
+      "INT"
+    ],
+    [
+      127,
+      61,
+      1,
+      53,
+      1,
+      "INT"
+    ],
+    [
+      128,
+      61,
+      0,
+      56,
+      1,
+      "INT"
+    ],
+    [
+      129,
+      61,
+      1,
+      56,
+      2,
+      "INT"
+    ],
+    [
+      131,
+      63,
+      0,
+      64,
+      0,
+      "IMAGE"
+    ],
+    [
+      132,
+      63,
+      0,
+      22,
+      0,
+      "IMAGE"
+    ],
+    [
+      133,
+      63,
+      0,
+      61,
+      0,
+      "IMAGE"
+    ],
+    [
+      134,
+      63,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      135,
+      63,
+      1,
+      22,
+      1,
+      "MASK"
+    ],
+    [
+      136,
+      63,
+      1,
+      25,
+      0,
+      "MASK"
+    ],
+    [
+      137,
+      63,
+      2,
+      29,
+      0,
+      "IMAGE"
+    ],
+    [
+      138,
+      63,
+      2,
+      56,
+      0,
+      "IMAGE"
+    ],
+    [
+      139,
+      63,
+      2,
+      42,
+      2,
+      "IMAGE"
+    ],
+    [
+      140,
+      22,
+      0,
+      65,
+      0,
+      "LAYER"
+    ],
+    [
+      141,
+      56,
+      0,
+      65,
+      1,
+      "IMAGE"
+    ],
+    [
+      142,
+      65,
+      0,
+      24,
+      0,
+      "IMAGE"
+    ],
+    [
+      143,
+      65,
+      0,
+      14,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [],
