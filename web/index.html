@@ -124,13 +124,18 @@
             flex-direction: column;
         }
 
+        .output {
+            width: 90%;
+            margin: 12px;
+        }
+
         .output_card {
             height: 100%;
             width: 100%;
             box-shadow: 0px 0px 8px 3px #e6e7e7;
 
             display: flex;
-
+            flex-wrap: wrap;
             /* justify-content: center;
             align-items: center; */
 
@@ -140,6 +145,8 @@
         video {
             max-width: 400px;
             max-height: 600px;
+            margin: 8px;
+            min-width: 200px;
         }
 
         .card {
@@ -213,8 +220,9 @@
         .show_text {
             font-size: 14px;
             /* display: inline-block; */
-            /* margin: 13px; */
+            margin: 8px;
             padding: 32px;
+            min-width: 200px;
             background: #242424;
             color: white;
         }
@@ -345,24 +353,69 @@
 
 
         function createOutputs(outputData) {
-            // Array.from( window._appData.output,n=>n.id)
-            const container = document.createElement("div");
-            container.className = 'output_card'
+            const container = document.createElement('div');
+            container.className = "output";
+
+            const action = document.createElement('div');
+            container.appendChild(action)
+
+            const copyHTML = document.createElement('button');
+            copyHTML.innerText = 'copy as html'
+            action.appendChild(copyHTML)
+
+            const copyImages = document.createElement('button');
+            copyImages.innerText = 'copy images'
+            action.appendChild(copyImages)
+            copyImages.style.marginLeft = '18px';
+
+            const copyText = document.createElement('button');
+            copyText.innerText = 'copy text'
+            action.appendChild(copyText)
+            copyText.style.marginLeft = '18px';
+
+            const output_card = document.createElement("div");
+            output_card.className = 'output_card'
+            container.appendChild(output_card)
+
+            const success = (isSuccess, btn, text) => {
+                isSuccess ? btn.innerText = 'success' : text;
+                setTimeout(() => {
+                    btn.innerText = text;
+                }, 5000)
+            }
+
+            copyText.addEventListener('click', e => {
+                e.preventDefault();
+                copyTextToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy text'))
+
+            })
+
+            copyImages.addEventListener('click', e => {
+                e.preventDefault();
+                // copyHtmlWithImagesToClipboard(output_card.outerHTML)
+                copyImagesToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy images'))
+                // copyTextToClipboard()
+            })
+            copyHTML.addEventListener('click', e => {
+                e.preventDefault();
+                copyHtmlWithImagesToClipboard(output_card.outerHTML, (r) => success(r, copyText, 'copy as html'))
+                // copyImagesToClipboard(output_card.outerHTML)
+            })
 
             for (const node of outputData) {
-                console.log('output', node)
+                // console.log('output', node)
                 if (node.class_type == "ShowTextForGPT") {
                     let div = document.createElement('div');
                     div.className = "show_text"
                     div.id = `output_${node.id}`;
-                    div.innerText = node.inputs.text[0]
-                    container.appendChild(div);
+                    div.innerText = Array.isArray(node.inputs.text) ? node.inputs.text[0] : node.inputs.text
+                    output_card.appendChild(div);
                 };
                 if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
                     let img = new Image();
                     img.id = `output_${node.id}`;
                     img.src = base64Df;
-                    container.appendChild(img);
+                    output_card.appendChild(img);
                 }
 
                 // video ,gif
@@ -378,7 +431,7 @@
 
                     v.appendChild(video);
                     v.appendChild(img);
-                    container.appendChild(v);
+                    output_card.appendChild(v);
                 }
 
             }
@@ -426,6 +479,134 @@
                 console.error('无法读取剪贴板中的图片:', error);
             }
         }
+
+
+        function copyHtmlWithImagesToClipboard(data, cb) {
+            // 创建一个临时div元素
+            const tempDiv = document.createElement('div');
+
+            // 将HTML字符串赋值给div的innerHTML属性
+            tempDiv.innerHTML = data;
+
+            // 获取div中的所有图像元素
+            const images = tempDiv.getElementsByTagName('img');
+
+            // 遍历图像元素，并将图像数据转换为Base64编码
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+
+                // 设置canvas尺寸与图像尺寸相同
+                canvas.width = image.width;
+                canvas.height = image.height;
+
+                // 在canvas上绘制图像
+                context.drawImage(image, 0, 0);
+
+                // 将canvas转换为Base64编码
+                const imageData = canvas.toDataURL();
+
+                // 将Base64编码替换图像元素的src属性
+                image.src = imageData;
+            }
+
+
+            let richText = tempDiv.innerHTML;
+
+            // 创建一个新的Blob对象，并将富文本字符串作为数据传递进去
+            const blob = new Blob([richText], { type: 'text/html' });
+
+            // 创建一个ClipboardItem对象，并将Blob对象添加到其中
+            const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+            // 使用Clipboard API将内容复制到剪贴板
+            navigator.clipboard.write([clipboardItem])
+                .then(() => {
+                    console.log('富文本已成功复制到剪贴板');
+                    tempDiv.remove()
+                    if (cb) cb(true)
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    tempDiv.remove()
+                    if (cb) cb(false)
+                });
+
+        }
+
+        // const htmlWithImages = "<p>这是要复制的HTML内容</p><img src='data:image/png;base64,iVBORw0KG...'>"
+        // copyHtmlWithImagesToClipboard(htmlWithImages);
+
+        function copyImagesToClipboard(html, cb) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const images = tempDiv.querySelectorAll('img');
+            const promises = Array.from(images).map((image) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = image.src;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        context.drawImage(img, 0, 0);
+                        canvas.toBlob((blob) => {
+                            const clipboardItem = new ClipboardItem({ 'image/png': blob });
+                            navigator.clipboard.write([clipboardItem])
+                                .then(() => {
+                                    resolve();
+                                    tempDiv.remove()
+                                    if (cb) cb(true)
+                                })
+                                .catch((error) => {
+                                    reject(error);
+                                    tempDiv.remove()
+                                    if (cb) cb(false)
+                                });
+                        });
+                    };
+                });
+            });
+            Promise.all([...promises])
+                .then(() => {
+                    console.log('所有图片已成功复制到剪贴板');
+                    if (cb) cb(true)
+                    tempDiv.remove()
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    if (cb) cb(false)
+                    tempDiv.remove()
+                });
+        }
+
+        function copyTextToClipboard(html, cb) {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const text = tempDiv.innerText;
+            const textData = new ClipboardItem({ 'text/plain': new Blob([text], { type: 'text/plain' }) });
+
+            navigator.clipboard.write([textData])
+                .then(() => {
+                    console.log('所有文本已成功复制到剪贴板', text);
+                    if (cb) cb(true)
+                    tempDiv.remove()
+                })
+                .catch((error) => {
+                    console.error('复制到剪贴板失败:', error);
+                    if (cb) cb(false)
+                    tempDiv.remove()
+                });
+        }
+
+
+        // const htmlString = "<p>这是要复制的HTML内容</p><img src='url'><img src='url'>";
+        // copyImagesToClipboard(htmlString);
+
+
 
         function createInputs(inputData) {
             // Assuming you have an HTML element with the id "container" to hold the UI
@@ -924,8 +1105,8 @@
                     // if (!images) return; 
                     const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
                     show(src, detail.node, 'image');
-                } else if (text && text[0]) {
-                    ui.output.update("text", text[0], detail.node)
+                } else if (text) {
+                    ui.output.update("text", Array.isArray(text) ? text[0] : text, detail.node)
                 } else if (gifs && gifs[0]) {
                     // if (!images) return; 
                     const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
@@ -1017,9 +1198,11 @@
             }
 
             window._appData = window._apps[0];
-            createAppList(window._apps);
+
+            if (!filename) { createAppList(window._apps); }
+
             createApp(window._appData);
-       
+
         };
 
         init_app()

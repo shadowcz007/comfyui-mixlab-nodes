@@ -185,14 +185,14 @@ async function save (json, download = false) {
     // let http_workflow = app.graph.serialize()
 
     if (download) {
-      const { filename } = await save_app(data)
+       await save_app(data)
       await downloadJsonFile(data, data.app.filename)
       let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?type=new`
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(data.app.filename)}`
       )
       if (open)
         window.open(
-          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(filename)}`
+          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(data.app.filename)}`
         )
     } else {
       await save_app(data)
