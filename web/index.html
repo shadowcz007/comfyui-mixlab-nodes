@@ -25,6 +25,7 @@
             display: flex;
         }
 
+
         .apps .card {
             width: 200px;
             margin: 12px;
@@ -54,9 +55,10 @@
         }
 
         .apps .card img {
-            width: 100px;
-            height: fit-content;
-            margin-right: 12px;
+            width: auto;
+            height: 100%;
+
+            margin: 0px;
         }
 
         .apps .card .item {
@@ -65,6 +67,17 @@
             justify-content: space-between;
             align-items: flex-start;
         }
+
+        .apps .card .icon {
+            width: 120px;
+            height: 120px;
+            overflow: hidden;
+            background: #e3e3e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
 
         .apps .card .version {
             font-size: 12px;
@@ -98,17 +111,24 @@
             display: flex;
             flex-direction: column;
             min-width: 400px;
-            background: #eee;
+            /* background: #eee; */
             margin: 24px;
             flex: 1;
             align-items: center;
             /* justify-content: center; */
         }
 
+        .panel .header {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+        }
+
         .panel h1 {
             padding: 0 12px;
-            margin-top: 12px;
-            margin-bottom: 0;
+            margin: 0;
         }
 
         .panel img,
@@ -132,8 +152,8 @@
         .output_card {
             height: 100%;
             width: 100%;
-            box-shadow: 0px 0px 8px 3px #e6e7e7;
-
+            box-shadow: 0px 0px 20px 7px #e6e7e7;
+            margin-top: 24px;
             display: flex;
             flex-wrap: wrap;
             /* justify-content: center;
@@ -188,7 +208,7 @@
             border: 3px solid;
         }
 
-        .run_btn:hover {
+        button:hover {
             border-color: yellow;
             color: yellow;
         }
@@ -243,6 +263,17 @@
             margin-left: 4px;
             font-size: 12px;
             color: #555;
+        }
+
+        select,
+        button,
+        input {
+            height: 32px;
+            cursor: pointer;
+            background: #5c5c5c;
+            color: white;
+            outline: none;
+            border: none;
         }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
@@ -332,6 +363,14 @@
                 });
         }
 
+
+        function success(isSuccess, btn, text) {
+            isSuccess ? btn.innerText = 'success' : text;
+            setTimeout(() => {
+                btn.innerText = text;
+            }, 5000)
+        }
+
         async function get_my_app(filename = null) {
 
             let url = get_url()
@@ -388,12 +427,7 @@
             output_card.className = 'output_card'
             container.appendChild(output_card)
 
-            const success = (isSuccess, btn, text) => {
-                isSuccess ? btn.innerText = 'success' : text;
-                setTimeout(() => {
-                    btn.innerText = text;
-                }, 5000)
-            }
+
 
             copyText.addEventListener('click', e => {
                 e.preventDefault();
@@ -812,7 +846,7 @@
             // 创建标签元素
             var label = document.createElement("label");
             label.innerHTML = labelText;
-            label.setAttribute('data-content',value);
+            label.setAttribute('data-content', value);
 
             // 创建容器元素，并将滑块输入和标签添加到容器中
             var container = document.createElement("div");
@@ -823,9 +857,9 @@
             // 添加change事件监听器
             slider.addEventListener("input", function (event) {
                 var value = event.target.value;
-                value=type == 'float' ? value : Math.round(value)
+                value = type == 'float' ? value : Math.round(value)
                 console.log("滑块输入的值为：" + value);
-                label.setAttribute('data-content',value);
+                label.setAttribute('data-content', value);
                 // 在这里可以执行其他操作，根据需要进行相应的处理
                 callback && callback(value)
             });
@@ -896,8 +930,23 @@
             // top: 12px;flex:0.6`
 
             // 创建标题
+            let titleDiv = document.createElement('div');
+            titleDiv.className = 'header'
+
             var title = document.createElement('h1');
             title.textContent = 'My Application';
+
+            const shareBtn = document.createElement('button');
+            shareBtn.innerText = 'share';
+            shareBtn.addEventListener('click', e => {
+                e.preventDefault();
+                let url = `${get_url}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
+                copyTextToClipboard(url,success(e,shareBtn,'share'));
+            })
+
+            titleDiv.appendChild(title);
+            titleDiv.appendChild(shareBtn);
+
 
             let iconDes = document.createElement('div');
             // 创建应用图标
@@ -928,7 +977,7 @@
             submitButton.className = 'run_btn'
 
             // 将所有UI元素添加到页面中
-            leftDiv.appendChild(title);
+            leftDiv.appendChild(titleDiv);
             leftDiv.appendChild(iconDes);
             // leftDiv.appendChild(des);
             leftDiv.appendChild(status);
@@ -1040,8 +1089,8 @@
                 reader.onload = function (e) {
                     var contents = e.target.result;
                     var jsonData = JSON.parse(contents);
-                    
-                    
+
+
                     Array.from(detail.querySelectorAll('.card'), c => c.classList.remove('selected'));
                     div.className = 'upload_btn card selected'
 
@@ -1160,7 +1209,7 @@
             let details = document.createElement('details');
             details.className = 'apps';
 
-            details.innerHTML = `<summary>APPs #${apps.length}</summary>
+            details.innerHTML = `<summary>ComfyUI APP Store / ${apps.length}</summary>
                 <div class="content"> </div>`
 
             let div = details.querySelector('div');
@@ -1172,10 +1221,10 @@
                 d.appendChild(dd);
                 dd.className = 'card' + (index == 0 ? ' selected' : '')
                 dd.innerHTML = ` 
-                        <div class="item">
+                        <div class="item icon">
                             <img src="${app.icon || base64Df}"/>
                         </div>
-                        <div class="item">
+                        <div class="item" style="margin-left: 24px;">
                             <div>
                                 <h5>${app.name}</h5>
                                 <p>${app.description}</p>
