@@ -58,14 +58,31 @@ class PromptSlide:
     def INPUT_TYPES(s):
         return {
             "required": {
-                "weight":("FLOAT", {"default": 1, "min": -10,"max": 10,
-                                                                "step": 0.01,
-                                                                "display": "slider"}),
+                
                 "prompt_keyword": ("STRING", 
                          {
                             "multiline": False, 
                             "default": ''
                           }),
+
+                "weight":("FLOAT", {"default": 1, "min": -10,"max": 10,
+                                                                "step": 0.01,
+                                                                "display": "slider"}),
+
+                "min_value":("FLOAT", {
+                        "default": -2, 
+                        "min": -10, 
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, 
+                        "display": "number"  
+                    }),
+                "max_value":("FLOAT", {
+                        "default": 2, 
+                        "min": -10, 
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, 
+                        "display": "number"  
+                    }),
               
                 }
             }
@@ -82,7 +99,11 @@ class PromptSlide:
     OUTPUT_NODE = False
 
     # 运行的函数
-    def run(self,weight,prompt_keyword):
+    def run(self,prompt_keyword,weight,min_value,max_value):
+        if weight < min_value:
+            weight= min_value
+        elif weight > max_value:
+            weight= max_value
         p=addWeight(prompt_keyword,weight)
         return (p,)
 
@@ -150,6 +171,8 @@ class RandomPrompt:
             w1=w1.strip()
             for w2 in words2:
                 w2=w2.strip()
+                if '``' not in w2:
+                    w2=w2+',``'
                 if w1!='' and w2!='':
                     prompts.append(w2.replace('``', w1))
                 pbar.update(1)
