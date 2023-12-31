@@ -91,13 +91,14 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
 
         if (node.type == 'IntNumber' || node.type == 'FloatSlider') {
           // min max step
-
-          options = node.widgets.filter(w => w.type === 'number')[0].options
+          let [v, min, max, step] = Array.from(node.widgets, w => w.value)
+          options = { min, max, step }
+          // node.widgets.filter(w => w.type === 'number')[0].options
         }
 
         if (node.type == 'PromptSlide') {
           // min max step
-          options = node.widgets.filter(w => w.type === "slider")[0].options
+          options = node.widgets.filter(w => w.type === 'slider')[0].options
         }
 
         input[inputIds.indexOf(id)] = {

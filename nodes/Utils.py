@@ -182,6 +182,27 @@ class FloatSlider:
                         "step": 0.001, #Slider's step
                         "display": "slider" # Cosmetic only: display as "number" or "slider"
                     }),
+                    "min_value":("FLOAT", {
+                        "default": 0, 
+                        "min": -0xffffffffffffffff, 
+                        "max": 0xffffffffffffffff,
+                        "step": 0.001, 
+                        "display": "number"  
+                    }),
+                    "max_value":("FLOAT", {
+                            "default": 1, 
+                            "min": -0xffffffffffffffff,
+                            "max": 0xffffffffffffffff,
+                            "step": 0.001, 
+                            "display": "number"  
+                        }),
+                    "step":("FLOAT", {
+                            "default": 0.001, 
+                            "min": -0xffffffffffffffff,
+                            "max": 0xffffffffffffffff,
+                            "step": 0.001, 
+                            "display": "number"  
+                        }),
                              },
                 }
     
@@ -194,8 +215,11 @@ class FloatSlider:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,number):
-       
+    def run(self,number,min_value,max_value,step):
+        if number < min_value:
+            number= min_value
+        elif number > max_value:
+            number= max_value
         return (number,)
     
   
@@ -210,7 +234,27 @@ class IntNumber:
                         "step": 1, 
                         "display": "number"
                     }),
-                    
+                    "min_value":("INT", {
+                        "default": 0, 
+                        "min": -0xffffffffffffffff, 
+                        "max": 0xffffffffffffffff,
+                        "step": 1, 
+                        "display": "number"  
+                    }),
+                    "max_value":("INT", {
+                            "default": 1, 
+                            "min": -0xffffffffffffffff,
+                            "max": 0xffffffffffffffff,
+                            "step": 1, 
+                            "display": "number"  
+                        }),
+                    "step":("INT", {
+                            "default": 1, 
+                            "min": -0xffffffffffffffff,
+                            "max": 0xffffffffffffffff,
+                            "step":1, 
+                            "display": "number"  
+                        }),
                              },
                 }
     
@@ -223,8 +267,11 @@ class IntNumber:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,number):
-       
+    def run(self,number,min_value,max_value,step):
+        if number < min_value:
+            number= min_value
+        elif number > max_value:
+            number= max_value
         return (number,)
 
 class MultiplicationNode:
