@@ -1,0 +1,723 @@
+{
+  "last_node_id": 22,
+  "last_link_id": 23,
+  "nodes": [
+    {
+      "id": 9,
+      "type": "CLIPTextEncode",
+      "pos": [
+        2070,
+        830
+      ],
+      "size": {
+        "0": 425.27801513671875,
+        "1": 180.6060791015625
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "EmptyLatentImage",
+      "pos": [
+        2070,
+        1060
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        512,
+        512,
+        1
+      ]
+    },
+    {
+      "id": 6,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        1640,
+        920
+      ],
+      "size": {
+        "0": 315,
+        "1": 98
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            6,
+            7
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            9
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "deliberate_v2.safetensors"
+      ]
+    },
+    {
+      "id": 8,
+      "type": "CLIPTextEncode",
+      "pos": [
+        2080,
+        630
+      ],
+      "size": {
+        "0": 422.84503173828125,
+        "1": 164.31304931640625
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 6
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 16,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
+      ]
+    },
+    {
+      "id": 10,
+      "type": "VAEDecode",
+      "pos": [
+        2870,
+        630
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {
+        "collapsed": false
+      },
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 8
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            12
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 16,
+      "type": "ShowTextForGPT",
+      "pos": [
+        3288,
+        -323
+      ],
+      "size": {
+        "0": 449.1168212890625,
+        "1": 76
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 20,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "a girl face,super,(Pop Art:1.26),(Black and White:1.26)"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "PreviewImage",
+      "pos": [
+        3319,
+        -161
+      ],
+      "size": {
+        "0": 435.8727111816406,
+        "1": 511.8609619140625
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 13
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 5,
+      "type": "KSampler",
+      "pos": [
+        2520,
+        630
+      ],
+      "size": {
+        "0": 315,
+        "1": 262
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 2
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 3
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 4
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 5
+        },
+        {
+          "name": "seed",
+          "type": "INT",
+          "link": 21,
+          "widget": {
+            "name": "seed"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        1063141893699118,
+        "fixed",
+        20,
+        8,
+        "euler",
+        "normal",
+        1
+      ]
+    },
+    {
+      "id": 18,
+      "type": "IntNumber",
+      "pos": [
+        2852,
+        275
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "INT",
+          "type": "INT",
+          "links": [
+            21
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "Seed",
+      "properties": {
+        "Node name for S&R": "IntNumber"
+      },
+      "widgets_values": [
+        -1
+      ]
+    },
+    {
+      "id": 22,
+      "type": "PromptSlide",
+      "pos": [
+        2364,
+        -294
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            23
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PromptSlide"
+      },
+      "widgets_values": [
+        "Pop Art",
+        1.26
+      ]
+    },
+    {
+      "id": 12,
+      "type": "AppInfo",
+      "pos": [
+        2924,
+        846
+      ],
+      "size": {
+        "0": 400,
+        "1": 272
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            13
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AppInfo"
+      },
+      "widgets_values": [
+        "Prompt-weight-test",
+        "21\n22\n18",
+        "11\n16",
+        "",
+        1,
+        "",
+        null
+      ]
+    },
+    {
+      "id": 21,
+      "type": "PromptSlide",
+      "pos": [
+        2360,
+        -544
+      ],
+      "size": {
+        "0": 315,
+        "1": 82
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            22
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PromptSlide"
+      },
+      "widgets_values": [
+        "Black and White",
+        1.26
+      ]
+    },
+    {
+      "id": 13,
+      "type": "RandomPrompt",
+      "pos": [
+        2840,
+        -330
+      ],
+      "size": {
+        "0": 400,
+        "1": 224
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mutable_prompt",
+          "type": "STRING",
+          "link": 22,
+          "widget": {
+            "name": "mutable_prompt"
+          }
+        },
+        {
+          "name": "immutable_prompt",
+          "type": "STRING",
+          "link": 23,
+          "widget": {
+            "name": "immutable_prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            19
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RandomPrompt"
+      },
+      "widgets_values": [
+        1,
+        "",
+        " ``",
+        "disable",
+        ""
+      ]
+    },
+    {
+      "id": 15,
+      "type": "RandomPrompt",
+      "pos": [
+        2840,
+        -30
+      ],
+      "size": {
+        "0": 400,
+        "1": 224
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "mutable_prompt",
+          "type": "STRING",
+          "link": 19,
+          "widget": {
+            "name": "mutable_prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            16,
+            20
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RandomPrompt"
+      },
+      "widgets_values": [
+        1,
+        "",
+        " a girl face,super,``",
+        "disable",
+        ""
+      ]
+    }
+  ],
+  "links": [
+    [
+      2,
+      6,
+      0,
+      5,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      8,
+      0,
+      5,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      9,
+      0,
+      5,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      7,
+      0,
+      5,
+      3,
+      "LATENT"
+    ],
+    [
+      6,
+      6,
+      1,
+      8,
+      0,
+      "CLIP"
+    ],
+    [
+      7,
+      6,
+      1,
+      9,
+      0,
+      "CLIP"
+    ],
+    [
+      8,
+      5,
+      0,
+      10,
+      0,
+      "LATENT"
+    ],
+    [
+      9,
+      6,
+      2,
+      10,
+      1,
+      "VAE"
+    ],
+    [
+      12,
+      10,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      12,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      16,
+      15,
+      0,
+      8,
+      1,
+      "STRING"
+    ],
+    [
+      19,
+      13,
+      0,
+      15,
+      0,
+      "STRING"
+    ],
+    [
+      20,
+      15,
+      0,
+      16,
+      0,
+      "STRING"
+    ],
+    [
+      21,
+      18,
+      0,
+      5,
+      4,
+      "INT"
+    ],
+    [
+      22,
+      21,
+      0,
+      13,
+      0,
+      "STRING"
+    ],
+    [
+      23,
+      22,
+      0,
+      13,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
