@@ -4784,6 +4784,7 @@
             "MergeLayers",
             "NewLayer",
             "RandomPrompt",
+            "PromptSlide",
             "ScreenShare",
             "ShowLayer",
             "ShowTextForGPT",

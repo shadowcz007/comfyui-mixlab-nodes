@@ -437,7 +437,7 @@ PromptServer.add_routes=new_add_routes
 
 
 # 导入节点
-from .nodes.PromptNode import RandomPrompt
+from .nodes.PromptNode import RandomPrompt,PromptSlide
 from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
@@ -452,6 +452,7 @@ from .nodes.Lama import LaMaInpainting
 NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
     "RandomPrompt":RandomPrompt,
+    "PromptSlide":PromptSlide,
     "NoiseImage":NoiseImage,
     "TransparentImage":TransparentImage,
     "ResizeImageMixlab":ResizeImage,
@@ -513,7 +514,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
-    "LaMaInpainting":"LaMaInpainting ♾️Mixlab"
+    "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
+    "PromptSlide":"PromptSlide ♾️Mixlab"
 
     # "GamePal":"GamePal ♾️Mixlab"
 }

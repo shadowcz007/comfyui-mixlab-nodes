@@ -125,10 +125,10 @@ class FontInput:
     CATEGORY = "♾️Mixlab/utils"
 
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,)
+    OUTPUT_IS_LIST = (False,)
 
     def run(self,font):
-
+        
         return (font_files[font],)
     
 class TextToNumber:
