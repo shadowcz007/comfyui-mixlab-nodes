@@ -22,8 +22,8 @@ Example:
 [text-to-image](./workflow/Text-to-Image-app.json)
 
 APP-JSON:
-- [text-to-image](./example/text-to-image_1_Wed%20Dec%2027%202023.json)
-- [image-to-image](./example/image-to-image_1_Wed%20Dec%2027%202023.json)
+- [text-to-image](./example/Text-to-Image_3.json)
+- [image-to-image](./example/Image-to-Image_2.json)
 - text-to-text
 
 > 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
