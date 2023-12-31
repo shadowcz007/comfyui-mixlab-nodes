@@ -2,13 +2,18 @@
 ## 🚀🚗🚚🏃 Workflow-to-APP 
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
 - 支持多个web app 切换
+- 发布为app的workflow，可以在右键里再次编辑了
 
 - Support multiple web app switching.
 - Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.
+- The workflow, which is now released as an app, can also be edited again by right-clicking.
+
 
 ![](./assets/0-m-app.png)
 
 ![](./assets/appinfo-readme.png)
+
+![](./assets/appinfo-2.png)
 
 Example:
 - workflow

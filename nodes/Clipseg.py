@@ -31,10 +31,10 @@ logger = logging.getLogger('CLIPSeg nodes')
 clipseg_model_dir = os.path.join(folder_paths.models_dir, "clipseg")
 
 if not os.path.exists(clipseg_model_dir):
+    print(f"## clipseg model not found: {clipseg_model_dir},pls download from https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main")
     clipseg_model_dir='CIDAS/clipseg-rd64-refined'
 
 """Helper methods for CLIPSeg nodes"""
-
 
 # Tensor to PIL
 def tensor2pil(image):
