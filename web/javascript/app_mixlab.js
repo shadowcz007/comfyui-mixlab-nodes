@@ -70,11 +70,13 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
   const data = jsonData
   const input = []
   const output = []
+  const seed = {}
 
   for (const id in data) {
     if (data.hasOwnProperty(id)) {
+      let node = app.graph.getNodeById(id)
       if (inputIds.includes(id)) {
-        let node = app.graph.getNodeById(id)
+        // let node = app.graph.getNodeById(id)
         let options = []
         // 模型
         try {
@@ -87,6 +89,17 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           }
         } catch (error) {}
 
+        if (node.type == 'IntNumber' || node.type == 'FloatSlider') {
+          // min max step
+
+          options = node.widgets.filter(w => w.type === 'number')[0].options
+        }
+
+        if (node.type == 'PromptSlide') {
+          // min max step
+          options = node.widgets.filter(w => w.type === "slider")[0].options
+        }
+
         input[inputIds.indexOf(id)] = {
           ...data[id],
           title: node.title,
@@ -96,14 +109,23 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         // input.push()
       }
       if (outputIds.includes(id)) {
-        let node = app.graph.getNodeById(id)
+        // let node = app.graph.getNodeById(id)
         // output.push()
         output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
+      }
+
+      if (node.type === 'KSampler') {
+        // seed 的类型收集
+        try {
+          seed[id] = node.widgets.filter(
+            w => w.name === 'seed'
+          )[0].linkedWidgets[0].value
+        } catch (error) {}
       }
     }
   }
 
-  return { input, output }
+  return { input, output, seed }
 }
 
 function getUrl () {
@@ -162,7 +184,7 @@ async function save (json, download = false) {
   try {
     let data = await app.graphToPrompt()
 
-    const { input, output } = extractInputAndOutputData(
+    const { input, output, seed } = extractInputAndOutputData(
       data.output,
       inputIds,
       outputIds
@@ -174,6 +196,7 @@ async function save (json, download = false) {
       version,
       input,
       output,
+      seed, //控制是fixed 还是random
       share_prefix,
       filename: `${name}_${version}_${new Date().toDateString()}.json`
     }
@@ -185,14 +208,18 @@ async function save (json, download = false) {
     // let http_workflow = app.graph.serialize()
 
     if (download) {
-       await save_app(data)
-       await downloadJsonFile(data, data.app.filename)
+      await save_app(data)
+      await downloadJsonFile(data, data.app.filename)
       let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(data.app.filename)}`
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+          data.app.filename
+        )}`
       )
       if (open)
         window.open(
-          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(data.app.filename)}`
+          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+            data.app.filename
+          )}`
         )
     } else {
       await save_app(data)

@@ -207,9 +207,10 @@ class IntNumber:
                         "default": 0, 
                         "min": -1, #Minimum value
                         "max": 0xffffffffffffffff,
-                        "step": 1, #Slider's step
-                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                        "step": 1, 
+                        "display": "number"
                     }),
+                    
                              },
                 }
     

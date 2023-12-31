@@ -11,6 +11,7 @@
             width: 90%;
             min-width: 400px;
             margin-left: 5%;
+            user-select: none;
         }
 
         .apps {
@@ -85,6 +86,17 @@
 
         }
 
+        .status_seed {
+            display: flex;
+            flex-direction: column;
+            margin: 12px;
+        }
+
+        .seeds {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
         .status {
             background: black;
             color: white;
@@ -92,7 +104,7 @@
             width: fit-content;
             padding: 4px;
             font-size: 12px;
-            margin: 12px;
+
         }
 
         .description {
@@ -154,7 +166,7 @@
         .output_card {
             height: 100%;
             width: 100%;
-            
+
             margin-top: 24px;
             display: flex;
             flex-wrap: wrap;
@@ -348,7 +360,7 @@
         function queuePrompt(promptWorkflow, client_id) {
 
             // 随机seed
-            promptWorkflow = randomSeed(promptWorkflow);
+            // promptWorkflow = randomSeed(promptWorkflow);
 
             let url = get_url()
             const data = JSON.stringify({ prompt: promptWorkflow, client_id });
@@ -762,15 +774,39 @@
                     container.appendChild(uploadContainer);
                 }
 
+                if (["PromptSlide"].includes(data.class_type)) {
+                    // 滑块输入
+                    let options = data.options || {
+                        min: -3,
+                        max: 3,
+                    };
+
+                    const label = data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
+                    let silde = createNumSlide(label,
+                        data.inputs.weight,
+                        (v) => {
+                            window._appData.data[data.id].inputs.weight = v;
+                        },
+                        options.min,
+                        options.max,
+                        'float')
+                    container.appendChild(silde);
+                }
+
+
                 if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
                     // 滑块输入
+                    let options = data.options || {
+                        min: 0,
+                        max: data.class_type === 'IntNumber' ? 6000 : 1,
+                    };
                     let silde = createNumSlide(data.title,
                         data.inputs.number,
                         (v) => {
                             window._appData.data[data.id].inputs.number = v;
                         },
-                        0,
-                        data.class_type === 'IntNumber' ? 6000 : 1,
+                        options.min,
+                        options.max,
                         data.class_type === 'IntNumber' ? 'int' : 'float')
                     container.appendChild(silde);
                 }
@@ -916,10 +952,14 @@
 
 
 
-        function createUI(inputData, outputData, share = true) {
+        function createUI(inputData, outputData, seed = {}, share = true) {
 
             let mainDiv = document.createElement('div');
-            let leftDiv = document.createElement('div');
+            let leftDetails = document.createElement('details');
+            leftDetails.innerHTML = `<summary>INPUT</summary>
+                <div class="content"></div>`
+
+            let leftDiv = leftDetails.querySelector('.content');
             let rightDiv = document.createElement('div');
 
             mainDiv.className = 'app'
@@ -927,7 +967,7 @@
             leftDiv.style.alignItems = 'flex-start';
             rightDiv.className = 'panel'
             leftDiv.style.flex = 0.4
-            rightDiv.style.flex = 0.6;
+            rightDiv.style.flex = 1;
             // rightDiv.style.height='70vh'
             //         rightDiv.style=`position: fixed;
             // right: 0;
@@ -969,9 +1009,36 @@
             iconDes.className = 'description'
 
             // 创建状态标签
+            let statusDiv = document.createElement('div');
+            statusDiv.className = 'status_seed'
             var status = document.createElement('div');
             status.textContent = 'Status';
             status.className = 'status';
+
+            // seed 汇总
+            var seeds = document.createElement('details');
+            // seeds.textContent = 'Status';
+            seeds.className = 'seeds';
+
+            try {
+                if (Object.keys(seed).length > 0) {
+                    seeds.innerHTML = `<summary>SEED</summary>
+                <div class="content"> </div>`
+                    for (const id in seed) {
+                        const s = seed[id];
+                        let em = document.createElement('em');
+                        em.innerText = s;
+                        seeds.querySelector('.content').appendChild(em)
+                    }
+                }
+
+            } catch (error) {
+
+            }
+
+
+            statusDiv.appendChild(status);
+            statusDiv.appendChild(seeds);
 
             // 创建输入框
             var input1 = createInputs(inputData)
@@ -987,13 +1054,13 @@
             leftDiv.appendChild(titleDiv);
             leftDiv.appendChild(iconDes);
             // leftDiv.appendChild(des);
-            leftDiv.appendChild(status);
+            leftDiv.appendChild(statusDiv);
             leftDiv.appendChild(input1);
-            leftDiv.appendChild(submitButton);
+            mainDiv.appendChild(submitButton);
 
             rightDiv.appendChild(output);
 
-            mainDiv.appendChild(leftDiv);
+            mainDiv.appendChild(leftDetails);
             mainDiv.appendChild(rightDiv);
 
             document.body.appendChild(mainDiv)
@@ -1124,9 +1191,9 @@
 
 
         async function createApp(appData, share = true) {
-            console.log(appData)
+            // console.log(appData)
             // 使用示例：
-            var ui = createUI(appData.input, appData.output, share);
+            var ui = createUI(appData.input, appData.output, appData.seed, share);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
