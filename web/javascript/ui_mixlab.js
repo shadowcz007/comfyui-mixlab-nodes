@@ -890,13 +890,13 @@ app.registerExtension({
                 try {
                   let item = (await get_my_app(a.filename))[0]
                   if (item) {
-                    console.log(item.data)
+                    // console.log(item.data)
                     app.loadGraphData(item.data)
                     setTimeout(() => {
-                      const node = app.graph.getNodeById(item.data.last_node_id)
+                      const node = app.graph._nodes_in_order[0]
                       if (!node) return
                       app.canvas.centerOnNode(node)
-                      app.canvas.setZoom(0.3)
+                      app.canvas.setZoom(0.5)
                     }, 1000)
                   }
                 } catch (error) {}
