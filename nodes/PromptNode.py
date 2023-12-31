@@ -65,24 +65,24 @@ class PromptSlide:
                             "default": ''
                           }),
 
-                "weight":("FLOAT", {"default": 1, "min": -10,"max": 10,
+                "weight":("FLOAT", {"default": 1, "min": -3,"max": 3,
                                                                 "step": 0.01,
                                                                 "display": "slider"}),
 
-                "min_value":("FLOAT", {
-                        "default": -2, 
-                        "min": -10, 
-                        "max": 0xffffffffffffffff,
-                        "step": 0.01, 
-                        "display": "number"  
-                    }),
-                "max_value":("FLOAT", {
-                        "default": 2, 
-                        "min": -10, 
-                        "max": 0xffffffffffffffff,
-                        "step": 0.01, 
-                        "display": "number"  
-                    }),
+                # "min_value":("FLOAT", {
+                #         "default": -2, 
+                #         "min": -10, 
+                #         "max": 0xffffffffffffffff,
+                #         "step": 0.01, 
+                #         "display": "number"  
+                #     }),
+                # "max_value":("FLOAT", {
+                #         "default": 2, 
+                #         "min": -10, 
+                #         "max": 0xffffffffffffffff,
+                #         "step": 0.01, 
+                #         "display": "number"  
+                #     }),
               
                 }
             }
@@ -99,11 +99,11 @@ class PromptSlide:
     OUTPUT_NODE = False
 
     # 运行的函数
-    def run(self,prompt_keyword,weight,min_value,max_value):
-        if weight < min_value:
-            weight= min_value
-        elif weight > max_value:
-            weight= max_value
+    def run(self,prompt_keyword,weight):
+        # if weight < min_value:
+        #     weight= min_value
+        # elif weight > max_value:
+        #     weight= max_value
         p=addWeight(prompt_keyword,weight)
         return (p,)
 
