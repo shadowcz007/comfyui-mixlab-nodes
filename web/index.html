@@ -686,7 +686,10 @@
             //         class_type: "LoadImage"
             //     }
             // ];
+            inputData=inputData.filter(inp=>inp);
+            // console.log('inputData',inputData)
             inputData.forEach(data => {
+                // console.log(data)
                 // Check if the class_type is "LoadImage"
                 if (data.class_type === "LoadImage") {
                     // Create a container for the upload control
@@ -790,6 +793,7 @@
 
 
                 if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
+                    // console.log('data.options',data.options)
                     // 滑块输入
                     let options = data.options || {
                         min: 0,
