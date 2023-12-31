@@ -877,11 +877,10 @@ app.registerExtension({
           if (!document.querySelector('#mixlab_find_the_node'))
             document.body.appendChild(div)
         }
-      })
-
-      options.push({
+      },{
         content: 'Workflow App ♾️Mixlab',
         has_submenu: true,
+        disabled: false,
         submenu: {
           options: Array.from(apps, a => {
             return {
@@ -905,6 +904,8 @@ app.registerExtension({
           })
         }
       })
+
+    
 
       // options.push({
       //   content: `Save For App ♾️Mixlab`,
