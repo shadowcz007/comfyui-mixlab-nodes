@@ -1,3 +1,4 @@
+> 适配了最新版comfyui的py3.11 ，torch 2.1.2+cu121
 
 ## 🚀🚗🚚🏃 Workflow-to-APP 
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
