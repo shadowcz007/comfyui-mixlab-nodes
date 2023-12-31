@@ -201,7 +201,7 @@ async function save (json, download = false) {
       seed, //控制是fixed 还是random
       share_prefix,
       link,
-      filename: `${name}_${version}}.json`
+      filename: `${name}_${version}.json`
     }
 
     try {
