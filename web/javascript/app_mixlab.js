@@ -170,6 +170,7 @@ async function save (json, download = false) {
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
+    link=json[7],//用于创建界面上的跳转链接
     description = json[4],
     inputIds = json[2].split('\n').filter(f => f),
     outputIds = json[3].split('\n').filter(f => f)
@@ -199,7 +200,8 @@ async function save (json, download = false) {
       output,
       seed, //控制是fixed 还是random
       share_prefix,
-      filename: `${name}_${version}_${new Date().toDateString()}.json`
+      link,
+      filename: `${name}_${version}}.json`
     }
 
     try {
@@ -319,7 +321,6 @@ app.registerExtension({
       nodeType.prototype.onExecuted = async function (message) {
         onExecuted?.apply(this, arguments)
         console.log(message.json)
-
         window._mixlab_app_json = message.json
         try {
           const div = this.widgets.filter(w => w.div)[0].div

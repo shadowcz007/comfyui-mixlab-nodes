@@ -290,6 +290,7 @@
             outline: none;
             border: none;
             border-radius: 4px;
+            margin-top: 8px;
         }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
@@ -414,7 +415,7 @@
         }
 
 
-        function createOutputs(outputData) {
+        function createOutputs(outputData, link) {
             const container = document.createElement('div');
             container.className = "output";
 
@@ -435,10 +436,21 @@
             action.appendChild(copyText)
             copyText.style.marginLeft = '18px';
 
+            if (link) {
+                const linkBtn = document.createElement('button');
+                // linkBtn.href = link;
+                linkBtn.innerText = 'go to'
+                action.appendChild(linkBtn)
+                linkBtn.style.marginLeft = '18px';
+                linkBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    window.open(link);
+                })
+            }
+
             const output_card = document.createElement("div");
             output_card.className = 'output_card'
             container.appendChild(output_card)
-
 
 
             copyText.addEventListener('click', e => {
@@ -686,7 +698,7 @@
             //         class_type: "LoadImage"
             //     }
             // ];
-            inputData=inputData.filter(inp=>inp);
+            inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
             inputData.forEach(data => {
                 // console.log(data)
@@ -951,11 +963,11 @@
 
 
 
-        function createUI(inputData, outputData, seed = {}, share = true) {
+        function createUI(inputData, outputData, seed = {}, share = true, link = "") {
 
             let mainDiv = document.createElement('div');
             let leftDetails = document.createElement('details');
-            leftDetails.setAttribute('open','true')
+            leftDetails.setAttribute('open', 'true')
             leftDetails.innerHTML = `<summary>INPUT</summary>
                 <div class="content"></div>`
 
@@ -1043,7 +1055,7 @@
             // 创建输入框
             var input1 = createInputs(inputData)
 
-            var output = createOutputs(outputData)
+            var output = createOutputs(outputData, link)
 
             // 创建提交按钮
             var submitButton = document.createElement('button');
@@ -1193,7 +1205,7 @@
         async function createApp(appData, share = true) {
             // console.log(appData)
             // 使用示例：
-            var ui = createUI(appData.input, appData.output, appData.seed, share);
+            var ui = createUI(appData.input, appData.output, appData.seed, share,appData.link);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
