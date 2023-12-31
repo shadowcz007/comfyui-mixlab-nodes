@@ -68,7 +68,7 @@ async function get_my_app (filename = null) {
   let data = []
   try {
     for (const res of result.data) {
-      let { app,workflow } = res.data
+      let { app, workflow } = res.data
       if (app.filename)
         data.push({
           ...app,
@@ -700,6 +700,7 @@ app.registerExtension({
       ] // and return the options
     }
     LGraphCanvas.prototype.centerOnNode = function (node) {
+      // console.log(node)
       var dpr = window.devicePixelRatio || 1 // 获取设备像素比
       this.ds.offset[0] =
         -node.pos[0] -
@@ -891,6 +892,12 @@ app.registerExtension({
                   if (item) {
                     console.log(item.data)
                     app.loadGraphData(item.data)
+                    setTimeout(() => {
+                      const node = app.graph.getNodeById(item.data.last_node_id)
+                      if (!node) return
+                      app.canvas.centerOnNode(node)
+                      app.canvas.setZoom(0.3)
+                    }, 1000)
                   }
                 } catch (error) {}
               }
