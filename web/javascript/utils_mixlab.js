@@ -2,7 +2,7 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
-import { addValueControlWidget } from "../../../scripts/widgets.js";
+import { addValueControlWidget } from '../../../scripts/widgets.js'
 
 const getLocalData = key => {
   let data = {}
@@ -45,6 +45,21 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
+function hexToRGBA (hexColor) {
+  var hex = hexColor.replace('#', '')
+  var r = parseInt(hex.substring(0, 2), 16)
+  var g = parseInt(hex.substring(2, 4), 16)
+  var b = parseInt(hex.substring(4, 6), 16)
+
+  // 获取透明度的十六进制值
+  var alphaHex = hex.substring(6)
+
+  // 将透明度的十六进制值转换为十进制值
+  var alpha = parseInt(alphaHex, 16) / 255
+
+  return [r,g,b,alpha]
+}
+
 app.registerExtension({
   name: 'Mixlab.utils.Color',
   async getCustomWidgets (app) {
@@ -60,8 +75,16 @@ app.registerExtension({
             return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            let data = getLocalData('_mixlab_utils_color')
-            return data[node.id] || '#000000'
+            let data = getLocalData('_mixlab_utils_color');
+            let hex=data[node.id] || '#000000'
+            let [r,g,b,a]=hexToRGBA(hex)
+            return {
+              hex,
+              r,
+              g,
+              b,
+              a
+            }
           }
         }
         //  widget.something = something;          // maybe adds stuff to it
@@ -109,7 +132,7 @@ app.registerExtension({
           ip.style = `outline: none;
             border: none;
             padding: 4px;
-            width: 100%;cursor: pointer;
+            width: 70%;cursor: pointer;
             height: 32px;`
           const label = document.createElement('label')
           label.style = 'font-size: 10px;min-width:32px'
@@ -164,16 +187,17 @@ app.registerExtension({
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'TextToNumber') {
-
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        const random_number=this.widgets.filter(w=>w.name==='random_number')[0]
-        if(random_number.value==='enable'){
-          const n=this.widgets.filter(w=>w.name==='number')[0]
-          n.value=message.num[0]
+        const random_number = this.widgets.filter(
+          w => w.name === 'random_number'
+        )[0]
+        if (random_number.value === 'enable') {
+          const n = this.widgets.filter(w => w.name === 'number')[0]
+          n.value = message.num[0]
         }
-        
+
         console.log('TextToNumber', random_number.value)
       }
     }

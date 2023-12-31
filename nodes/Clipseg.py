@@ -101,7 +101,7 @@ class CLIPSeg:
         return {"required":
                     {
                         "image": ("IMAGE",),
-                        "text": ("STRING", {"multiline": False}),
+                        "text": ("STRING", {"multiline": False,"dynamicPrompts": False}),
                         
                      },
                 "optional":
@@ -246,7 +246,7 @@ class CombineMasks:
         
         # Resize heatmap and binary mask to match the original image dimensions
         dimensions = (image_np.shape[1], image_np.shape[0])
-        print('heatmap',heatmap)
+        # print('heatmap',heatmap)
         if dimensions is None or dimensions[0] == 0 or dimensions[1] == 0:
             raise ValueError("Invalid dimensions")
         

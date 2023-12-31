@@ -445,7 +445,7 @@ from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
-
+from .nodes.Lama import LaMaInpainting
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -492,6 +492,7 @@ NODE_CLASS_MAPPINGS = {
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
+    "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
 
@@ -511,7 +512,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
-    "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab"
+    "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
+    "LaMaInpainting":"LaMaInpainting ♾️Mixlab"
 
     # "GamePal":"GamePal ♾️Mixlab"
 }
@@ -520,5 +522,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 WEB_DIRECTORY = "./web"
 
 print('--------------')
-print('\033[91mMixlab Nodes: \033[93mLoaded\033[0m')
+print('\033[91m ### Mixlab Nodes: \033[93mLoaded\033[0m')
 print('--------------')

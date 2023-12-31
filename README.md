@@ -113,6 +113,10 @@ Add edges to an image.
 ![FeatheredMask](./assets/FlVou_Y6kaGWYoEj1Tn0aTd4AjMI.jpg)
 
 
+> LaMaInpainting
+
+from [simple-lama-inpainting](https://github.com/enesmsahin/simple-lama-inpainting)
+
 
 ### Improvement 
 
@@ -127,7 +131,9 @@ An improvement has been made to directly redirect to GitHub to search for missin
 
 
 ### Models
-[Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : model/clipseg
+[Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : models/clipseg
+
+[Download lama](https://github.com/enesmsahin/simple-lama-inpainting/releases/download/v0.1.0/big-lama.pt), move to : models/lama
 
 <!-- ### Workflow
 [Workflow](./workflow.md) -->
@@ -165,7 +171,6 @@ pip3 install -r requirements.txt
 
 #### Chinese community
 访问 [www.mixcomfy.com](https://www.mixcomfy.com)，获得更多内测功能，关注微信公众号：Mixlab无界社区
-
 
 
 #### Thanks:

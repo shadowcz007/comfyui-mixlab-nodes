@@ -4799,7 +4799,8 @@
             "VAELoaderConsistencyDecoder",
             "TextToNumber",
             "TextInput_",
-            "DynamicDelayProcessor"
+            "DynamicDelayProcessor",
+            "LaMaInpainting"
         ],
         {
             "title_aux": "comfyui-mixlab-nodes"

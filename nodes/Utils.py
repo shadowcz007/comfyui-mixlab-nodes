@@ -88,18 +88,23 @@ class ColorInput:
                              },
                 }
     
-    RETURN_TYPES = ("STRING",)
-    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+    RETURN_TYPES = ("STRING","INT","INT","INT","FLOAT",)
+    RETURN_NAMES = ("hex","r","g","b","a",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/utils"
 
     INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,False,)
+    OUTPUT_IS_LIST = (False,False,False,False,False,)
 
     def run(self,color):
-        return (color,)
+        h=color['hex']
+        r=color['r']
+        g=color['g']
+        b=color['b']
+        a=color['a']
+        return (h,r,g,b,a,)
 
 
 
