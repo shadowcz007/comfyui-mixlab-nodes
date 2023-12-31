@@ -1,7 +1,8 @@
-## 
-v0.7.0 🚀🚗🚚🏃‍ Workflow-to-APP
-- 支持多个web app 切换
+
+### Workflow-to-APP 🚀🚗🚚🏃
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
+- 支持多个web app 切换
+
 - Support multiple web app switching.
 - Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.
 
@@ -24,15 +25,9 @@ APP-JSON:
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
 
 
-### 3D
-![](./assets/3dimage.png)
-[workflow](./workflow/3D-workflow.json)
+### Real-time Design
+> ScreenShareNode & FloatingVideoNode. Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
 
-
-### ScreenShareNode & FloatingVideoNode
-> Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
-
-> 
 ![screenshare](./assets/screenshare.png)
 
 https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43e-410a-ab3a-1952b7b4e7da
@@ -43,6 +38,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 !! Please use the address with HTTPS (https://127.0.0.1).
 
+
 ### SpeechRecognition & SpeechSynthesis
 ![f](./assets/audio-workflow.svg)
 
@@ -51,10 +47,22 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ### GPT
 > Support for calling multiple GPTs.ChatGPT、ChatGLM3 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 .  Azure OpenAI:https://xxxx.openai.azure.com 
 
-
 ![gpt-workflow.svg](./assets/gpt-workflow.svg)
 
 [workflow-5](./workflow/5-gpt-workflow.json)
+
+### 3D
+![](./assets/3dimage.png)
+[workflow](./workflow/3D-workflow.json)
+
+
+### Layers
+> A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
+
+![layers](./assets/layers-workflow.svg)
+
+![poster](./assets/poster-workflow.svg)
+
 
 ### LoadImagesFromLocal
 > Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. 
@@ -66,13 +74,6 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ### LoadImagesFromURL
 > Conveniently load images from a fixed address on the internet to ensure that default images in the workflow can be executed.
 
-
-### Layers
-> A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
-
-![layers](./assets/layers-workflow.svg)
-
-![poster](./assets/poster-workflow.svg)
 
 ## Utils
 > The Color node provides a color picker for easy color selection, the Font node offers built-in font selection for use with TextImage to generate text images, and the DynamicDelayByText node allows delayed execution based on the length of the input text.
@@ -130,6 +131,17 @@ An improvement has been made to directly redirect to GitHub to search for missin
 ![node-not-found](./assets/node-not-found.png)
 
 
+### Update 
+v0.8.0 🚀🚗🚚🏃‍ LaMaInpainting
+- 新增 LaMaInpainting
+- 优化color节点的输出
+- 修复高清显示屏上定位节点不准的情况
+
+- Add LaMaInpainting
+- Optimize the output of the color node
+- Fix the issue of inaccurate positioning node on high-definition display screens
+
+
 ### Models
 [Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : models/clipseg
 
@@ -137,7 +149,6 @@ An improvement has been made to directly redirect to GitHub to search for missin
 
 <!-- ### Workflow
 [Workflow](./workflow.md) -->
-
 
 
 ## Installation
