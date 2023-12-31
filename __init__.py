@@ -221,7 +221,7 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
             
             for item in data:
                 x=item["data"]
-                print(apps[0]['filename'] ,item["filename"])
+                # print(apps[0]['filename'] ,item["filename"])
                 if apps[0]['filename']!=item["filename"]:
                     apps.append({
                         "filename":item["filename"],

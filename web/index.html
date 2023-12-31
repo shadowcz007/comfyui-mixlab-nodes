@@ -389,9 +389,7 @@
         }
 
         async function get_my_app(filename = null) {
-
             let url = get_url()
-
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
                 body: JSON.stringify({
@@ -411,10 +409,7 @@
                     })
                 }
             } catch (error) {
-
             }
-
-
             return data
         }
 

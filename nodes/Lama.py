@@ -8,14 +8,13 @@ import numpy as np
 import torch
 
 
-os.environ['LAMA_MODEL'] =  os.path.join(folder_paths.models_dir, "lama/big-lama.pt")
-if os.environ.get("LAMA_MODEL"):
-    model_path=os.environ.get("LAMA_MODEL")
-    if not os.path.exists(model_path):
-        os.environ['LAMA_MODEL']=''
-        raise FileNotFoundError(
-            f"lama torchscript model not found: {model_path}"
-                )
+ 
+llma_model_path=os.path.join(folder_paths.models_dir, "lama/big-lama.pt")
+if not os.path.exists(llma_model_path):
+    os.environ['LAMA_MODEL']=''
+    print(f"lama torchscript model not found: {llma_model_path}")
+else:
+    os.environ['LAMA_MODEL'] = llma_model_path
 
 # Tensor to PIL
 def tensor2pil(image):

@@ -4,7 +4,6 @@ import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 import { closeIcon } from './svg_icons.js'
 
-
 import {
   GroupNodeConfig,
   GroupNodeHandler
@@ -47,6 +46,38 @@ async function get_nodes_map () {
     })
   })
   return await res.json()
+}
+
+function get_url () {
+  let api_host = `${window.location.hostname}:${window.location.port}`
+  let api_base = ''
+  let url = `${window.location.protocol}//${api_host}${api_base}`
+  return url
+}
+
+async function get_my_app (filename = null) {
+  let url = get_url()
+  const res = await fetch(`${url}/mixlab/workflow`, {
+    method: 'POST',
+    body: JSON.stringify({
+      task: 'my_app',
+      filename
+    })
+  })
+  let result = await res.json()
+  let data = []
+  try {
+    for (const res of result.data) {
+      let { app,workflow } = res.data
+      if (app.filename)
+        data.push({
+          ...app,
+          data: workflow,
+          date: res.date
+        })
+    }
+  } catch (error) {}
+  return data
 }
 
 function loadCSS (url) {
@@ -668,29 +699,31 @@ app.registerExtension({
         ...options
       ] // and return the options
     }
-    LGraphCanvas.prototype.centerOnNode = function(node) {
-      var dpr = window.devicePixelRatio || 1;  // 获取设备像素比
+    LGraphCanvas.prototype.centerOnNode = function (node) {
+      var dpr = window.devicePixelRatio || 1 // 获取设备像素比
       this.ds.offset[0] =
-          -node.pos[0] -
-          node.size[0] * 0.5 +
-          (this.canvas.width * 0.5) / (this.ds.scale * dpr);  // 考虑设备像素比
+        -node.pos[0] -
+        node.size[0] * 0.5 +
+        (this.canvas.width * 0.5) / (this.ds.scale * dpr) // 考虑设备像素比
       this.ds.offset[1] =
-          -node.pos[1] -
-          node.size[1] * 0.5 +
-          (this.canvas.height * 0.5) / (this.ds.scale * dpr);  // 考虑设备像素比
-      this.setDirty(true, true);
-    };
+        -node.pos[1] -
+        node.size[1] * 0.5 +
+        (this.canvas.height * 0.5) / (this.ds.scale * dpr) // 考虑设备像素比
+      this.setDirty(true, true)
+    }
   },
   async setup () {
     // Add canvas menu options
     const orig = LGraphCanvas.prototype.getCanvasMenuOptions
 
+    const apps = await get_my_app()
+    // console.log('apps',apps)
     LGraphCanvas.prototype.getCanvasMenuOptions = function () {
       const options = orig.apply(this, arguments)
 
       options.push(null, {
         content: `Nodes Map ♾️Mixlab`,
-        disabled: false, // or a function determining whether to disable
+        disabled: false,
         callback: async () => {
           nodesMap =
             nodesMap && Object.keys(nodesMap).length > 0
@@ -809,7 +842,7 @@ app.registerExtension({
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
                 background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-                d.addEventListener('click', () => {
+              d.addEventListener('click', () => {
                 const node = app.graph.getNodeById(nodeId)
                 if (!node) return
                 app.canvas.centerOnNode(node)
@@ -842,6 +875,27 @@ app.registerExtension({
 
           if (!document.querySelector('#mixlab_find_the_node'))
             document.body.appendChild(div)
+        }
+      })
+
+      options.push({
+        content: 'Workflow App ♾️Mixlab',
+        has_submenu: true,
+        submenu: {
+          options: Array.from(apps, a => {
+            return {
+              content: a.name,
+              callback: async () => {
+                try {
+                  let item = (await get_my_app(a.filename))[0]
+                  if (item) {
+                    console.log(item.data)
+                    app.loadGraphData(item.data)
+                  }
+                } catch (error) {}
+              }
+            }
+          })
         }
       })
 
