@@ -4,6 +4,7 @@ import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 import { closeIcon } from './svg_icons.js'
 
+
 import {
   GroupNodeConfig,
   GroupNodeHandler
@@ -667,10 +668,23 @@ app.registerExtension({
         ...options
       ] // and return the options
     }
+    LGraphCanvas.prototype.centerOnNode = function(node) {
+      var dpr = window.devicePixelRatio || 1;  // 获取设备像素比
+      this.ds.offset[0] =
+          -node.pos[0] -
+          node.size[0] * 0.5 +
+          (this.canvas.width * 0.5) / (this.ds.scale * dpr);  // 考虑设备像素比
+      this.ds.offset[1] =
+          -node.pos[1] -
+          node.size[1] * 0.5 +
+          (this.canvas.height * 0.5) / (this.ds.scale * dpr);  // 考虑设备像素比
+      this.setDirty(true, true);
+    };
   },
   async setup () {
     // Add canvas menu options
     const orig = LGraphCanvas.prototype.getCanvasMenuOptions
+
     LGraphCanvas.prototype.getCanvasMenuOptions = function () {
       const options = orig.apply(this, arguments)
 
@@ -795,7 +809,7 @@ app.registerExtension({
               let d = document.createElement('button')
               d.style = `text-align: left;margin:6px;color: var(--input-text);
                 background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
-              d.addEventListener('click', () => {
+                d.addEventListener('click', () => {
                 const node = app.graph.getNodeById(nodeId)
                 if (!node) return
                 app.canvas.centerOnNode(node)
