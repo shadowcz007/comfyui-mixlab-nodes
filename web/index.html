@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mixlab APP</title>
     <style>
-        body{
+        body {
             margin: 0;
             padding: 0;
         }
+
         .app {
             display: flex;
             width: 90%;
@@ -102,6 +103,7 @@
         .card .toggle:hover {
             color: #7f7f7f !important;
         }
+
         em .toggle:hover {
             color: #7f7f7f !important;
         }
@@ -197,7 +199,7 @@
 
         .output_card img,
         video {
-            max-width: 400px;
+            max-width: 200px;
             max-height: 600px;
             margin: 8px;
             min-width: 200px;
@@ -314,6 +316,8 @@
         }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
+    <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
+
 </head>
 
 <body>
@@ -325,21 +329,28 @@
             padding: 8px;
             color: #4a4a4a;
             border-bottom: 1px dashed #595959;">Explore your creative potential with <a class="link"
-            href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
-         <br>
+                href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
+            <br>
             <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
         </div>
 
         <a target="_blank" href="https://github.com/shadowcz007/comfyui-mixlab-nodes" style="text-decoration: none;
         color: black;font-size:12px">
-            <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true" class="octicon octicon-mark-github v-align-middle color-fg-default">
-                <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
+            <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
+                class="octicon octicon-mark-github v-align-middle color-fg-default">
+                <path
+                    d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z">
+                </path>
             </svg> Code
-             
+
         </a>
 
-   </div>
+    </div>
+    <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
     <script type="module">
+        import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
+        // console.log(Lightbox)
+
         import { api } from "../../../scripts/api.js";
         // console.log('api', api)
         const base64Df =
@@ -529,26 +540,45 @@
                     output_card.appendChild(div);
                 };
                 if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
+
+                    let a = document.createElement('a');
+                    a.id = `output_${node.id}`
+                    a.setAttribute('data-pswp-width', "200");
+                    a.setAttribute('data-pswp-height', "200");
+                    a.setAttribute('target', "_blank");
+                    a.setAttribute('href', base64Df);
+
                     let img = new Image();
-                    img.id = `output_${node.id}`;
+                    // img;
                     img.src = base64Df;
-                    output_card.appendChild(img);
+                    a.appendChild(img)
+                    output_card.appendChild(a);
                 }
 
                 // video ,gif
                 if (["VHS_VideoCombine"].includes(node.class_type)) {
-                    let v = document.createElement('div');
+
+                    let a = document.createElement('a');
+                    a.id = `output_${node.id}`
+                    a.setAttribute('data-pswp-width', "200");
+                    a.setAttribute('data-pswp-height', "200");
+                    a.setAttribute('target', "_blank");
+                    a.setAttribute('href', base64Df);
+
+
+                    // let v = document.createElement('div');
                     let video = document.createElement('video'), img = new Image();
                     video.style.display = 'none'
                     video.controls = 'true'
                     video.autoplay = 'true'
                     video.loop = 'true'
-                    v.id = `output_${node.id}`;
+                    // v.id = `output_${node.id}`;
+
                     img.src = base64Df;
 
-                    v.appendChild(video);
-                    v.appendChild(img);
-                    output_card.appendChild(v);
+                    a.appendChild(video);
+                    a.appendChild(img);
+                    output_card.appendChild(a);
                 }
 
             }
@@ -1091,7 +1121,13 @@
             return filename;
         }
 
-
+        function createImage(url) {
+            let im = new Image()
+            return new Promise((res, rej) => {
+                im.onload = () => res(im)
+                im.src = url
+            })
+        }
 
         function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
@@ -1195,10 +1231,10 @@
                                 toggleRandomize.addEventListener("click", function () {
                                     if (data.seed[id] === 'randomize') {
                                         data.seed[id] = 'fixed';
-                                        inSeed.style.display='block'
+                                        inSeed.style.display = 'block'
                                     } else {
                                         data.seed[id] = 'randomize';
-                                        inSeed.style.display='none'
+                                        inSeed.style.display = 'none'
                                     }
                                     emText.innerText = `#${id} ${data.seed[id].toUpperCase()}`;
                                 });
@@ -1281,26 +1317,49 @@
                 },
                 output: {
                     element: output,
-                    update: function (type = "image", val, id) {
+                    update: async function (type = "image", val, id) {
                         console.log(val, id)
-                        if (type == "image" && output.querySelector(`#output_${id}`)) {
-                            if (output.querySelector(`#output_${id} img`)) {
-                                output.querySelector(`#output_${id} img`).src = val;
-                            } else {
-                                output.querySelector(`#output_${id}`).src = val;
-                            }
+                        if (val && type == "image" && output.querySelector(`#output_${id}`)) {
+                            // if (output.querySelector(`#output_${id}`)) {
+
+                            let im = await createImage(val)
+
+                            output.querySelector(`#output_${id} img`).src = val;
+
+                            let a = output.querySelector(`#output_${id}`);
+                            a.setAttribute('data-pswp-width', im.naturalWidth);
+                            a.setAttribute('data-pswp-height', im.naturalHeight);
+                            a.setAttribute('target', "_blank");
+                            a.setAttribute('href', val);
+
+                            // }
+                            //  else {
+                            //     output.querySelector(`#output_${id}`).src = val;
+                            // }
 
                         }
 
-                        if (type == "video" && output.querySelector(`#output_${id}`)) {
+                        if (val && type == "video" && output.querySelector(`#output_${id}`)) {
+
                             let video = output.querySelector(`#output_${id} video`);
                             let img = output.querySelector(`#output_${id} img`);
                             img.style.display = 'none';
                             video.style.display = 'block';
+
+                            video.onloadeddata = function () {
+
+                                let a = output.querySelector(`#output_${id}`);
+                                a.setAttribute('data-pswp-width', video.videoWidth);
+                                a.setAttribute('data-pswp-height', video.videoHeight);
+                                a.setAttribute('target', "_blank");
+                                a.setAttribute('href', val);
+                            };
+
                             video.src = val;
+
                         }
 
-                        if (type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
+                        if (val && type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
 
                     }
                 },
@@ -1449,14 +1508,32 @@
 
             });
 
-            api.addEventListener("b_preview", ({ detail }) => {
-                // if (!enabled) return;
-                console.log("b_preview", detail)
-                show(URL.createObjectURL(detail));
-            });
+            // api.addEventListener("b_preview", ({ detail }) => {
+            //     // if (!enabled) return;
+            //     console.log("b_preview", detail)
+            //     show(URL.createObjectURL(detail));
+            // });
+
+
+            api.addEventListener('execution_start', ({ detail }) => {
+                console.log("execution_start", detail)
+                try {
+                    ui.status.update(`execution_start_#${detail.node}`);
+                } catch (error) {
+
+                }
+            })
 
             api.api_base = ""
             api.init();
+
+
+            const lightbox = new PhotoSwipeLightbox({
+                gallery: '.output_card',
+                children: 'a',
+                pswpModule: () => import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
+            });
+            lightbox.init();
 
         }
 
@@ -1524,10 +1601,13 @@
 
             createApp(window._appData);
 
+
         };
 
         init_app()
     </script>
+
+
 </body>
 
 </html>
