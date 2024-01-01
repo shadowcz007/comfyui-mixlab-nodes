@@ -803,15 +803,48 @@ app.registerExtension({
               div.appendChild(btn)
 
               const updateNodes = (ns, nd) => {
+                let appInfoNodes = {}
+                try {
+                  let appInfo=app.graph._nodes
+                  .filter(n => n.type === 'AppInfo')[0];
+                  appInfoNodes[appInfo.id]=2;
+                  for (const id of appInfo.widgets[1].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id]=0;
+                    }
+                  }
+                  for (const id of app.graph._nodes
+                    .filter(n => n.type === 'AppInfo')[0]
+                    .widgets[2].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id]=1;
+                    }
+                  }
+                } catch (error) {
+                  console.log(error)
+                }
+
                 for (let nodeId in ns) {
-                  let n = ns[nodeId].class_type
+                  let n = ns[nodeId].title || ns[nodeId].class_type
                   if (nodesMap[n]) {
                     const { url, title } = nodesMap[n]
                     let d = document.createElement('button')
-                    d.style = `text-align: left;margin:6px;color: var(--input-text);
-                   background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                    d.style = `text-align: left;
+                    margin:6px;
+                    color: var(--input-text);
+                   background-color: var(--comfy-input-bg); 
+                   border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                   cursor: pointer;`
+
+                   if(appInfoNodes[nodeId]===2){
+                    // appinfo
+                    d.style.backgroundColor='#326328';
+                    d.style.color='#ffffff';
+                    d.style.borderColor='transparent';
+                   }
+
                     d.addEventListener('click', () => {
-                      console.log('node')
+                      // console.log('node')
                       const node = app.graph.getNodeById(nodeId)
 
                       if (!node) return
@@ -839,6 +872,26 @@ app.registerExtension({
               }
 
               let nodesDivv = document.createElement('div')
+              let appInfoNodes = {}
+              try {
+                let appInfo=app.graph._nodes
+                .filter(n => n.type === 'AppInfo')[0];
+                appInfoNodes[appInfo.id]=2;
+                for (const id of appInfo.widgets[1].value.split('\n')) {
+                  if (id && id.trim() && parseInt(id)) {
+                    appInfoNodes[id]=0;
+                  }
+                }
+                for (const id of app.graph._nodes
+                  .filter(n => n.type === 'AppInfo')[0]
+                  .widgets[2].value.split('\n')) {
+                  if (id && id.trim() && parseInt(id)) {
+                    appInfoNodes[id]=1;
+                  }
+                }
+              } catch (error) {
+                console.log(error)
+              }
 
               for (let nodeId in nodes) {
                 let n = nodes[nodeId].class_type
@@ -846,8 +899,21 @@ app.registerExtension({
                   const { url, title: _title } = nodesMap[n]
                   let title = app.graph.getNodeById(nodeId).title || _title
                   let d = document.createElement('button')
-                  d.style = `text-align: left;margin:6px;color: var(--input-text);
-                 background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+                  d.style = `text-align: left;
+                  margin:6px;
+                  color: var(--input-text);
+                 background-color: var(--comfy-input-bg); 
+                 border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                 cursor: pointer;`
+
+                 if(appInfoNodes[nodeId]===2){
+                  // appinfo
+                  d.style.backgroundColor='#326328';
+                  d.style.color='#ffffff';
+                  d.style.borderColor='transparent';
+                 }
+
+
                   d.addEventListener('click', () => {
                     console.log('click')
                     const node = app.graph.getNodeById(nodeId)
@@ -856,7 +922,7 @@ app.registerExtension({
                     app.canvas.setZoom(1)
                   })
                   d.addEventListener('mouseover', async () => {
-                    console.log('mouseover')
+                    // console.log('mouseover')
                     let n = (await app.graphToPrompt()).output
                     if (!deepEqual(n, nodes)) {
                       nodesDivv.innerHTML = ''

@@ -2139,7 +2139,7 @@ const node = {
       try {
         let max_count = node.widgets.filter(w => w.name === "max_count")[0];
         max_count.value= node.widgets_values[0]
-        console.log('RandomPrompt',max_count,node.widgets_values[0])
+        // console.log('RandomPrompt',max_count,node.widgets_values[0])
       } catch (error) {
         console.log(error)
       }
