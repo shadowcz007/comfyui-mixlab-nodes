@@ -811,11 +811,14 @@
                     let silde = createNumSlide(label,
                         data.inputs.weight,
                         (v) => {
-                            window._appData.data[data.id].inputs.weight = v;
+                            window._appData.data[data.id].inputs.weight = parseFloat(v);
                         },
                         options.min,
                         options.max,
-                        'float')
+                        'float',
+                        options.keywords,
+                        data.id
+                    )
                     container.appendChild(silde);
                 }
 
@@ -900,7 +903,9 @@
             return container
         }
 
-        function createNumSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1, type = 'float') {
+        function createNumSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1, type = 'float', keywords = null, targetId = null) {
+
+            value = 'float' ? parseFloat(value.toFixed(3)) : parseInt(value)
 
             // 输入div
             let inputDiv = document.createElement('div');
@@ -919,6 +924,28 @@
             var label = document.createElement("label");
             label.innerHTML = labelText;
             label.setAttribute('data-content', value);
+
+            if (keywords && keywords[0]) {
+                label.innerHTML = ``
+                // 有备选的关键词
+                let selectTag = createSelect(Array.from([labelText, ...keywords], k => {
+                    return {
+                        value: k,
+                        text: k,
+                    }
+                }), labelText);
+                selectTag.style=`background: none;
+    color: black;    max-width: 300px;
+    border-bottom: 1px solid #acacac;
+    border-radius: 0;`
+                selectTag.addEventListener('change', e => {
+                    e.preventDefault();
+                    window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
+                    // label.querySelector('.label').innerText = selectTag.value
+                    // console.log(window._appData.data[targetId].inputs.prompt_keyword,selectTag.value)
+                })
+                label.appendChild(selectTag);
+            }
 
             // 创建容器元素，并将滑块输入和标签添加到容器中
             var container = document.createElement("div");
@@ -959,16 +986,7 @@
 
         }
 
-        function createSelectWithOptions(title, options, defaultValue) {
-
-            const div = document.createElement("div");
-            div.className = 'card';
-
-            // Create a label for the upload control
-            const nameLabel = document.createElement("label");
-            nameLabel.textContent = title;
-            div.appendChild(nameLabel);
-
+        function createSelect(options, defaultValue) {
             var selectElement = document.createElement("select");
             selectElement.className = "select"
 
@@ -982,6 +1000,21 @@
 
             // 设置默认值
             selectElement.value = defaultValue;
+
+            return selectElement
+        }
+
+        function createSelectWithOptions(title, options, defaultValue) {
+
+            const div = document.createElement("div");
+            div.className = 'card';
+
+            // Create a label for the upload control
+            const nameLabel = document.createElement("label");
+            nameLabel.textContent = title;
+            div.appendChild(nameLabel);
+
+            var selectElement = createSelect(options, defaultValue);
 
             div.appendChild(selectElement)
 
@@ -1084,7 +1117,7 @@
 
                             let seedInput = document.createElement('div');
                             content.appendChild(seedInput)
-                            seedInput.style=`outline: 1px dashed gray;margin-bottom: 12px;margin-top: 12px;`
+                            seedInput.style = `outline: 1px dashed gray;margin-bottom: 12px;margin-top: 12px;`
 
                             let em = document.createElement('em');
                             em.innerText = `#${id} ${s.toUpperCase()}`;

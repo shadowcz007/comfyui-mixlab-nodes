@@ -1,0 +1,135 @@
+Vintage
+Grain
+Sepia
+High Key
+Low Key
+High Dynamic Range
+Cross Process
+Radial Blur
+Infrared
+Lomo
+Photocopy
+Pencil Sketch
+Pop Art
+Orton
+Mosaic
+Selective Black and White
+Torn Paper
+Tilt-Shift
+Double Exposure
+Polaroid
+Liquid Ink
+Color Splash
+Sketch
+Water Drops
+Polarizer
+Chinese Painting
+Water Droplets
+Polarization
+Color Inversion
+Fish-eye
+Soft Focus
+Solarization
+Posterize
+Comic Book
+Duotone
+Gradient Map
+Edge Detection
+Oil Painting
+Reflection
+Mirror
+ASCII Art
+Glitch
+Time-Lapse
+Day to Night
+Surreal
+Black and White
+Sepia Tone
+Vintage Film
+Grainy Texture
+High Key Lighting
+Low Key Lighting
+Cross Processed Film
+Infrared Photography
+Photocopy
+Pencil Drawing
+Pop Art Filter
+Mosaic Filter
+Selective Desaturation
+Torn Paper
+Tilt-Shift Photography
+Double Exposure
+Polaroid Style Frame
+Water Drops Texture
+Polarizer
+Chinese Painting
+Water Droplets Texture
+Polarization
+Color Inversion
+Fish-eye Lens
+Soft Focus
+Solarize Filter
+Edge Detection
+Oil Painting
+Reflection
+Mirror Image
+Time-Lapse Photography
+Day to Night Transition
+Surreal Art Style
+Abstract Expressionism
+Acrylic Painting
+Anime
+Art Deco
+Biomorphic Abstraction
+Black and White Photograph
+Cartoon
+Charcoal Sketch
+Chibi Anime
+Chinese Painting
+Classicist Painting
+Collage
+Concept Art
+Cyberpunk
+Dada Art
+Digital Art
+Fantasy Art
+Fashion Art
+Fashion Sketch
+Fish-Eye lens Photograph
+Goth Art
+Graffiti
+Harlem Renaissance
+High Key Photograph
+Hyperrealist Pencil Sketch
+Impressionist Painting
+Josei Anime
+Long Exposure Photograph
+Low Key Photograph
+Macro Photograph
+Manga
+Metal Sculpture
+Mid Century Modern Illustration
+Mixed Media
+Modern Art
+Moe Anime
+Nihonga
+Origami
+Paper Mache
+Pen and Ink
+Pencil Sketch
+Photograph
+Photorealism
+Pinup Art
+Romanticist Painting
+Sci-Fi Art
+Semi Realistic Fantasy Art
+Semi Realistic Cyberpunk Art
+Shallow Depth of Field Photograph
+Steam Punk Art
+Stone Sculpture
+Superhero Comic
+Surrealist Art
+Tempura Painting
+Underground Comic
+Watercolor Painting
+Zulu Urban Art

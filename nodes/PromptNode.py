@@ -62,7 +62,8 @@ class PromptSlide:
                 "prompt_keyword": ("STRING", 
                          {
                             "multiline": False, 
-                            "default": ''
+                            "default": '',
+                            "dynamicPrompts": False
                           }),
 
                 "weight":("FLOAT", {"default": 1, "min": -3,"max": 3,

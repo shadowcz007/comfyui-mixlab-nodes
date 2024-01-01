@@ -1,0 +1,23 @@
+GoPro
+Drone
+polaroid
+black and white film
+Kodachrome
+shot on 8mm
+shot on 16mm
+shot on 35mm
+Microscopic
+Fisheye Lens
+Wide Angle
+Ultra-Wide Angle
+Panorama
+Short Exposure
+Long Exposure
+Double Exposure
+f2.8
+Depth of Field
+Soft Focus
+Deep Focus
+Shallow Focus
+Vanishing Point
+Vantage Point

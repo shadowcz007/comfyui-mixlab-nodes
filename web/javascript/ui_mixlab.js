@@ -808,7 +808,9 @@ app.registerExtension({
                 d.style = `text-align: left;margin:6px;color: var(--input-text);
                   background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
                 d.addEventListener('click', () => {
+                  console.log('node')
                   const node = app.graph.getNodeById(nodeId)
+                  
                   if (!node) return
                   app.canvas.centerOnNode(node)
                   app.canvas.setZoom(1)
@@ -844,6 +846,7 @@ app.registerExtension({
               d.style = `text-align: left;margin:6px;color: var(--input-text);
                 background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
               d.addEventListener('click', () => {
+                console.log('click')
                 const node = app.graph.getNodeById(nodeId)
                 if (!node) return
                 app.canvas.centerOnNode(node)

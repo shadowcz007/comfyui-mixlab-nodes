@@ -99,6 +99,12 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         if (node.type == 'PromptSlide') {
           // min max step
           options = node.widgets.filter(w => w.type === 'slider')[0].options
+          // 备选的keywords清单
+          let keywords=getLocalData(`${id}_PromptSlide`);
+          // console.log('keywords',keywords)
+          if(keywords&&keywords[0]){
+            options.keywords=keywords;
+          }
         }
 
         input[inputIds.indexOf(id)] = {
@@ -134,6 +140,16 @@ function getUrl () {
   let api_base = ''
   let url = `${window.location.protocol}//${api_host}${api_base}`
   return url
+}
+
+const getLocalData = key => {
+  let data = {}
+  try {
+    data = JSON.parse(localStorage.getItem(key)) || {}
+  } catch (error) {
+    return {}
+  }
+  return data
 }
 
 async function save_app (json) {
