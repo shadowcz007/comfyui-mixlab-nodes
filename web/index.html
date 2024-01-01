@@ -565,6 +565,7 @@
                     a.setAttribute('target', "_blank");
                     a.setAttribute('href', base64Df);
 
+                    // TODO 支持视频 https://photoswipe.com/custom-content/
 
                     // let v = document.createElement('div');
                     let video = document.createElement('video'), img = new Image();
@@ -1534,6 +1535,13 @@
                 pswpModule: () => import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
             });
             lightbox.init();
+            // window._lightbox = lightbox
+
+            // lightbox.addFilter('preventPointerEvent', (preventPointerEvent, originalEvent, pointerType) => {
+            //     // return true to preventDefault pointermove/pointerdown events
+            //     // (also applies to touchmove/mousemove)
+            //     return true;
+            // });
 
         }
 
