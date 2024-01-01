@@ -254,10 +254,59 @@ def get_images_filepath(f,white_bg=False):
 
     return images
 
+
+
+def get_average_color_image(image):
+    # 打开图片
+    # image = Image.open(image_path)
+
+    # 将图片转换为RGB模式
+    image = image.convert("RGB")
+
+    # 获取图片的像素值
+    pixel_data = image.load()
+
+    # 初始化颜色总和和像素数量
+    total_red = 0
+    total_green = 0
+    total_blue = 0
+    pixel_count = 0
+
+    # 遍历图片的每个像素
+    for i in range(image.width):
+        for j in range(image.height):
+            # 获取像素的RGB值
+            r, g, b = pixel_data[i, j]
+
+            # 累加颜色值
+            total_red += r
+            total_green += g
+            total_blue += b
+
+            # 像素数量加1
+            pixel_count += 1
+
+    # 计算平均颜色值
+    average_red = int(total_red // pixel_count)
+    average_green = int(total_green // pixel_count)
+    average_blue = int(total_blue // pixel_count)
+
+    # 返回平均颜色值
+
+    im = Image.new("RGB", (image.width, image.height), (average_red, average_green, average_blue))
+
+    return im
+
+
+
 # 创建噪声图像
-def create_noisy_image(width, height, mode="RGB", noise_level=128):
+def create_noisy_image(width, height, mode="RGB", noise_level=128, background_color="#FFFFFF"):
+    
+    background_rgb = tuple(int(background_color[i:i+2], 16) for i in (1, 3, 5))
+    image = Image.new(mode, (width, height), background_rgb)
+
     # 创建空白图像
-    image = Image.new(mode, (width, height))
+    # image = Image.new(mode, (width, height))
 
     # 遍历每个像素，并随机设置像素值
     pixels = image.load()
@@ -870,7 +919,7 @@ class LoadImagesFromPath:
     def INPUT_TYPES(s):
         return {
                 "required": {
-                                "file_path": ("STRING",{"multiline": False,"default": ""}),
+                                "file_path": ("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                             },
                 "optional":{
                     "white_bg": (["disable","enable"],),
@@ -1573,7 +1622,7 @@ class NoiseImage:
                     "step": 1,
                     "display": "slider"
                 }),
-
+                "color_hex": ("STRING",{"multiline": False,"default": "#FFFFFF","dynamicPrompts": False}),
                 },
                 }
     
@@ -1592,9 +1641,9 @@ class NoiseImage:
     # 输出是否为列表
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,width,height,noise_level):
+    def run(self,width,height,noise_level,color_hex):
         # 创建噪声图像
-        im=create_noisy_image(width,height,"RGB",noise_level)
+        im=create_noisy_image(width,height,"RGB",noise_level,color_hex)
         
         #获取临时目录：temp
         output_dir = folder_paths.get_temp_directory()
@@ -1649,32 +1698,51 @@ class ResizeImage:
 
             "optional":{
                     "image": ("IMAGE",),
+                    "average_color": (["on",'off'],),
             }
                 }
     
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE","IMAGE")
+    RETURN_NAMES = ("image","average_image",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/image"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (False,)
+    OUTPUT_IS_LIST = (True,True,)
 
-    def run(self,width,height,scale_option,image=None):
+    def run(self,width,height,scale_option,image=None,average_color=['on']):
         
         w=width[0]
         h=height[0]
         scale_option=scale_option[0]
+        average_color=average_color[0]
+
+        imgs=[]
+        average_images=[]
 
         if image==None:
             im=create_noisy_image(w,h,"RGB")
-        else:
-            im=image[0]
-            im=tensor2pil(im)
-            im=resize_image(im,scale_option,w,h)
-            im=im.convert('RGB')
+            a_im=get_average_color_image(im)
+            
+            im=pil2tensor(im)
+            imgs.append(im)
 
-        im=pil2tensor(im)
+            a_im=pil2tensor(a_im)
+            average_images.append(a_im)
+        else:
+            for im in image:
+                im=tensor2pil(im)
+                im=resize_image(im,scale_option,w,h)
+                im=im.convert('RGB')
+
+                a_im=get_average_color_image(im)
+
+                im=pil2tensor(im)
+                imgs.append(im)
+
+                a_im=pil2tensor(a_im)
+                average_images.append(a_im)
         
-        return (im,)
+        return (imgs,average_images,)
