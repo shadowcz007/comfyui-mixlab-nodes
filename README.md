@@ -57,9 +57,14 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-5](./workflow/5-gpt-workflow.json)
 
-### 3D
-![](./assets/3dimage.png)
-[workflow](./workflow/3D-workflow.json)
+
+## Prompt
+> PromptSlide
+![](./assets/prompt_weight.png)
+
+> randomPrompt
+
+![randomPrompt](./assets/randomPrompt.png)
 
 
 ### Layers
@@ -68,6 +73,11 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 ![layers](./assets/layers-workflow.svg)
 
 ![poster](./assets/poster-workflow.svg)
+
+
+### 3D
+![](./assets/3dimage.png)
+[workflow](./workflow/3D-workflow.json)
 
 
 ### LoadImagesFromLocal
@@ -88,6 +98,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 - [Added DynamicDelayByText, enabling delayed execution based on input text length.](./workflow/audio-chatgpt-workflow.json)
 
+
 ## Other Nodes
 
 ![main](./assets/all-workflow.svg)
@@ -95,9 +106,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-1](./workflow/1-workflow.json)
 
-> randomPrompt
 
-![randomPrompt](./assets/randomPrompt.png)
 
 > TransparentImage
 
