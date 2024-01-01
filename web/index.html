@@ -347,21 +347,29 @@
         }
 
 
-        function randomSeed(data) {
-            for (const key in data) {
-                if (data[key].inputs.seed != undefined) {
-                    data[key].inputs.seed = Math.round(Math.random() * 1849378600828930)
-                    console.log('new Seed', data[key])
+        function randomSeed(seed, data) {
+            for (const id in data) {
+
+                if (data[id].inputs.seed != undefined
+                    && !Array.isArray(data[id].inputs.seed) //如果是数组，则由其他节点控制
+                    && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
+                    data[id].inputs.seed = Math.round(Math.random() * 1849378600828930)
+                    console.log('new Seed', data[id])
                 }
             }
             return data
         }
 
+        function updateSeed(id, val) {
+            console.log(val)
+            if (!Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
+        }
 
-        function queuePrompt(promptWorkflow, client_id) {
+
+        function queuePrompt(promptWorkflow, seed, client_id) {
 
             // 随机seed
-            // promptWorkflow = randomSeed(promptWorkflow);
+            promptWorkflow = randomSeed(seed, promptWorkflow);
 
             let url = get_url()
             const data = JSON.stringify({ prompt: promptWorkflow, client_id });
@@ -436,7 +444,15 @@
             action.appendChild(copyText)
             copyText.style.marginLeft = '18px';
 
-            if (link) {
+            let isURL = false;
+            try {
+                new URL(link)
+                isURL = true;
+            } catch (error) {
+                isURL = false;
+            }
+            // new URL(link)
+            if (isURL) {
                 const linkBtn = document.createElement('button');
                 // linkBtn.href = link;
                 linkBtn.innerText = 'go to'
@@ -1035,17 +1051,25 @@
             try {
                 if (Object.keys(seed).length > 0) {
                     seeds.innerHTML = `<summary>SEED</summary>
-                <div class="content"> </div>`
+                <div class="content"> </div>`;
+                    const content = seeds.querySelector('.content')
                     for (const id in seed) {
                         const s = seed[id];
                         let em = document.createElement('em');
                         em.innerText = s;
-                        seeds.querySelector('.content').appendChild(em)
+                        content.appendChild(em)
+
+                        if (s === 'fixed') {
+                            // console.log('###fiex',1)
+                            let inputSeed = createNumSlide(`#${id}`, 0, (newSeed) => updateSeed(id, newSeed), 0, 1849378600828930, 'int');
+
+                            content.appendChild(inputSeed)
+                        }
                     }
                 }
 
             } catch (error) {
-
+                console.log(error)
             }
 
 
@@ -1205,7 +1229,7 @@
         async function createApp(appData, share = true) {
             // console.log(appData)
             // 使用示例：
-            var ui = createUI(appData.input, appData.output, appData.seed, share,appData.link);
+            var ui = createUI(appData.input, appData.output, appData.seed, share, appData.link);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
@@ -1221,7 +1245,7 @@
             // 添加提交按钮点击事件
             ui.submitButton.update(function () {
                 // 在提交按钮点击时执行的逻辑
-                queuePrompt(window._appData.data, api.clientId)
+                queuePrompt(window._appData.data, window._appData.seed, api.clientId)
             });
 
 
