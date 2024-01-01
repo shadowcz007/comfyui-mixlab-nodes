@@ -100,7 +100,8 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           // min max step
           options = node.widgets.filter(w => w.type === 'slider')[0].options
           // 备选的keywords清单
-          let keywords=getLocalData(`${id}_PromptSlide`);
+          let ks = getLocalData(`_mixlab_PromptSlide`)
+          let keywords=ks[id];
           // console.log('keywords',keywords)
           if(keywords&&keywords[0]){
             options.keywords=keywords;

@@ -1800,15 +1800,19 @@ const updateUI = node => {
     pw.inputEl.title = `Total of ${prompts.length} prompts`
   } else {
     // 动态添加
-    console.log('ComfyWidgets',ComfyWidgets.STRING(
-      node,
-      'prompts',
-      ['STRING', { multiline: true }]
-    ))
+    // console.log('ComfyWidgets',ComfyWidgets.STRING(
+    //   node,
+    //   'prompts',
+    //   ['STRING', { multiline: true }]
+    // ))
+
+    // ComfyWidgets.STRING(this, "", ["", {default:this.properties.text, multiline: true}], app)
+
     const w = ComfyWidgets.STRING(
       node,
       'prompts',
-      ['STRING', { multiline: true }]
+      ['STRING', { multiline: true }],
+      app
     ).widget
     w.inputEl.readOnly = true
     w.inputEl.style.opacity = 0.6
@@ -2089,13 +2093,13 @@ const node = {
   name: 'RandomPrompt',
   async init (app) {
     // Any initial setup to run as soon as the page loads
-    console.log('[logging]', 'extension init')
+    // console.log('[logging]', 'extension init')
 
     if (window.location.href.match('/?')) {
       const { workflow } = getURLParameters(window.location.href)
       if (workflow)
         get_my_workflow().then(data => {
-          console.log('#get_my_workflow', data)
+          // console.log('#get_my_workflow', data)
           let my_workflow = data.filter(
             d => d.filename == 'my_workflow.json'
           )[0]
@@ -2131,10 +2135,15 @@ const node = {
     // }
   },
   loadedGraphNode (node, app) {
-    // Fires for each node when loading/dragging/etc a workflow json or png
-    // If you break something in the backend and want to patch workflows in the frontend
-    // This is the place to do this
-    // console.log("[logging]", "loaded graph node: ", exportGraph(node.graph));
+    if (node.type === 'RandomPrompt') {
+      try {
+        let max_count = node.widgets.filter(w => w.name === "max_count")[0];
+        max_count.value= node.widgets_values[0]
+        console.log('RandomPrompt',max_count,node.widgets_values[0])
+      } catch (error) {
+        console.log(error)
+      }
+    }
   },
   async nodeCreated (node) {
     if (node.type === 'RandomPrompt') {
@@ -2227,7 +2236,7 @@ const node = {
         const r = onExecuted?.apply?.(this, arguments)
 
         let prompts = message.prompts
-        console.log('executed', message)
+        // console.log('executed', message)
         // console.log('#RandomPrompt', this.widgets)
         const pw = this.widgets.filter(w => w.name === 'prompts')[0]
 

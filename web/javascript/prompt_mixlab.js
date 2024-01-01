@@ -138,7 +138,7 @@ app.registerExtension({
             const reader = new FileReader()
 
             // 定义读取完成事件的回调函数
-            reader.onload =  (event)=> {
+            reader.onload = event => {
               // 读取完成后的文本内容
               const fileContent = event.target.result.split('\n')
               const keywords = Array.from(fileContent, f => f.trim()).filter(
@@ -148,7 +148,9 @@ app.registerExtension({
               //   console.log(keywords)
 
               // widget.value = keywords
-              setLocalDataOfWin(`${this.id}_PromptSlide`,keywords)
+              let ks = getLocalData(`_mixlab_PromptSlide`)
+              ks[this.id] = keywords
+              setLocalDataOfWin(`_mixlab_PromptSlide`, ks)
 
               createSelect(select, keywords, prompt_keyword)
 
@@ -183,8 +185,9 @@ app.registerExtension({
     if (node.type === 'PromptSlide') {
       try {
         let prompt = node.widgets.filter(w => w.name === 'prompt_keyword')[0]
-       
-       let keywords= getLocalData( `${node.id}_PromptSlide`)
+        let ks = getLocalData(`_mixlab_PromptSlide`)
+
+        let keywords = ks[node.id]
         // console.log('keywords',keywords)
         let widget = node.widgets.filter(w => w.select)[0]
         if (keywords && keywords[0]) {
