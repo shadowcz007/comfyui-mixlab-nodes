@@ -459,7 +459,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt,PromptSlide
-from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -475,6 +475,7 @@ NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "PromptSlide":PromptSlide,
     "NoiseImage":NoiseImage,
+    "GradientImage":GradientImage,
     "TransparentImage":TransparentImage,
     "ResizeImageMixlab":ResizeImage,
     "LoadImagesFromPath":LoadImagesFromPath,

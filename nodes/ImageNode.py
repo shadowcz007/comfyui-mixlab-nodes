@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import torch
+# from PIL import Image, ImageDraw
 from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
 import base64,os,random
@@ -153,6 +154,46 @@ def get_not_transparent_area(image):
     x, y, w, h = cv2.boundingRect(coords)
 
     return (x, y, w, h)
+
+
+
+
+def generate_gradient_image(width, height, start_color_hex, end_color_hex):
+    image = Image.new('RGBA', (width, height))
+    draw = ImageDraw.Draw(image)
+
+    # 将十六进制颜色代码转换为RGBA元组，包括透明度
+    start_color = tuple(int(start_color_hex[i:i+2], 16) for i in (0, 2, 4, 6))
+    end_color = tuple(int(end_color_hex[i:i+2], 16) for i in (0, 2, 4, 6))
+
+    for y in range(height):
+        # 计算当前行的颜色
+        r = int(start_color[0] + (end_color[0] - start_color[0]) * y / height)
+        g = int(start_color[1] + (end_color[1] - start_color[1]) * y / height)
+        b = int(start_color[2] + (end_color[2] - start_color[2]) * y / height)
+        a = int(start_color[3] + (end_color[3] - start_color[3]) * y / height)
+
+        # 绘制当前行的渐变色
+        draw.line((0, y, width, y), fill=(r, g, b, a))
+
+    # Create a mask from the image's alpha channel
+    mask = image.split()[-1]
+
+    # Convert the mask to a black and white image
+    mask = mask.convert('L')
+
+    image=image.convert('RGB')
+
+    return (image, mask)
+
+# 示例用法
+# width = 500
+# height = 200
+# start_color_hex = 'FF0000FF'  # 红色，完全不透明
+# end_color_hex = '0000FFFF'  # 蓝色，完全不透明
+
+# gradient_image = generate_gradient_image(width, height, start_color_hex, end_color_hex)
+# gradient_image.save('gradient_image.png')
 
 
 # 读取不了分层
@@ -863,7 +904,10 @@ class TransparentImage:
         # result 里输出给下个节点的数据 
         # print('TransparentImage',len(images_rgb))
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_rgb,images_rgba)}
-        
+
+
+
+
 
 class EnhanceImage:
     @classmethod
@@ -1595,6 +1639,80 @@ class MergeLayers:
         masks=torch.cat(masks, dim=0)
         return (bg_images,masks,)
     
+
+
+class GradientImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                "width": ("INT",{
+                    "default": 512, 
+                    "min": 1, # 最小值
+                    "max": 8192, # 最大值
+                    "step": 1, # 间隔
+                    "display": "number" # 控件类型： 输入框 number、滑块 slider
+                }),
+                "height": ("INT",{
+                    "default": 512, 
+                    "min": 1,
+                    "max": 8192,
+                    "step": 1,
+                    "display": "number"
+                }),
+                "start_color_hex": ("STRING",{"multiline": False,"default": "#FFFFFF","dynamicPrompts": False}),
+                "end_color_hex": ("STRING",{"multiline": False,"default": "#000000","dynamicPrompts": False}),
+                },
+                }
+    
+    # 输出的数据类型
+    RETURN_TYPES = ("IMAGE","MASK",)
+
+    # 运行时方法名称
+    FUNCTION = "run"
+
+    # 右键菜单目录
+    CATEGORY = "♾️Mixlab/image"
+
+    # 输入是否为列表
+    INPUT_IS_LIST = False
+
+    # 输出是否为列表
+    OUTPUT_IS_LIST = (False,False,)
+
+    def run(self,width,height,start_color_hex, end_color_hex):
+
+        im,mask=generate_gradient_image(width, height, start_color_hex, end_color_hex)
+
+        #获取临时目录：temp
+        output_dir = folder_paths.get_temp_directory()
+
+        (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('tmp_', output_dir)
+        
+        image_file = f"{filename}_{counter:05}.png"
+
+        image_path=os.path.join(full_output_folder, image_file)
+        # 保存图片
+        im.save(image_path,compress_level=6)
+
+        # 把PIL数据类型转为tensor
+        im=pil2tensor(im)
+
+        mask=pil2tensor(mask)
+
+        # 定义ui字段，数据将回传到web前端的 nodeType.prototype.onExecuted
+        # result是节点的输出
+        return {"ui":{"images": [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type":"temp"
+            }]},"result": (im,mask,)}
+
 
 
 class NoiseImage:

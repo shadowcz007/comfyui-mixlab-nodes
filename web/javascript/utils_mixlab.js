@@ -57,11 +57,18 @@ function hexToRGBA (hexColor) {
   // 将透明度的十六进制值转换为十进制值
   var alpha = parseInt(alphaHex, 16) / 255
 
-  return [r,g,b,alpha]
+  return [r, g, b, alpha]
 }
 
 app.registerExtension({
   name: 'Mixlab.utils.Color',
+  init () {
+    $el('link', {
+      rel: 'stylesheet',
+      href: '/extensions/comfyui-mixlab-nodes/lib/classic.min.css',
+      parent: document.head
+    })
+  },
   async getCustomWidgets (app) {
     return {
       TCOLOR (node, inputName, inputData, app) {
@@ -75,9 +82,9 @@ app.registerExtension({
             return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            let data = getLocalData('_mixlab_utils_color');
-            let hex=data[node.id] || '#000000'
-            let [r,g,b,a]=hexToRGBA(hex)
+            let data = getLocalData('_mixlab_utils_color')
+            let hex = data[node.id] || '#000000'
+            let [r, g, b, a] = hexToRGBA(hex)
             return {
               hex,
               r,
@@ -100,7 +107,7 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        console.log('Color nodeData', this.widgets)
+        // console.log('Color nodeData', this.widgets)
 
         const widget = {
           type: 'div',
@@ -109,7 +116,8 @@ app.registerExtension({
             Object.assign(
               this.div.style,
               get_position_style(ctx, widget_width, 44, node.size[1])
-            )
+            );
+            // console.log('draw',y,node.widgets[0].last_y)
           }
         }
 
@@ -117,35 +125,9 @@ app.registerExtension({
 
         document.body.appendChild(widget.div)
 
-        const inputDiv = (key, placeholder, value) => {
+        const inputDiv = () => {
           let div = document.createElement('div')
-          const ip = document.createElement('input')
-          ip.type = 'color'
-          ip.className = `${'comfy-multiline-input'} ${placeholder}`
-          div.style = `display: flex;
-            align-items: center; 
-            margin: 6px 8px;
-            margin-top: 0;`
-          ip.placeholder = placeholder
-          ip.value = value
-
-          ip.style = `outline: none;
-            border: none;
-            padding: 4px;
-            width: 70%;cursor: pointer;
-            height: 32px;`
-          const label = document.createElement('label')
-          label.style = 'font-size: 10px;min-width:32px'
-          label.innerText = placeholder
-          div.appendChild(label)
-          div.appendChild(ip)
-
-          ip.addEventListener('change', () => {
-            let data = getLocalData(key)
-            data[this.id] = ip.value.trim()
-            localStorage.setItem(key, JSON.stringify(data))
-            // console.log(this.id, ip.value.trim())
-          })
+          div.id = `color_picker_${this.id}`
           return div
         }
 
@@ -155,10 +137,71 @@ app.registerExtension({
 
         this.addCustomWidget(widget)
 
+        const pickr = Pickr.create({
+          el: `#${inputColor.id}`,
+          theme: 'classic', // or 'monolith', or 'nano'
+          // closeOnScroll: true,
+          swatches: [
+            'rgba(244, 67, 54, 1)',
+            'rgba(233, 30, 99, 0.95)',
+            'rgba(156, 39, 176, 0.9)',
+            'rgba(103, 58, 183, 0.85)',
+            'rgba(63, 81, 181, 0.8)',
+            'rgba(33, 150, 243, 0.75)',
+            'rgba(3, 169, 244, 0.7)',
+            'rgba(0, 188, 212, 0.7)',
+            'rgba(0, 150, 136, 0.75)',
+            'rgba(76, 175, 80, 0.8)',
+            'rgba(139, 195, 74, 0.85)',
+            'rgba(205, 220, 57, 0.9)',
+            'rgba(255, 235, 59, 0.95)',
+            'rgba(255, 193, 7, 1)'
+          ],
+
+          components: {
+            // Main components
+            preview: true,
+            opacity: true,
+            hue: true,
+            // Input / output Options
+            interaction: {
+              hex: true,
+              rgba: true,
+              hsla: true,
+              hsva: true,
+              cmyk: true,
+              input: true,
+              // clear: true,
+              save: true,
+              cancel: true
+            }
+          }
+        })
+
+        pickr.on('save', (color, instance) => {
+          // console.log('Event: "save"', color.toHEXA().toString())
+          let data = getLocalData('_mixlab_utils_color')
+          data[this.id] = color.toHEXA().toString()
+          localStorage.setItem('_mixlab_utils_color', JSON.stringify(data))
+        }).on('cancel', instance => {
+          pickr&&pickr.hide()
+      })
+
+        const handleMouseWheel=()=>pickr&&pickr.hide()
+
+        document.addEventListener('mousewheel',handleMouseWheel);
+
+
+        this.pickr = pickr
+
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           inputColor.remove()
           widget.div.remove()
+          pickr.destroyAndRemove()
+          pickr=null;
+          this.pickr=null;
+          document.removeEventListener('mousewheel',handleMouseWheel);
           return onRemoved?.()
         }
 
@@ -176,8 +219,10 @@ app.registerExtension({
       let data = getLocalData('_mixlab_utils_color')
 
       let id = node.id
+      node.pickr.setColor(data[id] || '#000000')
+      // console.log(node.pickr)
 
-      widget.div.querySelector('.Color').value = data[id] || '#000000'
+      // widget.div.querySelector('.Color').value = data[id] || '#000000'
     }
   }
 })

@@ -805,19 +805,22 @@ app.registerExtension({
               const updateNodes = (ns, nd) => {
                 let appInfoNodes = {}
                 try {
-                  let appInfo=app.graph._nodes
-                  .filter(n => n.type === 'AppInfo')[0];
-                  appInfoNodes[appInfo.id]=2;
-                  for (const id of appInfo.widgets[1].value.split('\n')) {
-                    if (id && id.trim() && parseInt(id)) {
-                      appInfoNodes[id]=0;
+                  let appInfo = app.graph._nodes.filter(
+                    n => n.type === 'AppInfo'
+                  )[0]
+                  if (appInfo) {
+                    appInfoNodes[appInfo.id] = 2
+                    for (const id of appInfo.widgets[1].value.split('\n')) {
+                      if (id && id.trim() && parseInt(id)) {
+                        appInfoNodes[id] = 0
+                      }
                     }
-                  }
-                  for (const id of app.graph._nodes
-                    .filter(n => n.type === 'AppInfo')[0]
-                    .widgets[2].value.split('\n')) {
-                    if (id && id.trim() && parseInt(id)) {
-                      appInfoNodes[id]=1;
+                    for (const id of app.graph._nodes
+                      .filter(n => n.type === 'AppInfo')[0]
+                      .widgets[2].value.split('\n')) {
+                      if (id && id.trim() && parseInt(id)) {
+                        appInfoNodes[id] = 1
+                      }
                     }
                   }
                 } catch (error) {
@@ -833,15 +836,21 @@ app.registerExtension({
                     margin:6px;
                     color: var(--input-text);
                    background-color: var(--comfy-input-bg); 
-                   border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                   border-color: ${
+                     appInfoNodes[nodeId] >= 0
+                       ? appInfoNodes[nodeId] === 1
+                         ? 'blue'
+                         : 'red'
+                       : 'var(--border-color)'
+                   };
                    cursor: pointer;`
 
-                   if(appInfoNodes[nodeId]===2){
-                    // appinfo
-                    d.style.backgroundColor='#326328';
-                    d.style.color='#ffffff';
-                    d.style.borderColor='transparent';
-                   }
+                    if (appInfoNodes[nodeId] === 2) {
+                      // appinfo
+                      d.style.backgroundColor = '#326328'
+                      d.style.color = '#ffffff'
+                      d.style.borderColor = 'transparent'
+                    }
 
                     d.addEventListener('click', () => {
                       // console.log('node')
@@ -874,19 +883,22 @@ app.registerExtension({
               let nodesDivv = document.createElement('div')
               let appInfoNodes = {}
               try {
-                let appInfo=app.graph._nodes
-                .filter(n => n.type === 'AppInfo')[0];
-                appInfoNodes[appInfo.id]=2;
-                for (const id of appInfo.widgets[1].value.split('\n')) {
-                  if (id && id.trim() && parseInt(id)) {
-                    appInfoNodes[id]=0;
+                let appInfo = app.graph._nodes.filter(
+                  n => n.type === 'AppInfo'
+                )[0]
+                if (appInfo) {
+                  appInfoNodes[appInfo.id] = 2
+                  for (const id of appInfo.widgets[1].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id] = 0
+                    }
                   }
-                }
-                for (const id of app.graph._nodes
-                  .filter(n => n.type === 'AppInfo')[0]
-                  .widgets[2].value.split('\n')) {
-                  if (id && id.trim() && parseInt(id)) {
-                    appInfoNodes[id]=1;
+                  for (const id of app.graph._nodes
+                    .filter(n => n.type === 'AppInfo')[0]
+                    .widgets[2].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id] = 1
+                    }
                   }
                 }
               } catch (error) {
@@ -903,16 +915,21 @@ app.registerExtension({
                   margin:6px;
                   color: var(--input-text);
                  background-color: var(--comfy-input-bg); 
-                 border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                 border-color: ${
+                   appInfoNodes[nodeId] >= 0
+                     ? appInfoNodes[nodeId] === 1
+                       ? 'blue'
+                       : 'red'
+                     : 'var(--border-color)'
+                 };
                  cursor: pointer;`
 
-                 if(appInfoNodes[nodeId]===2){
-                  // appinfo
-                  d.style.backgroundColor='#326328';
-                  d.style.color='#ffffff';
-                  d.style.borderColor='transparent';
-                 }
-
+                  if (appInfoNodes[nodeId] === 2) {
+                    // appinfo
+                    d.style.backgroundColor = '#326328'
+                    d.style.color = '#ffffff'
+                    d.style.borderColor = 'transparent'
+                  }
 
                   d.addEventListener('click', () => {
                     console.log('click')
