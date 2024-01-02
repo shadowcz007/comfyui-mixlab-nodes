@@ -2247,7 +2247,7 @@ const node = {
         } else {
           // 动态添加
           const w = ComfyWidgets.STRING(
-            node,
+            this,
             'prompts',
             ['STRING', { multiline: true }],
             app
