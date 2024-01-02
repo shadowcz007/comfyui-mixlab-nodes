@@ -302,6 +302,8 @@
             color: #555;
         }
 
+       
+
         select,
         button,
         input {
@@ -315,10 +317,10 @@
             margin-top: 8px;
         }
 
-       
+
         .pickr .pcr-button {
-            width: 56px!important;
-            height: 56px!important;
+            width: 56px !important;
+            height: 56px !important;
             outline: 1px solid white;
         }
     </style>
@@ -884,7 +886,13 @@
                         max: 3,
                     };
 
-                    const label = data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
+                    const label = data.title;
+
+                    if (!options.keywords.includes(data.inputs.prompt_keyword)) {
+                        options.keywords = [data.inputs.prompt_keyword, ...options.keywords]
+                    };
+
+                    //  data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
                     let silde = createNumSlide(label,
                         data.inputs.weight,
                         (v) => {
@@ -977,11 +985,11 @@
 
                 if (["Color"].includes(data.class_type)) {
                     let value = data.inputs.color.hex || '#000000';
-                    let d=document.createElement('div');
-                    d.className='card';
-                    
-                    let label=document.createElement('label');
-                    label.innerText=data.title;
+                    let d = document.createElement('div');
+                    d.className = 'card';
+
+                    let label = document.createElement('label');
+                    label.innerText = data.title;
 
                     let color = document.createElement('div');
                     color.id = `color_input_${data.id}`;
@@ -1116,18 +1124,20 @@
             label.setAttribute('data-content', value);
 
             if (keywords && keywords[0]) {
-                label.innerHTML = ``
+                // label.innerHTML = ``
                 // 有备选的关键词
-                let selectTag = createSelect(Array.from([labelText, ...keywords], k => {
+                let selectTag = createSelect(Array.from(keywords, (k,i) => {
                     return {
                         value: k,
                         text: k,
+                        selected:i==0
                     }
-                }), labelText);
+                }), keywords[0]);
                 selectTag.style = `background: none;
-    color: black;    max-width: 300px;
-    border-bottom: 1px solid #acacac;
-    border-radius: 0;`
+                                    color: black;    max-width: 300px;
+                                    border-bottom: 1px solid #acacac;
+                                    border-radius: 0;`
+                // selectTag.setAttribute('data-content',labelText);
                 selectTag.addEventListener('change', e => {
                     e.preventDefault();
                     window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
@@ -1184,11 +1194,12 @@
                 option.value = options[i].value;
                 option.text = options[i].text;
                 selectElement.appendChild(option);
+                // if(options[i].selected) 
             }
 
             // 设置默认值
             selectElement.value = defaultValue;
-
+            console.log(defaultValue,options)
             return selectElement
         }
 
@@ -1620,7 +1631,7 @@
             api.addEventListener('execution_start', ({ detail }) => {
                 console.log("execution_start", detail)
                 try {
-                    ui.status.update(`execution_start_#${detail.node}`);
+                    ui.status.update(`execution_start`);
                 } catch (error) {
 
                 }

@@ -79,6 +79,16 @@ font_files = get_font_files(r_directory)
 # print(font_files)
 
 
+def flatten_list(nested_list):
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flat_list.extend(flatten_list(item))
+        else:
+            flat_list.append(item)
+    return flat_list
+
+
 class ColorInput:
     @classmethod
     def INPUT_TYPES(s):
@@ -501,6 +511,7 @@ class SwitchByIndex:
                         "step": 1, 
                         "display": "number"  
                     }),
+                 "flat": (['off',"on"],),
             }
         }
 
@@ -514,13 +525,20 @@ class SwitchByIndex:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self, A,B,index):
+    def run(self, A,B,index,flat):
+
+        flat=flat[0]
+
         C=[]
         index=index[0]
         for a in A:
             C.append(a)
         for b in B:
             C.append(b)
+
+        if flat=='on':
+            C=flatten_list(C)
+
         if index>-1:
             try:
                 C=[C[index]]

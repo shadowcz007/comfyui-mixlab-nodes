@@ -101,7 +101,7 @@ app.registerExtension({
           async serializeValue (nodeId, widgetIndex) {
             // let data = getLocalData('_mixlab_utils_color')
             // let hex = data[node.id] || '#000000'
-            let hex = widget.value
+            let hex = widget.value || '#000000'
             let [r, g, b, a] = hexToRGBA(hex)
             return {
               hex,
@@ -159,6 +159,7 @@ app.registerExtension({
           el: `#${inputColor.id}`,
           theme: 'classic', // or 'monolith', or 'nano'
           // closeOnScroll: true,
+          default:'#000000',
           swatches: [
             'rgba(244, 67, 54, 1)',
             'rgba(233, 30, 99, 0.95)',
