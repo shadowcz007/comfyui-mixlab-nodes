@@ -133,8 +133,38 @@ def create_for_https():
     return (crt,key)
 
 
+
+# workflow  目录下的所有json
+def read_workflow_json_files_all(folder_path):
+    print('#read_workflow_json_files_all',folder_path)
+    json_files = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith('.json'):
+                json_files.append(os.path.join(root, file))
+
+    data = []
+    for file_path in json_files:
+        try:
+            with open(file_path) as json_file:
+                json_data = json.load(json_file)
+                creation_time = datetime.datetime.fromtimestamp(os.path.getctime(file_path))
+                numeric_timestamp = creation_time.timestamp()
+                file_info = {
+                    'filename': os.path.basename(file_path),
+                    'category': os.path.dirname(file_path),
+                    'data': json_data,
+                    'date': numeric_timestamp
+                }
+                data.append(file_info)
+        except Exception as e:
+            print(e)
+    
+    sorted_data = sorted(data, key=lambda x: x['date'], reverse=True)
+    return sorted_data
+
 # workflow  
-def read_workflow_json_files(folder_path):
+def read_workflow_json_files(folder_path ):
     json_files = []
     for filename in os.listdir(folder_path):
         if filename.endswith('.json'):
@@ -169,7 +199,7 @@ def get_workflows():
     workflows=read_workflow_json_files(workflow_path)
     return workflows
 
-def get_my_workflow_for_app(filename="my_workflow_app.json",category=""):
+def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=False):
     app_path=os.path.join(current_path, "app")
     if not os.path.exists(app_path):
         os.mkdir(app_path)
@@ -182,25 +212,33 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category=""):
     if filename==None:
 
         #TODO 支持目录内遍历 
-        data=read_workflow_json_files(category_path)
+        if is_all:
+            data=read_workflow_json_files_all(category_path)
+        else:
+            data=read_workflow_json_files(category_path)
         
         i=0
         for item in data:
+            # print(item)
             try:
                 x=item["data"]
                 if i==0:
                     apps.append({
                         "filename":item["filename"],
-                        "category":category,
+                        # "category":item['category'],
                         "data":x,
                         "date":item["date"],
                     })
                 else:
+                    category=''
+                    if 'category' in x['app']:
+                        category=x['app']['category']
                     apps.append({
                         "filename":item["filename"],
                         "category":category,
                         "data":{
                             "app":{
+                                "category":category,
                                 "description":x['app']['description'],
                                 "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
@@ -232,11 +270,15 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category=""):
                 x=item["data"]
                 # print(apps[0]['filename'] ,item["filename"])
                 if apps[0]['filename']!=item["filename"]:
+                    category=''
+                    if 'category' in x['app']:
+                        category=x['app']['category']
                     apps.append({
                         "filename":item["filename"],
-                        "category":category,
+                        # "category":category,
                         "data":{
                             "app":{
+                                "category":category,
                                 "description":x['app']['description'],
                                 "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
@@ -397,12 +439,15 @@ async def mixlab_workflow_hander(request):
             elif data['task']=='my_app':
                 filename=None
                 category=""
+                admin=False
                 if 'filename' in data:
                     filename=data['filename']
                 if 'category' in data:
                     category=data['category']
+                if 'admin' in data:
+                    admin=data['admin']
                 result={
-                    'data':get_my_workflow_for_app(filename,category),
+                    'data':get_my_workflow_for_app(filename,category,admin),
                     'status':'success',
                 }
             elif data['task']=='list':

@@ -99,10 +99,9 @@ app.registerExtension({
             return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            
             // let data = getLocalData('_mixlab_utils_color')
             // let hex = data[node.id] || '#000000'
-            let hex=widget.value;
+            let hex = widget.value
             let [r, g, b, a] = hexToRGBA(hex)
             return {
               hex,
@@ -212,21 +211,28 @@ app.registerExtension({
           .on('cancel', instance => {
             pickr && pickr.hide()
           })
-
-        const handleMouseWheel = () => pickr && pickr.hide()
+        this.pickr = pickr
+        const handleMouseWheel = () => {
+          try {
+            this.pickr && this.pickr.hide()
+          } catch (error) {}
+        }
 
         document.addEventListener('wheel', handleMouseWheel)
-
-        this.pickr = pickr
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           inputColor.remove()
           widget.div.remove()
-          pickr.destroyAndRemove()
-          pickr = null
-          this.pickr = null
-          document.removeEventListener('wheel', handleMouseWheel)
+
+          try {
+            this.pickr.destroyAndRemove()
+            this.pickr = null
+            document.removeEventListener('wheel', handleMouseWheel)
+          } catch (error) {
+            console.log(error)
+          }
+
           return onRemoved?.()
         }
 
@@ -241,13 +247,9 @@ app.registerExtension({
     if (node.type === 'Color') {
       try {
         let TCOLOR = node.widgets.filter(w => w.type == 'TCOLOR')[0]
-    
-      setTimeout(()=>node.pickr.setColor(TCOLOR.value || '#000000'),1000)
-       
-      } catch (error) {
-        
-      }
-      
+
+        setTimeout(() => node.pickr.setColor(TCOLOR.value || '#000000'), 1000)
+      } catch (error) {}
     }
   }
 })

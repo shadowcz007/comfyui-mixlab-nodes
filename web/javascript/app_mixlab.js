@@ -334,7 +334,7 @@ app.registerExtension({
       }
 
       const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = async function (message) {
+      nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
         console.log(message.json)
         window._mixlab_app_json = message.json
