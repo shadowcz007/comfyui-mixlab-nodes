@@ -68,6 +68,24 @@ app.registerExtension({
       href: '/extensions/comfyui-mixlab-nodes/lib/classic.min.css',
       parent: document.head
     })
+
+    $el("style", {
+			textContent: `
+      .pickr{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+				.pickr .pcr-button {
+					width: 56px;
+          height: 56px;
+          outline: 1px solid white;
+				}
+				 
+			`,
+			parent: document.body,
+		});
+
   },
   async getCustomWidgets (app) {
     return {
@@ -189,7 +207,7 @@ app.registerExtension({
 
         const handleMouseWheel=()=>pickr&&pickr.hide()
 
-        document.addEventListener('mousewheel',handleMouseWheel);
+        document.addEventListener('wheel',handleMouseWheel);
 
 
         this.pickr = pickr
@@ -201,7 +219,7 @@ app.registerExtension({
           pickr.destroyAndRemove()
           pickr=null;
           this.pickr=null;
-          document.removeEventListener('mousewheel',handleMouseWheel);
+          document.removeEventListener('wheel',handleMouseWheel);
           return onRemoved?.()
         }
 
@@ -214,7 +232,7 @@ app.registerExtension({
     // You can modify widgets/add handlers/etc here
 
     if (node.type === 'Color') {
-      let widget = node.widgets.filter(w => w.div)[0]
+      // let widget = node.widgets.filter(w => w.div)[0]
 
       let data = getLocalData('_mixlab_utils_color')
 

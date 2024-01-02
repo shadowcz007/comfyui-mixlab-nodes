@@ -162,6 +162,14 @@ def generate_gradient_image(width, height, start_color_hex, end_color_hex):
     image = Image.new('RGBA', (width, height))
     draw = ImageDraw.Draw(image)
 
+    if len(start_color_hex) == 7:
+        start_color_hex += "FF"
+    if len(end_color_hex) == 7:
+        end_color_hex += "FF"
+
+    start_color_hex = start_color_hex.lstrip("#")
+    end_color_hex = end_color_hex.lstrip("#")
+
     # 将十六进制颜色代码转换为RGBA元组，包括透明度
     start_color = tuple(int(start_color_hex[i:i+2], 16) for i in (0, 2, 4, 6))
     end_color = tuple(int(end_color_hex[i:i+2], 16) for i in (0, 2, 4, 6))

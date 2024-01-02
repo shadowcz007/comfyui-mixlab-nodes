@@ -1328,7 +1328,7 @@
                     element: output,
                     update: async function (type = "image", val, id) {
                         console.log(val, id)
-                        if (val && type == "image" && output.querySelector(`#output_${id}`)) {
+                        if (val && type == "image" && output.querySelector(`#output_${id} img`)) {
                             // if (output.querySelector(`#output_${id}`)) {
 
                             let im = await createImage(val)
@@ -1348,7 +1348,7 @@
 
                         }
 
-                        if (val && type == "video" && output.querySelector(`#output_${id}`)) {
+                        if (val && type == "video" && output.querySelector(`#output_${id} video`)) {
 
                             let video = output.querySelector(`#output_${id} video`);
                             let img = output.querySelector(`#output_${id} img`);
