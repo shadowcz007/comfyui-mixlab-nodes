@@ -108,6 +108,10 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           }
         }
 
+        if(node.type=='Color'){
+          
+        }
+
         input[inputIds.indexOf(id)] = {
           ...data[id],
           title: node.title,

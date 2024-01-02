@@ -439,7 +439,7 @@ class AppInfo:
                     }),
                     "share_prefix":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                     "link":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
-                    "category":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
+                    "category":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                 }
 
                 }

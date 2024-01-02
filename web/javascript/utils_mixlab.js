@@ -69,8 +69,8 @@ app.registerExtension({
       parent: document.head
     })
 
-    $el("style", {
-			textContent: `
+    $el('style', {
+      textContent: `
       .pickr{
         display: flex;
         justify-content: center;
@@ -83,9 +83,8 @@ app.registerExtension({
 				}
 				 
 			`,
-			parent: document.body,
-		});
-
+      parent: document.body
+    })
   },
   async getCustomWidgets (app) {
     return {
@@ -100,8 +99,10 @@ app.registerExtension({
             return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            let data = getLocalData('_mixlab_utils_color')
-            let hex = data[node.id] || '#000000'
+            
+            // let data = getLocalData('_mixlab_utils_color')
+            // let hex = data[node.id] || '#000000'
+            let hex=widget.value;
             let [r, g, b, a] = hexToRGBA(hex)
             return {
               hex,
@@ -134,7 +135,7 @@ app.registerExtension({
             Object.assign(
               this.div.style,
               get_position_style(ctx, widget_width, 44, node.size[1])
-            );
+            )
             // console.log('draw',y,node.widgets[0].last_y)
           }
         }
@@ -196,19 +197,25 @@ app.registerExtension({
           }
         })
 
-        pickr.on('save', (color, instance) => {
-          // console.log('Event: "save"', color.toHEXA().toString())
-          let data = getLocalData('_mixlab_utils_color')
-          data[this.id] = color.toHEXA().toString()
-          localStorage.setItem('_mixlab_utils_color', JSON.stringify(data))
-        }).on('cancel', instance => {
-          pickr&&pickr.hide()
-      })
+        pickr
+          .on('save', (color, instance) => {
+            // console.log('Event: "save"', color.toHEXA().toString())
+            let data = getLocalData('_mixlab_utils_color')
+            data[this.id] = color.toHEXA().toString()
+            localStorage.setItem('_mixlab_utils_color', JSON.stringify(data))
 
-        const handleMouseWheel=()=>pickr&&pickr.hide()
+            try {
+              let tc = this.widgets.filter(w => w.type == 'TCOLOR')[0]
+              tc.value = color.toHEXA().toString()
+            } catch (error) {}
+          })
+          .on('cancel', instance => {
+            pickr && pickr.hide()
+          })
 
-        document.addEventListener('wheel',handleMouseWheel);
+        const handleMouseWheel = () => pickr && pickr.hide()
 
+        document.addEventListener('wheel', handleMouseWheel)
 
         this.pickr = pickr
 
@@ -217,9 +224,9 @@ app.registerExtension({
           inputColor.remove()
           widget.div.remove()
           pickr.destroyAndRemove()
-          pickr=null;
-          this.pickr=null;
-          document.removeEventListener('wheel',handleMouseWheel);
+          pickr = null
+          this.pickr = null
+          document.removeEventListener('wheel', handleMouseWheel)
           return onRemoved?.()
         }
 
@@ -232,12 +239,13 @@ app.registerExtension({
     // You can modify widgets/add handlers/etc here
 
     if (node.type === 'Color') {
-      // let widget = node.widgets.filter(w => w.div)[0]
+      let TCOLOR = node.widgets.filter(w => w.type == 'TCOLOR')[0]
+      console.log('TCOLOR', TCOLOR)
+      // let data = getLocalData('_mixlab_utils_color')
 
-      let data = getLocalData('_mixlab_utils_color')
-
-      let id = node.id
-      node.pickr.setColor(data[id] || '#000000')
+      // let id = node.id
+      setTimeout(()=>node.pickr.setColor(TCOLOR.value || '#000000'),1000)
+      
       // console.log(node.pickr)
 
       // widget.div.querySelector('.Color').value = data[id] || '#000000'
