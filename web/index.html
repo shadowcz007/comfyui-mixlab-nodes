@@ -410,7 +410,12 @@
 
 
         function queuePrompt(promptWorkflow, seed, client_id) {
-
+            // appinfo升级后 兼容，补丁
+            for (const id in promptWorkflow) {
+                if (promptWorkflow[id].class_type == 'AppInfo') {
+                    promptWorkflow[id].inputs.category = promptWorkflow[id].inputs.category || ""
+                }
+            }
             // 随机seed
             promptWorkflow = randomSeed(seed, promptWorkflow);
 
@@ -1116,12 +1121,12 @@
             if (!queryString) {
                 return {};
             }
-            
+
             const params = new URLSearchParams(queryString);
-            
-            const filename = params.get('filename')?decodeURIComponent(params.get('filename')):null;
-            const category = params.get('category')?decodeURIComponent(params.get('category')||''):'';
-            
+
+            const filename = params.get('filename') ? decodeURIComponent(params.get('filename')) : null;
+            const category = params.get('category') ? decodeURIComponent(params.get('category') || '') : '';
+
             return { category, filename };
         }
 
@@ -1170,7 +1175,7 @@
                 shareBtn.innerText = 'copy url';
                 shareBtn.addEventListener('click', e => {
                     e.preventDefault();
-                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category||'')}`;
+                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
                     copyTextToClipboard(url, success(e, shareBtn, 'copy url'));
                 })
 
@@ -1587,7 +1592,7 @@
                     dd.className = 'card selected'
                     // console.log(app.filename)
 
-                    window._appData = (await get_my_app(app.category,app.filename))[0];
+                    window._appData = (await get_my_app(app.category, app.filename))[0];
                     if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
@@ -1611,7 +1616,6 @@
             createAppList(window._apps);
 
             createApp(window._appData);
-
 
         };
 

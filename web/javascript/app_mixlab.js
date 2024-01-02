@@ -229,31 +229,23 @@ async function save (json, download = false) {
     } catch (error) {}
     // console.log(data.app)
     // let http_workflow = app.graph.serialize()
-
+    await save_app(data)
     if (download) {
-      await save_app(data)
       await downloadJsonFile(data, data.app.filename)
-      let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
-          data.app.filename
-        )}`
-      )
-      if (open)
-        window.open(
-          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
-            data.app.filename
-          )}`
-        )
-    } else {
-      await save_app(data)
-
-      let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app`
-      )
-      if (open) window.open(`${getUrl()}/mixlab/app`)
     }
+    let open = window.confirm(
+      `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+        data.app.filename
+      )}&category=${encodeURIComponent(data.app.category)}`
+    )
+    if (open)
+      window.open(
+        `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+          data.app.filename
+        )}&category=${encodeURIComponent(data.app.category)}`
+      )
   } catch (error) {
-    console.log('###SpeechRecognition', error)
+    console.log('###error', error)
   }
 }
 
