@@ -55,13 +55,15 @@ function get_url () {
   return url
 }
 
-async function get_my_app (filename = null) {
+async function get_my_app (filename = null, category = '') {
   let url = get_url()
   const res = await fetch(`${url}/mixlab/workflow`, {
     method: 'POST',
     body: JSON.stringify({
       task: 'my_app',
-      filename
+      filename,
+      category,
+      admin: true
     })
   })
   let result = await res.json()
@@ -719,7 +721,78 @@ app.registerExtension({
       const orig = LGraphCanvas.prototype.getCanvasMenuOptions
 
       const apps = await get_my_app()
-      // console.log('apps',apps)
+
+      let apps_map = { '0': [] }
+
+      for (const app of apps) {
+        if (app.category) {
+          if (!apps_map[app.category]) apps_map[app.category] = []
+          apps_map[app.category].push(app)
+        } else {
+          apps_map['0'].push(app)
+        }
+      }
+
+      let apps_opts = []
+      for (const category in apps_map) {
+        console.log('category',typeof(category))
+        if (category === '0') {
+          apps_opts.push(
+            ...Array.from(apps_map[category], a => {
+              return {
+                content: a.name,
+                has_submenu: false,
+                callback: async () => {
+                  try {
+                    let item = (await get_my_app(a.filename))[0]
+                    if (item) {
+                      // console.log(item.data)
+                      app.loadGraphData(item.data)
+                      setTimeout(() => {
+                        const node = app.graph._nodes_in_order[0]
+                        if (!node) return
+                        app.canvas.centerOnNode(node)
+                        app.canvas.setZoom(0.5)
+                      }, 1000)
+                    }
+                  } catch (error) {}
+                }
+              }
+            })
+          )
+        } else {
+          // 二级
+          apps_opts.push({
+            content:  '🚀 '+category,
+            has_submenu: true,
+            disabled: false,
+            submenu: {
+              options: Array.from(apps_map[category], a => {
+                return {
+                  content: a.name,
+                  callback: async () => {
+                    try {
+                      let item = (await get_my_app(a.filename, a.category))[0]
+                      if (item) {
+                        // console.log(item.data)
+                        app.loadGraphData(item.data)
+                        setTimeout(() => {
+                          const node = app.graph._nodes_in_order[0]
+                          if (!node) return
+                          app.canvas.centerOnNode(node)
+                          app.canvas.setZoom(0.5)
+                        }, 1000)
+                      }
+                    } catch (error) {}
+                  }
+                }
+              })
+            }
+          })
+        }
+      }
+
+      // console.log('apps',apps_map, apps_opts,apps)
       LGraphCanvas.prototype.getCanvasMenuOptions = function () {
         const options = orig.apply(this, arguments)
 
@@ -805,19 +878,22 @@ app.registerExtension({
               const updateNodes = (ns, nd) => {
                 let appInfoNodes = {}
                 try {
-                  let appInfo=app.graph._nodes
-                  .filter(n => n.type === 'AppInfo')[0];
-                  appInfoNodes[appInfo.id]=2;
-                  for (const id of appInfo.widgets[1].value.split('\n')) {
-                    if (id && id.trim() && parseInt(id)) {
-                      appInfoNodes[id]=0;
+                  let appInfo = app.graph._nodes.filter(
+                    n => n.type === 'AppInfo'
+                  )[0]
+                  if (appInfo) {
+                    appInfoNodes[appInfo.id] = 2
+                    for (const id of appInfo.widgets[1].value.split('\n')) {
+                      if (id && id.trim() && parseInt(id)) {
+                        appInfoNodes[id] = 0
+                      }
                     }
-                  }
-                  for (const id of app.graph._nodes
-                    .filter(n => n.type === 'AppInfo')[0]
-                    .widgets[2].value.split('\n')) {
-                    if (id && id.trim() && parseInt(id)) {
-                      appInfoNodes[id]=1;
+                    for (const id of app.graph._nodes
+                      .filter(n => n.type === 'AppInfo')[0]
+                      .widgets[2].value.split('\n')) {
+                      if (id && id.trim() && parseInt(id)) {
+                        appInfoNodes[id] = 1
+                      }
                     }
                   }
                 } catch (error) {
@@ -833,15 +909,21 @@ app.registerExtension({
                     margin:6px;
                     color: var(--input-text);
                    background-color: var(--comfy-input-bg); 
-                   border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                   border-color: ${
+                     appInfoNodes[nodeId] >= 0
+                       ? appInfoNodes[nodeId] === 1
+                         ? 'blue'
+                         : 'red'
+                       : 'var(--border-color)'
+                   };
                    cursor: pointer;`
 
-                   if(appInfoNodes[nodeId]===2){
-                    // appinfo
-                    d.style.backgroundColor='#326328';
-                    d.style.color='#ffffff';
-                    d.style.borderColor='transparent';
-                   }
+                    if (appInfoNodes[nodeId] === 2) {
+                      // appinfo
+                      d.style.backgroundColor = '#326328'
+                      d.style.color = '#ffffff'
+                      d.style.borderColor = 'transparent'
+                    }
 
                     d.addEventListener('click', () => {
                       // console.log('node')
@@ -874,19 +956,22 @@ app.registerExtension({
               let nodesDivv = document.createElement('div')
               let appInfoNodes = {}
               try {
-                let appInfo=app.graph._nodes
-                .filter(n => n.type === 'AppInfo')[0];
-                appInfoNodes[appInfo.id]=2;
-                for (const id of appInfo.widgets[1].value.split('\n')) {
-                  if (id && id.trim() && parseInt(id)) {
-                    appInfoNodes[id]=0;
+                let appInfo = app.graph._nodes.filter(
+                  n => n.type === 'AppInfo'
+                )[0]
+                if (appInfo) {
+                  appInfoNodes[appInfo.id] = 2
+                  for (const id of appInfo.widgets[1].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id] = 0
+                    }
                   }
-                }
-                for (const id of app.graph._nodes
-                  .filter(n => n.type === 'AppInfo')[0]
-                  .widgets[2].value.split('\n')) {
-                  if (id && id.trim() && parseInt(id)) {
-                    appInfoNodes[id]=1;
+                  for (const id of app.graph._nodes
+                    .filter(n => n.type === 'AppInfo')[0]
+                    .widgets[2].value.split('\n')) {
+                    if (id && id.trim() && parseInt(id)) {
+                      appInfoNodes[id] = 1
+                    }
                   }
                 }
               } catch (error) {
@@ -903,16 +988,21 @@ app.registerExtension({
                   margin:6px;
                   color: var(--input-text);
                  background-color: var(--comfy-input-bg); 
-                 border-color: ${appInfoNodes[nodeId]>=0?(appInfoNodes[nodeId]===1?'blue':'red'):'var(--border-color)'};
+                 border-color: ${
+                   appInfoNodes[nodeId] >= 0
+                     ? appInfoNodes[nodeId] === 1
+                       ? 'blue'
+                       : 'red'
+                     : 'var(--border-color)'
+                 };
                  cursor: pointer;`
 
-                 if(appInfoNodes[nodeId]===2){
-                  // appinfo
-                  d.style.backgroundColor='#326328';
-                  d.style.color='#ffffff';
-                  d.style.borderColor='transparent';
-                 }
-
+                  if (appInfoNodes[nodeId] === 2) {
+                    // appinfo
+                    d.style.backgroundColor = '#326328'
+                    d.style.color = '#ffffff'
+                    d.style.borderColor = 'transparent'
+                  }
 
                   d.addEventListener('click', () => {
                     console.log('click')
@@ -955,26 +1045,7 @@ app.registerExtension({
             has_submenu: true,
             disabled: false,
             submenu: {
-              options: Array.from(apps, a => {
-                return {
-                  content: a.name,
-                  callback: async () => {
-                    try {
-                      let item = (await get_my_app(a.filename))[0]
-                      if (item) {
-                        // console.log(item.data)
-                        app.loadGraphData(item.data)
-                        setTimeout(() => {
-                          const node = app.graph._nodes_in_order[0]
-                          if (!node) return
-                          app.canvas.centerOnNode(node)
-                          app.canvas.setZoom(0.5)
-                        }, 1000)
-                      }
-                    } catch (error) {}
-                  }
-                }
-              })
+              options:apps_opts
             }
           }
         )

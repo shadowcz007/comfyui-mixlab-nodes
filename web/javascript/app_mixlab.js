@@ -101,11 +101,15 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           options = node.widgets.filter(w => w.type === 'slider')[0].options
           // 备选的keywords清单
           let ks = getLocalData(`_mixlab_PromptSlide`)
-          let keywords=ks[id];
+          let keywords = ks[id]
           // console.log('keywords',keywords)
-          if(keywords&&keywords[0]){
-            options.keywords=keywords;
+          if (keywords && keywords[0]) {
+            options.keywords = keywords
           }
+        }
+
+        if(node.type=='Color'){
+          
         }
 
         input[inputIds.indexOf(id)] = {
@@ -161,7 +165,8 @@ async function save_app (json) {
     body: JSON.stringify({
       data: json,
       task: 'save_app',
-      filename: json.app.filename
+      filename: json.app.filename,
+      category: json.app.category
     })
   })
   return await res.json()
@@ -187,7 +192,8 @@ async function save (json, download = false) {
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
-    link=json[7],//用于创建界面上的跳转链接
+    link = json[7], //用于创建界面上的跳转链接
+    category = json[8] || '', //用于分类
     description = json[4],
     inputIds = json[2].split('\n').filter(f => f),
     outputIds = json[3].split('\n').filter(f => f)
@@ -218,6 +224,7 @@ async function save (json, download = false) {
       seed, //控制是fixed 还是random
       share_prefix,
       link,
+      category,
       filename: `${name}_${version}.json`
     }
 
@@ -226,31 +233,23 @@ async function save (json, download = false) {
     } catch (error) {}
     // console.log(data.app)
     // let http_workflow = app.graph.serialize()
-
+    await save_app(data)
     if (download) {
-      await save_app(data)
       await downloadJsonFile(data, data.app.filename)
-      let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
-          data.app.filename
-        )}`
-      )
-      if (open)
-        window.open(
-          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
-            data.app.filename
-          )}`
-        )
-    } else {
-      await save_app(data)
-
-      let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app`
-      )
-      if (open) window.open(`${getUrl()}/mixlab/app`)
     }
+    let open = window.confirm(
+      `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+        data.app.filename
+      )}&category=${encodeURIComponent(data.app.category)}`
+    )
+    if (open)
+      window.open(
+        `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+          data.app.filename
+        )}&category=${encodeURIComponent(data.app.category)}`
+      )
   } catch (error) {
-    console.log('###SpeechRecognition', error)
+    console.log('###error', error)
   }
 }
 
@@ -335,7 +334,7 @@ app.registerExtension({
       }
 
       const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = async function (message) {
+      nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
         console.log(message.json)
         window._mixlab_app_json = message.json

@@ -133,8 +133,38 @@ def create_for_https():
     return (crt,key)
 
 
+
+# workflow  目录下的所有json
+def read_workflow_json_files_all(folder_path):
+    print('#read_workflow_json_files_all',folder_path)
+    json_files = []
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            if file.endswith('.json'):
+                json_files.append(os.path.join(root, file))
+
+    data = []
+    for file_path in json_files:
+        try:
+            with open(file_path) as json_file:
+                json_data = json.load(json_file)
+                creation_time = datetime.datetime.fromtimestamp(os.path.getctime(file_path))
+                numeric_timestamp = creation_time.timestamp()
+                file_info = {
+                    'filename': os.path.basename(file_path),
+                    'category': os.path.dirname(file_path),
+                    'data': json_data,
+                    'date': numeric_timestamp
+                }
+                data.append(file_info)
+        except Exception as e:
+            print(e)
+    
+    sorted_data = sorted(data, key=lambda x: x['date'], reverse=True)
+    return sorted_data
+
 # workflow  
-def read_workflow_json_files(folder_path):
+def read_workflow_json_files(folder_path ):
     json_files = []
     for filename in os.listdir(folder_path):
         if filename.endswith('.json'):
@@ -169,29 +199,46 @@ def get_workflows():
     workflows=read_workflow_json_files(workflow_path)
     return workflows
 
-def get_my_workflow_for_app(filename="my_workflow_app.json"):
+def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=False):
     app_path=os.path.join(current_path, "app")
     if not os.path.exists(app_path):
         os.mkdir(app_path)
 
+    category_path=os.path.join(app_path,category)
+    if not os.path.exists(category_path):
+        os.mkdir(category_path)
+
     apps=[]
     if filename==None:
-        data=read_workflow_json_files(app_path)
+
+        #TODO 支持目录内遍历 
+        if is_all:
+            data=read_workflow_json_files_all(category_path)
+        else:
+            data=read_workflow_json_files(category_path)
+        
         i=0
         for item in data:
+            # print(item)
             try:
                 x=item["data"]
                 if i==0:
                     apps.append({
                         "filename":item["filename"],
+                        # "category":item['category'],
                         "data":x,
-                        "date":item["date"]
+                        "date":item["date"],
                     })
                 else:
+                    category=''
+                    if 'category' in x['app']:
+                        category=x['app']['category']
                     apps.append({
                         "filename":item["filename"],
+                        "category":category,
                         "data":{
                             "app":{
+                                "category":category,
                                 "description":x['app']['description'],
                                 "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
@@ -205,7 +252,7 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
             except Exception as e:
                 print("发生异常：", str(e))
     else:
-        app_workflow_path=os.path.join(app_path, filename)
+        app_workflow_path=os.path.join(category_path, filename)
         # print('app_workflow_path: ',app_workflow_path)
         try:
             with open(app_workflow_path) as json_file:
@@ -216,17 +263,22 @@ def get_my_workflow_for_app(filename="my_workflow_app.json"):
         except Exception as e:
             print("发生异常：", str(e))
         
-        if len(apps)==1:
-            data=read_workflow_json_files(app_path)
+        if len(apps)==1 and category!='' and category!=None:
+            data=read_workflow_json_files(category_path)
             
             for item in data:
                 x=item["data"]
                 # print(apps[0]['filename'] ,item["filename"])
                 if apps[0]['filename']!=item["filename"]:
+                    category=''
+                    if 'category' in x['app']:
+                        category=x['app']['category']
                     apps.append({
                         "filename":item["filename"],
+                        # "category":category,
                         "data":{
                             "app":{
+                                "category":category,
                                 "description":x['app']['description'],
                                 "filename":(x['app']['filename'] if 'filename' in x['app'] else "") ,
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
@@ -245,11 +297,16 @@ def save_workflow_json(data):
         json.dump(data, file)
     return workflow_path
 
-def save_workflow_for_app(data,filename="my_workflow_app.json"):
+def save_workflow_for_app(data,filename="my_workflow_app.json",category=""):
     app_path=os.path.join(current_path, "app")
     if not os.path.exists(app_path):
         os.mkdir(app_path)
-    app_workflow_path=os.path.join(app_path, filename)
+
+    category_path=os.path.join(app_path,category)
+    if not os.path.exists(category_path):
+        os.mkdir(category_path)
+    
+    app_workflow_path=os.path.join(category_path, filename)
  
     try:
         output_str = json.dumps(data['output'])
@@ -371,17 +428,26 @@ async def mixlab_workflow_hander(request):
                     'file_path':file_path
                 }
             elif data['task']=='save_app':
-                file_path=save_workflow_for_app(data['data'],data['filename'])
+                category=""
+                if "category" in data:
+                    category=data['category']
+                file_path=save_workflow_for_app(data['data'],data['filename'],category)
                 result={
                     'status':'success',
                     'file_path':file_path
                 }
             elif data['task']=='my_app':
                 filename=None
+                category=""
+                admin=False
                 if 'filename' in data:
                     filename=data['filename']
+                if 'category' in data:
+                    category=data['category']
+                if 'admin' in data:
+                    admin=data['admin']
                 result={
-                    'data':get_my_workflow_for_app(filename),
+                    'data':get_my_workflow_for_app(filename,category,admin),
                     'status':'success',
                 }
             elif data['task']=='list':
@@ -438,7 +504,7 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt,PromptSlide
-from .nodes.ImageNode import NoiseImage,TransparentImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
@@ -454,6 +520,7 @@ NODE_CLASS_MAPPINGS = {
     "RandomPrompt":RandomPrompt,
     "PromptSlide":PromptSlide,
     "NoiseImage":NoiseImage,
+    "GradientImage":GradientImage,
     "TransparentImage":TransparentImage,
     "ResizeImageMixlab":ResizeImage,
     "LoadImagesFromPath":LoadImagesFromPath,

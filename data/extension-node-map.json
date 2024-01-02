@@ -4774,6 +4774,7 @@
             "Color",
             "CombineMasks_",
             "EnhanceImage",
+            "GradientImage",
             "FaceToMask",
             "FeatheredMask",
             "FloatingVideo",

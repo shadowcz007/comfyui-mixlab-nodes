@@ -302,6 +302,8 @@
             color: #555;
         }
 
+       
+
         select,
         button,
         input {
@@ -314,10 +316,18 @@
             border-radius: 4px;
             margin-top: 8px;
         }
+
+
+        .pickr .pcr-button {
+            width: 56px !important;
+            height: 56px !important;
+            outline: 1px solid white;
+        }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
-
+    <link href="/extensions/comfyui-mixlab-nodes/lib/classic.min.css" rel="stylesheet">
+    <script src="/extensions/comfyui-mixlab-nodes/lib/pickr.min.js"></script>
 </head>
 
 <body>
@@ -410,7 +420,12 @@
 
 
         function queuePrompt(promptWorkflow, seed, client_id) {
-
+            // appinfo升级后 兼容，补丁
+            for (const id in promptWorkflow) {
+                if (promptWorkflow[id].class_type == 'AppInfo') {
+                    promptWorkflow[id].inputs.category = promptWorkflow[id].inputs.category || ""
+                }
+            }
             // 随机seed
             promptWorkflow = randomSeed(seed, promptWorkflow);
 
@@ -440,13 +455,14 @@
             }, 5000)
         }
 
-        async function get_my_app(filename = null) {
+        async function get_my_app(category = "", filename = null) {
             let url = get_url()
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
                 body: JSON.stringify({
                     task: 'my_app',
-                    filename
+                    filename,
+                    category
                 })
             })
             let result = await res.json();
@@ -870,7 +886,13 @@
                         max: 3,
                     };
 
-                    const label = data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
+                    const label = data.title;
+
+                    if (!options.keywords.includes(data.inputs.prompt_keyword)) {
+                        options.keywords = [data.inputs.prompt_keyword, ...options.keywords]
+                    };
+
+                    //  data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
                     let silde = createNumSlide(label,
                         data.inputs.weight,
                         (v) => {
@@ -961,9 +983,94 @@
                     container.appendChild(div);
                 }
 
+                if (["Color"].includes(data.class_type)) {
+                    let value = data.inputs.color.hex || '#000000';
+                    let d = document.createElement('div');
+                    d.className = 'card';
+
+                    let label = document.createElement('label');
+                    label.innerText = data.title;
+
+                    let color = document.createElement('div');
+                    color.id = `color_input_${data.id}`;
+                    color.className = 'color_input';
+                    color.setAttribute('data-color', value);
+                    color.setAttribute('data-id', data.id);
+
+                    d.appendChild(label);
+                    d.appendChild(color);
+
+                    container.appendChild(d);
+                }
+
 
             });
             return container
+        }
+
+        function createColorInput(elId, value, nodeId) {
+            const pickr = Pickr.create({
+                el: `#${elId}`,
+                theme: 'classic',
+                default: value,
+                swatches: [
+                    'rgba(244, 67, 54, 1)',
+                    'rgba(233, 30, 99, 0.95)',
+                    'rgba(156, 39, 176, 0.9)',
+                    'rgba(103, 58, 183, 0.85)',
+                    'rgba(63, 81, 181, 0.8)',
+                    'rgba(33, 150, 243, 0.75)',
+                    'rgba(3, 169, 244, 0.7)',
+                    'rgba(0, 188, 212, 0.7)',
+                    'rgba(0, 150, 136, 0.75)',
+                    'rgba(76, 175, 80, 0.8)',
+                    'rgba(139, 195, 74, 0.85)',
+                    'rgba(205, 220, 57, 0.9)',
+                    'rgba(255, 235, 59, 0.95)',
+                    'rgba(255, 193, 7, 1)'
+                ],
+                components: {
+                    // Main components
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+                    // Input / output Options
+                    interaction: {
+                        hex: true,
+                        rgba: true,
+                        hsla: true,
+                        hsva: true,
+                        cmyk: true,
+                        input: true,
+                        // clear: true,
+                        save: true,
+                        cancel: true
+                    }
+                }
+            });
+
+            pickr
+                .on('save', (color, instance) => {
+                    try {
+                        // console.log(color)
+                        // window._appData.data[data.id].inputs.color.hex = color.toHEXA().toString();
+                        let [r, g, b, a] = color.toRGBA();
+                        window._appData.data[nodeId].inputs.color = {
+                            ...window._appData.data[nodeId].inputs.color,
+                            r, g, b, a,
+                            hex: color.toHEXA().toString()
+                        }
+                    } catch (error) { }
+                })
+                .on('cancel', instance => {
+                    pickr && pickr.hide()
+                })
+        }
+
+        function createAllColorInput() {
+            for (const cInp of document.querySelectorAll('.color_input')) {
+                createColorInput(cInp.id, cInp.getAttribute('data-color'), cInp.getAttribute('data-id'));
+            }
         }
 
         function createToggleBtn() {
@@ -1017,18 +1124,20 @@
             label.setAttribute('data-content', value);
 
             if (keywords && keywords[0]) {
-                label.innerHTML = ``
+                // label.innerHTML = ``
                 // 有备选的关键词
-                let selectTag = createSelect(Array.from([labelText, ...keywords], k => {
+                let selectTag = createSelect(Array.from(keywords, (k,i) => {
                     return {
                         value: k,
                         text: k,
+                        selected:i==0
                     }
-                }), labelText);
+                }), keywords[0]);
                 selectTag.style = `background: none;
-    color: black;    max-width: 300px;
-    border-bottom: 1px solid #acacac;
-    border-radius: 0;`
+                                    color: black;    max-width: 300px;
+                                    border-bottom: 1px solid #acacac;
+                                    border-radius: 0;`
+                // selectTag.setAttribute('data-content',labelText);
                 selectTag.addEventListener('change', e => {
                     e.preventDefault();
                     window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
@@ -1085,11 +1194,12 @@
                 option.value = options[i].value;
                 option.text = options[i].text;
                 selectElement.appendChild(option);
+                // if(options[i].selected) 
             }
 
             // 设置默认值
             selectElement.value = defaultValue;
-
+            console.log(defaultValue,options)
             return selectElement
         }
 
@@ -1110,16 +1220,18 @@
             return [div, selectElement];
         }
 
-        function getFilenameFromUrl(url) {
+        function getFilenameAndCategoryFromUrl(url) {
             const queryString = url.split('?')[1];
             if (!queryString) {
-                return null;
+                return {};
             }
 
             const params = new URLSearchParams(queryString);
-            const filename = decodeURIComponent(params.get('filename'));
 
-            return filename;
+            const filename = params.get('filename') ? decodeURIComponent(params.get('filename')) : null;
+            const category = params.get('category') ? decodeURIComponent(params.get('category') || '') : '';
+
+            return { category, filename };
         }
 
         function createImage(url) {
@@ -1167,7 +1279,7 @@
                 shareBtn.innerText = 'copy url';
                 shareBtn.addEventListener('click', e => {
                     e.preventDefault();
-                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}`;
+                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
                     copyTextToClipboard(url, success(e, shareBtn, 'copy url'));
                 })
 
@@ -1320,7 +1432,7 @@
                     element: output,
                     update: async function (type = "image", val, id) {
                         console.log(val, id)
-                        if (val && type == "image" && output.querySelector(`#output_${id}`)) {
+                        if (val && type == "image" && output.querySelector(`#output_${id} img`)) {
                             // if (output.querySelector(`#output_${id}`)) {
 
                             let im = await createImage(val)
@@ -1340,7 +1452,7 @@
 
                         }
 
-                        if (val && type == "video" && output.querySelector(`#output_${id}`)) {
+                        if (val && type == "video" && output.querySelector(`#output_${id} video`)) {
 
                             let video = output.querySelector(`#output_${id} video`);
                             let img = output.querySelector(`#output_${id} img`);
@@ -1519,7 +1631,7 @@
             api.addEventListener('execution_start', ({ detail }) => {
                 console.log("execution_start", detail)
                 try {
-                    ui.status.update(`execution_start_#${detail.node}`);
+                    ui.status.update(`execution_start`);
                 } catch (error) {
 
                 }
@@ -1527,6 +1639,10 @@
 
             api.api_base = ""
             api.init();
+
+            // 外挂的UI
+
+            createAllColorInput();
 
 
             const lightbox = new PhotoSwipeLightbox({
@@ -1584,7 +1700,7 @@
                     dd.className = 'card selected'
                     // console.log(app.filename)
 
-                    window._appData = (await get_my_app(app.filename))[0];
+                    window._appData = (await get_my_app(app.category, app.filename))[0];
                     if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
@@ -1600,8 +1716,8 @@
 
         async function init_app() {
 
-            const filename = getFilenameFromUrl(location.href);
-            window._apps = await get_my_app(filename);
+            const { category, filename } = getFilenameAndCategoryFromUrl(location.href);
+            window._apps = await get_my_app(category, filename);
 
             window._appData = window._apps[0];
 

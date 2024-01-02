@@ -4,10 +4,13 @@
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
 - 支持多个web app 切换
 - 发布为app的workflow，可以在右键里再次编辑了
+- web app可以设置分类，在comfyui右键菜单可以编辑更新web app
+
 
 - Support multiple web app switching.
 - Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.
 - The workflow, which is now released as an app, can also be edited again by right-clicking.
+- The web app can be configured with categories, and the web app can be edited and updated in the right-click menu of ComfyUI.
 
 
 ![](./assets/0-m-app.png)
@@ -26,7 +29,7 @@ APP-JSON:
 - [image-to-image](./example/Image-to-Image_2.json)
 - text-to-text
 
-> 暂时支持6种节点作为界面上的输入节点：Load Image、CLIPTextEncode、TextInput_、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
+> 暂时支持8种节点作为界面上的输入节点：Load Image、CLIPTextEncode、PromptSlide、TextInput_、Color、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
 
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
 
