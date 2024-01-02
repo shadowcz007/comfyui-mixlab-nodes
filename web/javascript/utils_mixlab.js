@@ -200,9 +200,9 @@ app.registerExtension({
         pickr
           .on('save', (color, instance) => {
             // console.log('Event: "save"', color.toHEXA().toString())
-            let data = getLocalData('_mixlab_utils_color')
-            data[this.id] = color.toHEXA().toString()
-            localStorage.setItem('_mixlab_utils_color', JSON.stringify(data))
+            // let data = getLocalData('_mixlab_utils_color')
+            // data[this.id] = color.toHEXA().toString()
+            // localStorage.setItem('_mixlab_utils_color', JSON.stringify(data))
 
             try {
               let tc = this.widgets.filter(w => w.type == 'TCOLOR')[0]
@@ -239,16 +239,15 @@ app.registerExtension({
     // You can modify widgets/add handlers/etc here
 
     if (node.type === 'Color') {
-      let TCOLOR = node.widgets.filter(w => w.type == 'TCOLOR')[0]
-      console.log('TCOLOR', TCOLOR)
-      // let data = getLocalData('_mixlab_utils_color')
-
-      // let id = node.id
+      try {
+        let TCOLOR = node.widgets.filter(w => w.type == 'TCOLOR')[0]
+    
       setTimeout(()=>node.pickr.setColor(TCOLOR.value || '#000000'),1000)
+       
+      } catch (error) {
+        
+      }
       
-      // console.log(node.pickr)
-
-      // widget.div.querySelector('.Color').value = data[id] || '#000000'
     }
   }
 })
