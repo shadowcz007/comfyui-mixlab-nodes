@@ -101,10 +101,10 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           options = node.widgets.filter(w => w.type === 'slider')[0].options
           // 备选的keywords清单
           let ks = getLocalData(`_mixlab_PromptSlide`)
-          let keywords=ks[id];
+          let keywords = ks[id]
           // console.log('keywords',keywords)
-          if(keywords&&keywords[0]){
-            options.keywords=keywords;
+          if (keywords && keywords[0]) {
+            options.keywords = keywords
           }
         }
 
@@ -161,7 +161,8 @@ async function save_app (json) {
     body: JSON.stringify({
       data: json,
       task: 'save_app',
-      filename: json.app.filename
+      filename: json.app.filename,
+      category: json.app.category
     })
   })
   return await res.json()
@@ -187,7 +188,8 @@ async function save (json, download = false) {
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
-    link=json[7],//用于创建界面上的跳转链接
+    link = json[7], //用于创建界面上的跳转链接
+    category = json[8] || '', //用于分类
     description = json[4],
     inputIds = json[2].split('\n').filter(f => f),
     outputIds = json[3].split('\n').filter(f => f)
@@ -218,6 +220,7 @@ async function save (json, download = false) {
       seed, //控制是fixed 还是random
       share_prefix,
       link,
+      category,
       filename: `${name}_${version}.json`
     }
 

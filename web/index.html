@@ -440,13 +440,14 @@
             }, 5000)
         }
 
-        async function get_my_app(filename = null) {
+        async function get_my_app(category = "", filename = null) {
             let url = get_url()
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
                 body: JSON.stringify({
                     task: 'my_app',
-                    filename
+                    filename,
+                    category
                 })
             })
             let result = await res.json();
@@ -1110,16 +1111,18 @@
             return [div, selectElement];
         }
 
-        function getFilenameFromUrl(url) {
+        function getFilenameAndCategoryFromUrl(url) {
             const queryString = url.split('?')[1];
             if (!queryString) {
-                return null;
+                return {};
             }
-
+            
             const params = new URLSearchParams(queryString);
-            const filename = decodeURIComponent(params.get('filename'));
-
-            return filename;
+            
+            const filename = params.get('filename')?decodeURIComponent(params.get('filename')):null;
+            const category = params.get('category')?decodeURIComponent(params.get('category')||''):'';
+            
+            return { category, filename };
         }
 
         function createImage(url) {
@@ -1584,7 +1587,7 @@
                     dd.className = 'card selected'
                     // console.log(app.filename)
 
-                    window._appData = (await get_my_app(app.filename))[0];
+                    window._appData = (await get_my_app(app.category,app.filename))[0];
                     if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
 
@@ -1600,8 +1603,8 @@
 
         async function init_app() {
 
-            const filename = getFilenameFromUrl(location.href);
-            window._apps = await get_my_app(filename);
+            const { category, filename } = getFilenameAndCategoryFromUrl(location.href);
+            window._apps = await get_my_app(category, filename);
 
             window._appData = window._apps[0];
 

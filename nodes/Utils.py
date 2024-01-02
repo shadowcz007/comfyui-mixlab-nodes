@@ -439,6 +439,7 @@ class AppInfo:
                     }),
                     "share_prefix":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                     "link":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
+                    "category":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
                 }
 
                 }
@@ -453,13 +454,13 @@ class AppInfo:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,name,image,input_ids,output_ids,description,version,share_prefix,link):
+    def run(self,name,image,input_ids,output_ids,description,version,share_prefix,link,category):
 
         im=create_temp_file(image)
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])
 
-        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link]}, "result": (image,)}
+        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category]}, "result": (image,)}
     
 
     
