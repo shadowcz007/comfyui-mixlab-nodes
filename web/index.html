@@ -978,7 +978,8 @@
                 if (["Color"].includes(data.class_type)) {
                     let value = data.inputs.color.hex || '#000000';
                     let d=document.createElement('div');
-
+                    d.className='card';
+                    
                     let label=document.createElement('label');
                     label.innerText=data.title;
 
