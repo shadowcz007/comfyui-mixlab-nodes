@@ -1686,8 +1686,8 @@
                 }
 
 
-                try {
-                    ui.status.update(`executed_#${detail.node}`);
+                try { 
+                    ui.status.update(`executed_#${window._appData.data[detail.node]?.class_type}`);
                     ui.submitButton.reset()
                 } catch (error) {
 
