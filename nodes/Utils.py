@@ -465,7 +465,7 @@ class AppInfo:
     OUTPUT_IS_LIST = (False,)
 
     def run(self,name,image,input_ids,output_ids,description,version,share_prefix,link,category):
-
+        #TODO batch 的方式需要处理
         im=create_temp_file(image)
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])

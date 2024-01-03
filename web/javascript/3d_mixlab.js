@@ -196,6 +196,9 @@ app.registerExtension({
               }
               if (bg) {
                 data.bg_image = await parseImage(bg)
+                if (!data.bg_image.match('data:image/')) {
+                  delete data.bg_image
+                }
               }
 
               if (material) {
