@@ -1,0 +1,2415 @@
+{
+  "last_node_id": 128,
+  "last_link_id": 207,
+  "nodes": [
+    {
+      "id": 8,
+      "type": "PreviewImage",
+      "pos": [
+        2521.460559703692,
+        -1587.2180470095893
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 14
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 14,
+      "type": "PreviewImage",
+      "pos": [
+        2535.460559703692,
+        -1204.2180470095905
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 17
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 7,
+      "type": "LoadImagesFromURL",
+      "pos": [
+        1711.42830256307,
+        -1599.3206325408398
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            12,
+            119,
+            128
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "links": [
+            13,
+            117
+          ],
+          "shape": 6,
+          "slot_index": 1
+        }
+      ],
+      "title": "# 3-4",
+      "properties": {
+        "Node name for S&R": "LoadImagesFromURL"
+      },
+      "widgets_values": [
+        "https://www.mixcomfy.com/assets/images/AIPC3-4.png"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "LoadImagesFromURL",
+      "pos": [
+        1695.4605597036943,
+        -1264.2180470095902
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            15,
+            124,
+            129
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "links": [
+            16,
+            125
+          ],
+          "shape": 6,
+          "slot_index": 1
+        }
+      ],
+      "title": "# 9-16",
+      "properties": {
+        "Node name for S&R": "LoadImagesFromURL"
+      },
+      "widgets_values": [
+        "https://www.mixcomfy.com/assets/images/AIPC9-16.png"
+      ]
+    },
+    {
+      "id": 55,
+      "type": "GetImageSize_",
+      "pos": [
+        3005.974020506248,
+        -1121.2566086687507
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 128
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            79
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            80
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 70,
+      "type": "GetImageSize_",
+      "pos": [
+        2996.974020506248,
+        -938.2566086687494
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 129
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            120
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            121
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 71,
+      "type": "GetImageSize_",
+      "pos": [
+        2998.974020506248,
+        -734.2566086687494
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 130
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            122
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            123
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 49,
+      "type": "NewLayer",
+      "pos": [
+        3301.974020506248,
+        -1186.2566086687507
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 119
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 117
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 79,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 80,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            113
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        0,
+        0,
+        512,
+        512,
+        1,
+        "width",
+        ""
+      ]
+    },
+    {
+      "id": 68,
+      "type": "NewLayer",
+      "pos": [
+        3322.974020506248,
+        -877.2566086687494
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 124
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 125
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 120,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 121,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            114
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        0,
+        0,
+        512,
+        512,
+        1,
+        "width",
+        ""
+      ]
+    },
+    {
+      "id": 76,
+      "type": "PreviewImage",
+      "pos": [
+        3488.369251598011,
+        -1663.088123668324
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 142
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 58,
+      "type": "NewLayer",
+      "pos": [
+        3689.974020506248,
+        -1178.2566086687507
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 92
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 85
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 113
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": 88
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            131
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        968,
+        1381,
+        114,
+        22,
+        2,
+        "height",
+        ""
+      ]
+    },
+    {
+      "id": 63,
+      "type": "NewLayer",
+      "pos": [
+        3681.974020506248,
+        -857.2566086687494
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 103
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 94
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 114
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": 95
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            135
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        971,
+        1818,
+        87,
+        22,
+        2,
+        "height",
+        ""
+      ]
+    },
+    {
+      "id": 101,
+      "type": "PreviewImage",
+      "pos": [
+        5328.397364750004,
+        -1726.0537115390628
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 161
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 21,
+      "type": "Note",
+      "pos": [
+        5329.397364750004,
+        -1946.0537115390628
+      ],
+      "size": {
+        "0": 210,
+        "1": 166.71800231933594
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "分享信息"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 40,
+      "type": "LoadImagesFromURL",
+      "pos": [
+        4928.397364750004,
+        -1961.0537115390628
+      ],
+      "size": {
+        "0": 210,
+        "1": 117.2959976196289
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImagesFromURL"
+      },
+      "widgets_values": [
+        "https://www.mixcomfy.com/assets/images/mixlab_logo_b.png"
+      ]
+    },
+    {
+      "id": 65,
+      "type": "NewLayer",
+      "pos": [
+        3683,
+        -525
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 102
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 100
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 115
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": 99
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            138
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        1791,
+        1000,
+        120,
+        23,
+        2,
+        "height",
+        ""
+      ]
+    },
+    {
+      "id": 69,
+      "type": "NewLayer",
+      "pos": [
+        3331,
+        -547
+      ],
+      "size": {
+        "0": 210,
+        "1": 262
+      },
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 126
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 127
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": null
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 122,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 123,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            115
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        0,
+        0,
+        512,
+        512,
+        1,
+        "width",
+        ""
+      ]
+    },
+    {
+      "id": 18,
+      "type": "PreviewImage",
+      "pos": [
+        2550.3720433339645,
+        -773.3056833328795
+      ],
+      "size": {
+        "0": 210,
+        "1": 246
+      },
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 20
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 17,
+      "type": "TransparentImage",
+      "pos": [
+        2192.460559703692,
+        -768.2180470095883
+      ],
+      "size": {
+        "0": 315,
+        "1": 358.0000305175781
+      },
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 18
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            20,
+            99,
+            189
+          ],
+          "shape": 6,
+          "slot_index": 1
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TransparentImage"
+      },
+      "widgets_values": [
+        "yes",
+        "no",
+        "Mixlab_save"
+      ]
+    },
+    {
+      "id": 121,
+      "type": "GetImageSize_",
+      "pos": [
+        3007.0709458493775,
+        -116.84108583414061
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 189
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            190
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            191
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 13,
+      "type": "TransparentImage",
+      "pos": [
+        2188.460559703692,
+        -1215.2180470095902
+      ],
+      "size": {
+        "0": 315,
+        "1": 358.0000305175781
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 15
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": 16
+        }
+      ],
+      "outputs": [
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            17,
+            95,
+            195
+          ],
+          "shape": 6,
+          "slot_index": 1
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TransparentImage"
+      },
+      "widgets_values": [
+        "yes",
+        "no",
+        "Mixlab_save"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "TransparentImage",
+      "pos": [
+        2169.460559703692,
+        -1640.2180470095893
+      ],
+      "size": {
+        "0": 315,
+        "1": 358.0000305175781
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "file_path",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        },
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            14,
+            88,
+            199
+          ],
+          "shape": 6,
+          "slot_index": 1
+        },
+        {
+          "name": "RGBA",
+          "type": "RGBA",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TransparentImage"
+      },
+      "widgets_values": [
+        "yes",
+        "no",
+        "Mixlab_save"
+      ]
+    },
+    {
+      "id": 125,
+      "type": "GetImageSize_",
+      "pos": [
+        2996.0709458493775,
+        396.1589141658592
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 199
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            196
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            197
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 16,
+      "type": "LoadImagesFromURL",
+      "pos": [
+        1703.3720433339654,
+        -957.3056833328795
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {
+        "pinned": false
+      },
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            18,
+            126,
+            130
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "masks",
+          "type": "MASK",
+          "links": [
+            19,
+            127
+          ],
+          "shape": 6,
+          "slot_index": 1
+        }
+      ],
+      "title": "# 16-9",
+      "properties": {
+        "Node name for S&R": "LoadImagesFromURL"
+      },
+      "widgets_values": [
+        "https://www.mixcomfy.com/assets/images/AIPC16-9.png"
+      ]
+    },
+    {
+      "id": 72,
+      "type": "MergeLayers",
+      "pos": [
+        3955.974020506248,
+        -1182.2566086687507
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 131
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 198
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            202
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MergeLayers"
+      }
+    },
+    {
+      "id": 73,
+      "type": "MergeLayers",
+      "pos": [
+        3965,
+        -842
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 135
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 194
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            203
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MergeLayers"
+      }
+    },
+    {
+      "id": 74,
+      "type": "MergeLayers",
+      "pos": [
+        3956.974020506248,
+        -510.2566086687502
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 138
+        },
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 188
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            204
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MergeLayers"
+      }
+    },
+    {
+      "id": 75,
+      "type": "TextInput_",
+      "pos": [
+        2991,
+        -1909
+      ],
+      "size": {
+        "0": 325.0866394042969,
+        "1": 121.88375854492188
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            141
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "你的姓名/昵称",
+      "properties": {
+        "Node name for S&R": "TextInput_"
+      },
+      "widgets_values": [
+        "shadow"
+      ]
+    },
+    {
+      "id": 57,
+      "type": "PreviewImage",
+      "pos": [
+        4318,
+        -1243
+      ],
+      "size": {
+        "0": 382.9111022949219,
+        "1": 532.8897705078125
+      },
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 202
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 126,
+      "type": "PreviewImage",
+      "pos": [
+        4738,
+        -1242
+      ],
+      "size": {
+        "0": 368.4781188964844,
+        "1": 553.1112670898438
+      },
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 203
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 122,
+      "type": "ResizeImageMixlab",
+      "pos": [
+        3247.0709458493775,
+        143.15891416585947
+      ],
+      "size": {
+        "0": 315,
+        "1": 150
+      },
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 200
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 192,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 193,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            194
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "average_image",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ResizeImageMixlab"
+      },
+      "widgets_values": [
+        512,
+        512,
+        "center",
+        "off",
+        "#FFFFFF"
+      ]
+    },
+    {
+      "id": 123,
+      "type": "GetImageSize_",
+      "pos": [
+        3004,
+        156
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 195
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            192
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            193
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 127,
+      "type": "PreviewImage",
+      "pos": [
+        4305,
+        -631
+      ],
+      "size": {
+        "0": 378.9849548339844,
+        "1": 499.6607971191406
+      },
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 204
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 119,
+      "type": "ResizeImageMixlab",
+      "pos": [
+        3277,
+        -137
+      ],
+      "size": {
+        "0": 315,
+        "1": 150
+      },
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 185
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 190,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 191,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            188
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "average_image",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ResizeImageMixlab"
+      },
+      "widgets_values": [
+        512,
+        512,
+        "center",
+        "off",
+        "#FFFFFF"
+      ]
+    },
+    {
+      "id": 124,
+      "type": "ResizeImageMixlab",
+      "pos": [
+        3257,
+        359
+      ],
+      "size": {
+        "0": 315,
+        "1": 150
+      },
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 201
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 196,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 197,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            198
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "average_image",
+          "type": "IMAGE",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ResizeImageMixlab"
+      },
+      "widgets_values": [
+        512,
+        512,
+        "center",
+        "off",
+        "#FFFFFF"
+      ]
+    },
+    {
+      "id": 60,
+      "type": "Font",
+      "pos": [
+        2990.1117677550033,
+        -1666.4395648128136
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            82
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Font"
+      },
+      "widgets_values": [
+        "FangSong"
+      ]
+    },
+    {
+      "id": 59,
+      "type": "TextImage",
+      "pos": [
+        2990,
+        -1540
+      ],
+      "size": {
+        "0": 400,
+        "1": 216
+      },
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "font_path",
+          "type": "STRING",
+          "link": 82,
+          "widget": {
+            "name": "font_path"
+          }
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 141,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            92,
+            102,
+            103,
+            142
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            85,
+            94,
+            100
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextImage"
+      },
+      "widgets_values": [
+        "shadow",
+        "C:\\Users\\38957\\Documents\\ai-lab\\ComfyUI_windows_portable\\ComfyUI\\custom_nodes\\comfyui-mixlab-nodes\\assets\\王汉宗颜楷体繁.ttf",
+        101,
+        0,
+        "#000000",
+        false
+      ]
+    },
+    {
+      "id": 98,
+      "type": "AppInfo",
+      "pos": [
+        4922.397364750004,
+        -1807.0537115390628
+      ],
+      "size": {
+        "0": 362.42608642578125,
+        "1": 431.3537902832031
+      },
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 162
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            161
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AppInfo"
+      },
+      "widgets_values": [
+        "AIPC大赛模板",
+        "\n75\n118",
+        "57\n126\n127\n",
+        "投稿模板#发挥你的想象力",
+        4,
+        "#AIPC# 参赛作品",
+        "https://www.weibo.com",
+        "",
+        null
+      ]
+    },
+    {
+      "id": 106,
+      "type": "LoadImage",
+      "pos": [
+        4535,
+        -1843
+      ],
+      "size": [
+        210,
+        314
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            162
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1703759043279.png",
+        "image"
+      ]
+    },
+    {
+      "id": 118,
+      "type": "LoadImage",
+      "pos": [
+        2358,
+        -36
+      ],
+      "size": {
+        "0": 315,
+        "1": 314
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            185,
+            200,
+            201
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "title": "你的作品",
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1703665898041.png",
+        "image"
+      ]
+    }
+  ],
+  "links": [
+    [
+      12,
+      7,
+      0,
+      12,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      7,
+      1,
+      12,
+      1,
+      "MASK"
+    ],
+    [
+      14,
+      12,
+      1,
+      8,
+      0,
+      "IMAGE"
+    ],
+    [
+      15,
+      11,
+      0,
+      13,
+      0,
+      "IMAGE"
+    ],
+    [
+      16,
+      11,
+      1,
+      13,
+      1,
+      "MASK"
+    ],
+    [
+      17,
+      13,
+      1,
+      14,
+      0,
+      "IMAGE"
+    ],
+    [
+      18,
+      16,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ],
+    [
+      19,
+      16,
+      1,
+      17,
+      1,
+      "MASK"
+    ],
+    [
+      20,
+      17,
+      1,
+      18,
+      0,
+      "IMAGE"
+    ],
+    [
+      79,
+      55,
+      0,
+      49,
+      4,
+      "INT"
+    ],
+    [
+      80,
+      55,
+      1,
+      49,
+      5,
+      "INT"
+    ],
+    [
+      82,
+      60,
+      0,
+      59,
+      0,
+      "STRING"
+    ],
+    [
+      85,
+      59,
+      1,
+      58,
+      1,
+      "MASK"
+    ],
+    [
+      88,
+      12,
+      1,
+      58,
+      3,
+      "IMAGE"
+    ],
+    [
+      92,
+      59,
+      0,
+      58,
+      0,
+      "IMAGE"
+    ],
+    [
+      94,
+      59,
+      1,
+      63,
+      1,
+      "MASK"
+    ],
+    [
+      95,
+      13,
+      1,
+      63,
+      3,
+      "IMAGE"
+    ],
+    [
+      99,
+      17,
+      1,
+      65,
+      3,
+      "IMAGE"
+    ],
+    [
+      100,
+      59,
+      1,
+      65,
+      1,
+      "MASK"
+    ],
+    [
+      102,
+      59,
+      0,
+      65,
+      0,
+      "IMAGE"
+    ],
+    [
+      103,
+      59,
+      0,
+      63,
+      0,
+      "IMAGE"
+    ],
+    [
+      113,
+      49,
+      0,
+      58,
+      2,
+      "LAYER"
+    ],
+    [
+      114,
+      68,
+      0,
+      63,
+      2,
+      "LAYER"
+    ],
+    [
+      115,
+      69,
+      0,
+      65,
+      2,
+      "LAYER"
+    ],
+    [
+      117,
+      7,
+      1,
+      49,
+      1,
+      "MASK"
+    ],
+    [
+      119,
+      7,
+      0,
+      49,
+      0,
+      "IMAGE"
+    ],
+    [
+      120,
+      70,
+      0,
+      68,
+      4,
+      "INT"
+    ],
+    [
+      121,
+      70,
+      1,
+      68,
+      5,
+      "INT"
+    ],
+    [
+      122,
+      71,
+      0,
+      69,
+      4,
+      "INT"
+    ],
+    [
+      123,
+      71,
+      1,
+      69,
+      5,
+      "INT"
+    ],
+    [
+      124,
+      11,
+      0,
+      68,
+      0,
+      "IMAGE"
+    ],
+    [
+      125,
+      11,
+      1,
+      68,
+      1,
+      "MASK"
+    ],
+    [
+      126,
+      16,
+      0,
+      69,
+      0,
+      "IMAGE"
+    ],
+    [
+      127,
+      16,
+      1,
+      69,
+      1,
+      "MASK"
+    ],
+    [
+      128,
+      7,
+      0,
+      55,
+      0,
+      "IMAGE"
+    ],
+    [
+      129,
+      11,
+      0,
+      70,
+      0,
+      "IMAGE"
+    ],
+    [
+      130,
+      16,
+      0,
+      71,
+      0,
+      "IMAGE"
+    ],
+    [
+      131,
+      58,
+      0,
+      72,
+      0,
+      "LAYER"
+    ],
+    [
+      135,
+      63,
+      0,
+      73,
+      0,
+      "LAYER"
+    ],
+    [
+      138,
+      65,
+      0,
+      74,
+      0,
+      "LAYER"
+    ],
+    [
+      141,
+      75,
+      0,
+      59,
+      1,
+      "STRING"
+    ],
+    [
+      142,
+      59,
+      0,
+      76,
+      0,
+      "IMAGE"
+    ],
+    [
+      161,
+      98,
+      0,
+      101,
+      0,
+      "IMAGE"
+    ],
+    [
+      162,
+      106,
+      0,
+      98,
+      0,
+      "IMAGE"
+    ],
+    [
+      185,
+      118,
+      0,
+      119,
+      0,
+      "IMAGE"
+    ],
+    [
+      188,
+      119,
+      0,
+      74,
+      1,
+      "IMAGE"
+    ],
+    [
+      189,
+      17,
+      1,
+      121,
+      0,
+      "IMAGE"
+    ],
+    [
+      190,
+      121,
+      0,
+      119,
+      1,
+      "INT"
+    ],
+    [
+      191,
+      121,
+      1,
+      119,
+      2,
+      "INT"
+    ],
+    [
+      192,
+      123,
+      0,
+      122,
+      1,
+      "INT"
+    ],
+    [
+      193,
+      123,
+      1,
+      122,
+      2,
+      "INT"
+    ],
+    [
+      194,
+      122,
+      0,
+      73,
+      1,
+      "IMAGE"
+    ],
+    [
+      195,
+      13,
+      1,
+      123,
+      0,
+      "IMAGE"
+    ],
+    [
+      196,
+      125,
+      0,
+      124,
+      1,
+      "INT"
+    ],
+    [
+      197,
+      125,
+      1,
+      124,
+      2,
+      "INT"
+    ],
+    [
+      198,
+      124,
+      0,
+      72,
+      1,
+      "IMAGE"
+    ],
+    [
+      199,
+      12,
+      1,
+      125,
+      0,
+      "IMAGE"
+    ],
+    [
+      200,
+      118,
+      0,
+      122,
+      0,
+      "IMAGE"
+    ],
+    [
+      201,
+      118,
+      0,
+      124,
+      0,
+      "IMAGE"
+    ],
+    [
+      202,
+      72,
+      0,
+      57,
+      0,
+      "IMAGE"
+    ],
+    [
+      203,
+      73,
+      0,
+      126,
+      0,
+      "IMAGE"
+    ],
+    [
+      204,
+      74,
+      0,
+      127,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "title": "模板",
+      "bounding": [
+        1685,
+        -1714,
+        1070,
+        1314
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Group",
+      "bounding": [
+        4912,
+        -2035,
+        637,
+        669
+      ],
+      "color": "#444",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Group",
+      "bounding": [
+        2981,
+        -1993,
+        728,
+        216
+      ],
+      "color": "#A88",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Group",
+      "bounding": [
+        2987,
+        -1260,
+        1198,
+        1007
+      ],
+      "color": "#88A",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Group",
+      "bounding": [
+        2979,
+        -1741,
+        420,
+        426
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "locked": false
+    },
+    {
+      "title": "Group",
+      "bounding": [
+        2986,
+        -211,
+        616,
+        730
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "locked": false
+    }
+  ],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
