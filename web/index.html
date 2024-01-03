@@ -302,7 +302,7 @@
             color: #555;
         }
 
-       
+
 
         select,
         button,
@@ -397,6 +397,47 @@
 
             return { url: src, name }
 
+        }
+
+        async function getQueue(clientId) {
+            try {
+
+                const res = await fetch(`${get_url()}/queue`);
+                const data = await res.json();
+                return {
+                    // Running action uses a different endpoint for cancelling
+                    Running: Array.from(data.queue_running, prompt => {
+                        if (prompt[3].client_id === clientId) {
+                            let prompt_id = prompt[1];
+                            return {
+                                prompt_id,
+                                remove: () => interrupt(),
+                            }
+                        }
+                    }),
+                    Pending: data.queue_pending.map((prompt) => ({ prompt })),
+                };
+            } catch (error) {
+                console.error(error);
+                return { Running: [], Pending: [] };
+            }
+        }
+
+
+        async function interrupt() {
+            try {
+                await fetch(`${get_url()}/interrupt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: undefined
+                });
+
+            } catch (error) {
+                console.error(error)
+            }
+            return true
         }
 
 
@@ -1126,11 +1167,11 @@
             if (keywords && keywords[0]) {
                 // label.innerHTML = ``
                 // 有备选的关键词
-                let selectTag = createSelect(Array.from(keywords, (k,i) => {
+                let selectTag = createSelect(Array.from(keywords, (k, i) => {
                     return {
                         value: k,
                         text: k,
-                        selected:i==0
+                        selected: i == 0
                     }
                 }), keywords[0]);
                 selectTag.style = `background: none;
@@ -1199,7 +1240,7 @@
 
             // 设置默认值
             selectElement.value = defaultValue;
-            console.log(defaultValue,options)
+            console.log(defaultValue, options)
             return selectElement
         }
 
@@ -1478,19 +1519,42 @@
                 },
                 submitButton: {
                     element: submitButton,
-                    update: function (callback) {
+                    update: function (runFn, cancelFn) {
                         submitButton.addEventListener('dblclick', (e) => {
+                            e.preventDefault()
                             submitButton.classList.remove('disabled');
                         });
                         submitButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+
+                            if (submitButton.classList.contains('data-click')) {
+                                return
+                            } else {
+                                submitButton.classList.add('data-click')
+                                setTimeout(() => submitButton.classList.remove('data-click'), 500)
+                            }
 
                             if (!submitButton.classList.contains('disabled')) {
-                                callback && callback();
+                                runFn && runFn();
                                 submitButton.classList.add('disabled');
-                                setTimeout(() => submitButton.classList.remove('disabled'), 500)
+                                submitButton.innerText = 'Cancel'
+                            } else {
+                                // 如果能取消
+                                let canCancel = cancelFn && cancelFn();
+                                if (canCancel) submitButton.classList.remove('disabled');
+                                if (canCancel) submitButton.innerText = 'Create';
                             }
 
                         });
+                    },
+                    running: () => {
+                        submitButton.innerText = 'Cancel';
+                        if (!submitButton.classList.contains('disabled')) submitButton.classList.add('disabled');
+                    },
+                    reset: () => {
+                        submitButton.innerText = 'Create';
+                        submitButton.classList.remove('disabled');
+                        submitButton.classList.remove('data-click');
                     }
                 },
             };
@@ -1521,7 +1585,6 @@
 
                     Array.from(detail.querySelectorAll('.card'), c => c.classList.remove('selected'));
                     div.className = 'upload_btn card selected'
-
 
                     let { output, app } = jsonData;
 
@@ -1561,10 +1624,19 @@
             ui.status.update(appData ? 'READY' : '-');
 
             // 添加提交按钮点击事件
-            ui.submitButton.update(function () {
-                // 在提交按钮点击时执行的逻辑
-                queuePrompt(window._appData.data, window._appData.seed, api.clientId)
-            });
+            ui.submitButton.update(
+                () => {
+                    // 在提交按钮点击时执行的逻辑
+                    queuePrompt(window._appData.data, window._appData.seed, api.clientId);
+                }, () => {
+                    // 取消
+                    if (api.runningCancel) {
+                        api.runningCancel();
+                        api.runningCancel = null;
+                        return true
+                    }
+
+                });
 
 
             const show = (src, id, type = "image") => {
@@ -1586,12 +1658,13 @@
                 console.log("progress", detail);
                 try {
                     ui.status.update(`${detail.value}/${detail.max}`);
+                    ui.submitButton.running()
                 } catch (error) {
 
                 }
             });
 
-            api.addEventListener("executed", ({ detail }) => {
+            api.addEventListener("executed", async ({ detail }) => {
                 console.log("executed", detail)
                 // if (!enabled) return;
                 const images = detail?.output?.images;
@@ -1615,8 +1688,22 @@
 
                 try {
                     ui.status.update(`executed_#${detail.node}`);
+                    ui.submitButton.reset()
                 } catch (error) {
 
+                }
+
+                // console.log(Running, Pending);
+                try {
+                    const { Running, Pending } = await getQueue(api.clientId);
+                    if (Running && Running[0]) {
+                        api.runningCancel = Running[0].remove;
+                        ui.submitButton.running()
+                    } else {
+                        api.runningCancel = null;
+                    }
+                } catch (error) {
+                    api.runningCancel = null;
                 }
 
             });
@@ -1628,12 +1715,24 @@
             // });
 
 
-            api.addEventListener('execution_start', ({ detail }) => {
+            api.addEventListener('execution_start', async ({ detail }) => {
                 console.log("execution_start", detail)
                 try {
                     ui.status.update(`execution_start`);
+                    ui.submitButton.running()
                 } catch (error) {
 
+                }
+
+                try {
+                    const { Running, Pending } = await getQueue(api.clientId);
+                    if (Running && Running[0]) {
+                        api.runningCancel = Running[0].remove;
+                    } else {
+                        api.runningCancel = null;
+                    }
+                } catch (error) {
+                    api.runningCancel = null;
                 }
             })
 
