@@ -516,24 +516,40 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     return bg_image
 
 
-def resize_image(layer_image,scale_option,width,height):
+
+def resize_image(layer_image, scale_option, width, height,color="white"):
     layer_image = layer_image.convert("RGB")
+    original_width, original_height = layer_image.size
+    
     if scale_option == "height":
-        # 按照高度比例缩放
-        original_width, original_height = layer_image.size
+        # Scale image based on height
         scale = height / original_height
         new_width = int(original_width * scale)
         layer_image = layer_image.resize((new_width, height))
+        
     elif scale_option == "width":
-        # 按照宽度比例缩放
-        original_width, original_height = layer_image.size
+        # Scale image based on width
         scale = width / original_width
         new_height = int(original_height * scale)
         layer_image = layer_image.resize((width, new_height))
+        
     elif scale_option == "overall":
-        # 整体缩放
+        # Scale image overall
         layer_image = layer_image.resize((width, height))
+        
+    elif scale_option == "center":
+        # Scale image to minimum of width and height, center it, and fill extra area with black
+        scale = min(width / original_width, height / original_height)
+        new_width = int(original_width * scale)
+        new_height = int(original_height * scale)
+        resized_image = Image.new("RGB", (width, height), color=color)
+        resized_image.paste(layer_image.resize((new_width, new_height)), ((width - new_width) // 2, (height - new_height) // 2))
+        resized_image=resized_image.convert("RGB")
+        return resized_image
+    
     return layer_image
+
+
 
 
 # def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
@@ -1818,13 +1834,14 @@ class ResizeImage:
                     "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
-                "scale_option": (["width","height",'overall'],),
+                "scale_option": (["width","height",'overall','center'],),
 
                              },
 
             "optional":{
                     "image": ("IMAGE",),
                     "average_color": (["on",'off'],),
+                    "fill_color":("STRING",{"multiline": False,"default": "#FFFFFF","dynamicPrompts": False}),
             }
                 }
     
@@ -1838,12 +1855,13 @@ class ResizeImage:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)
 
-    def run(self,width,height,scale_option,image=None,average_color=['on']):
+    def run(self,width,height,scale_option,image=None,average_color=['on'],fill_color=["#FFFFFF"]):
         
         w=width[0]
         h=height[0]
         scale_option=scale_option[0]
         average_color=average_color[0]
+        fill_color=fill_color[0]
 
         imgs=[]
         average_images=[]
@@ -1860,7 +1878,7 @@ class ResizeImage:
         else:
             for im in image:
                 im=tensor2pil(im)
-                im=resize_image(im,scale_option,w,h)
+                im=resize_image(im,scale_option,w,h,fill_color)
                 im=im.convert('RGB')
 
                 a_im=get_average_color_image(im)
