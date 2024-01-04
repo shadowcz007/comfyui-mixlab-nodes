@@ -71,6 +71,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 ![randomPrompt](./assets/randomPrompt.png)
 
+> ClipInterrogator
+
+[add clip-interrogator](https://github.com/pharmapsychotic/clip-interrogator)
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
