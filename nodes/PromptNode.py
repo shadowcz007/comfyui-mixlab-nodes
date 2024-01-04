@@ -51,6 +51,87 @@ def addWeight(text, weight=1):
     else:
         return f"({text}:{round(weight,2)})"
 
+def prompt_delete_words(sentence, new_words_length):
+    # 使用逗号分割句子，并去除空格
+    words = [word.strip() for word in sentence.split(",")]
+    
+    # 计算需要删除的单词数量
+    num_to_delete = len(words) - new_words_length
+    
+    words_to=[w for w in words]
+
+    # 逐个删除单词并存储在新列表中
+    new_words = []
+    for i in range(len(words)):
+        if num_to_delete > 0:
+            num_to_delete -= 1
+        else:
+            words_to.pop()
+            new_words.append(", ".join(words_to))
+         
+    return new_words
+
+# # 测试方法
+# sentence = "a computer, a glass tablet with a keyboard on a dark background, 3d illustration, reflection, cgi 8k, clear glass, archaic, cut-away, white outline"
+# new_words_length = 5
+# result = prompt_delete_words(sentence, new_words_length)
+# print(result)
+
+
+class PromptSimplification:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "prompt": ("STRING", 
+                         {
+                            "multiline": True, 
+                            "default": '',
+                            "dynamicPrompts": False
+                          }),
+
+                "length":("INT", {"default": 5, "min": 1,"max":100, "step": 1, "display": "number"}),
+
+                # "min_value":("FLOAT", {
+                #         "default": -2, 
+                #         "min": -10, 
+                #         "max": 0xffffffffffffffff,
+                #         "step": 0.01, 
+                #         "display": "number"  
+                #     }),
+                # "max_value":("FLOAT", {
+                #         "default": 2, 
+                #         "min": -10, 
+                #         "max": 0xffffffffffffffff,
+                #         "step": 0.01, 
+                #         "display": "number"  
+                #     }),
+              
+                }
+            }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("prompts",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/prompt"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+    OUTPUT_NODE = True
+
+    # 运行的函数
+    def run(self,prompt,length):
+        length=length[0]
+        result=[]
+        for p in prompt:
+            nps=prompt_delete_words(p,length)
+            for n in nps:
+                result.append(n)
+
+        return {"ui": {"prompts": result}, "result": (result,)}
+
 
 
 class PromptSlide:

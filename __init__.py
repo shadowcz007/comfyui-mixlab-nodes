@@ -503,7 +503,7 @@ PromptServer.add_routes=new_add_routes
 
 
 # 导入节点
-from .nodes.PromptNode import RandomPrompt,PromptSlide
+from .nodes.PromptNode import RandomPrompt,PromptSlide,PromptSimplification
 from .nodes.ImageNode import NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
@@ -520,6 +520,7 @@ NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
     "RandomPrompt":RandomPrompt,
     "PromptSlide":PromptSlide,
+    "PromptSimplification":PromptSimplification,
     "ClipInterrogator":ClipInterrogator,
     "NoiseImage":NoiseImage,
     "GradientImage":GradientImage,
