@@ -929,7 +929,7 @@
 
                     const label = data.title;
 
-                    if (!options.keywords.includes(data.inputs.prompt_keyword)) {
+                    if (options.keywords&&!options.keywords?.includes(data.inputs.prompt_keyword)) {
                         options.keywords = [data.inputs.prompt_keyword, ...options.keywords]
                     };
 
