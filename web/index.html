@@ -987,7 +987,7 @@
                     try {
                         const { value, height } = JSON.parse(json);
                         textInput.value = value;
-                        textInput.style.height=height;
+                        textInput.style.height = height;
                     } catch (error) {
 
                     }
@@ -1006,8 +1006,9 @@
                         window._appData.data[data.id].inputs.text = textInput.value;
 
                         localStorage.setItem(`t_${data.id}`, JSON.stringify({
-                             value: textInput.value, 
-                             height: textInput.style.height }));
+                            value: textInput.value,
+                            height: textInput.style.height
+                        }));
                     })
 
                     // Append the upload container to the main container
@@ -1160,6 +1161,12 @@
         function createNumSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1, type = 'float', keywords = null, targetId = null) {
 
             value = 'float' ? parseFloat(value.toFixed(3)) : parseInt(value)
+            try {
+                let i=parseFloat(localStorage.getItem(`_slider_${targetId}`))
+                if(!!i) value = i
+            } catch (error) {
+
+            }
 
             // 输入div
             let inputDiv = document.createElement('div');
@@ -1237,6 +1244,8 @@
                 label.setAttribute('data-content', value);
                 // 在这里可以执行其他操作，根据需要进行相应的处理
                 callback && callback(value)
+
+                localStorage.setItem(`_slider_${targetId}`, value)
             });
 
             // 返回容器元素
