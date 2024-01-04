@@ -1509,7 +1509,8 @@
                                 // img;
                                 img.src = v;
                                 a.appendChild(img)
-                                imgDiv.parentElement.appendChild(a);
+                                // imgDiv.parentElement.appendChild(a);
+                                imgDiv.parentElement.insertBefore(a, imgDiv.parentElement.firstChild);
                             }
 
                         }
