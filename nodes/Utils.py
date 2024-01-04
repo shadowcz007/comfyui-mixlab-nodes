@@ -188,7 +188,7 @@ class FloatSlider:
                     "number":("FLOAT", {
                         "default": 0, 
                         "min": 0, #Minimum value
-                        "max": 1, #Maximum value
+                        "max": 0xffffffffffffffff, #Maximum value
                         "step": 0.001, #Slider's step
                         "display": "slider" # Cosmetic only: display as "number" or "slider"
                     }),
