@@ -67,7 +67,8 @@ def prompt_delete_words(sentence, new_words_length):
             num_to_delete -= 1
         else:
             words_to.pop()
-            new_words.append(", ".join(words_to))
+            if len(words_to)>0:
+                new_words.append(", ".join(words_to))
          
     return new_words
 
