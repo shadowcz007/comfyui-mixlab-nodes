@@ -4786,6 +4786,7 @@
             "NewLayer",
             "RandomPrompt",
             "PromptSlide",
+            "ClipInterrogator",
             "ScreenShare",
             "ShowLayer",
             "ShowTextForGPT",

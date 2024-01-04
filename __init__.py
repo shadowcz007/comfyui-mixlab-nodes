@@ -512,6 +512,7 @@ from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
 from .nodes.Lama import LaMaInpainting
+from .nodes.ClipInterrogator import ClipInterrogator
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -519,6 +520,7 @@ NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
     "RandomPrompt":RandomPrompt,
     "PromptSlide":PromptSlide,
+    "ClipInterrogator":ClipInterrogator,
     "NoiseImage":NoiseImage,
     "GradientImage":GradientImage,
     "TransparentImage":TransparentImage,

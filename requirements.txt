@@ -5,3 +5,4 @@ opencv-python-headless
 matplotlib
 openai
 simple-lama-inpainting
+clip-interrogator==0.6.0

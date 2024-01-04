@@ -71,6 +71,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 ![randomPrompt](./assets/randomPrompt.png)
 
+> ClipInterrogator
+
+[add clip-interrogator](https://github.com/pharmapsychotic/clip-interrogator)
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
@@ -167,9 +170,7 @@ v0.8.0 🚀🚗🚚🏃‍ LaMaInpainting
 
 [Download lama](https://github.com/enesmsahin/simple-lama-inpainting/releases/download/v0.1.0/big-lama.pt), move to : models/lama
 
-<!-- ### Workflow
-[Workflow](./workflow.md) -->
-
+[Download Salesforce\blip-image-captioning-base](https://huggingface.co/Salesforce/blip-image-captioning-base), move to : models/clip_interrogator/Salesforce/blip-image-captioning-base
 
 ## Installation
 
