@@ -33,6 +33,8 @@ APP-JSON:
 
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
 
+> seed统一输入控件，支持：SamplerCustom、KSampler
+
 
 ## 🏃🚗🚚🚀  Real-time Design
 > ScreenShareNode & FloatingVideoNode. Now comfyui supports capturing screen pixel streams from any software and can be used for LCM-Lora integration. Let's get started with implementation and design! 💻🌐
