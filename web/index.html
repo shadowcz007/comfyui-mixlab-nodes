@@ -1021,6 +1021,22 @@
                 if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
                     let value = data.inputs.ckpt_name || data.inputs.lora_name;
 
+                    try {
+                        let v = localStorage.getItem(`_model_${data.id}_${data.class_type}`)
+                        if (v) {
+                            value = v;
+                            if (data.class_type === 'CheckpointLoaderSimple') {
+                                window._appData.data[data.id].inputs.ckpt_name = value;
+                            }
+                            if (data.class_type === 'LoraLoader') {
+                                window._appData.data[data.id].inputs.lora_name = value;
+                            }
+                        }
+                    } catch (error) {
+
+                    }
+
+
                     let [div, selectDom] = createSelectWithOptions(data.title, Array.from(data.options, o => {
                         return {
                             value: o,
@@ -1037,6 +1053,8 @@
                         if (data.class_type === 'LoraLoader') {
                             window._appData.data[data.id].inputs.lora_name = selectDom.value;
                         }
+
+                        localStorage.setItem(`_model_${data.id}_${data.class_type}`, selectDom.value)
                     })
 
                     container.appendChild(div);
