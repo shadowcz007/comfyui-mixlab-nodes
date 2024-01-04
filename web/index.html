@@ -1169,13 +1169,17 @@
             if (keywords && keywords[0]) {
                 // label.innerHTML = ``
                 // 有备选的关键词
+
+                let defaultValue=(targetId?localStorage.getItem(`_slide_${targetId}`):'')|| keywords[0];
+
                 let selectTag = createSelect(Array.from(keywords, (k, i) => {
                     return {
                         value: k,
                         text: k,
                         selected: i == 0
                     }
-                }), keywords[0]);
+                }),defaultValue);
+                
                 selectTag.style = `background: none;
                                     color: black;    max-width: 300px;
                                     border-bottom: 1px solid #acacac;
@@ -1184,8 +1188,8 @@
                 selectTag.addEventListener('change', e => {
                     e.preventDefault();
                     window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
-                    // label.querySelector('.label').innerText = selectTag.value
-                    // console.log(window._appData.data[targetId].inputs.prompt_keyword,selectTag.value)
+                    
+                    targetId?localStorage.setItem(`_slide_${targetId}`,selectTag.value):''
                 })
                 label.appendChild(selectTag);
             }
