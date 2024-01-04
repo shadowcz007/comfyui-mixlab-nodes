@@ -985,9 +985,11 @@
                     // uploadImageInput.type = "text";
                     let json = localStorage.getItem(`t_${data.id}`)
                     try {
+                        // 缓存
                         const { value, height } = JSON.parse(json);
                         textInput.value = value;
                         textInput.style.height = height;
+                        window._appData.data[data.id].inputs.text = textInput.value;
                     } catch (error) {
 
                     }
@@ -1162,8 +1164,11 @@
 
             value = 'float' ? parseFloat(value.toFixed(3)) : parseInt(value)
             try {
-                let i=parseFloat(localStorage.getItem(`_slider_${targetId}`))
-                if(!!i) value = i
+                let i = parseFloat(localStorage.getItem(`_slider_${targetId}`))
+                if (!!i) {
+                    value = i;
+                    callback && callback(value)
+                }
             } catch (error) {
 
             }
@@ -1191,6 +1196,8 @@
                 // 有备选的关键词
 
                 let defaultValue = (targetId ? localStorage.getItem(`_slide_${targetId}`) : '') || keywords[0];
+
+                window._appData.data[targetId].inputs.prompt_keyword = defaultValue;
 
                 let selectTag = createSelect(Array.from(keywords, (k, i) => {
                     return {
