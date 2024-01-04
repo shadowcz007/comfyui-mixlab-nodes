@@ -980,8 +980,9 @@
 
                     // Create an input field for the image name
                     const textInput = document.createElement("textarea");
+                    // textInput.className=;
                     // uploadImageInput.type = "text";
-                    textInput.value = data.inputs.text;
+                    textInput.value = localStorage.getItem(`t_${data.id}`) || data.inputs.text;
                     uploadContainer.appendChild(textInput);
 
                     function autoResize(textarea) {
@@ -993,6 +994,7 @@
                         // console.log(textInput.value)
                         autoResize(textInput);
                         window._appData.data[data.id].inputs.text = textInput.value;
+                        localStorage.setItem(`t_${data.id}`, textInput.value);
                     })
 
                     // Append the upload container to the main container
