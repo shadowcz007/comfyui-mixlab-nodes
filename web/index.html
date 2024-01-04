@@ -981,9 +981,19 @@
                     // Create an input field for the image name
                     const textInput = document.createElement("textarea");
                     // textInput.className=;
+                    textInput.value = data.inputs.text;
                     // uploadImageInput.type = "text";
-                    textInput.value = localStorage.getItem(`t_${data.id}`) || data.inputs.text;
+                    let json = localStorage.getItem(`t_${data.id}`)
+                    try {
+                        const { value, height } = JSON.parse(json);
+                        textInput.value = value;
+                        textInput.style.height=height;
+                    } catch (error) {
+
+                    }
+
                     uploadContainer.appendChild(textInput);
+                    // autoResize(textInput);
 
                     function autoResize(textarea) {
                         textarea.style.height = 'auto';
@@ -994,7 +1004,10 @@
                         // console.log(textInput.value)
                         autoResize(textInput);
                         window._appData.data[data.id].inputs.text = textInput.value;
-                        localStorage.setItem(`t_${data.id}`, textInput.value);
+
+                        localStorage.setItem(`t_${data.id}`, JSON.stringify({
+                             value: textInput.value, 
+                             height: textInput.style.height }));
                     })
 
                     // Append the upload container to the main container
@@ -1170,7 +1183,7 @@
                 // label.innerHTML = ``
                 // 有备选的关键词
 
-                let defaultValue=(targetId?localStorage.getItem(`_slide_${targetId}`):'')|| keywords[0];
+                let defaultValue = (targetId ? localStorage.getItem(`_slide_${targetId}`) : '') || keywords[0];
 
                 let selectTag = createSelect(Array.from(keywords, (k, i) => {
                     return {
@@ -1178,8 +1191,8 @@
                         text: k,
                         selected: i == 0
                     }
-                }),defaultValue);
-                
+                }), defaultValue);
+
                 selectTag.style = `background: none;
                                     color: black;    max-width: 300px;
                                     border-bottom: 1px solid #acacac;
@@ -1188,8 +1201,8 @@
                 selectTag.addEventListener('change', e => {
                     e.preventDefault();
                     window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
-                    
-                    targetId?localStorage.setItem(`_slide_${targetId}`,selectTag.value):''
+
+                    targetId ? localStorage.setItem(`_slide_${targetId}`, selectTag.value) : ''
                 })
                 label.appendChild(selectTag);
             }
@@ -1246,7 +1259,7 @@
 
             // 设置默认值
             selectElement.value = defaultValue;
-            console.log(defaultValue, options)
+            // console.log(defaultValue, options)
             return selectElement
         }
 
