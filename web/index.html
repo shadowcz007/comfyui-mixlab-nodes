@@ -443,13 +443,19 @@
 
         function randomSeed(seed, data) {
             for (const id in data) {
-
                 if (data[id].inputs.seed != undefined
                     && !Array.isArray(data[id].inputs.seed) //如果是数组，则由其他节点控制
                     && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
                     data[id].inputs.seed = Math.round(Math.random() * 1849378600828930)
                     // console.log('new Seed', data[id])
                 }
+                if (data[id].inputs.noise_seed != undefined
+                    && !Array.isArray(data[id].inputs.noise_seed) //如果是数组，则由其他节点控制
+                    && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
+                    data[id].inputs.noise_seed = Math.round(Math.random() * 1849378600828930)
+                    
+                }
+                console.log('new Seed', data[id])
             }
             return data
         }
