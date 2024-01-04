@@ -453,7 +453,7 @@
                     && !Array.isArray(data[id].inputs.noise_seed) //如果是数组，则由其他节点控制
                     && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
                     data[id].inputs.noise_seed = Math.round(Math.random() * 1849378600828930)
-                    
+
                 }
                 console.log('new Seed', data[id])
             }
@@ -979,7 +979,7 @@
                 }
 
                 // Check if the class_type is "CLIPTextEncode"
-                if (["TextInput_", "CLIPTextEncode"].includes(data.class_type)) {
+                if (["TextInput_", "CLIPTextEncode", "PromptSimplification"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
@@ -992,7 +992,12 @@
                     // Create an input field for the image name
                     const textInput = document.createElement("textarea");
                     // textInput.className=;
-                    textInput.value = data.inputs.text;
+                    if (data.class_type == "PromptSimplification") {
+                        textInput.value = data.inputs.prompt;
+                    } else {
+                        textInput.value = data.inputs.text;
+                    }
+
                     // uploadImageInput.type = "text";
                     let json = localStorage.getItem(`t_${data.id}`)
                     try {
@@ -1000,7 +1005,14 @@
                         const { value, height } = JSON.parse(json);
                         textInput.value = value;
                         textInput.style.height = height;
-                        window._appData.data[data.id].inputs.text = textInput.value;
+
+                        if (data.class_type == "PromptSimplification") {
+                            window._appData.data[data.id].inputs.prompt = textInput.value;
+                        } else {
+                            window._appData.data[data.id].inputs.text = textInput.value;
+                        }
+
+
                     } catch (error) {
 
                     }
@@ -1016,8 +1028,12 @@
                     textInput.addEventListener('input', (event) => {
                         // console.log(textInput.value)
                         autoResize(textInput);
-                        window._appData.data[data.id].inputs.text = textInput.value;
 
+                        if (data.class_type == "PromptSimplification") {
+                            window._appData.data[data.id].inputs.prompt = textInput.value;
+                        } else {
+                            window._appData.data[data.id].inputs.text = textInput.value;
+                        }
                         localStorage.setItem(`t_${data.id}`, JSON.stringify({
                             value: textInput.value,
                             height: textInput.style.height
@@ -1731,7 +1747,7 @@
             };
 
             api.addEventListener("status", ({ detail }) => {
-                console.log("status", detail,detail.exec_info.queue_remaining);
+                console.log("status", detail, detail.exec_info.queue_remaining);
                 try {
                     ui.status.update(`queue#${detail.exec_info.queue_remaining}`);
                     if (detail.exec_info.queue_remaining === 0) {
