@@ -1492,7 +1492,7 @@
                             imgDiv.style.display = 'none';
 
                             // 清空
-                            Array.from(imgDiv.querySelectorAll('.output_images'), im => im.remove());
+                            // Array.from(imgDiv.parentElement.querySelectorAll('.output_images'), im => im.remove());
 
                             for (const v of val) {
                                 let im = await createImage(v);
