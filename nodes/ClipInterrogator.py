@@ -2,7 +2,7 @@ import os
 import folder_paths
 
 from PIL import Image
-
+import comfy.utils
 import numpy as np
 import json
 import torch
@@ -108,6 +108,9 @@ class ClipInterrogator:
         prompt_result=[]
         analysis_result=[]
 
+        # 进度条
+        pbar = comfy.utils.ProgressBar(len(image)*(2 if analysis=='on' else 1))
+        
         if ci==None:
             config=Config(
                 clip_model_name="ViT-L-14/openai",
@@ -136,9 +139,10 @@ class ClipInterrogator:
             if analysis=='on':
                 analysis_res=image_analysis(ci,im)
                 analysis_result.append(json.dumps(analysis_res))
+                pbar.update(1)
 
             prompt=image_to_prompt(ci,im,prompt_mode)
-
+            pbar.update(1)
             prompt_result.append(prompt)
 
 

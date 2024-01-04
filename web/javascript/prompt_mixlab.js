@@ -133,7 +133,7 @@ app.registerExtension({
           inp.addEventListener('change', event => {
             // 获取选择的文件
             const file = event.target.files[0]
-
+            console.log(file)
             // 创建文件读取器
             const reader = new FileReader()
 
