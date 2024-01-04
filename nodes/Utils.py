@@ -262,7 +262,7 @@ class IntNumber:
                             "default": 1, 
                             "min": -0xffffffffffffffff,
                             "max": 0xffffffffffffffff,
-                            "step":1, 
+                            "step":1,
                             "display": "number"  
                         }),
                              },

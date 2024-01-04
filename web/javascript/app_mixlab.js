@@ -126,11 +126,11 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
       }
 
-      if (node.type === 'KSampler') {
+      if (node.type === 'KSampler'||node.type=='SamplerCustom') {
         // seed 的类型收集
         try {
           seed[id] = node.widgets.filter(
-            w => w.name === 'seed'
+            w => (w.name === 'seed'||w.name=='noise_seed')
           )[0].linkedWidgets[0].value
         } catch (error) {}
       }

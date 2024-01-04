@@ -455,8 +455,9 @@
         }
 
         function updateSeed(id, val) {
-            console.log(val)
-            if (!Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
+            // console.log(val)
+            if (window._appData.data[id].inputs.seed && !Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
+            if (window._appData.data[id].inputs.noise_seed && !Array.isArray(window._appData.data[id].inputs.noise_seed)) window._appData.data[id].inputs.noise_seed = Math.round(val);
         }
 
 
@@ -929,7 +930,7 @@
 
                     const label = data.title;
 
-                    if (options.keywords&&!options.keywords?.includes(data.inputs.prompt_keyword)) {
+                    if (options.keywords && !options.keywords?.includes(data.inputs.prompt_keyword)) {
                         options.keywords = [data.inputs.prompt_keyword, ...options.keywords]
                     };
 
@@ -959,11 +960,15 @@
                     let silde = createNumSlide(data.title,
                         data.inputs.number,
                         (v) => {
+                            // console.log(data.id,window._appData.data[data.id])
                             window._appData.data[data.id].inputs.number = v;
                         },
                         options.min,
                         options.max,
-                        data.class_type === 'IntNumber' ? 'int' : 'float')
+                        data.class_type === 'IntNumber' ? 'int' : 'float',
+                        null,
+                        data.id
+                    )
                     container.appendChild(silde);
                 }
 
@@ -1720,11 +1725,16 @@
             };
 
             api.addEventListener("status", ({ detail }) => {
-                console.log("status", detail);
+                console.log("status", detail,detail.exec_info.queue_remaining);
                 try {
                     ui.status.update(`queue#${detail.exec_info.queue_remaining}`);
+                    if (detail.exec_info.queue_remaining === 0) {
+                        // 运行按钮重设
+                        ui.submitButton.reset()
+                        console.log('运行按钮重设')
+                    }
                 } catch (error) {
-
+                    console.log(error)
                 }
 
             });
