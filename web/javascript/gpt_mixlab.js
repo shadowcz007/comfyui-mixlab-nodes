@@ -256,6 +256,7 @@ app.registerExtension({
 			const onExecuted = nodeType.prototype.onExecuted;
 			nodeType.prototype.onExecuted = function (message) {
 				onExecuted?.apply(this, arguments);
+        console.log('##',message.text)
 				populate.call(this, message.text);
 			};
 

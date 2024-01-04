@@ -180,8 +180,9 @@ class ShowTextForGPT:
     CATEGORY = "♾️Mixlab/GPT"
 
     def run(self, text):
-        # print(session_history)
+        # print(text)
         return {"ui": {"text": text}, "result": (text,)}
+        
 
 
 class CharacterInText:

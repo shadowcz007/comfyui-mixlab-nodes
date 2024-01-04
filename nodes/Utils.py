@@ -461,6 +461,7 @@ class AppInfo:
 
     CATEGORY = "♾️Mixlab"
 
+    OUTPUT_NODE = True
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 

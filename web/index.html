@@ -1775,6 +1775,11 @@
             //     console.log("b_preview", detail)
             //     show(URL.createObjectURL(detail));
             // });
+            api.addEventListener("execution_error", ({ detail }) => {
+
+                console.log("execution_error", detail)
+                // show(URL.createObjectURL(detail));
+            });
 
 
             api.addEventListener('execution_start', async ({ detail }) => {

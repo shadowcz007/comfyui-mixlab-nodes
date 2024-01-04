@@ -42,7 +42,7 @@ def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
 
-def image_analysis(ci,image):
+def image_analysis_fn(ci,image):
     image = image.convert('RGB')
     image_features = ci.image_to_features(image)
 
@@ -88,13 +88,13 @@ class ClipInterrogator:
                              },
                 }
     
-    RETURN_TYPES = ("STRING","STRING",)
-    RETURN_NAMES = ("prompt","analysis",)
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("prompt",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/prompt"
-
+    OUTPUT_NODE = True
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
     global ci
@@ -137,8 +137,8 @@ class ClipInterrogator:
             im=im.convert('RGB')
 
             if analysis=='on':
-                analysis_res=image_analysis(ci,im)
-                analysis_result.append(json.dumps(analysis_res))
+                analysis_res=image_analysis_fn(ci,im)
+                analysis_result.append( analysis_res )
                 pbar.update(1)
 
             prompt=image_to_prompt(ci,im,prompt_mode)
@@ -155,4 +155,6 @@ class ClipInterrogator:
             ci.caption_model = ci.caption_model.to('cpu')
             ci.caption_offloaded = True
 
-        return {"ui":{"prompt": prompt_result,"analysis":analysis_result},"result": (prompt_result,analysis_result,)}
+        # analysis_result=[]
+
+        return {"ui":{"prompt": prompt_result,"analysis":analysis_result},"result": (prompt_result,)}
