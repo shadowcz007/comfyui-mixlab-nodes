@@ -1788,7 +1788,7 @@
                     }), detail.node, 'images');
 
                 } else if (text) {
-                    ui.output.update("text", Array.isArray(text) ? text[0] : text, detail.node)
+                    ui.output.update("text", Array.isArray(text) ? text.join('\n\n') : text, detail.node)
                 } else if (gifs && gifs[0]) {
                     // if (!images) return; 
                     const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
