@@ -34,13 +34,13 @@ def create_temp_file(image):
         ) = folder_paths.get_save_image_path('tmp', output_dir)
 
     
-    image=tensor2pil(image)
+    im=tensor2pil(image)
  
     image_file = f"{filename}_{counter:05}.png"
      
     image_path=os.path.join(full_output_folder, image_file)
 
-    image.save(image_path,compress_level=4)
+    im.save(image_path,compress_level=4)
 
     return [{
                 "filename": image_file,
@@ -461,12 +461,24 @@ class AppInfo:
 
     CATEGORY = "♾️Mixlab"
 
-    INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,)
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
 
     def run(self,name,image,input_ids,output_ids,description,version,share_prefix,link,category):
+        name=name[0]
+        im=image[0][0]
+        # image [img,] img[batch,w,h,a] 列表里面是batch，
+
+        input_ids=input_ids[0]
+        output_ids=output_ids[0]
+        description=description[0]
+        version=version[0]
+        share_prefix=share_prefix[0]
+        link=link[0]
+        category=category[0]
+
         #TODO batch 的方式需要处理
-        im=create_temp_file(image)
+        im=create_temp_file(im)
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])
 

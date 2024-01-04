@@ -953,20 +953,27 @@ class EnhanceImage:
 
     CATEGORY = "♾️Mixlab/image"
 
-    INPUT_IS_LIST = False
+    INPUT_IS_LIST = True
 
-    OUTPUT_IS_LIST = (False,)
+    OUTPUT_IS_LIST = (True,)
   
     # 运行的函数
     def run(self,image,contrast):
-        # print('EnhanceImage',image.shape)
-        image=tensor2pil(image)
-     
-        image=enhance_depth_map(image,contrast)
+        # print('EnhanceImage',len(image),image[0].shape)
+        contrast=contrast[0]
+        res=[]
+        for ims in image:
+            for im in ims:
 
-        image=pil2tensor(image)
+                image=tensor2pil(im)
+            
+                image=enhance_depth_map(image,contrast)
+
+                image=pil2tensor(image)
+
+                res.append(image)
            
-        return (image,)
+        return (res,)
 
 
 

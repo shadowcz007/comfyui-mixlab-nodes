@@ -170,9 +170,7 @@ v0.8.0 🚀🚗🚚🏃‍ LaMaInpainting
 
 [Download lama](https://github.com/enesmsahin/simple-lama-inpainting/releases/download/v0.1.0/big-lama.pt), move to : models/lama
 
-<!-- ### Workflow
-[Workflow](./workflow.md) -->
-
+[Download Salesforce\blip-image-captioning-base](https://huggingface.co/Salesforce/blip-image-captioning-base), move to : models/clip_interrogator/Salesforce/blip-image-captioning-base
 
 ## Installation
 
