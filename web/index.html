@@ -1474,7 +1474,6 @@
                     update: async function (type = "image", val, id) {
                         console.log(val, id)
                         if (val && type == "image" && output.querySelector(`#output_${id} img`)) {
-                            // if (output.querySelector(`#output_${id}`)) {
 
                             let im = await createImage(val)
 
@@ -1486,10 +1485,32 @@
                             a.setAttribute('target', "_blank");
                             a.setAttribute('href', val);
 
-                            // }
-                            //  else {
-                            //     output.querySelector(`#output_${id}`).src = val;
-                            // }
+                        }
+
+                        if (val && type == "images" && output.querySelector(`#output_${id} img`)) {
+                            let imgDiv = output.querySelector(`#output_${id}`)
+                            imgDiv.style.display = 'none';
+
+                            // 清空
+                            Array.from(imgDiv.querySelectorAll('.output_images'), im => im.remove());
+
+                            for (const v of val) {
+                                let im = await createImage(v);
+
+                                // 构建新的
+                                let a = document.createElement('a');
+                                a.className = `${imgDiv.id} output_images`
+                                a.setAttribute('data-pswp-width', im.naturalWidth);
+                                a.setAttribute('data-pswp-height', im.naturalHeight);
+                                a.setAttribute('target', "_blank");
+                                a.setAttribute('href', v);
+
+                                let img = new Image();
+                                // img;
+                                img.src = v;
+                                a.appendChild(img)
+                                imgDiv.parentElement.appendChild(a);
+                            }
 
                         }
 
@@ -1672,9 +1693,14 @@
                 const gifs = detail?.output?.gifs;
 
                 if (images) {
-                    // if (!images) return; 
-                    const src = `${get_url()}/view?filename=${encodeURIComponent(images[0].filename)}&type=${images[0].type}&subfolder=${encodeURIComponent(images[0].subfolder)}&t=${+new Date()}`;
-                    show(src, detail.node, 'image');
+                    // if (!images) return;
+
+                    let url = get_url();
+
+                    show(Array.from(images, img => {
+                        return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
+                    }), detail.node, 'images');
+
                 } else if (text) {
                     ui.output.update("text", Array.isArray(text) ? text[0] : text, detail.node)
                 } else if (gifs && gifs[0]) {
@@ -1686,7 +1712,7 @@
                 }
 
 
-                try { 
+                try {
                     ui.status.update(`executed_#${window._appData.data[detail.node]?.class_type}`);
                     ui.submitButton.reset()
                 } catch (error) {
