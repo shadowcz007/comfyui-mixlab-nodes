@@ -35,7 +35,13 @@ function get_position_style (ctx, widget_width, y, node_height) {
     justifyContent: 'space-between'
   }
 }
-
+function createImage (url) {
+  let im = new Image()
+  return new Promise((res, rej) => {
+    im.onload = () => res(im)
+    im.src = url
+  })
+}
 const getLocalData = key => {
   let data = {}
   try {
@@ -218,7 +224,7 @@ app.registerExtension({
             Object.assign(this.div.style, {
               ...get_position_style(ctx, widget_width, y, node.size[1]),
               flexWrap: 'wrap',
-              justifyContent: 'flex-start'
+              justifyContent: 'space-between'
             })
           }
         }
@@ -239,7 +245,7 @@ app.registerExtension({
       }
 
       const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
+      nodeType.prototype.onExecuted =async function (message) {
         onExecuted?.apply(this, arguments)
         console.log('PromptImage', message.prompts, message._images)
         // window._mixlab_app_json = message.json
@@ -258,9 +264,11 @@ app.registerExtension({
               }${app.getPreviewFormatParam()}${app.getRandParam()}`
             )
 
+            let image=await createImage(url)
+
             // 创建card
             let div = document.createElement('div')
-            div.style = `width: 150px;`
+            div.style = `width: 150px;height:${image.naturalHeight*150/image.naturalWidth}px`
             div.innerHTML = `<img src="${url}" style='width: 100%'/><p style="margin: 0;
             font-size: 12px;
             position: relative;
