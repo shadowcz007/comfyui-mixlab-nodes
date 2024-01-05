@@ -1756,10 +1756,10 @@
             };
 
             api.addEventListener("status", ({ detail }) => {
-                console.log("status", detail, detail.exec_info.queue_remaining);
+                console.log("status", detail, detail.exec_info?.queue_remaining);
                 try {
-                    ui.status.update(`queue#${detail.exec_info.queue_remaining}`);
-                    if (detail.exec_info.queue_remaining === 0) {
+                    ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
+                    if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.submitButton.reset()
                         console.log('运行按钮重设')
