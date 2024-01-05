@@ -603,6 +603,15 @@
                     div.innerText = Array.isArray(node.inputs.text) ? node.inputs.text[0] : node.inputs.text
                     output_card.appendChild(div);
                 };
+
+                if (node.class_type == "ClipInterrogator") {
+                    let div = document.createElement('div');
+                    div.className = "show_text";
+                    div.id = `output_${node.id}`;
+                    div.innerText = '#ClipInterrogator: …… '
+                    output_card.appendChild(div);
+                };
+
                 if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
@@ -1763,8 +1772,9 @@
 
             api.addEventListener("progress", ({ detail }) => {
                 console.log("progress", detail);
+                const class_type = window._appData.data[detail?.node]?.class_type || ''
                 try {
-                    ui.status.update(`${detail.value}/${detail.max}`);
+                    ui.status.update(`${parseFloat(100 * detail.value / detail.max).toFixed(1)}% ${class_type}`);
                     ui.submitButton.running()
                 } catch (error) {
 
@@ -1777,6 +1787,9 @@
                 const images = detail?.output?.images;
                 const text = detail?.output?.text;
                 const gifs = detail?.output?.gifs;
+
+                const prompt=detail?.output?.prompt;
+                const analysis=detail?.output?.analysis;
 
                 if (images) {
                     // if (!images) return;
@@ -1795,8 +1808,13 @@
                         }&&format=${gifs[0].format}&t=${+new Date()}`;
 
                     show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
+                }else if(prompt&&analysis){
+                    // #ClipInterrogator: …… 
+                
+                    ui.output.update("text",`${prompt.join('\n\n')}\n${JSON.stringify(analysis,null,2)}`, detail.node)
                 }
 
+            
 
                 try {
                     ui.status.update(`executed_#${window._appData.data[detail.node]?.class_type}`);
