@@ -77,6 +77,9 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [add clip-interrogator](https://github.com/pharmapsychotic/clip-interrogator)
 
+> PromptImage & PromptSimplification,Assist in simplifying prompt words, comparing images and prompt word nodes.
+
+
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
 
