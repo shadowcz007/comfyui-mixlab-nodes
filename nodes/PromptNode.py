@@ -1,9 +1,11 @@
 import random
 import comfy.utils
-import json
+import os
+import numpy as np
 from urllib import request, parse
-
-
+import folder_paths
+from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
+from PIL.PngImagePlugin import PngInfo
 # def queue_prompt(prompt_workflow):
 #     p = {"prompt": prompt_workflow}
 #     data = json.dumps(p).encode('utf-8')
@@ -45,6 +47,9 @@ default_prompt1='''Swing
 default_prompt1="\n".join([p.strip() for p in default_prompt1.split('\n') if p.strip()!=''])
 
 
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
 def addWeight(text, weight=1):
     if weight == 1:
         return text
@@ -77,6 +82,73 @@ def prompt_delete_words(sentence, new_words_length):
 # new_words_length = 5
 # result = prompt_delete_words(sentence, new_words_length)
 # print(result)
+
+class PromptImage:
+    def __init__(self):
+        self.temp_dir = folder_paths.get_temp_directory()
+        self.type = "temp"
+        self.prefix_append = "PromptImage"
+        self.compress_level = 4
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "prompts": ("STRING", 
+                         {
+                            "multiline": True, 
+                            "default": '',
+                            "dynamicPrompts": False
+                          }),
+
+                "images": ("IMAGE",{"default": None}), 
+                 "save_to_image": (["enable", "disable"],),
+                }
+            }
+    
+    RETURN_TYPES = ()
+   
+    OUTPUT_NODE = True
+
+    INPUT_IS_LIST = True
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/prompt"
+
+    # 运行的函数
+    def run(self,prompts,images,save_to_image):
+        filename_prefix="mixlab_"
+        filename_prefix += self.prefix_append
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+            filename_prefix, self.temp_dir, images[0].shape[1], images[0].shape[0])
+        results = list()
+
+        save_to_image=save_to_image[0]=='enable'
+
+        for index in range(len(images)):
+            image=images[index]
+            img=tensor2pil(image)
+           
+            metadata = None
+            if save_to_image:
+                metadata = PngInfo()
+                prompt_text=prompts[index]
+                if prompt_text is not None:
+                    metadata.add_text("prompt_text", prompt_text)
+                
+            file = f"{filename}_{index}_{counter:05}_.png"
+            img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+            results.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            counter += 1
+
+        return { "ui": { "_images": results,"prompts":prompts } }
+
+
 
 
 class PromptSimplification:

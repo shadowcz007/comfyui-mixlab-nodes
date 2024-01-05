@@ -132,8 +132,8 @@ app.registerExtension({
           inp.click()
           inp.addEventListener('change', event => {
             // 获取选择的文件
-            const file = event.target.files[0];
-            this.title=file.name.split('.')[0];
+            const file = event.target.files[0]
+            this.title = file.name.split('.')[0]
 
             // console.log(file.name.split('.')[0])
             // 创建文件读取器
@@ -199,6 +199,77 @@ app.registerExtension({
           createSelect(widget.select, keywords, prompt)
         }
       } catch (error) {}
+    }
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.prompt.PromptImage',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'PromptImage') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+        console.log('#orig_nodeCreated', this)
+        const widget = {
+          type: 'div',
+          name: 'result',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(this.div.style, {
+              ...get_position_style(ctx, widget_width, y, node.size[1]),
+              flexWrap: 'wrap',
+              justifyContent: 'flex-start'
+            })
+          }
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+
+        this.addCustomWidget(widget)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        // this.serialize_widgets = true //需要保存参数
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('PromptImage', message.prompts, message._images)
+        // window._mixlab_app_json = message.json
+        try {
+          let widget = this.widgets.filter(w => w.name === 'result')[0]
+
+          widget.div.innerHTML = ``
+
+          for (let index = 0; index < message._images.length; index++) {
+            const img = message._images[index]
+            let url = api.apiURL(
+              `/view?filename=${encodeURIComponent(img.filename)}&type=${
+                img.type
+              }&subfolder=${
+                img.subfolder
+              }${app.getPreviewFormatParam()}${app.getRandParam()}`
+            )
+
+            // 创建card
+            let div = document.createElement('div')
+            div.style = `width: 150px;`
+            div.innerHTML = `<img src="${url}" style='width: 100%'/><p style="margin: 0;
+            font-size: 12px;
+            position: relative;
+            margin-top: -35px;
+            background: #8080808f;">${message.prompts[index]}</p>`
+            widget.div.appendChild(div)
+          }
+        } catch (error) {}
+      }
     }
   }
 })
