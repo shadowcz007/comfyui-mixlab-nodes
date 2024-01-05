@@ -323,6 +323,15 @@
             height: 56px !important;
             outline: 1px solid white;
         }
+
+
+        /* 给prompt image 节点使用 */
+        .prompt_image {
+            color: #2f2f2f;
+            padding: 0 10px;
+            font-size: 12px;
+            width: 200px;
+        }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
@@ -603,7 +612,16 @@
                     div.innerText = Array.isArray(node.inputs.text) ? node.inputs.text[0] : node.inputs.text
                     output_card.appendChild(div);
                 };
-                if (["SaveImage", "PreviewImage"].includes(node.class_type)) {
+
+                if (node.class_type == "ClipInterrogator") {
+                    let div = document.createElement('div');
+                    div.className = "show_text";
+                    div.id = `output_${node.id}`;
+                    div.innerText = '#ClipInterrogator: …… '
+                    output_card.appendChild(div);
+                };
+
+                if (["SaveImage", "PreviewImage", "PromptImage"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
@@ -1567,7 +1585,7 @@
 
                         }
 
-                        if (val && type == "images" && output.querySelector(`#output_${id} img`)) {
+                        if (val && (type == "images" || type == 'images_prompts') && output.querySelector(`#output_${id} img`)) {
                             let imgDiv = output.querySelector(`#output_${id}`)
                             imgDiv.style.display = 'none';
 
@@ -1575,7 +1593,16 @@
                             // Array.from(imgDiv.parentElement.querySelectorAll('.output_images'), im => im.remove());
 
                             for (const v of val) {
-                                let im = await createImage(v);
+
+                                let url = v, prompt = ''
+
+                                if (type == 'images_prompts') {
+                                    // 是个数组，多了对应的prompt
+                                    url = v[0];
+                                    prompt = v[1];
+                                }
+
+                                let im = await createImage(url);
 
                                 // 构建新的
                                 let a = document.createElement('a');
@@ -1583,12 +1610,22 @@
                                 a.setAttribute('data-pswp-width', im.naturalWidth);
                                 a.setAttribute('data-pswp-height', im.naturalHeight);
                                 a.setAttribute('target', "_blank");
-                                a.setAttribute('href', v);
+                                a.setAttribute('href', url);
+
 
                                 let img = new Image();
                                 // img;
-                                img.src = v;
-                                a.appendChild(img)
+                                img.src = url;
+                                a.appendChild(img);
+
+                                if (prompt) {
+                                    a.style.textDecoration = 'none';
+                                    let p = document.createElement('p')
+                                    p.className = 'prompt_image'
+                                    p.innerText = prompt;
+                                    a.appendChild(p)
+                                }
+
                                 // imgDiv.parentElement.appendChild(a);
                                 imgDiv.parentElement.insertBefore(a, imgDiv.parentElement.firstChild);
                             }
@@ -1747,10 +1784,10 @@
             };
 
             api.addEventListener("status", ({ detail }) => {
-                console.log("status", detail, detail.exec_info.queue_remaining);
+                console.log("status", detail, detail.exec_info?.queue_remaining);
                 try {
-                    ui.status.update(`queue#${detail.exec_info.queue_remaining}`);
-                    if (detail.exec_info.queue_remaining === 0) {
+                    ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
+                    if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.submitButton.reset()
                         console.log('运行按钮重设')
@@ -1763,8 +1800,9 @@
 
             api.addEventListener("progress", ({ detail }) => {
                 console.log("progress", detail);
+                const class_type = window._appData.data[detail?.node]?.class_type || ''
                 try {
-                    ui.status.update(`${detail.value}/${detail.max}`);
+                    ui.status.update(`${parseFloat(100 * detail.value / detail.max).toFixed(1)}% ${class_type}`);
                     ui.submitButton.running()
                 } catch (error) {
 
@@ -1778,6 +1816,12 @@
                 const text = detail?.output?.text;
                 const gifs = detail?.output?.gifs;
 
+                const prompt = detail?.output?.prompt;
+                const analysis = detail?.output?.analysis;
+
+                const _images = detail?.output?._images;
+                const prompts = detail?.output?.prompts;
+
                 if (images) {
                     // if (!images) return;
 
@@ -1787,6 +1831,15 @@
                         return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
                     }), detail.node, 'images');
 
+                } else if (_images && prompts) {
+                    let url = get_url();
+
+                    show(Array.from(_images, (img, i) => {
+                        return [`${url}/view?filename=${encodeURIComponent(img.filename)
+                            }&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)
+                            }&t=${+new Date()}`, prompts[i]];
+                    }), detail.node, 'images_prompts');
+
                 } else if (text) {
                     ui.output.update("text", Array.isArray(text) ? text.join('\n\n') : text, detail.node)
                 } else if (gifs && gifs[0]) {
@@ -1795,7 +1848,11 @@
                         }&&format=${gifs[0].format}&t=${+new Date()}`;
 
                     show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
+                } else if (prompt && analysis) {
+                    // #ClipInterrogator: …… 
+                    ui.output.update("text", `${prompt.join('\n\n')}\n${JSON.stringify(analysis, null, 2)}`, detail.node)
                 }
+
 
 
                 try {

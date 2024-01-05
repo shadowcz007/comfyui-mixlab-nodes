@@ -35,6 +35,24 @@ function get_position_style (ctx, widget_width, y, node_height) {
     justifyContent: 'space-between'
   }
 }
+function createImage (url) {
+  let im = new Image()
+  return new Promise((res, rej) => {
+    im.onload = () => res(im)
+    im.src = url
+  })
+}
+
+async function fetchImage (url) {
+  try {
+    const response = await fetch(url)
+    const blob = await response.blob()
+     
+    return blob
+  } catch (error) {
+    console.error('出现错误:', error)
+  }
+}
 
 const getLocalData = key => {
   let data = {}
@@ -132,8 +150,8 @@ app.registerExtension({
           inp.click()
           inp.addEventListener('change', event => {
             // 获取选择的文件
-            const file = event.target.files[0];
-            this.title=file.name.split('.')[0];
+            const file = event.target.files[0]
+            this.title = file.name.split('.')[0]
 
             // console.log(file.name.split('.')[0])
             // 创建文件读取器
@@ -199,6 +217,150 @@ app.registerExtension({
           createSelect(widget.select, keywords, prompt)
         }
       } catch (error) {}
+    }
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.prompt.PromptImage',
+  _createResult: async (node, widget, message) => {
+    widget.div.innerHTML = ``
+
+    const width = node.size[0] * 0.5 - 12
+
+    let height_add = 0
+
+    for (let index = 0; index < message._images.length; index++) {
+      const img = message._images[index]
+      let url = api.apiURL(
+        `/view?filename=${encodeURIComponent(img.filename)}&type=${
+          img.type
+        }&subfolder=${
+          img.subfolder
+        }${app.getPreviewFormatParam()}${app.getRandParam()}`
+      )
+
+      let image = await createImage(url)
+
+      // 创建card
+      let div = document.createElement('div')
+      div.className = 'card'
+      div.draggable = true
+
+      div.ondragend = async event => {
+        console.log('拖动停止')
+        let url = div.querySelector('img').src
+
+        let blob = await fetchImage(url)
+
+        let imageNode = null
+        // No image node selected: add a new one
+        if (!imageNode) {
+          const newNode = LiteGraph.createNode('LoadImage')
+          newNode.pos = [...app.canvas.graph_mouse]
+          imageNode = app.graph.add(newNode)
+          app.graph.change()
+        }
+
+        
+        // const blob = item.getAsFile();
+        imageNode.pasteFile(blob)
+      }
+
+      div.setAttribute('data-scale', image.naturalHeight / image.naturalWidth)
+
+      let h = (image.naturalHeight * width) / image.naturalWidth
+      if (index % 2 === 0) height_add += h
+      div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
+      div.innerHTML = `<img src="${url}" style='width: 100%'/>
+            <p style="position: absolute;
+            bottom: 0;
+            left: 0; 
+            background:#444444c2;
+            margin: 0;
+            font-size: 12px;
+            padding: 5px;
+            text-align: left;">${message.prompts[index]}</p>`
+      widget.div.appendChild(div)
+    }
+
+    node.size[1] = 98 + height_add
+  },
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'PromptImage') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+        console.log('#orig_nodeCreated', this)
+        const widget = {
+          type: 'div',
+          name: 'result',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(this.div.style, {
+              ...get_position_style(ctx, widget_width, y, node.size[1]),
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              // outline: '1px solid red',
+              paddingLeft: '0px',
+              width: widget_width + 'px'
+            })
+          }
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+
+        this.addCustomWidget(widget)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        const onResize = this.onResize
+        this.onResize = function () {
+          // 缩放发生
+          // console.log('##缩放发生', this.size)
+          let w = this.size[0] * 0.5 - 12
+          Array.from(widget.div.querySelectorAll('.card'), card => {
+            card.style.width = `${w}px`
+            card.style.height = `${
+              w * parseFloat(card.getAttribute('data-scale'))
+            }px`
+          })
+          return onResize?.apply(this, arguments)
+        }
+
+        // this.serialize_widgets = true //需要保存参数
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = async function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('PromptImage', message.prompts, message._images)
+        // window._mixlab_app_json = message.json
+        try {
+          let widget = this.widgets.filter(w => w.name === 'result')[0]
+          widget.value = message
+
+          this._createResult(this, widget, message)
+        } catch (error) {}
+      }
+
+      this.serialize_widgets = true //需要保存参数
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'PromptImage') {
+      // await sleep(0)
+      let widget = node.widgets.filter(w => w.name === 'result')[0]
+      console.log('widget.value', widget.value)
+      let cards = widget.div.querySelectorAll('.card')
+      if (cards.length == 0) node.size = [280, 120]
+
+      this._createResult(node, widget, widget.value)
     }
   }
 })
