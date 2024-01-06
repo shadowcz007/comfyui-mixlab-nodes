@@ -277,26 +277,31 @@ app.registerExtension({
 })
 
 const min_max = node => {
-  const min_value = node.widgets.filter(w => w.name === 'min_value')[0]
-  const max_value = node.widgets.filter(w => w.name === 'max_value')[0]
-
-  const number = node.widgets.filter(w => w.name === 'number')[0];
-  if(number){
-    number.options.min = min_value.value
-    number.options.max = max_value.value
+  if(node.widgets){
+    const min_value = node.widgets.filter(w => w.name === 'min_value')[0]
+    const max_value = node.widgets.filter(w => w.name === 'max_value')[0]
   
-    number.value = Math.min(number.options.max, number.value)
-    number.value = Math.max(number.options.min, number.value)
+    const number = node.widgets.filter(w => w.name === 'number')[0]
+    if (number) {
+      number.options.min = min_value.value
+      number.options.max = max_value.value
+  
+      number.value = Math.min(number.options.max, number.value)
+      number.value = Math.max(number.options.min, number.value)
+    }
+  
+    if (min_value)
+      min_value.callback = e => {
+        number.options.min = e
+        number.value = e
+      }
+    if (max_value)
+      max_value.callback = e => {
+        number.options.max = e
+        number.value = e
+      }
   }
- 
-if(min_value)  min_value.callback = e => {
-    number.options.min = e
-    number.value = e
-  }
- if(max_value) max_value.callback = e => {
-    number.options.max = e
-    number.value = e
-  }
+  
 }
 
 app.registerExtension({
