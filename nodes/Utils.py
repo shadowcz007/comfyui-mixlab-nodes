@@ -225,12 +225,13 @@ class FloatSlider:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,number,min_value,max_value,step):
+    def run(self, number, min_value, max_value, step):
         if number < min_value:
-            number= min_value
+            number = min_value
         elif number > max_value:
-            number= max_value
-        return (number,)
+            number = max_value
+        scaled_number = (number - min_value) / (max_value - min_value)
+        return (scaled_number,)
     
   
 class IntNumber:

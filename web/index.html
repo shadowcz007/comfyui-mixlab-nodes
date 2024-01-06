@@ -985,7 +985,7 @@
                         data.inputs.number,
                         (v) => {
                             // console.log(data.id,window._appData.data[data.id])
-                            window._appData.data[data.id].inputs.number = v;
+                            window._appData.data[data.id].inputs.number =data.class_type === 'IntNumber' ? parseInt(v):parseFloat(v);
                         },
                         options.min,
                         options.max,
