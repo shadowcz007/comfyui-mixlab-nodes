@@ -159,7 +159,7 @@ app.registerExtension({
           el: `#${inputColor.id}`,
           theme: 'classic', // or 'monolith', or 'nano'
           // closeOnScroll: true,
-          default:'#000000',
+          default: '#000000',
           swatches: [
             'rgba(244, 67, 54, 1)',
             'rgba(233, 30, 99, 0.95)',
@@ -272,6 +272,27 @@ app.registerExtension({
         }
 
         console.log('TextToNumber', random_number.value)
+      }
+    }
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.utils.FloatSlider',
+  async loadedGraphNode (node, app) {
+    if (node.type === 'FloatSlider') {
+      const min_value = node.widgets.filter(w => w.name === 'min_value')[0]
+      const max_value = node.widgets.filter(w => w.name === 'max_value')[0]
+
+      const number = node.widgets.filter(w => w.name === 'number')[0]
+
+      min_value.callback = e => {
+        number.options.min = e
+        number.value = e
+      }
+      max_value.callback = e => {
+        number.options.max = e
+        number.value = e
       }
     }
   }
