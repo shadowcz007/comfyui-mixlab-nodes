@@ -47,7 +47,7 @@ async function fetchImage (url) {
   try {
     const response = await fetch(url)
     const blob = await response.blob()
-     
+
     return blob
   } catch (error) {
     console.error('出现错误:', error)
@@ -167,7 +167,8 @@ app.registerExtension({
               // 打印文件内容
               //   console.log(keywords)
 
-              // widget.value = keywords
+              widget.value = JSON.stringify(keywords)
+
               let ks = getLocalData(`_mixlab_PromptSlide`)
               ks[this.id] = keywords
               setLocalDataOfWin(`_mixlab_PromptSlide`, ks)
@@ -205,14 +206,13 @@ app.registerExtension({
     if (node.type === 'PromptSlide') {
       try {
         let prompt = node.widgets.filter(w => w.name === 'prompt_keyword')[0]
-        let ks = getLocalData(`_mixlab_PromptSlide`)
-
-        let keywords = ks[node.id]
+        // let ks = getLocalData(`_mixlab_PromptSlide`)
+        let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
+        // console.log('##widget', uploadWidget.value)
+        let keywords = JSON.parse(uploadWidget.value)
         // console.log('keywords',keywords)
         let widget = node.widgets.filter(w => w.select)[0]
         if (keywords && keywords[0]) {
-          // let widget = node.widgets.filter(w => w.select)[0]
-          // console.log('select',widget,widget.value)
           widget.select.style.display = 'block'
           createSelect(widget.select, keywords, prompt)
         }
@@ -262,7 +262,6 @@ app.registerExtension({
           app.graph.change()
         }
 
-        
         // const blob = item.getAsFile();
         imageNode.pasteFile(blob)
       }
