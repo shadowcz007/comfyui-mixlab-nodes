@@ -91,6 +91,117 @@ const createSelect = (select, opts, targetWidget) => {
 }
 
 app.registerExtension({
+  name: 'Mixlab.prompt.RandomPrompt',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'RandomPrompt') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = async function () {
+        orig_nodeCreated?.apply(this, arguments)
+        name
+ 
+        const mutable_prompt = this.widgets.filter(
+          w => w.name == 'mutable_prompt'
+        )[0]
+        // console.log('PromptSlide nodeData', prompt_keyword)
+
+        const widget = {
+          type: 'div',
+          name: 'upload',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, y, node.size[1])
+            )
+          }
+        }
+
+        widget.div = $el('div', {})
+
+        const btn = document.createElement('button')
+        btn.innerText = 'Upload Keywords'
+
+        btn.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;    height: 30px;min-width: 122px;
+       `
+
+        // const btn=document.createElement('button');
+        // btn.innerText='Upload'
+        btn.addEventListener('click', () => {
+          let inp = document.createElement('input')
+          inp.type = 'file'
+          inp.accept = '.txt'
+          inp.click()
+          inp.addEventListener('change', event => {
+            // 获取选择的文件
+            const file = event.target.files[0]
+            this.title = file.name.split('.')[0]
+
+            // console.log(file.name.split('.')[0])
+            // 创建文件读取器
+            const reader = new FileReader()
+
+            // 定义读取完成事件的回调函数
+            reader.onload = event => {
+              // 读取完成后的文本内容
+              const fileContent = event.target.result.split('\n')
+              const keywords = Array.from(fileContent, f => f.trim()).filter(
+                f => f
+              )
+              // 打印文件内容
+              //   console.log(keywords)
+
+              mutable_prompt.value =  keywords.join('\n')
+
+              inp.remove()
+            }
+
+            // 以文本方式读取文件
+            reader.readAsText(file)
+          })
+        })
+
+        widget.div.appendChild(btn) 
+        document.body.appendChild(widget.div)
+        this.addCustomWidget(widget)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        if (this.onResize) {
+          this.onResize(this.size)
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'RandomPrompt') {
+      // try {
+      //   let mutable_prompt = node.widgets.filter(w => w.name === 'mutable_prompt')[0]
+      //   // let ks = getLocalData(`_mixlab_PromptSlide`)
+      //   let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
+      //   // console.log('##widget', uploadWidget.value)
+      //   let keywords = JSON.parse(uploadWidget.value)
+      
+      //   if (keywords && keywords[0]) {
+      //     mutable_prompt.value=keywords.join('\n')
+      //   }
+      // } catch (error) {}
+    }
+  }
+})
+
+app.registerExtension({
   name: 'Mixlab.prompt.PromptSlide',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'PromptSlide') {
@@ -169,9 +280,9 @@ app.registerExtension({
 
               widget.value = JSON.stringify(keywords)
 
-              let ks = getLocalData(`_mixlab_PromptSlide`)
-              ks[this.id] = keywords
-              setLocalDataOfWin(`_mixlab_PromptSlide`, ks)
+              // let ks = getLocalData(`_mixlab_PromptSlide`)
+              // ks[this.id] = keywords
+              // setLocalDataOfWin(`_mixlab_PromptSlide`, ks)
 
               createSelect(select, keywords, prompt_keyword)
 
