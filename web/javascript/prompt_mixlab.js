@@ -331,8 +331,7 @@ app.registerExtension({
   }
 })
 
-
-const  _createResult=async (node, widget, message) => {
+const _createResult = async (node, widget, message) => {
   widget.div.innerHTML = ``
 
   const width = node.size[0] * 0.5 - 12
@@ -340,56 +339,59 @@ const  _createResult=async (node, widget, message) => {
   let height_add = 0
 
   for (let index = 0; index < message._images.length; index++) {
-    const img = message._images[index]
-    let url = api.apiURL(
-      `/view?filename=${encodeURIComponent(img.filename)}&type=${
-        img.type
-      }&subfolder=${
-        img.subfolder
-      }${app.getPreviewFormatParam()}${app.getRandParam()}`
-    )
+    const imgs = message._images[index]
 
-    let image = await createImage(url)
+    for (const img of imgs) {
+      let url = api.apiURL(
+        `/view?filename=${encodeURIComponent(img.filename)}&type=${
+          img.type
+        }&subfolder=${
+          img.subfolder
+        }${app.getPreviewFormatParam()}${app.getRandParam()}`
+      )
 
-    // 创建card
-    let div = document.createElement('div')
-    div.className = 'card'
-    div.draggable = true
+      let image = await createImage(url)
 
-    div.ondragend = async event => {
-      console.log('拖动停止')
-      let url = div.querySelector('img').src
+      // 创建card
+      let div = document.createElement('div')
+      div.className = 'card'
+      div.draggable = true
 
-      let blob = await fetchImage(url)
+      div.ondragend = async event => {
+        console.log('拖动停止')
+        let url = div.querySelector('img').src
 
-      let imageNode = null
-      // No image node selected: add a new one
-      if (!imageNode) {
-        const newNode = LiteGraph.createNode('LoadImage')
-        newNode.pos = [...app.canvas.graph_mouse]
-        imageNode = app.graph.add(newNode)
-        app.graph.change()
+        let blob = await fetchImage(url)
+
+        let imageNode = null
+        // No image node selected: add a new one
+        if (!imageNode) {
+          const newNode = LiteGraph.createNode('LoadImage')
+          newNode.pos = [...app.canvas.graph_mouse]
+          imageNode = app.graph.add(newNode)
+          app.graph.change()
+        }
+
+        // const blob = item.getAsFile();
+        imageNode.pasteFile(blob)
       }
 
-      // const blob = item.getAsFile();
-      imageNode.pasteFile(blob)
+      div.setAttribute('data-scale', image.naturalHeight / image.naturalWidth)
+
+      let h = (image.naturalHeight * width) / image.naturalWidth
+      if (index % 2 === 0) height_add += h
+      div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
+      div.innerHTML = `<img src="${url}" style='width: 100%'/>
+            <p style="position: absolute;
+            bottom: 0;
+            left: 0; 
+            background:#444444c2;
+            margin: 0;
+            font-size: 12px;
+            padding: 5px;
+            text-align: left;">${message.prompts[index]}</p>`
+      widget.div.appendChild(div)
     }
-
-    div.setAttribute('data-scale', image.naturalHeight / image.naturalWidth)
-
-    let h = (image.naturalHeight * width) / image.naturalWidth
-    if (index % 2 === 0) height_add += h
-    div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
-    div.innerHTML = `<img src="${url}" style='width: 100%'/>
-          <p style="position: absolute;
-          bottom: 0;
-          left: 0; 
-          background:#444444c2;
-          margin: 0;
-          font-size: 12px;
-          padding: 5px;
-          text-align: left;">${message.prompts[index]}</p>`
-    widget.div.appendChild(div)
   }
 
   node.size[1] = 98 + height_add
@@ -397,7 +399,7 @@ const  _createResult=async (node, widget, message) => {
 
 app.registerExtension({
   name: 'Mixlab.prompt.PromptImage',
-  
+
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'PromptImage') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated

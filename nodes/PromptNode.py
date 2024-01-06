@@ -122,30 +122,35 @@ class PromptImage:
         filename_prefix += self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
             filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        
         results = list()
 
         save_to_image=save_to_image[0]=='enable'
 
         for index in range(len(images)):
-            image=images[index]
-            img=tensor2pil(image)
-           
-            metadata = None
-            if save_to_image:
-                metadata = PngInfo()
-                prompt_text=prompts[index]
-                if prompt_text is not None:
-                    metadata.add_text("prompt_text", prompt_text)
-                
-            file = f"{filename}_{index}_{counter:05}_.png"
-            img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
-            results.append({
-                "filename": file,
-                "subfolder": subfolder,
-                "type": self.type
-            })
-            counter += 1
+            res=[]
+            imgs=images[index]
 
+            for image in imgs:
+                img=tensor2pil(image)
+
+                metadata = None
+                if save_to_image:
+                    metadata = PngInfo()
+                    prompt_text=prompts[index]
+                    if prompt_text is not None:
+                        metadata.add_text("prompt_text", prompt_text)
+                    
+                file = f"{filename}_{index}_{counter:05}_.png"
+                img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+                res.append({
+                    "filename": file,
+                    "subfolder": subfolder,
+                    "type": self.type
+                })
+                counter += 1
+            results.append(res)
+        
         return { "ui": { "_images": results,"prompts":prompts } }
 
 
