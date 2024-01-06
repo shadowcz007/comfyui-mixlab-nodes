@@ -85,8 +85,8 @@ def prompt_delete_words(sentence, new_words_length):
 
 class PromptImage:
     def __init__(self):
-        self.temp_dir = folder_paths.get_temp_directory()
-        self.type = "temp"
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
         self.prefix_append = "PromptImage"
         self.compress_level = 4
 
@@ -121,7 +121,7 @@ class PromptImage:
         filename_prefix="mixlab_"
         filename_prefix += self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
-            filename_prefix, self.temp_dir, images[0].shape[1], images[0].shape[0])
+            filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         results = list()
 
         save_to_image=save_to_image[0]=='enable'
@@ -202,6 +202,8 @@ class PromptSimplification:
             nps=prompt_delete_words(p,length)
             for n in nps:
                 result.append(n)
+
+        result= [elem.strip() for elem in result if elem.strip()]
 
         return {"ui": {"prompts": result}, "result": (result,)}
 
@@ -340,6 +342,8 @@ class RandomPrompt:
             prompts = random.sample(prompts, min(max_count,len(prompts)))
         else:
             prompts = prompts[:min(max_count,len(prompts))]
+
+        prompts= [elem.strip() for elem in prompts if elem.strip()]
 
         # return (new_prompt)
         return {"ui": {"prompts": prompts}, "result": (prompts,)}

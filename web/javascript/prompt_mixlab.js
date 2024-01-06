@@ -98,7 +98,7 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
         name
- 
+
         const mutable_prompt = this.widgets.filter(
           w => w.name == 'mutable_prompt'
         )[0]
@@ -156,7 +156,7 @@ app.registerExtension({
               // 打印文件内容
               //   console.log(keywords)
 
-              mutable_prompt.value =  keywords.join('\n')
+              mutable_prompt.value = keywords.join('\n')
 
               inp.remove()
             }
@@ -166,7 +166,7 @@ app.registerExtension({
           })
         })
 
-        widget.div.appendChild(btn) 
+        widget.div.appendChild(btn)
         document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
 
@@ -192,7 +192,6 @@ app.registerExtension({
       //   let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       //   // console.log('##widget', uploadWidget.value)
       //   let keywords = JSON.parse(uploadWidget.value)
-      
       //   if (keywords && keywords[0]) {
       //     mutable_prompt.value=keywords.join('\n')
       //   }
@@ -332,70 +331,73 @@ app.registerExtension({
   }
 })
 
-app.registerExtension({
-  name: 'Mixlab.prompt.PromptImage',
-  _createResult: async (node, widget, message) => {
-    widget.div.innerHTML = ``
 
-    const width = node.size[0] * 0.5 - 12
+const  _createResult=async (node, widget, message) => {
+  widget.div.innerHTML = ``
 
-    let height_add = 0
+  const width = node.size[0] * 0.5 - 12
 
-    for (let index = 0; index < message._images.length; index++) {
-      const img = message._images[index]
-      let url = api.apiURL(
-        `/view?filename=${encodeURIComponent(img.filename)}&type=${
-          img.type
-        }&subfolder=${
-          img.subfolder
-        }${app.getPreviewFormatParam()}${app.getRandParam()}`
-      )
+  let height_add = 0
 
-      let image = await createImage(url)
+  for (let index = 0; index < message._images.length; index++) {
+    const img = message._images[index]
+    let url = api.apiURL(
+      `/view?filename=${encodeURIComponent(img.filename)}&type=${
+        img.type
+      }&subfolder=${
+        img.subfolder
+      }${app.getPreviewFormatParam()}${app.getRandParam()}`
+    )
 
-      // 创建card
-      let div = document.createElement('div')
-      div.className = 'card'
-      div.draggable = true
+    let image = await createImage(url)
 
-      div.ondragend = async event => {
-        console.log('拖动停止')
-        let url = div.querySelector('img').src
+    // 创建card
+    let div = document.createElement('div')
+    div.className = 'card'
+    div.draggable = true
 
-        let blob = await fetchImage(url)
+    div.ondragend = async event => {
+      console.log('拖动停止')
+      let url = div.querySelector('img').src
 
-        let imageNode = null
-        // No image node selected: add a new one
-        if (!imageNode) {
-          const newNode = LiteGraph.createNode('LoadImage')
-          newNode.pos = [...app.canvas.graph_mouse]
-          imageNode = app.graph.add(newNode)
-          app.graph.change()
-        }
+      let blob = await fetchImage(url)
 
-        // const blob = item.getAsFile();
-        imageNode.pasteFile(blob)
+      let imageNode = null
+      // No image node selected: add a new one
+      if (!imageNode) {
+        const newNode = LiteGraph.createNode('LoadImage')
+        newNode.pos = [...app.canvas.graph_mouse]
+        imageNode = app.graph.add(newNode)
+        app.graph.change()
       }
 
-      div.setAttribute('data-scale', image.naturalHeight / image.naturalWidth)
-
-      let h = (image.naturalHeight * width) / image.naturalWidth
-      if (index % 2 === 0) height_add += h
-      div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
-      div.innerHTML = `<img src="${url}" style='width: 100%'/>
-            <p style="position: absolute;
-            bottom: 0;
-            left: 0; 
-            background:#444444c2;
-            margin: 0;
-            font-size: 12px;
-            padding: 5px;
-            text-align: left;">${message.prompts[index]}</p>`
-      widget.div.appendChild(div)
+      // const blob = item.getAsFile();
+      imageNode.pasteFile(blob)
     }
 
-    node.size[1] = 98 + height_add
-  },
+    div.setAttribute('data-scale', image.naturalHeight / image.naturalWidth)
+
+    let h = (image.naturalHeight * width) / image.naturalWidth
+    if (index % 2 === 0) height_add += h
+    div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
+    div.innerHTML = `<img src="${url}" style='width: 100%'/>
+          <p style="position: absolute;
+          bottom: 0;
+          left: 0; 
+          background:#444444c2;
+          margin: 0;
+          font-size: 12px;
+          padding: 5px;
+          text-align: left;">${message.prompts[index]}</p>`
+    widget.div.appendChild(div)
+  }
+
+  node.size[1] = 98 + height_add
+}
+
+app.registerExtension({
+  name: 'Mixlab.prompt.PromptImage',
+  
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'PromptImage') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
@@ -449,14 +451,15 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = async function (message) {
         onExecuted?.apply(this, arguments)
-        console.log('PromptImage', message.prompts, message._images)
+        console.log('#PromptImage', message.prompts, message._images)
         // window._mixlab_app_json = message.json
         try {
           let widget = this.widgets.filter(w => w.name === 'result')[0]
           widget.value = message
-
-          this._createResult(this, widget, message)
-        } catch (error) {}
+          _createResult(this, widget, { ...message })
+        } catch (error) {
+          console.log(error)
+        }
       }
 
       this.serialize_widgets = true //需要保存参数
@@ -470,7 +473,7 @@ app.registerExtension({
       let cards = widget.div.querySelectorAll('.card')
       if (cards.length == 0) node.size = [280, 120]
 
-      this._createResult(node, widget, widget.value)
+      _createResult(node, widget, widget.value)
     }
   }
 })
