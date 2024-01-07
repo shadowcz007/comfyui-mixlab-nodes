@@ -269,7 +269,6 @@ app.registerExtension({
           const n = this.widgets.filter(w => w.name === 'number')[0]
           n.value = message.num[0]
         }
-
         console.log('TextToNumber', random_number.value)
       }
     }
@@ -307,11 +306,16 @@ const min_max = node => {
 app.registerExtension({
   name: 'Mixlab.utils.FloatSlider',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    const orig_nodeCreated = nodeType.prototype.onNodeCreated
-    nodeType.prototype.onNodeCreated = function () {
-      orig_nodeCreated?.apply(this, arguments)
-      min_max(this)
+
+    if (nodeType.comfyClass == 'FloatSlider') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated;
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+        min_max(this)
+      }
     }
+
+   
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'FloatSlider') {
@@ -322,11 +326,15 @@ app.registerExtension({
 app.registerExtension({
   name: 'Mixlab.utils.IntNumber',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    const orig_nodeCreated = nodeType.prototype.onNodeCreated
-    nodeType.prototype.onNodeCreated = function () {
-      orig_nodeCreated?.apply(this, arguments)
-      min_max(this)
+    
+    if (nodeType.comfyClass == 'IntNumber') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+        min_max(this)
+      }
     }
+   
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'IntNumber') {
