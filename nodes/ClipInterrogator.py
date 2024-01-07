@@ -6,6 +6,7 @@ import comfy.utils
 import numpy as np
 import json
 import torch
+import random
 
 from transformers import AutoProcessor, BlipForConditionalGeneration
 
@@ -58,7 +59,53 @@ def image_analysis_fn(ci,image):
     trending_ranks = {trending: sim for trending, sim in zip(top_trendings, ci.similarities(image_features, top_trendings))}
     flavor_ranks = {flavor: sim for flavor, sim in zip(top_flavors, ci.similarities(image_features, top_flavors))}
     
-    return medium_ranks, artist_ranks, movement_ranks, trending_ranks, flavor_ranks
+    return {
+        "medium_ranks":medium_ranks, 
+        "artist_ranks":artist_ranks, 
+        "movement_ranks":movement_ranks, 
+        "trending_ranks":trending_ranks, 
+        "flavor_ranks":flavor_ranks
+        }
+
+
+def generate_sentences(data):
+    sentences = []
+
+    # Get the length of data
+    data_length = len(data)
+
+    # Use a recursive function to handle variable-length data
+    def generate_recursive(index, current_sentence, current_score):
+        # Check if recursion is complete
+        if index == data_length:
+            sentences.append({"sentence": current_sentence, "score": current_score})
+            return
+
+        # Get the current level data
+        current_data = data[index]
+
+        # Iterate through the current level data
+        for phrase in current_data:
+            sentence = current_sentence + ("," if current_sentence.strip() else "") + phrase
+            score = current_score + current_data[phrase]
+            generate_recursive(index + 1, sentence, score)
+
+    # Start recursive generation of sentences
+    generate_recursive(0, "", 0)
+
+    # Sort the generated sentences by score in descending order
+    sentences.sort(key=lambda x: x["score"], reverse=True)
+
+    def get_random_elements(elements, num):
+        return random.sample(elements, num)
+
+    ps = get_random_elements(sentences, 5)
+    ps = [s["sentence"] for s in sorted(ps, key=lambda x: x["score"], reverse=True)]
+
+    return ps
+
+
+
 
 def image_to_prompt(ci,image, mode):
     ci.config.chunk_size = 2048 if ci.config.clip_model_name == "ViT-L-14/openai" else 1024
@@ -86,17 +133,22 @@ class ClipInterrogator:
             "prompt_mode": (['fast','classic','best','negative'],),
             "image_analysis": (["off","on"],), 
                              },
+
+                # "optional":{
+                #     "output":("CLIPINTERROGATOR", {"multiline": True,"default": "", "dynamicPrompts": False})
+                # },
+
                 }
     
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("prompt",)
+    RETURN_TYPES = ("STRING","STRING",)
+    RETURN_NAMES = ("prompt","random_samples",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/prompt"
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (True,True,)
     global ci
     ci = None
     def run(self,image,prompt_mode,image_analysis):
@@ -156,5 +208,21 @@ class ClipInterrogator:
             ci.caption_offloaded = True
 
         # analysis_result=[]
+        # items = app.graph.getNodeById(31).widgets[2].value["items"]
+        
+        random_samples=[]
 
-        return {"ui":{"prompt": prompt_result,"analysis":analysis_result},"result": (prompt_result,)}
+        for r in analysis_result:
+            random_sample = generate_sentences([r['medium_ranks'], r['artist_ranks'],r['movement_ranks'],r['trending_ranks'],r['flavor_ranks']])
+            for s in random_sample:
+                random_samples.append(s)
+        # print(len(random_samples))
+        # print('-----')
+        # print( random_samples)
+        return {
+            "ui":{
+                    "prompt": prompt_result,
+                    "analysis":analysis_result,
+                    "random_samples":random_samples
+                },
+            "result": (prompt_result,random_samples,)}
