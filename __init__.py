@@ -351,32 +351,58 @@ async def new_request(self, method, url, *args, **kwargs):
 
 # 应用 Monkey Patch
 aiohttp.ClientSession._request = new_request
+import socket
+
+async def check_port_available(address, port):
+    #检查端口是否可用
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        try:
+            sock.bind((address, port))
+            return True
+        except socket.error:
+            return False
 
 # https
 async def new_start(self, address, port, verbose=True, call_on_start=None):
-        
-
+    try:
         runner = web.AppRunner(self.app, access_log=None)
         await runner.setup()
+
+        if not await check_port_available(address, port):
+            raise RuntimeError(f"Port {port} is already in use.")
+
         site = web.TCPSite(runner, address, port)
         await site.start()
 
         import ssl
-        crt,key=create_for_https()
+        crt, key = create_for_https()
         ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        ssl_context.load_cert_chain(crt,key)
-        site2 = web.TCPSite(runner, address, port+1,ssl_context=ssl_context)
-        await site2.start()
+        ssl_context.load_cert_chain(crt, key)
+
+        success = False
+        for i in range(10):  # 尝试最多10次
+            if await check_port_available(address, port + 1 + i):
+                https_port = port + 1 + i
+                site2 = web.TCPSite(runner, address, https_port, ssl_context=ssl_context)
+                await site2.start()
+                success = True
+                break
+
+        if not success:
+            raise RuntimeError(f"Ports {port + 1} to {port + 10} are all in use.")
 
         if address == '':
             address = '0.0.0.0'
         if verbose:
-            # print('\033[91mMixlab Nodes: \033[93mLoaded\033[0m')
             print("\033[93mStarting server\n")
             print("\033[93mTo see the GUI go to: http://{}:{}".format(address, port))
-            print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, port+1))
+            print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
         if call_on_start is not None:
             call_on_start(address, port)
+
+    except Exception as e:
+        print(f"Error starting the server: {e}")
 
         # import webbrowser
         # if os.name == 'nt' and address == '0.0.0.0':
