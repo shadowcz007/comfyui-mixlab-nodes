@@ -1123,7 +1123,7 @@ class LoadImagesFromPath:
             print("发生了一个未知的错误：", str(e))
 
         # print('#prompt::::',prompt)
-        return (imgs,masks,prompt,)
+        return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,)}
 
 
 # TODO 扩大选区的功能,重新输出mask

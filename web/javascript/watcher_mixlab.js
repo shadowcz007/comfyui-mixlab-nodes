@@ -60,30 +60,7 @@ app.registerExtension({
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
           size: [128, 24], // a default size
-          draw (ctx, node, width, y) {
-            // // 绘制文件图标的函数
-            // function drawFileIcon () {
-            //   // 清空画布
-            //   // ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-            //   // 绘制文件外框
-            //   ctx.fillStyle = '#000'
-            //   ctx.fillRect(5, 5, 40, 40)
-
-            //   // 绘制文件夹图标
-            //   ctx.fillStyle = '#f00'
-            //   ctx.fillRect(10, 15, 30, 20)
-
-            //   // 绘制监听符号
-            //   ctx.beginPath()
-            //   ctx.arc(30, 35, 5, 0, 2 * Math.PI)
-            //   ctx.fillStyle = '#00f'
-            //   ctx.fill()
-            // }
-
-            // // 调用绘制函数
-            // drawFileIcon()
-          },
+          draw (ctx, node, width, y) {},
           computeSize (...args) {
             return [128, 24] // a method to compute the current size of the widget
           },
@@ -124,11 +101,19 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        console.log('watch widtget', this.widgets)
+        // 虚拟的widget，用于更新节点，让其每次都运行
+        const widget = {
+          type: 'div',
+          name: 'seed',
+          draw (ctx, node, widget_width, y, widget_height) {}
+        }
+
+        this.addCustomWidget(widget)
 
         const watcher = this.widgets.filter(w => w.name == 'watcher')[0]
 
         watcher.callback = () => {
+          console.log('watcher', watcher.value)
           if (watcher.value === 'enable') {
             if (window._mixlab_watcher_t)
               clearInterval(window._mixlab_watcher_t)
@@ -140,7 +125,7 @@ app.registerExtension({
                   window._mixlab_file_path_watcher = json.event_type
                   // widget.card.innerText = window._mixlab_file_path_watcher || ''
                   //运行
-                  document.querySelector('#queue-button').click()
+                  // document.querySelector('#queue-button').click()
                 }
               })
             }, 1000)
@@ -162,15 +147,59 @@ app.registerExtension({
           window._mixlab_file_path_watcher = json.event_type
         })
 
-        /*
-                Add the widget, make sure we clean up nicely, and we do not want to be serialized!
-                */
-        // this.addCustomWidget(widget)
         this.onRemoved = function () {
           // widget.card.remove()
         }
         this.serialize_widgets = true
       }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log(message)
+        try {
+          let seed = this.widgets.filter(w => w.name === 'seed')[0]
+          if (seed) {
+            if (!seed.value) seed.value = 0
+            seed.value += 1
+          }
+        } catch (error) {}
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'LoadImagesFromPath') {
+      const watcher = node.widgets.filter(w => w.name == 'watcher')[0]
+      if (watcher) {
+        if (watcher.value === 'enable') {
+          if (window._mixlab_watcher_t) clearInterval(window._mixlab_watcher_t)
+          window._mixlab_watcher_t = setInterval(() => {
+            // 上次路径填充
+            getConfig().then(json => {
+              console.log(json.event_type)
+              if (json.event_type != window._mixlab_file_path_watcher) {
+                window._mixlab_file_path_watcher = json.event_type
+                // widget.card.innerText = window._mixlab_file_path_watcher || ''
+                //运行
+                // document.querySelector('#queue-button').click()
+              }
+            })
+          }, 1000)
+        } else {
+          if (window._mixlab_watcher_t) {
+            clearInterval(window._mixlab_watcher_t)
+          }
+          window._mixlab_watcher_t = null
+        }
+      }
+
+      try {
+        let seed = node.widgets.filter(w => w.name === 'seed')[0]
+        if (seed) {
+          if (!seed.value) seed.value = 0
+          seed.value += 1
+        }
+      } catch (error) {}
     }
   }
 })
