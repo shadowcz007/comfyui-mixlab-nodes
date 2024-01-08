@@ -10,7 +10,7 @@ import folder_paths
 import json,io
 from comfy.cli_args import args
 import cv2 
-
+import math
 from .Watcher import FolderWatcher
 
 
@@ -25,6 +25,52 @@ def tensor2pil(image):
 # Convert PIL to Tensor
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
+
+
+# 颜色迁移
+# Color-Transfer-between-Images https://github.com/chia56028/Color-Transfer-between-Images/blob/master/color_transfer.py
+
+def get_mean_and_std(x):
+	x_mean, x_std = cv2.meanStdDev(x)
+	x_mean = np.hstack(np.around(x_mean,2))
+	x_std = np.hstack(np.around(x_std,2))
+	return x_mean, x_std
+
+def color_transfer(source,target):
+	# sources = ['s1','s2','s3','s4','s5','s6']
+	# targets = ['t1','t2','t3','t4','t5','t6']
+
+     # 将PIL的Image类型转换为OpenCV的numpy数组
+    source = cv2.cvtColor(np.array(source), cv2.COLOR_RGB2LAB)
+    target = cv2.cvtColor(np.array(target), cv2.COLOR_RGB2LAB)
+
+    s_mean, s_std = get_mean_and_std(source)
+    t_mean, t_std = get_mean_and_std(target)
+
+    height, width, channel = source.shape
+	
+    for i in range(0,height):
+        for j in range(0,width):
+            for k in range(0,channel):
+                x = source[i,j,k]
+                x = ((x-s_mean[k])*(t_std[k]/s_std[k]))+t_mean[k]
+				# round or +0.5
+                x = round(x)
+				# boundary check
+                x = 0 if x<0 else x
+                x = 255 if x>255 else x
+                source[i,j,k] = x
+    
+    source = cv2.cvtColor(source,cv2.COLOR_LAB2RGB)
+ 
+    # 创建PIL图像对象
+    image_pil = Image.fromarray(source)
+    
+    return image_pil
+
+
+
+
 
 
 def naive_cutout(img, mask,invert=True):
@@ -516,7 +562,7 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     return bg_image
 
 
-
+# TODO 几个像素点的底
 def resize_image(layer_image, scale_option, width, height,color="white"):
     layer_image = layer_image.convert("RGB")
     original_width, original_height = layer_image.size
@@ -540,14 +586,16 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
     elif scale_option == "center":
         # Scale image to minimum of width and height, center it, and fill extra area with black
         scale = min(width / original_width, height / original_height)
-        new_width = int(original_width * scale)
-        new_height = int(original_height * scale)
+        new_width = math.ceil(original_width * scale)
+        new_height = math.ceil(original_height * scale)
         resized_image = Image.new("RGB", (width, height), color=color)
         resized_image.paste(layer_image.resize((new_width, new_height)), ((width - new_width) // 2, (height - new_height) // 2))
-        resized_image=resized_image.convert("RGB")
+        resized_image = resized_image.convert("RGB")
         return resized_image
     
     return layer_image
+
+
 
 
 
@@ -1606,7 +1654,7 @@ class MergeLayers:
 
                 }
     
-    RETURN_TYPES = ("IMAGE",)
+    RETURN_TYPES = ("IMAGE","MASK",)
     # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
 
     FUNCTION = "run"
@@ -1632,7 +1680,10 @@ class MergeLayers:
                 bg_image=tensor2pil(bg_image)
                 # 按z-index排序
                 layers_new = sorted(layers, key=lambda x: x["z_index"])
-            
+                
+                width, height = bg_image.size
+                final_mask= Image.new('L', (width, height), 0)
+
                 for layer in layers_new:
                     image=layer['image']
                     mask=layer['mask']
@@ -1658,24 +1709,31 @@ class MergeLayers:
                                         layer['scale_option']
                                         )
                     
-                mask=bg_image.convert('RGBA')
-                mask=pil2tensor(mask)
+                    final_mask=merge_images(final_mask,
+                                        layer_mask.convert('RGB'),
+                                        layer_mask,
+                                        layer['x'],
+                                        layer['y'],
+                                        layer['width'],
+                                        layer['height'],
+                                        layer['scale_option']
+                                        )
+                    
+                    final_mask=final_mask.convert('L')
+                    
+                # mask=bg_image.convert('RGBA')
+                final_mask=pil2tensor(final_mask)
                 
                 bg_image=bg_image.convert('RGB')
                 bg_image=pil2tensor(bg_image)
 
-                channels = ["red", "green", "blue", "alpha"]
-                # print(mask,mask.shape)
-                mask = mask[:, :, :, channels.index("green")]
-
                 bg_images.append(bg_image)
-                masks.append(mask)
+                masks.append(final_mask)
         
         bg_images=torch.cat(bg_images, dim=0)
         masks=torch.cat(masks, dim=0)
         return (bg_images,masks,)
     
-
 
 class GradientImage:
     @classmethod
@@ -1902,3 +1960,49 @@ class ResizeImage:
                 average_images.append(a_im)
         
         return (imgs,average_images,)
+    
+
+
+
+class ImageColorTransfer:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                "source": ("IMAGE",),
+                "target": ("IMAGE",),
+                },
+                }
+    
+    # 输出的数据类型
+    RETURN_TYPES = ("IMAGE",)
+
+    # 运行时方法名称
+    FUNCTION = "run"
+
+    # 右键菜单目录
+    CATEGORY = "♾️Mixlab/_test"
+
+    # 输入是否为列表
+    INPUT_IS_LIST = True
+
+    # 输出是否为列表
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self,source,target):
+
+        res=[]
+
+        target=target[0][0]
+        print(target.shape)
+        target=tensor2pil(target)
+
+        for ims in source:
+            for im in ims:
+                image=tensor2pil(im)
+                image=color_transfer(image,target)
+                image=pil2tensor(image)
+                res.append(image)
+
+        return (res,)
+
+
