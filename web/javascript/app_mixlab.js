@@ -108,8 +108,7 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           }
         }
 
-        if(node.type=='Color'){
-          
+        if (node.type == 'Color') {
         }
 
         input[inputIds.indexOf(id)] = {
@@ -126,11 +125,11 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
       }
 
-      if (node.type === 'KSampler'||node.type=='SamplerCustom') {
+      if (node.type === 'KSampler' || node.type == 'SamplerCustom') {
         // seed 的类型收集
         try {
           seed[id] = node.widgets.filter(
-            w => (w.name === 'seed'||w.name=='noise_seed')
+            w => w.name === 'seed' || w.name == 'noise_seed'
           )[0].linkedWidgets[0].value
         } catch (error) {}
       }
@@ -188,7 +187,7 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
   }, 0)
 }
 
-async function save (json, download = false) {
+async function save (json, download = false, showInfo = true) {
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
@@ -237,19 +236,50 @@ async function save (json, download = false) {
     if (download) {
       await downloadJsonFile(data, data.app.filename)
     }
-    let open = window.confirm(
-      `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
-        data.app.filename
-      )}&category=${encodeURIComponent(data.app.category)}`
-    )
-    if (open)
-      window.open(
-        `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+
+    if (showInfo) {
+      let open = window.confirm(
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
           data.app.filename
         )}&category=${encodeURIComponent(data.app.category)}`
       )
+      if (open)
+        window.open(
+          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+            data.app.filename
+          )}&category=${encodeURIComponent(data.app.category)}`
+        )
+    }
   } catch (error) {
     console.log('###error', error)
+  }
+}
+
+function getInputsAndOutputs () {
+  const inputs =
+      `LoadImage CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
+        ' '
+      ),
+    outputs = `PreviewImage SaveImage ShowTextForGPT VHS_VideoCombine`.split(
+      ' '
+    )
+
+  let inputsId = [],
+    outputsId = []
+
+  for (let node of app.graph._nodes) {
+    if (inputs.includes(node.type)) {
+      inputsId.push(node.id)
+    }
+
+    if (outputs.includes(node.type)) {
+      outputsId.push(node.id)
+    }
+  }
+
+  return {
+    input: inputsId,
+    output: outputsId
   }
 }
 
@@ -260,7 +290,16 @@ app.registerExtension({
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
-        console.log('#orig_nodeCreated', this)
+        // console.log('#orig_nodeCreated', this)
+
+        // 自动计算workflow里哪些节点支持
+        let input_ids = this.widgets.filter(w => w.name == 'input_ids')[0],
+          output_ids = this.widgets.filter(w => w.name == 'output_ids')[0]
+
+        const { input, output } = getInputsAndOutputs()
+        input_ids.value = input.join('\n')
+        output_ids.value = output.join('\n')
+
         const widget = {
           type: 'div',
           name: 'AppInfoRun',
@@ -339,12 +378,44 @@ app.registerExtension({
         console.log(message.json)
         window._mixlab_app_json = message.json
         try {
+          let a = this.widgets.filter(w => w.name === 'AppInfoRun')[0]
+          if (a) {
+            if (!a.value) a.value = 0
+            a.value += 1
+          }
+
           const div = this.widgets.filter(w => w.div)[0].div
           Array.from(
             div.querySelectorAll('button'),
             b => (b.style.background = 'yellow')
           )
         } catch (error) {}
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'AppInfo') {
+      let auto_save = node.widgets.filter(w => w.name == 'auto_save')[0]
+      if (auto_save) {
+        if (!['enable', 'disable'].includes(auto_save.value)) {
+          auto_save.value = 'enable'
+        }
+      }
+    }
+  }
+})
+
+api.addEventListener('executed', async ({ detail }) => {
+  console.log('#executed', detail)
+  const { output } = getInputsAndOutputs()
+  if (output.includes(parseInt(detail.node))) {
+    let appinfo = app.graph.findNodesByType('AppInfo')[0]
+    if (appinfo) {
+      let auto_save = appinfo.widgets.filter(w => w.name == 'auto_save')[0]
+      if (auto_save?.value === 'enable') {
+        // 自动保存
+        console.log('auto_save')
+        if (window._mixlab_app_json) save(window._mixlab_app_json,false,false)
       }
     }
   }

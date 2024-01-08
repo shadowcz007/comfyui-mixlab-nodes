@@ -434,12 +434,12 @@ class AppInfo:
     def INPUT_TYPES(s):
         return {"required": { 
                     "name": ("STRING",{"multiline": False,"default": "Mixlab-App","dynamicPrompts": False}),
-                    "image": ("IMAGE",),
                     "input_ids":("STRING",{"multiline": True,"default": "\n".join(["1","2","3"]),"dynamicPrompts": False}),
                     "output_ids":("STRING",{"multiline": True,"default": "\n".join(["5","9"]),"dynamicPrompts": False}),
                              },
 
                 "optional":{
+                    "LOGO": ("IMAGE",),
                     "description":("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
                     "version":("INT", {
                         "default": 1, 
@@ -451,12 +451,13 @@ class AppInfo:
                     "share_prefix":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                     "link":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
                     "category":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
+                    "auto_save": (["enable","disable"],),
                 }
 
                 }
     
-    RETURN_TYPES = ("IMAGE",)
-    RETURN_NAMES = ("IMAGE",)
+    RETURN_TYPES = ()
+    # RETURN_NAMES = ("IMAGE",)
 
     FUNCTION = "run"
 
@@ -464,11 +465,16 @@ class AppInfo:
 
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    # OUTPUT_IS_LIST = (True,)
 
-    def run(self,name,image,input_ids,output_ids,description,version,share_prefix,link,category):
+    def run(self,name,input_ids,output_ids,image,description,version,share_prefix,link,category,auto_save):
         name=name[0]
-        im=image[0][0]
+        
+        im=None
+        if image:
+            im=image[0][0]
+            #TODO batch 的方式需要处理
+            im=create_temp_file(im)
         # image [img,] img[batch,w,h,a] 列表里面是batch，
 
         input_ids=input_ids[0]
@@ -478,13 +484,10 @@ class AppInfo:
         share_prefix=share_prefix[0]
         link=link[0]
         category=category[0]
-
-        #TODO batch 的方式需要处理
-        im=create_temp_file(im)
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])
 
-        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category]}, "result": (image,)}
+        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category]}, "result": ()}
     
 
     
