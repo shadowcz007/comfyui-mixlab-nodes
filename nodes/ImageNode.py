@@ -1134,15 +1134,15 @@ class ImageCropByAlpha:
                              "RGBA": ("RGBA",),  },
                 }
     
-    RETURN_TYPES = ("IMAGE","MASK","MASK",)
-    RETURN_NAMES = ("IMAGE","MASK","AREA_MASK",)
+    RETURN_TYPES = ("IMAGE","MASK","MASK","INT","INT","INT","INT",)
+    RETURN_NAMES = ("IMAGE","MASK","AREA_MASK","x","y","width","height",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,True,True,)
+    OUTPUT_IS_LIST = (True,True,True,True,True,True,True,)
 
     def run(self,image,RGBA):
         # print(image.shape,RGBA.shape)
@@ -1162,6 +1162,11 @@ class ImageCropByAlpha:
         y = min(y, image.shape[1] - 1)
         to_x = w + x
         to_y = h + y
+
+        x_1=x
+        y_1=y
+        width_1=w
+        height_1=h
 
         img = image[:,y:to_y, x:to_x, :]
 
@@ -1203,7 +1208,7 @@ class ImageCropByAlpha:
         b_image =AreaToMask_run(RGBA)
         # img=None
         # b_image=None
-        return ([img],[ori],[b_image],)
+        return ([img],[ori],[b_image],[x_1],[y_1],[width_1],[height_1],)
 
 
 
