@@ -561,6 +561,7 @@ class SwitchByIndex:
                 C=[C[index]]
             except Exception as e:
                 C=[]
+        
         return (C,)
 
 
@@ -615,3 +616,24 @@ class LimitNumber:
         
         return (nn,)
 
+
+
+class TESTNODE_:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { "ANY":(any_type,), },
+                }
+    
+    RETURN_TYPES = (any_type,)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/_test"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self,ANY):
+        print(ANY)
+        
+        return (ANY,)

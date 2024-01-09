@@ -1134,29 +1134,93 @@ class ImageCropByAlpha:
                              "RGBA": ("RGBA",),  },
                 }
     
-    RETURN_TYPES = ("IMAGE",)
-    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+    RETURN_TYPES = ("IMAGE","MASK","MASK",)
+    RETURN_NAMES = ("IMAGE","MASK","AREA_MASK",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/image"
 
-    INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,)
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,True,True,)
 
     def run(self,image,RGBA):
+        # print(image.shape,RGBA.shape)
+
+        image=image[0]
+        RGBA=RGBA[0]
+
+        bf_im = tensor2pil(image)
+
         # print(RGBA)
         im=tensor2pil(RGBA)
         im=naive_cutout(im,im)
         x, y, w, h=get_not_transparent_area(im)
-        print('#ForImageCrop:',w, h,x, y,)
+        # print('#ForImageCrop:',w, h,x, y,)
 
         x = min(x, image.shape[2] - 1)
         y = min(y, image.shape[1] - 1)
         to_x = w + x
         to_y = h + y
+
         img = image[:,y:to_y, x:to_x, :]
-        return (img,)
+
+
+
+        # 原图的mask
+        ori=RGBA[:,y:to_y, x:to_x, :]
+        ori=tensor2pil(ori)
+
+        # 创建一个新的图像对象，大小和模式与原始图像相同
+        new_image = Image.new("RGBA", ori.size)
+
+        # 获取原始图像的像素数据
+        pixel_data = ori.load()
+
+        # 获取新图像的像素数据
+        new_pixel_data = new_image.load()
+
+        # 遍历图像的每个像素
+        for y in range(ori.size[1]):
+            for x in range(ori.size[0]):
+                # 获取当前像素的RGBA值
+                r, g, b, a = pixel_data[x, y]
+
+                # 如果a通道不为0（不透明），将当前像素设置为白色
+                if a != 0:
+                    new_pixel_data[x, y] = (255, 255, 255, 255)
+                else:
+                    new_pixel_data[x, y] = (r, g, b, a)
+
+        # 保存修改后的图像
+        # new_image.save("output.png")
+                    
+        ori=new_image.convert('L')
+        # threshold = 128
+        # ori = ori.point(lambda x: 0 if x < threshold else 255, '1')
+        ori=pil2tensor(ori)
+
+
+
+        # 矩形区域，mask
+        # print(bf_im.size,(x, y, x + w, y + h))
+        b_image = Image.new("RGBA", bf_im.size,(0, 0, 0, 0))
+        # f_image = Image.new("RGBA", bf_im.size,(255, 255, 255, 255))
+
+        draw = ImageDraw.Draw(b_image)
+
+        # 定义区域坐标
+        x1, y1 = x, y  # 左上角坐标
+        x2, y2 =to_x, to_y  # 右下角坐标
+
+        # 绘制白色方块并填充白色
+        draw.rectangle([(x1, y1), (x2, y2)], fill="white")
+
+        b_image=b_image.convert('L')
+        b_image=pil2tensor(b_image)
+        # img=None
+        # b_image=None
+        return ([img],[ori],[b_image],)
 
 
 
@@ -1655,7 +1719,7 @@ class MergeLayers:
                 }
     
     RETURN_TYPES = ("IMAGE","MASK",)
-    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+    RETURN_NAMES = ("IMAGE","MASK",)
 
     FUNCTION = "run"
 
