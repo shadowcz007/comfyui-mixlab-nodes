@@ -1166,7 +1166,6 @@ class ImageCropByAlpha:
         img = image[:,y:to_y, x:to_x, :]
 
 
-
         # 原图的mask
         ori=RGBA[:,y:to_y, x:to_x, :]
         ori=tensor2pil(ori)
@@ -1200,24 +1199,8 @@ class ImageCropByAlpha:
         # ori = ori.point(lambda x: 0 if x < threshold else 255, '1')
         ori=pil2tensor(ori)
 
-
-
         # 矩形区域，mask
-        # print(bf_im.size,(x, y, x + w, y + h))
-        b_image = Image.new("RGBA", bf_im.size,(0, 0, 0, 0))
-        # f_image = Image.new("RGBA", bf_im.size,(255, 255, 255, 255))
-
-        draw = ImageDraw.Draw(b_image)
-
-        # 定义区域坐标
-        x1, y1 = x, y  # 左上角坐标
-        x2, y2 =to_x, to_y  # 右下角坐标
-
-        # 绘制白色方块并填充白色
-        draw.rectangle([(x1, y1), (x2, y2)], fill="white")
-
-        b_image=b_image.convert('L')
-        b_image=pil2tensor(b_image)
+        b_image =AreaToMask_run(RGBA)
         # img=None
         # b_image=None
         return ([img],[ori],[b_image],)
@@ -1418,6 +1401,24 @@ class Image3D:
 
 
 
+def AreaToMask_run(RGBA):
+    # print(RGBA)
+    im=tensor2pil(RGBA)
+    im=naive_cutout(im,im)
+    x, y, w, h=get_not_transparent_area(im)
+        
+    im=im.convert("RGBA")
+        # print('#AreaToMask:',im)
+    img=areaToMask(x,y,w,h,im)
+    img=img.convert("RGBA")
+    mask=pil2tensor(img)
+
+    channels = ["red", "green", "blue", "alpha"]
+    # print(mask,mask.shape)
+    mask = mask[:, :, :, channels.index("green")]
+
+    return mask
+
 
 class AreaToMask:
     @classmethod
@@ -1436,20 +1437,8 @@ class AreaToMask:
     OUTPUT_IS_LIST = (False,)
 
     def run(self,RGBA):
-        # print(RGBA)
-        im=tensor2pil(RGBA)
-        im=naive_cutout(im,im)
-        x, y, w, h=get_not_transparent_area(im)
-        
-        im=im.convert("RGBA")
-        # print('#AreaToMask:',im)
-        img=areaToMask(x,y,w,h,im)
-        img=img.convert("RGBA")
-        mask=pil2tensor(img)
 
-        channels = ["red", "green", "blue", "alpha"]
-        # print(mask,mask.shape)
-        mask = mask[:, :, :, channels.index("green")]
+        mask =AreaToMask_run(RGBA)
 
         return (mask,)
 
