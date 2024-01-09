@@ -52,7 +52,7 @@ class LaMaInpainting:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)

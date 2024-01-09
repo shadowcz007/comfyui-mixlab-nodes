@@ -772,7 +772,7 @@ class SmoothMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
 
     INPUT_IS_LIST = False
 
@@ -820,7 +820,7 @@ class FeatheredMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
 
     OUTPUT_IS_LIST = (False,)
   
@@ -887,7 +887,7 @@ class SplitLongMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
 
     OUTPUT_IS_LIST = (True,)
   
@@ -931,7 +931,7 @@ class TransparentImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     # INPUT_IS_LIST = True， 一个batch传进来
     OUTPUT_IS_LIST = (True,True,True,)
@@ -1003,7 +1003,7 @@ class EnhanceImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
 
@@ -1069,7 +1069,7 @@ class LoadImagesFromPath:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     # INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,False,)
@@ -1139,7 +1139,7 @@ class ImageCropByAlpha:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,True,)
@@ -1258,7 +1258,7 @@ class TextImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
@@ -1287,7 +1287,7 @@ class LoadImagesFromURL:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (True,True,)
@@ -1344,7 +1344,7 @@ class SvgImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,True,)
@@ -1378,7 +1378,7 @@ class Image3D:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,False,)
@@ -1430,7 +1430,7 @@ class AreaToMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -1465,7 +1465,7 @@ class FaceToMask:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -1510,7 +1510,7 @@ class EmptyLayer:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/layer"
+    CATEGORY = "♾️Mixlab/Layer"
 
     OUTPUT_IS_LIST = (True,)
 
@@ -1591,7 +1591,7 @@ class NewLayer:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/layer"
+    CATEGORY = "♾️Mixlab/Layer"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
@@ -1679,7 +1679,7 @@ class ShowLayer:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/layer"
+    CATEGORY = "♾️Mixlab/Layer"
 
     INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (True,)
@@ -1723,7 +1723,7 @@ class MergeLayers:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/layer"
+    CATEGORY = "♾️Mixlab/Layer"
 
     INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (False,)
@@ -1829,7 +1829,7 @@ class GradientImage:
     FUNCTION = "run"
 
     # 右键菜单目录
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     # 输入是否为列表
     INPUT_IS_LIST = False
@@ -1909,7 +1909,7 @@ class NoiseImage:
     FUNCTION = "run"
 
     # 右键菜单目录
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     # 输入是否为列表
     INPUT_IS_LIST = False
@@ -1984,7 +1984,7 @@ class ResizeImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/image"
+    CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)
@@ -2024,7 +2024,62 @@ class ResizeImage:
                 average_images.append(a_im)
         
         return (imgs,average_images,)
+
+
+class MirroredImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                "image": ("IMAGE",),
+                },
+                }
     
+    # 输出的数据类型
+    RETURN_TYPES = ("IMAGE",)
+
+    # 运行时方法名称
+    FUNCTION = "run"
+
+    # 右键菜单目录
+    CATEGORY = "♾️Mixlab/Image"
+
+    # 输入是否为列表
+    INPUT_IS_LIST = True
+
+    # 输出是否为列表
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self,image):
+        res=[]
+        for ims in image:
+            for im in ims:
+                img=tensor2pil(im)
+                mirrored_image = img.transpose(Image.FLIP_LEFT_RIGHT)
+                img=pil2tensor(mirrored_image)
+                res.append(img)
+        return (res,)
+
+
+
+class GetImageSize_:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("INT", "INT")
+    RETURN_NAMES = ("width", "height")
+
+    FUNCTION = "get_size"
+
+    CATEGORY = "♾️Mixlab/Image"
+
+    def get_size(self, image):
+        _, height, width, _ = image.shape
+        return (width, height)
 
 
 
@@ -2044,7 +2099,7 @@ class ImageColorTransfer:
     FUNCTION = "run"
 
     # 右键菜单目录
-    CATEGORY = "♾️Mixlab/_test"
+    CATEGORY = "♾️Mixlab/Image"
 
     # 输入是否为列表
     INPUT_IS_LIST = True

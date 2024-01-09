@@ -24,7 +24,7 @@ class SpeechRecognition:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/audio"
+    CATEGORY = "♾️Mixlab/Audio"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -48,7 +48,7 @@ class SpeechSynthesis:
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
 
-    CATEGORY = "♾️Mixlab/audio"
+    CATEGORY = "♾️Mixlab/Audio"
 
     def run(self, text):
         # print(session_history)
@@ -82,7 +82,7 @@ class GamePal:
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (False,)
 
-    CATEGORY = "♾️Mixlab/audio"
+    CATEGORY = "♾️Mixlab/Audio"
 
     def run(self, input_text,input_num,python_code):
         exec(python_code)

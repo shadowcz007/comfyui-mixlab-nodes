@@ -145,7 +145,7 @@ class VAELoader:
     RETURN_TYPES = ("VAE",)
     FUNCTION = "load_vae"
 
-    CATEGORY = "♾️Mixlab/_test"
+    CATEGORY = "♾️Mixlab/__TEST"
 
     #TODO: scale factor?
     def load_vae(self, vae_name):
@@ -165,7 +165,7 @@ class VAEDecode:
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "decode"
 
-    CATEGORY = "♾️Mixlab/_test"
+    CATEGORY = "♾️Mixlab/__TEST"
 
     def decode(self, vae, samples):
         image = vae.decode(samples["samples"].to("cuda:0"))

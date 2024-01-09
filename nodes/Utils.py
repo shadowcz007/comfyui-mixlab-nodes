@@ -103,7 +103,7 @@ class ColorInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,False,False,)
@@ -132,7 +132,7 @@ class FontInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -162,7 +162,7 @@ class TextToNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -220,7 +220,7 @@ class FloatSlider:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -273,7 +273,7 @@ class IntNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -304,7 +304,7 @@ class MultiplicationNode:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
@@ -326,7 +326,7 @@ class TextInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -400,7 +400,7 @@ class DynamicDelayProcessor:
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ('output',)
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
     def run(self,any_input,delay_seconds,delay_by_text,words_per_seconds,replace_output,replace_value):
         # print(f"Delay text:",delay_by_text )
         # 获取开始时间戳
@@ -492,27 +492,6 @@ class AppInfo:
 
     
 
-class GetImageSize_:
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "image": ("IMAGE",),
-            }
-        }
-
-    RETURN_TYPES = ("INT", "INT")
-    RETURN_NAMES = ("width", "height")
-
-    FUNCTION = "get_size"
-
-    CATEGORY = "♾️Mixlab/utils"
-
-    def get_size(self, image):
-        _, height, width, _ = image.shape
-        return (width, height)
-
-
 
 class SwitchByIndex:
     @classmethod
@@ -537,7 +516,7 @@ class SwitchByIndex:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
@@ -594,7 +573,7 @@ class LimitNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/utils"
+    CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -628,7 +607,7 @@ class TESTNODE_:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/_test"
+    CATEGORY = "♾️Mixlab/__TEST"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)

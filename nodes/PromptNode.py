@@ -114,7 +114,7 @@ class PromptImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/Prompt"
 
     # 运行的函数
     def run(self,prompts,images,save_to_image):
@@ -193,7 +193,7 @@ class PromptSimplification:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/Prompt"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
@@ -254,7 +254,7 @@ class PromptSlide:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/Prompt"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -306,7 +306,7 @@ class RandomPrompt:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/Prompt"
 
     OUTPUT_IS_LIST = (True,)
     OUTPUT_NODE = True

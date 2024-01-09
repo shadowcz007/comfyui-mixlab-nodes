@@ -531,13 +531,13 @@ PromptServer.add_routes=new_add_routes
 
 # 导入节点
 from .nodes.PromptNode import RandomPrompt,PromptSlide,PromptSimplification,PromptImage
-from .nodes.ImageNode import ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
+from .nodes.Utils import TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Lama import LaMaInpainting
 from .nodes.ClipInterrogator import ClipInterrogator
 
@@ -551,6 +551,7 @@ NODE_CLASS_MAPPINGS = {
     "PromptSimplification":PromptSimplification,
     "PromptImage":PromptImage,
     "ClipInterrogator":ClipInterrogator,
+    "MirroredImage":MirroredImage,
     "NoiseImage":NoiseImage,
     "GradientImage":GradientImage,
     "TransparentImage":TransparentImage,

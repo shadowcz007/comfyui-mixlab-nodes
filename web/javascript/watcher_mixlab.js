@@ -181,7 +181,7 @@ app.registerExtension({
                 window._mixlab_file_path_watcher = json.event_type
                 // widget.card.innerText = window._mixlab_file_path_watcher || ''
                 //运行
-                // document.querySelector('#queue-button').click()
+                document.querySelector('#queue-button').click()
               }
             })
           }, 1000)

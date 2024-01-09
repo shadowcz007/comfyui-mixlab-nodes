@@ -145,7 +145,7 @@ class ClipInterrogator:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/prompt"
+    CATEGORY = "♾️Mixlab/Prompt"
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)

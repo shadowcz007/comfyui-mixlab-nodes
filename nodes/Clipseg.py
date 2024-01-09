@@ -112,7 +112,7 @@ class CLIPSeg:
                     }
                 }
 
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
     RETURN_TYPES = ("MASK", "IMAGE", "IMAGE",)
     RETURN_NAMES = ("Mask","Heatmap Mask", "BW Mask")
 
@@ -218,7 +218,7 @@ class CombineMasks:
                     },
                 }
         
-    CATEGORY = "♾️Mixlab/mask"
+    CATEGORY = "♾️Mixlab/Mask"
     RETURN_TYPES = ("MASK", "IMAGE", "IMAGE",)
     RETURN_NAMES = ("Combined Mask","Heatmap Mask", "BW Mask")
 
