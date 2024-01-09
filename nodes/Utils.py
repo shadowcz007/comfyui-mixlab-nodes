@@ -467,12 +467,12 @@ class AppInfo:
     INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self,name,input_ids,output_ids,image,description,version,share_prefix,link,category,auto_save):
+    def run(self,name,input_ids,output_ids,LOGO,description,version,share_prefix,link,category,auto_save):
         name=name[0]
         
         im=None
-        if image:
-            im=image[0][0]
+        if LOGO:
+            im=LOGO[0][0]
             #TODO batch 的方式需要处理
             im=create_temp_file(im)
         # image [img,] img[batch,w,h,a] 列表里面是batch，
