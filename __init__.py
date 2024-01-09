@@ -503,6 +503,7 @@ async def nodes_map_hander(request):
 # 把插件自定义的路由添加到comfyui server里
 def new_add_routes(self):
         import nodes
+        self.user_manager.add_routes(self.routes)
         self.app.add_routes(routes)
         self.app.add_routes(self.routes)
         for name, dir in nodes.EXTENSION_WEB_DIRS.items():
@@ -536,7 +537,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
+from .nodes.Utils import TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,GetImageSize_,MultiplicationNode
 from .nodes.Lama import LaMaInpainting
 from .nodes.ClipInterrogator import ClipInterrogator
 
@@ -544,6 +545,7 @@ from .nodes.ClipInterrogator import ClipInterrogator
 # 注意：名称应全局唯一
 NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
+    "TESTNODE_":TESTNODE_,
     "RandomPrompt":RandomPrompt,
     "PromptSlide":PromptSlide,
     "PromptSimplification":PromptSimplification,
