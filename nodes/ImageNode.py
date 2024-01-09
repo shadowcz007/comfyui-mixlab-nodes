@@ -1095,7 +1095,7 @@ class LoadImagesFromPath:
             if watcher_folder!=None:
                 watcher_folder.stop()
 
-
+        #TODO 修bug： ps6477. tmp 
         images=get_images_filepath(file_path,white_bg=='enable')
 
         # 当开启了监听，则取最新的，第一个文件
