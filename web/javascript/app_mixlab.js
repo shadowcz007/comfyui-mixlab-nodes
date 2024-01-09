@@ -100,11 +100,13 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
           // min max step
           options = node.widgets.filter(w => w.type === 'slider')[0].options
           // 备选的keywords清单
-          let ks = getLocalData(`_mixlab_PromptSlide`)
-          let keywords = ks[id]
-          // console.log('keywords',keywords)
-          if (keywords && keywords[0]) {
+          try {
+            let keywords = node.widgets.filter(w => w.name === 'upload')[0]
+              .value
+            keywords = JSON.parse(keywords)
             options.keywords = keywords
+          } catch (error) {
+            console.log(error)
           }
         }
 
@@ -415,7 +417,7 @@ api.addEventListener('executed', async ({ detail }) => {
       if (auto_save?.value === 'enable') {
         // 自动保存
         console.log('auto_save')
-        if (window._mixlab_app_json) save(window._mixlab_app_json,false,false)
+        if (window._mixlab_app_json) save(window._mixlab_app_json, false, false)
       }
     }
   }
