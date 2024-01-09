@@ -2004,18 +2004,19 @@ class ResizeImage:
             a_im=pil2tensor(a_im)
             average_images.append(a_im)
         else:
-            for im in image:
-                im=tensor2pil(im)
-                im=resize_image(im,scale_option,w,h,fill_color)
-                im=im.convert('RGB')
+            for ims in image:
+                for im in ims:
+                    im=tensor2pil(im)
+                    im=resize_image(im,scale_option,w,h,fill_color)
+                    im=im.convert('RGB')
 
-                a_im=get_average_color_image(im)
+                    a_im=get_average_color_image(im)
 
-                im=pil2tensor(im)
-                imgs.append(im)
+                    im=pil2tensor(im)
+                    imgs.append(im)
 
-                a_im=pil2tensor(a_im)
-                average_images.append(a_im)
+                    a_im=pil2tensor(a_im)
+                    average_images.append(a_im)
         
         return (imgs,average_images,)
 
