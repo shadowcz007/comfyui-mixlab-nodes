@@ -503,7 +503,11 @@ async def nodes_map_hander(request):
 # 把插件自定义的路由添加到comfyui server里
 def new_add_routes(self):
         import nodes
-        self.user_manager.add_routes(self.routes)
+        try:
+            self.user_manager.add_routes(self.routes)
+        except:
+            print('pls update')
+        
         self.app.add_routes(routes)
         self.app.add_routes(self.routes)
         for name, dir in nodes.EXTENSION_WEB_DIRS.items():
