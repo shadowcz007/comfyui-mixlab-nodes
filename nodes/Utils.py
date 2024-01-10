@@ -1,10 +1,56 @@
-import os
+import os,platform
 import re,random
 from PIL import Image
 import numpy as np
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 import folder_paths
 import matplotlib.font_manager as fm
+
+
+def recursive_search(directory, excluded_dir_names=None):
+    if not os.path.isdir(directory):
+        return [], {}
+
+    if excluded_dir_names is None:
+        excluded_dir_names = []
+
+    result = []
+    dirs = {directory: os.path.getmtime(directory)}
+    for dirpath, subdirs, filenames in os.walk(directory, followlinks=True, topdown=True):
+        subdirs[:] = [d for d in subdirs if d not in excluded_dir_names]
+        for file_name in filenames:
+            relative_path = os.path.relpath(os.path.join(dirpath, file_name), directory)
+            result.append(relative_path)
+        for d in subdirs:
+            path = os.path.join(dirpath, d)
+            dirs[path] = os.path.getmtime(path)
+    return result, dirs
+
+def filter_files_extensions(files, extensions):
+    return sorted(list(filter(lambda a: os.path.splitext(a)[-1].lower() in extensions or len(extensions) == 0, files)))
+
+
+def get_system_font_path():
+    ps=[]
+    system = platform.system()
+    if system == "Windows":
+        ps.append(os.path.join(os.environ["WINDIR"], "Fonts"))
+    elif system == "Darwin":
+        ps.append(os.path.join("/Library", "Fonts"))
+    elif system == "Linux":
+        ps.append(os.path.join("/usr", "share", "fonts"))
+        ps.append(os.path.join("/usr", "local", "share", "fonts"))
+    ps=[p for p in ps if os.path.exists(p)]
+    file_paths=[]
+    for f in ps:
+        result, dirs=recursive_search(f)
+        for r in result:
+            file_paths.append(r)
+    file_paths=filter_files_extensions(file_paths,[".otf", ".ttf"])
+
+    return file_paths
+
+
 
 # import json
 # import hashlib
@@ -60,14 +106,14 @@ def get_font_files(directory):
 
     # 尝试获取系统字体
     try:
-        font_paths = fm.findSystemFonts()
-        for path in font_paths:
+        font_paths = get_system_font_path()
+        for file in font_paths:
             try:
-                font_prop = fm.FontProperties(fname=path)
-                font_name = font_prop.get_name()
-                font_files[font_name] = path
+                font_name = os.path.splitext(file)[0]
+                font_path = file
+                font_files[font_name] = os.path.abspath(font_path)
             except Exception as e:
-                print(f"Error processing font {path}: {e}")
+                print(f"Error processing font {file}: {e}")
     except Exception as e:
         print(f"Error finding system fonts: {e}")
 
