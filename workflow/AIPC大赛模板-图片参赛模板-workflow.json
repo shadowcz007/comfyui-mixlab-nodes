@@ -1,6 +1,6 @@
 {
-  "last_node_id": 128,
-  "last_link_id": 207,
+  "last_node_id": 129,
+  "last_link_id": 208,
   "nodes": [
     {
       "id": 8,
@@ -466,7 +466,7 @@
         "1": 262
       },
       "flags": {},
-      "order": 28,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
@@ -526,7 +526,7 @@
         "1": 262
       },
       "flags": {},
-      "order": 30,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
@@ -573,31 +573,6 @@
         "height",
         ""
       ]
-    },
-    {
-      "id": 101,
-      "type": "PreviewImage",
-      "pos": [
-        5328.397364750004,
-        -1726.0537115390628
-      ],
-      "size": {
-        "0": 210,
-        "1": 246
-      },
-      "flags": {},
-      "order": 27,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 161
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
     },
     {
       "id": 21,
@@ -670,7 +645,7 @@
         "1": 262
       },
       "flags": {},
-      "order": 32,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
@@ -1148,7 +1123,7 @@
         "1": 46
       },
       "flags": {},
-      "order": 34,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -1171,6 +1146,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -1189,7 +1170,7 @@
         "1": 46
       },
       "flags": {},
-      "order": 35,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -1212,6 +1193,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -1230,7 +1217,7 @@
         "1": 46
       },
       "flags": {},
-      "order": 36,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -1253,6 +1240,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -1304,7 +1297,7 @@
         "1": 532.8897705078125
       },
       "flags": {},
-      "order": 37,
+      "order": 36,
       "mode": 0,
       "inputs": [
         {
@@ -1329,7 +1322,7 @@
         "1": 553.1112670898438
       },
       "flags": {},
-      "order": 38,
+      "order": 37,
       "mode": 0,
       "inputs": [
         {
@@ -1354,7 +1347,7 @@
         "1": 150
       },
       "flags": {},
-      "order": 31,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -1464,7 +1457,7 @@
         "1": 499.6607971191406
       },
       "flags": {},
-      "order": 39,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
@@ -1489,7 +1482,7 @@
         "1": 150
       },
       "flags": {},
-      "order": 33,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -1554,7 +1547,7 @@
         "1": 150
       },
       "flags": {},
-      "order": 29,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
@@ -1705,54 +1698,8 @@
         101,
         0,
         "#000000",
+        false,
         false
-      ]
-    },
-    {
-      "id": 98,
-      "type": "AppInfo",
-      "pos": [
-        4922.397364750004,
-        -1807.0537115390628
-      ],
-      "size": {
-        "0": 362.42608642578125,
-        "1": 431.3537902832031
-      },
-      "flags": {},
-      "order": 16,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 162
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            161
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "AppInfo"
-      },
-      "widgets_values": [
-        "AIPC大赛模板",
-        "\n75\n118",
-        "57\n126\n127\n",
-        "投稿模板#发挥你的想象力",
-        4,
-        "#AIPC# 参赛作品",
-        "https://www.weibo.com",
-        "",
-        null
       ]
     },
     {
@@ -1762,10 +1709,10 @@
         4535,
         -1843
       ],
-      "size": [
-        210,
-        314
-      ],
+      "size": {
+        "0": 210,
+        "1": 314
+      },
       "flags": {},
       "order": 7,
       "mode": 0,
@@ -1774,7 +1721,7 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            162
+            208
           ],
           "shape": 3,
           "slot_index": 0
@@ -1834,6 +1781,43 @@
       "widgets_values": [
         "1703665898041.png",
         "image"
+      ]
+    },
+    {
+      "id": 129,
+      "type": "AppInfo",
+      "pos": [
+        4893,
+        -1778
+      ],
+      "size": {
+        "0": 400,
+        "1": 344.0000305175781
+      },
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "LOGO",
+          "type": "IMAGE",
+          "link": 208
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AppInfo"
+      },
+      "widgets_values": [
+        "AIPC大赛模板",
+        "\n75\n118",
+        "57\n126\n127\n",
+        "投稿模板#发挥你的想象力",
+        4,
+        "#AIPC# 参赛作品",
+        "https://www.weibo.com",
+        "",
+        "enable",
+        1
       ]
     }
   ],
@@ -2175,22 +2159,6 @@
       "IMAGE"
     ],
     [
-      161,
-      98,
-      0,
-      101,
-      0,
-      "IMAGE"
-    ],
-    [
-      162,
-      106,
-      0,
-      98,
-      0,
-      "IMAGE"
-    ],
-    [
       185,
       118,
       0,
@@ -2333,6 +2301,14 @@
       127,
       0,
       "IMAGE"
+    ],
+    [
+      208,
+      106,
+      0,
+      129,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [
@@ -2351,10 +2327,10 @@
     {
       "title": "Group",
       "bounding": [
-        4912,
+        4883,
         -2035,
-        637,
-        669
+        666,
+        611
       ],
       "color": "#444",
       "font_size": 24,

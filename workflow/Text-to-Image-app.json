@@ -1,6 +1,6 @@
 {
-  "last_node_id": 25,
-  "last_link_id": 32,
+  "last_node_id": 26,
+  "last_link_id": 34,
   "nodes": [
     {
       "id": 5,
@@ -42,48 +42,6 @@
       ]
     },
     {
-      "id": 6,
-      "type": "VAEDecode",
-      "pos": [
-        1867,
-        -2378
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {
-        "collapsed": false
-      },
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 7
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 8
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            9
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      }
-    },
-    {
       "id": 15,
       "type": "EnhanceImage",
       "pos": [
@@ -101,7 +59,7 @@
         {
           "name": "image",
           "type": "IMAGE",
-          "link": 25
+          "link": 34
         }
       ],
       "outputs": [
@@ -120,57 +78,6 @@
       },
       "widgets_values": [
         1.1
-      ]
-    },
-    {
-      "id": 21,
-      "type": "EmptyLatentImage",
-      "pos": [
-        998,
-        -2674
-      ],
-      "size": [
-        315,
-        106
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "width",
-          "type": "INT",
-          "link": 30,
-          "widget": {
-            "name": "width"
-          }
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "link": 32,
-          "widget": {
-            "name": "height"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [
-            26
-          ],
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "EmptyLatentImage"
-      },
-      "widgets_values": [
-        512,
-        512,
-        1
       ]
     },
     {
@@ -262,7 +169,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 58
+        "1": 130
       },
       "flags": {},
       "order": 0,
@@ -283,7 +190,10 @@
         "Node name for S&R": "IntNumber"
       },
       "widgets_values": [
-        512
+        1,
+        0,
+        1,
+        1
       ]
     },
     {
@@ -295,7 +205,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 58
+        "1": 130
       },
       "flags": {},
       "order": 1,
@@ -316,7 +226,10 @@
         "Node name for S&R": "IntNumber"
       },
       "widgets_values": [
-        512
+        1,
+        0,
+        1,
+        1
       ]
     },
     {
@@ -428,46 +341,13 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        730250870715434,
+        52336089190516,
         "randomize",
         15,
         6.9,
         "euler",
         "karras",
         0.59
-      ]
-    },
-    {
-      "id": 14,
-      "type": "FloatSlider",
-      "pos": [
-        1007,
-        -2819
-      ],
-      "size": {
-        "0": 315,
-        "1": 58
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "FLOAT",
-          "type": "FLOAT",
-          "links": [
-            16
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "title": "denoise",
-      "properties": {
-        "Node name for S&R": "FloatSlider"
-      },
-      "widgets_values": [
-        1
       ]
     },
     {
@@ -535,24 +415,31 @@
       ]
     },
     {
-      "id": 7,
-      "type": "AppInfo",
+      "id": 6,
+      "type": "VAEDecode",
       "pos": [
-        2134,
-        -2528
+        1867,
+        -2378
       ],
       "size": {
-        "0": 408.4201965332031,
-        "1": 406.9195861816406
+        "0": 210,
+        "1": 46
       },
-      "flags": {},
-      "order": 11,
+      "flags": {
+        "collapsed": false
+      },
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 9
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 8
         }
       ],
       "outputs": [
@@ -560,10 +447,35 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            25
+            33,
+            34
           ],
-          "shape": 3,
           "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 26,
+      "type": "AppInfo",
+      "pos": [
+        2134,
+        -2264
+      ],
+      "size": {
+        "0": 400,
+        "1": 344.00006103515625
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "LOGO",
+          "type": "IMAGE",
+          "link": 33
         }
       ],
       "properties": {
@@ -576,7 +488,97 @@
         "演示基本的文生图流程",
         1,
         "#comfyui-mixlab-nodes# ",
-        null
+        "https://",
+        "",
+        "enable",
+        1
+      ]
+    },
+    {
+      "id": 14,
+      "type": "FloatSlider",
+      "pos": [
+        1007,
+        -2860
+      ],
+      "size": {
+        "0": 315,
+        "1": 130
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            16
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "denoise",
+      "properties": {
+        "Node name for S&R": "FloatSlider"
+      },
+      "widgets_values": [
+        1,
+        0,
+        1,
+        0.001
+      ]
+    },
+    {
+      "id": 21,
+      "type": "EmptyLatentImage",
+      "pos": [
+        1004,
+        -2633
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "link": 30,
+          "widget": {
+            "name": "width"
+          }
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "link": 32,
+          "widget": {
+            "name": "height"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            26
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        512,
+        512,
+        1
       ]
     }
   ],
@@ -638,14 +640,6 @@
       "VAE"
     ],
     [
-      9,
-      6,
-      0,
-      7,
-      0,
-      "IMAGE"
-    ],
-    [
       16,
       14,
       0,
@@ -658,14 +652,6 @@
       15,
       0,
       16,
-      0,
-      "IMAGE"
-    ],
-    [
-      25,
-      7,
-      0,
-      15,
       0,
       "IMAGE"
     ],
@@ -708,6 +694,22 @@
       21,
       1,
       "INT"
+    ],
+    [
+      33,
+      6,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
+      34,
+      6,
+      0,
+      15,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [],

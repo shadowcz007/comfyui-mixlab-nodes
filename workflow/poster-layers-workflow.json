@@ -1,6 +1,6 @@
 {
-  "last_node_id": 133,
-  "last_link_id": 289,
+  "last_node_id": 134,
+  "last_link_id": 296,
   "nodes": [
     {
       "id": 42,
@@ -178,7 +178,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        487152733962296,
+        981322491518329,
         "randomize",
         13,
         8,
@@ -284,7 +284,7 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 91,
+          "link": 291,
           "widget": {
             "name": "width"
           }
@@ -292,7 +292,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 92,
+          "link": 292,
           "widget": {
             "name": "height"
           }
@@ -554,7 +554,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        1031291986804327,
+        836429510062488,
         "randomize",
         13,
         8,
@@ -824,7 +824,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        715240655341851,
+        24900528323969,
         "randomize",
         12,
         8,
@@ -874,67 +874,6 @@
       "properties": {
         "Node name for S&R": "VAEDecode"
       }
-    },
-    {
-      "id": 46,
-      "type": "NewLayer",
-      "pos": [
-        1012.7987748686522,
-        1330
-      ],
-      "size": {
-        "0": 315,
-        "1": 262
-      },
-      "flags": {},
-      "order": 32,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 78
-        },
-        {
-          "name": "mask",
-          "type": "MASK",
-          "link": 79
-        },
-        {
-          "name": "layers",
-          "type": "LAYER",
-          "link": 227,
-          "slot_index": 2
-        },
-        {
-          "name": "canvas",
-          "type": "IMAGE",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "name": "layers",
-          "type": "LAYER",
-          "links": [
-            228
-          ],
-          "shape": 6,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "NewLayer"
-      },
-      "widgets_values": [
-        179,
-        134,
-        156,
-        146,
-        4,
-        "width",
-        ""
-      ]
     },
     {
       "id": 65,
@@ -1222,42 +1161,6 @@
       ]
     },
     {
-      "id": 28,
-      "type": "Reroute",
-      "pos": [
-        616,
-        1515
-      ],
-      "size": [
-        75,
-        26
-      ],
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "",
-          "type": "*",
-          "link": 48
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "IMAGE",
-          "links": [
-            90
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "showOutputText": false,
-        "horizontal": false
-      }
-    },
-    {
       "id": 96,
       "type": "Reroute",
       "pos": [
@@ -1295,55 +1198,6 @@
       }
     },
     {
-      "id": 49,
-      "type": "GetImageSize",
-      "pos": [
-        999,
-        1189
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {},
-      "order": 24,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 90
-        }
-      ],
-      "outputs": [
-        {
-          "name": "width",
-          "type": "INT",
-          "links": [
-            91,
-            238,
-            248
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "height",
-          "type": "INT",
-          "links": [
-            92,
-            239,
-            249
-          ],
-          "shape": 3,
-          "slot_index": 1
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "GetImageSize"
-      }
-    },
-    {
       "id": 118,
       "type": "NewLayer",
       "pos": [
@@ -1376,7 +1230,7 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 248,
+          "link": 295,
           "widget": {
             "name": "width"
           }
@@ -1384,7 +1238,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 249,
+          "link": 296,
           "widget": {
             "name": "height"
           }
@@ -1572,7 +1426,7 @@
         {
           "name": "width",
           "type": "INT",
-          "link": 238,
+          "link": 293,
           "widget": {
             "name": "width"
           }
@@ -1580,7 +1434,7 @@
         {
           "name": "height",
           "type": "INT",
-          "link": 239,
+          "link": 294,
           "widget": {
             "name": "height"
           }
@@ -1955,7 +1809,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        397643785545040,
+        371831550273153,
         "randomize",
         13,
         8,
@@ -2164,7 +2018,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        590319162197911,
+        996820396025175,
         "randomize",
         13,
         8,
@@ -2310,7 +2164,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        457217754867837,
+        763274893004397,
         "randomize",
         13,
         8,
@@ -2780,7 +2634,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 234
+        "1": 240
       },
       "flags": {},
       "order": 3,
@@ -2814,7 +2668,8 @@
         100,
         13,
         null,
-        true
+        true,
+        false
       ]
     },
     {
@@ -2986,10 +2841,10 @@
         100,
         706
       ],
-      "size": [
-        315,
-        234
-      ],
+      "size": {
+        "0": 315,
+        "1": 234
+      },
       "flags": {},
       "order": 15,
       "mode": 0,
@@ -3034,7 +2889,8 @@
         100,
         13,
         null,
-        true
+        true,
+        false
       ]
     },
     {
@@ -3044,10 +2900,10 @@
         100,
         1330
       ],
-      "size": [
-        315,
-        234
-      ],
+      "size": {
+        "0": 315,
+        "1": 234
+      },
       "flags": {},
       "order": 16,
       "mode": 0,
@@ -3091,7 +2947,8 @@
         100,
         13,
         null,
-        true
+        true,
+        false
       ]
     },
     {
@@ -3101,10 +2958,10 @@
         100,
         1922
       ],
-      "size": [
-        315,
-        234
-      ],
+      "size": {
+        "0": 315,
+        "1": 234
+      },
       "flags": {},
       "order": 17,
       "mode": 0,
@@ -3147,7 +3004,8 @@
         100,
         13,
         null,
-        true
+        true,
+        false
       ]
     },
     {
@@ -3159,7 +3017,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 70
+        "1": 174
       },
       "flags": {},
       "order": 6,
@@ -3175,13 +3033,37 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "r",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "g",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "b",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "a",
+          "type": "FLOAT",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
         "Node name for S&R": "Color"
       },
       "widgets_values": [
-        null,
+        "#000000",
         null
       ]
     },
@@ -3221,6 +3103,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -3263,6 +3151,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -3306,6 +3200,12 @@
           ],
           "shape": 3,
           "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
@@ -3334,6 +3234,152 @@
       ],
       "color": "#432",
       "bgcolor": "#653"
+    },
+    {
+      "id": 134,
+      "type": "GetImageSize_",
+      "pos": [
+        734,
+        1628
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 290
+        }
+      ],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            291,
+            293,
+            295
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            292,
+            294,
+            296
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "GetImageSize_"
+      }
+    },
+    {
+      "id": 28,
+      "type": "Reroute",
+      "pos": [
+        597,
+        1627
+      ],
+      "size": [
+        75,
+        26
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "",
+          "type": "*",
+          "link": 48
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "IMAGE",
+          "links": [
+            290
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "showOutputText": false,
+        "horizontal": false
+      }
+    },
+    {
+      "id": 46,
+      "type": "NewLayer",
+      "pos": [
+        1056,
+        1247
+      ],
+      "size": {
+        "0": 315,
+        "1": 262
+      },
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 78
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "link": 79
+        },
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "link": 227,
+          "slot_index": 2
+        },
+        {
+          "name": "canvas",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "layers",
+          "type": "LAYER",
+          "links": [
+            228
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewLayer"
+      },
+      "widgets_values": [
+        179,
+        134,
+        156,
+        146,
+        4,
+        "width",
+        ""
+      ]
     }
   ],
   "links": [
@@ -3432,30 +3478,6 @@
       48,
       1,
       "MASK"
-    ],
-    [
-      90,
-      28,
-      0,
-      49,
-      0,
-      "IMAGE"
-    ],
-    [
-      91,
-      49,
-      0,
-      50,
-      0,
-      "INT"
-    ],
-    [
-      92,
-      49,
-      1,
-      50,
-      1,
-      "INT"
     ],
     [
       111,
@@ -4002,44 +4024,12 @@
       "IMAGE"
     ],
     [
-      238,
-      49,
-      0,
-      116,
-      3,
-      "INT"
-    ],
-    [
-      239,
-      49,
-      1,
-      116,
-      4,
-      "INT"
-    ],
-    [
       247,
       116,
       0,
       118,
       2,
       "LAYER"
-    ],
-    [
-      248,
-      49,
-      0,
-      118,
-      3,
-      "INT"
-    ],
-    [
-      249,
-      49,
-      1,
-      118,
-      4,
-      "INT"
     ],
     [
       251,
@@ -4312,6 +4302,62 @@
       119,
       0,
       "IMAGE"
+    ],
+    [
+      290,
+      28,
+      0,
+      134,
+      0,
+      "IMAGE"
+    ],
+    [
+      291,
+      134,
+      0,
+      50,
+      0,
+      "INT"
+    ],
+    [
+      292,
+      134,
+      1,
+      50,
+      1,
+      "INT"
+    ],
+    [
+      293,
+      134,
+      0,
+      116,
+      3,
+      "INT"
+    ],
+    [
+      294,
+      134,
+      1,
+      116,
+      4,
+      "INT"
+    ],
+    [
+      295,
+      134,
+      0,
+      118,
+      3,
+      "INT"
+    ],
+    [
+      296,
+      134,
+      1,
+      118,
+      4,
+      "INT"
     ]
   ],
   "groups": [],
