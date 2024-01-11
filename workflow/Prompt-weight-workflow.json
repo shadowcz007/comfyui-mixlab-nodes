@@ -1,6 +1,6 @@
 {
-  "last_node_id": 22,
-  "last_link_id": 23,
+  "last_node_id": 23,
+  "last_link_id": 25,
   "nodes": [
     {
       "id": 9,
@@ -168,48 +168,6 @@
       ]
     },
     {
-      "id": 10,
-      "type": "VAEDecode",
-      "pos": [
-        2870,
-        630
-      ],
-      "size": {
-        "0": 210,
-        "1": 46
-      },
-      "flags": {
-        "collapsed": false
-      },
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "samples",
-          "type": "LATENT",
-          "link": 8
-        },
-        {
-          "name": "vae",
-          "type": "VAE",
-          "link": 9
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            12
-          ],
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "VAEDecode"
-      }
-    },
-    {
       "id": 16,
       "type": "ShowTextForGPT",
       "pos": [
@@ -247,31 +205,6 @@
       "widgets_values": [
         "a girl face,super,(Pop Art:1.26),(Black and White:1.26)"
       ]
-    },
-    {
-      "id": 11,
-      "type": "PreviewImage",
-      "pos": [
-        3319,
-        -161
-      ],
-      "size": {
-        "0": 435.8727111816406,
-        "1": 511.8609619140625
-      },
-      "flags": {},
-      "order": 13,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 13
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
     },
     {
       "id": 5,
@@ -349,7 +282,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 58
+        "1": 130
       },
       "flags": {},
       "order": 2,
@@ -370,7 +303,10 @@
         "Node name for S&R": "IntNumber"
       },
       "widgets_values": [
-        -1
+        0,
+        0,
+        1,
+        1
       ]
     },
     {
@@ -382,7 +318,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 82
+        "1": 106
       },
       "flags": {},
       "order": 3,
@@ -403,51 +339,7 @@
       },
       "widgets_values": [
         "Pop Art",
-        1.26
-      ]
-    },
-    {
-      "id": 12,
-      "type": "AppInfo",
-      "pos": [
-        2924,
-        846
-      ],
-      "size": {
-        "0": 400,
-        "1": 272
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 12
-        }
-      ],
-      "outputs": [
-        {
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            13
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "AppInfo"
-      },
-      "widgets_values": [
-        "Prompt-weight-test",
-        "21\n22\n18",
-        "11\n16",
-        "",
-        1,
-        "",
+        1.26,
         null
       ]
     },
@@ -460,7 +352,7 @@
       ],
       "size": {
         "0": 315,
-        "1": 82
+        "1": 106
       },
       "flags": {},
       "order": 4,
@@ -481,7 +373,8 @@
       },
       "widgets_values": [
         "Black and White",
-        1.26
+        1.26,
+        null
       ]
     },
     {
@@ -584,6 +477,111 @@
         "disable",
         ""
       ]
+    },
+    {
+      "id": 11,
+      "type": "PreviewImage",
+      "pos": [
+        3449,
+        -102
+      ],
+      "size": {
+        "0": 435.8727111816406,
+        "1": 511.8609619140625
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 24
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 10,
+      "type": "VAEDecode",
+      "pos": [
+        2870,
+        630
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {
+        "collapsed": false
+      },
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 8
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            24,
+            25
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 23,
+      "type": "AppInfo",
+      "pos": [
+        3363.0014990624995,
+        551.2261418945309
+      ],
+      "size": {
+        "0": 400,
+        "1": 344
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "LOGO",
+          "type": "IMAGE",
+          "link": 25
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AppInfo"
+      },
+      "widgets_values": [
+        "Prompt-weight-test",
+        "21\n22\n18",
+        "11\n16",
+        "",
+        1,
+        "",
+        "https://",
+        "",
+        "enable",
+        1
+      ]
     }
   ],
   "links": [
@@ -652,22 +650,6 @@
       "VAE"
     ],
     [
-      12,
-      10,
-      0,
-      12,
-      0,
-      "IMAGE"
-    ],
-    [
-      13,
-      12,
-      0,
-      11,
-      0,
-      "IMAGE"
-    ],
-    [
       16,
       15,
       0,
@@ -714,6 +696,22 @@
       13,
       1,
       "STRING"
+    ],
+    [
+      24,
+      10,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      25,
+      10,
+      0,
+      23,
+      0,
+      "IMAGE"
     ]
   ],
   "groups": [],
