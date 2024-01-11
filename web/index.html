@@ -303,10 +303,9 @@
         }
 
 
-
-        select,
-        button,
-        input {
+        .card select,
+        .card button,
+        .card input {
             height: 32px;
             cursor: pointer;
             background: #000000bf;
@@ -377,9 +376,6 @@
             </svg> Code
 
         </a>
-
-
-
     </div>
 
     <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
@@ -483,6 +479,19 @@
             const { TABS, TOOLS } = FilerobotImageEditor;
             const config = {
                 source: img.src,
+                // loadableDesignState:{ //默认值
+                //     annotations:{
+                //         watermark:{
+                //             image:'https://127.0.0.1:8189/view?filename=1703554480406.png&type=input&subfolder=&rand=0.044164708320141965',
+                //             width:100,
+                //             height:200,
+                //             x:10,
+                //             y:50,
+                //             name: "Image",
+                //             id:'watermark'
+                //         }
+                //     }
+                // },
                 // annotationsCommon: {
                 //     fill: '#ff0000',
                 // },
@@ -530,9 +539,9 @@
                         },
                     ],
                 },
-                tabsIds: [TABS.ADJUST], // or ['Adjust', 'Annotate', 'Watermark']
-                defaultTabId: TABS.ADJUST, // or 'Annotate'
-                // defaultToolId: TOOLS.TEXT, // or 'Text'
+                tabsIds: [...Object.values(TABS)], // or ['Adjust', 'Annotate', 'Watermark']
+                defaultTabId: TABS.WATERMARK, // or 'Annotate'
+                 defaultToolId: TOOLS.WATERMARK, // or 'Text'
                 closeAfterSave: true
             };
 
@@ -549,7 +558,7 @@
 
             filerobotImageEditor.render({
                 onSave: (editedImageObject, designState) => {
-                    console.log('saved', editedImageObject, designState)
+                    console.log('saved',  designState)
                     //adjustments
                     update()
                 },
