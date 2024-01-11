@@ -190,6 +190,7 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
 }
 
 async function save (json, download = false, showInfo = true) {
+  console.log('####SAVE', json[0])
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
@@ -396,6 +397,8 @@ app.registerExtension({
     }
   },
   async loadedGraphNode (node, app) {
+    console.log('#loadedGraphNode1111')
+    window._mixlab_app_json = null //切换workflow需要清空
     if (node.type === 'AppInfo') {
       let auto_save = node.widgets.filter(w => w.name == 'auto_save')[0]
       if (auto_save) {
