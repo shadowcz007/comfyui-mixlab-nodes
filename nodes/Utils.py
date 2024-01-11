@@ -1,5 +1,5 @@
 import os,platform
-import re,random
+import re,random,json
 from PIL import Image
 import numpy as np
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
@@ -643,6 +643,37 @@ class LimitNumber:
 
 
 
+class ListStatistics:
+    @staticmethod
+    def count_types(lst):
+        type_count = {}
+
+        for item in lst:
+            item_type = type(item).__name__
+            if item_type not in type_count:
+                type_count[item_type] = []
+
+            if item_type in ['dict', 'str', 'int', 'float']:
+                type_count[item_type].append(item)
+
+        return type_count
+
+# # 示例列表
+# my_list = [1, 'hello', {'name': 'John'}, 3.14, {'age': 25}, 'world', 10]
+
+# # 创建ListStatistics对象
+# list_stats = ListStatistics()
+
+# # 调用count_types方法进行统计
+# result = list_stats.count_types(my_list)
+
+# # 输出结果
+# for item_type, values in result.items():
+#     print(item_type + ':')
+#     for value in values:
+#         print(value)
+#     print('---')
+
 class TESTNODE_:
     @classmethod
     def INPUT_TYPES(s):
@@ -655,10 +686,16 @@ class TESTNODE_:
 
     CATEGORY = "♾️Mixlab/__TEST"
 
+    OUTPUT_NODE = True
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
     def run(self,ANY):
         print(ANY)
-        
-        return (ANY,)
+        # data=ANY
+        list_stats = ListStatistics()
+
+        # 调用count_types方法进行统计
+        result = list_stats.count_types(ANY)
+            
+        return {"ui": {"data": result,"type":[str(type(ANY[0]))]}, "result": (ANY,)}

@@ -342,3 +342,23 @@ app.registerExtension({
     }
   }
 })
+
+
+app.registerExtension({
+  name: 'Mixlab.utils.TESTNODE_',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    
+    if (nodeType.comfyClass == 'TESTNODE_') {
+    
+      const onExecuted = nodeType.prototype.onExecuted;
+			nodeType.prototype.onExecuted = function (message) {
+				onExecuted?.apply(this, arguments);
+        console.log('##',message)
+				 
+			};
+
+
+    }
+   
+  }, 
+})
