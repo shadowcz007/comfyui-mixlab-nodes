@@ -31,7 +31,7 @@ APP-JSON:
 
 > 暂时支持8种节点作为界面上的输入节点：Load Image、CLIPTextEncode、PromptSlide、TextInput_、Color、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
 
-> 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine
+> 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine、PromptImage
 
 > seed统一输入控件，支持：SamplerCustom、KSampler
 

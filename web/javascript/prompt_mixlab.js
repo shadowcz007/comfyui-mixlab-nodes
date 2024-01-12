@@ -3,6 +3,87 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
+import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
+function loadCSS (url) {
+  var link = document.createElement('link')
+  link.rel = 'stylesheet'
+  link.type = 'text/css'
+  link.href = url
+  document.getElementsByTagName('head')[0].appendChild(link)
+
+  // Create a style element
+  const style = document.createElement('style')
+  // Define the CSS rule for scrollbar width
+  const cssRule = `.pswp__custom-caption {
+    background: rgb(20 27 70);
+    font-size: 16px;
+    color: #fff;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    position: absolute;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+  }
+  .pswp__custom-caption a {
+    color: #fff;
+    text-decoration: underline;
+  }
+  .hidden-caption-content {
+    display: none;
+  }`
+  // Add the CSS rule to the style element
+  style.appendChild(document.createTextNode(cssRule))
+
+  // Append the style element to the document head
+  document.head.appendChild(style)
+}
+loadCSS('/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css')
+
+function initLightBox () {
+  const lightbox = new PhotoSwipeLightbox({
+    gallery: '.prompt_image_output',
+    children: 'a',
+    pswpModule: () =>
+      import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
+  })
+
+  lightbox.on('uiRegister', function () {
+    lightbox.pswp.ui.registerElement({
+      name: 'custom-caption',
+      order: 9,
+      isButton: false,
+      appendTo: 'root',
+      html: 'Caption text',
+      onInit: (el, pswp) => {
+        lightbox.pswp.on('change', () => {
+          const currSlideElement = lightbox.pswp.currSlide.data.element
+          let captionHTML = ''
+          if (currSlideElement) {
+            const hiddenCaption = currSlideElement.querySelector(
+              '.hidden-caption-content'
+            )
+            if (hiddenCaption) {
+              // get caption from element with class hidden-caption-content
+              captionHTML = hiddenCaption.innerHTML
+            } else {
+              // get caption from alt attribute
+              captionHTML = currSlideElement
+                .querySelector('img')
+                .getAttribute('alt')
+            }
+          }
+          el.innerHTML = captionHTML || ''
+        })
+      }
+    })
+  })
+
+  lightbox.init()
+}
+
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
 
@@ -381,11 +462,19 @@ const _createResult = async (node, widget, message) => {
       let h = (image.naturalHeight * width) / image.naturalWidth
       if (index % 2 === 0) height_add += h
       div.style = `width: ${width}px;height:${h}px;position: relative;margin: 4px;`
-      div.innerHTML = `<img src="${url}" style='width: 100%'/>
-            <p style="position: absolute;
+
+      div.innerHTML = `<a href="${url}" 
+      data-pswp-width="${image.naturalWidth}" 
+      data-pswp-height="${image.naturalHeight}" 
+      target="_blank">
+      <img src="${url}" style='width: 100%' alt="${message.prompts[index]}"/>
+    </a>
+    <p style="position: absolute;
             bottom: 0;
-            left: 0; 
-            background:#444444c2;
+            left: 0;
+            opacity: 0.6;
+            background-color: var(--comfy-input-bg); 
+            color: var(--descrip-text);
             margin: 0;
             font-size: 12px;
             padding: 5px;
@@ -422,10 +511,13 @@ app.registerExtension({
         }
 
         widget.div = $el('div', {})
+        widget.div.className = 'prompt_image_output'
 
         document.body.appendChild(widget.div)
 
         this.addCustomWidget(widget)
+
+        initLightBox()
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
@@ -472,6 +564,9 @@ app.registerExtension({
       // await sleep(0)
       let widget = node.widgets.filter(w => w.name === 'result')[0]
       console.log('widget.value', widget.value)
+
+      initLightBox()
+
       let cards = widget.div.querySelectorAll('.card')
       if (cards.length == 0) node.size = [280, 120]
 

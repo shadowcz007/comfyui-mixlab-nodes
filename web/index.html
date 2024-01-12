@@ -343,6 +343,31 @@
             width: 100%;
             display: none;
         }
+
+
+        /* 图片的字幕 */
+        .pswp__custom-caption {
+            background: rgb(20 27 70);
+            font-size: 16px;
+            color: #fff;
+            width: calc(100% - 32px);
+            max-width: 400px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            position: absolute;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+        }
+
+        .pswp__custom-caption a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .hidden-caption-content {
+            display: none;
+        }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
@@ -541,7 +566,7 @@
                 },
                 tabsIds: [...Object.values(TABS)], // or ['Adjust', 'Annotate', 'Watermark']
                 defaultTabId: TABS.WATERMARK, // or 'Annotate'
-                 defaultToolId: TOOLS.WATERMARK, // or 'Text'
+                defaultToolId: TOOLS.WATERMARK, // or 'Text'
                 closeAfterSave: true
             };
 
@@ -558,7 +583,7 @@
 
             filerobotImageEditor.render({
                 onSave: (editedImageObject, designState) => {
-                    console.log('saved',  designState)
+                    console.log('saved', designState)
                     //adjustments
                     update()
                 },
@@ -1801,6 +1826,7 @@
                                     p.className = 'prompt_image'
                                     p.innerText = prompt;
                                     a.appendChild(p)
+                                    img.alt=prompt
                                 }
 
                                 // imgDiv.parentElement.appendChild(a);
@@ -2108,6 +2134,36 @@
                 children: 'a',
                 pswpModule: () => import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
             });
+            lightbox.on('uiRegister', function () {
+                lightbox.pswp.ui.registerElement({
+                    name: 'custom-caption',
+                    order: 9,
+                    isButton: false,
+                    appendTo: 'root',
+                    html: 'Caption text',
+                    onInit: (el, pswp) => {
+                        lightbox.pswp.on('change', () => {
+                            const currSlideElement = lightbox.pswp.currSlide.data.element
+                            let captionHTML = ''
+                            if (currSlideElement) {
+                                const hiddenCaption = currSlideElement.querySelector(
+                                    '.hidden-caption-content'
+                                )
+                                if (hiddenCaption) {
+                                    // get caption from element with class hidden-caption-content
+                                    captionHTML = hiddenCaption.innerHTML
+                                } else {
+                                    // get caption from alt attribute
+                                    captionHTML = currSlideElement
+                                        .querySelector('img')
+                                        .getAttribute('alt')
+                                }
+                            }
+                            el.innerHTML = captionHTML || ''
+                        })
+                    }
+                })
+            })
             lightbox.init();
             // window._lightbox = lightbox
 
@@ -2182,7 +2238,6 @@
             createAppList(window._apps);
 
             createApp(window._appData);
-
 
         };
 

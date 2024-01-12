@@ -4767,6 +4767,7 @@
             "FloatSlider",
             "ResizeImage",
             "NoiseImage",
+            "PromptImage",
             "AreaToMask",
             "CLIPSeg_",
             "CharacterInText",
