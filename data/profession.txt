@@ -1,0 +1,101 @@
+Doctor
+Teacher
+Engineer
+Lawyer
+Accountant
+Nurse
+Architect
+Chef
+Pilot
+Scientist
+Artist
+Writer
+Musician
+Actor
+Photographer
+Police officer
+Firefighter
+Dentist
+Pharmacist
+Veterinarian
+Electrician
+Plumber
+Carpenter
+Mechanic
+Farmer
+Astronaut
+Athlete
+Journalist
+Politician
+Economist
+Psychologist
+Social worker
+Librarian
+Translator
+Salesperson
+Entrepreneur
+Financial advisor
+Graphic designer
+Web developer
+Marketing manager
+Human resources manager
+Project manager
+Event planner
+Fashion designer
+Interior decorator
+Real estate agent
+Archaeologist
+Biologist
+Chemist
+Geologist
+Physicist
+Mathematician
+Historian
+Geographer
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Geographer
+Historian
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Geographer
+Historian
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Geographer
+Historian
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Geographer
+Historian
+Economist
+Sociologist
+Anthropologist
+Archaeologist
+Linguist
+Philosopher
+Geographer
+Historian
+                     #MixCopilot
