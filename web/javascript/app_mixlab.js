@@ -373,6 +373,8 @@ app.registerExtension({
         }
 
         this.serialize_widgets = true //需要保存参数
+
+        window._mixlab_app_json = null
       }
 
       const onExecuted = nodeType.prototype.onExecuted
@@ -410,8 +412,14 @@ app.registerExtension({
   }
 })
 
+api.addEventListener('execution_start', async ({ detail }) => {
+  console.log('#execution_start', detail)
+  window._mixlab_app_json = null
+})
+
 api.addEventListener('executed', async ({ detail }) => {
   console.log('#executed', detail)
+  // window._mixlab_app_json=null;
   const { output } = getInputsAndOutputs()
   if (output.includes(parseInt(detail.node))) {
     let appinfo = app.graph.findNodesByType('AppInfo')[0]
