@@ -1,11 +1,45 @@
-import os
+import os,sys
 import folder_paths
-from simple_lama_inpainting import SimpleLama
-from PIL import Image
 
+from PIL import Image
+import importlib.util
 import numpy as np
 
 import torch
+
+global _available
+_available=False
+
+def is_installed(package):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        return False
+    return spec is not None
+
+if is_installed('simple_lama_inpainting')==False:
+    import subprocess
+    from packaging import version
+    
+    if version.parse(torch.__version__)>=version.parse('2.1'):
+        # 安装
+        print('#pip install simple_lama_inpainting')
+
+        result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'simple_lama_inpainting'], capture_output=True, text=True)
+
+        #检查命令执行结果
+        if result.returncode == 0:
+            print("#install success")
+            from simple_lama_inpainting import SimpleLama
+            _available=True
+        else:
+            print("#install error")
+    else:
+        print('#pls check your torch version >= 2.1')
+
+else:
+    from simple_lama_inpainting import SimpleLama
+    _available=True
 
 
  
@@ -38,6 +72,8 @@ def pil2tensor(image):
 
 
 class LaMaInpainting:
+    global _available
+    available=_available
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {

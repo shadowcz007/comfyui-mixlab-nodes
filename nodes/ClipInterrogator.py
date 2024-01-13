@@ -1,16 +1,55 @@
-import os
+import os,sys
 import folder_paths
 
 from PIL import Image
+import importlib.util
+
 import comfy.utils
 import numpy as np
 import json
 import torch
 import random
 
-from transformers import AutoProcessor, BlipForConditionalGeneration
 
-from clip_interrogator import Config, Interrogator
+# from clip_interrogator import Config, Interrogator
+
+
+global _available
+_available=False
+
+def is_installed(package):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        return False
+    return spec is not None
+
+try:
+    if is_installed('clip_interrogator')==False:
+        import subprocess
+
+        # 安装
+        print('#pip install clip-interrogator==0.6.0')
+
+        result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'clip-interrogator==0.6.0'], capture_output=True, text=True)
+
+        #检查命令执行结果
+        if result.returncode == 0:
+            print("#install success")
+            from transformers import AutoProcessor, BlipForConditionalGeneration
+            from clip_interrogator import Config, Interrogator
+            _available=True
+        else:
+            print("#install error")
+        
+    else:
+        from transformers import AutoProcessor, BlipForConditionalGeneration
+        from clip_interrogator import Config, Interrogator
+        _available=True
+
+except:
+    _available=False
+
 
 def load_caption_model(model_path,config,t='blip-base'):
     dtype=torch.float16 if config.device == 'cuda' else torch.float32
@@ -126,6 +165,10 @@ def image_to_prompt(ci,image, mode):
 
 
 class ClipInterrogator:
+
+    global _available
+    available=_available
+    
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {

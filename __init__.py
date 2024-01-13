@@ -542,8 +542,8 @@ from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
-from .nodes.Lama import LaMaInpainting
-from .nodes.ClipInterrogator import ClipInterrogator
+
+
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -554,7 +554,6 @@ NODE_CLASS_MAPPINGS = {
     "PromptSlide":PromptSlide,
     "PromptSimplification":PromptSimplification,
     "PromptImage":PromptImage,
-    "ClipInterrogator":ClipInterrogator,
     "MirroredImage":MirroredImage,
     "NoiseImage":NoiseImage,
     "GradientImage":GradientImage,
@@ -598,7 +597,7 @@ NODE_CLASS_MAPPINGS = {
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
-    "LaMaInpainting":LaMaInpainting
+    # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
 
@@ -620,14 +619,32 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "3DImage":"3DImage ♾️Mixlab",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
-    "PromptSlide":"PromptSlide ♾️Mixlab"
+    "PromptSlide":"PromptSlide ♾️Mixlab",
 
-    # "GamePal":"GamePal ♾️Mixlab"
+    "GamePal":"GamePal ♾️Mixlab"
 }
 
 # web ui的节点功能
 WEB_DIRECTORY = "./web"
 
 print('--------------')
-print('\033[91m ### Mixlab Nodes: \033[93mLoaded\033[0m')
-print('--------------')
+print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
+
+try:
+    from .nodes.Lama import LaMaInpainting
+    print('LaMaInpainting.available',LaMaInpainting.available)
+    if LaMaInpainting.available:
+        NODE_CLASS_MAPPINGS['LaMaInpainting']=LaMaInpainting
+except:
+    print('LaMaInpainting.available',False)
+
+try:
+    from .nodes.ClipInterrogator import ClipInterrogator
+    print('ClipInterrogator.available',ClipInterrogator.available)
+    if ClipInterrogator.available:
+        NODE_CLASS_MAPPINGS['ClipInterrogator']=ClipInterrogator
+except:
+    print('ClipInterrogator.available',False)
+ 
+
+print('\033[93m -------------- \033[0m')

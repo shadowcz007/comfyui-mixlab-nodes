@@ -106,8 +106,8 @@ class CLIPSeg:
                      },
                 "optional":
                     {
-                        "blur": ("FLOAT", {"min": 0, "max": 15, "step": 0.1, "default": 7}),
-                        "threshold": ("FLOAT", {"min": 0, "max": 1, "step": 0.05, "default": 0.4}),
+                        "blur": ("FLOAT", {"min": 0, "max": 15, "step": 0.1, "default": 3}),
+                        "threshold": ("FLOAT", {"min": 0, "max": 1, "step": 0.05, "default": 0.3}),
                         "dilation_factor": ("INT", {"min": 0, "max": 10, "step": 1, "default": 4}),
                     }
                 }
