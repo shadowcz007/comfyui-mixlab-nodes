@@ -67,7 +67,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 > PromptSlide
 ![](./assets/prompt_weight.png)
 
-![](./workflow/promptslide-appinfo-workflow.svg)
+<!-- ![](./workflow/promptslide-appinfo-workflow.svg) -->
 
 > randomPrompt
 
