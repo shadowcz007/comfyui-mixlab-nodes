@@ -249,6 +249,11 @@ def generate_gradient_image(width, height, start_color_hex, end_color_hex):
 # gradient_image = generate_gradient_image(width, height, start_color_hex, end_color_hex)
 # gradient_image.save('gradient_image.png')
 
+def rgb_to_hex(rgb):
+    r, g, b = rgb
+    hex_color = "#{:02x}{:02x}{:02x}".format(r, g, b)
+    return hex_color
+
 
 # 读取不了分层
 def load_psd(image):
@@ -390,7 +395,8 @@ def get_average_color_image(image):
 
     im = Image.new("RGB", (image.width, image.height), (average_red, average_green, average_blue))
 
-    return im
+    hex=rgb_to_hex((average_red, average_green, average_blue))
+    return (im,hex)
 
 
 
@@ -1973,15 +1979,15 @@ class ResizeImage:
             }
                 }
     
-    RETURN_TYPES = ("IMAGE","IMAGE")
-    RETURN_NAMES = ("image","average_image",)
+    RETURN_TYPES = ("IMAGE","IMAGE","STRING",)
+    RETURN_NAMES = ("image","average_image","average_hex",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,True,)
+    OUTPUT_IS_LIST = (True,True,True,)
 
     def run(self,width,height,scale_option,image=None,average_color=['on'],fill_color=["#FFFFFF"]):
         
@@ -1993,16 +1999,18 @@ class ResizeImage:
 
         imgs=[]
         average_images=[]
+        hexs=[]
 
         if image==None:
             im=create_noisy_image(w,h,"RGB")
-            a_im=get_average_color_image(im)
+            a_im,hex=get_average_color_image(im)
             
             im=pil2tensor(im)
             imgs.append(im)
 
             a_im=pil2tensor(a_im)
             average_images.append(a_im)
+            hexs.append(hex)
         else:
             for ims in image:
                 for im in ims:
@@ -2010,15 +2018,16 @@ class ResizeImage:
                     im=resize_image(im,scale_option,w,h,fill_color)
                     im=im.convert('RGB')
 
-                    a_im=get_average_color_image(im)
+                    a_im,hex=get_average_color_image(im)
 
                     im=pil2tensor(im)
                     imgs.append(im)
 
                     a_im=pil2tensor(a_im)
                     average_images.append(a_im)
+                    hexs.append(hex)
         
-        return (imgs,average_images,)
+        return (imgs,average_images,hexs,)
 
 
 class MirroredImage:
