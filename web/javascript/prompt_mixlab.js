@@ -19,7 +19,7 @@ function loadCSS (url) {
     font-size: 16px;
     color: #fff;
     width: calc(100% - 32px);
-    max-width: 400px;
+    max-width: 980px;
     padding: 2px 8px;
     border-radius: 4px;
     position: absolute;
