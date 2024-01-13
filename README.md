@@ -79,6 +79,10 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 > PromptImage & PromptSimplification,Assist in simplifying prompt words, comparing images and prompt word nodes.
 
+> ChinesePrompt && PromptGenerate，中文prompt节点，直接用中文书写你的prompt
+
+![](./assets/ChinesePrompt_workflow.svg)
+
 
 ### Layers
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
@@ -159,23 +163,16 @@ An improvement has been made to directly redirect to GitHub to search for missin
 ![node-not-found](./assets/node-not-found.png)
 
 
-### Update 
-v0.8.0 🚀🚗🚚🏃‍ LaMaInpainting
-- 新增 LaMaInpainting
-- 优化color节点的输出
-- 修复高清显示屏上定位节点不准的情况
-
-- Add LaMaInpainting
-- Optimize the output of the color node
-- Fix the issue of inaccurate positioning node on high-definition display screens
-
-
 ### Models
 [Download CLIPSeg](https://huggingface.co/CIDAS/clipseg-rd64-refined/tree/main), move to : models/clipseg
 
 [Download lama](https://github.com/enesmsahin/simple-lama-inpainting/releases/download/v0.1.0/big-lama.pt), move to : models/lama
 
-[Download Salesforce\blip-image-captioning-base](https://huggingface.co/Salesforce/blip-image-captioning-base), move to : models/clip_interrogator/Salesforce/blip-image-captioning-base
+[Download Salesforce/blip-image-captioning-base](https://huggingface.co/Salesforce/blip-image-captioning-base), move to : models/clip_interrogator/Salesforce/blip-image-captioning-base
+
+[Download succinctly/text2image-prompt-generator](https://huggingface.co/succinctly/text2image-prompt-generator/tree/main),move to:text_generator/text2image-prompt-generator
+
+[Download Helsinki-NLP/opus-mt-zh-en](https://huggingface.co/Helsinki-NLP/opus-mt-zh-en/tree/main),move to:prompt_generator/opus-mt-zh-en
 
 ## Installation
 
@@ -216,9 +213,6 @@ pip3 install -r requirements.txt
 #### discussions:
 [discussions](https://github.com/shadowcz007/comfyui-mixlab-nodes/discussions)
 
-### TODO:
-- 音频播放节点：带可视化、支持多音轨、可配置音轨音量
-- vector https://github.com/GeorgLegato/stable-diffusion-webui-vectorstudio
 
 
 <picture>

@@ -68,9 +68,9 @@ def load_caption_model(model_path,config,t='blip-base'):
 caption_model_path=os.path.join(folder_paths.models_dir, "clip_interrogator/Salesforce/blip-image-captioning-base")
 if not os.path.exists(caption_model_path):
     print(f"## clip_interrogator_model not found: {caption_model_path}, pls download from https://huggingface.co/Salesforce/blip-image-captioning-base")
+    caption_model_path='Salesforce/blip-image-captioning-base'
 
 cache_path=os.path.join(folder_paths.models_dir, "clip_interrogator")
-
 
 
 # Tensor to PIL

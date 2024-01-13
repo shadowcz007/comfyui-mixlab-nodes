@@ -620,7 +620,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
     "PromptSlide":"PromptSlide ♾️Mixlab",
-
+    "PromptGenerate_Mix":"PromptGenerate ♾️Mixlab",
+    "ChinesePrompt_Mix":"ChinesePrompt ♾️Mixlab",
     "GamePal":"GamePal ♾️Mixlab"
 }
 
@@ -645,6 +646,17 @@ try:
         NODE_CLASS_MAPPINGS['ClipInterrogator']=ClipInterrogator
 except:
     print('ClipInterrogator.available',False)
+
+try:
+    from .nodes.TextGenerateNode import PromptGenerate,ChinesePrompt
+    print('PromptGenerate.available',PromptGenerate.available)
+    if PromptGenerate.available:
+        NODE_CLASS_MAPPINGS['PromptGenerate_Mix']=PromptGenerate
+    print('ChinesePrompt.available',ChinesePrompt.available)
+    if ChinesePrompt.available:
+        NODE_CLASS_MAPPINGS['ChinesePrompt_Mix']=ChinesePrompt
+except:
+    print('TextGenerateNode.available',False)
  
 
 print('\033[93m -------------- \033[0m')

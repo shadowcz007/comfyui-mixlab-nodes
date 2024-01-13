@@ -4761,6 +4761,8 @@
     ],
     "https://github.com/shadowcz007/comfyui-mixlab-nodes": [
         [
+            "PromptGenerate_Mix",
+            "ChinesePrompt_Mix",
             "3DImage",
             "AppInfo",
             "IntNumber",
