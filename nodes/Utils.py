@@ -5,7 +5,7 @@ import numpy as np
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 import folder_paths
 import matplotlib.font_manager as fm
-
+import torch
 
 def recursive_search(directory, excluded_dir_names=None):
     if not os.path.isdir(directory):
@@ -131,7 +131,12 @@ def flatten_list(nested_list):
         if isinstance(item, list):
             flat_list.extend(flatten_list(item))
         else:
-            flat_list.append(item)
+            if torch.is_tensor(item):
+                print('item.shape',item.shape)
+                for i in range(item.shape[0]):
+                    flat_list.append(item[i:i + 1, ...])
+            else:
+                flat_list.append(item)
     return flat_list
 
 
@@ -485,7 +490,7 @@ class AppInfo:
                              },
 
                 "optional":{
-                    "LOGO": ("IMAGE",),
+                    "IMAGE": ("IMAGE",),
                     "description":("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
                     "version":("INT", {
                         "default": 1, 
@@ -513,12 +518,12 @@ class AppInfo:
     INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self,name,input_ids,output_ids,LOGO,description,version,share_prefix,link,category,auto_save):
+    def run(self,name,input_ids,output_ids,IMAGE,description,version,share_prefix,link,category,auto_save):
         name=name[0]
         
         im=None
-        if LOGO:
-            im=LOGO[0][0]
+        if IMAGE:
+            im=IMAGE[0][0]
             #TODO batch 的方式需要处理
             im=create_temp_file(im)
         # image [img,] img[batch,w,h,a] 列表里面是batch，
@@ -573,7 +578,8 @@ class SwitchByIndex:
 
         C=[]
         index=index[0]
-        for a in A:
+
+        for a in A:    
             C.append(a)
         for b in B:
             C.append(b)
