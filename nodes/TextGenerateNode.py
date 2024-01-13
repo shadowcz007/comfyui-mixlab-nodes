@@ -82,6 +82,7 @@ class ChinesePrompt:
 
                 "optional":{
                     "seed":("INT", {"default": 100, "min": 100, "max": 1000000}), 
+                    "generation": (["on","off"],), 
                 },
 
                 }
@@ -102,10 +103,11 @@ class ChinesePrompt:
     zh_en_model=None
     zh_en_tokenizer=None 
 
-    def run(self,text,seed):
+    def run(self,text,seed,generation):
         global text_pipe,zh_en_model,zh_en_tokenizer
 
         seed=seed[0]
+        generation=generation[0]
 
         # 进度条
         pbar = comfy.utils.ProgressBar(len(text)+1)
@@ -130,18 +132,20 @@ class ChinesePrompt:
 
         pbar.update(1)
         for t in en_text:
-            prompt =text_generate(text_pipe,t,seed)
-            # 多条，还是单条
-            lines = prompt.split("\n")
-            longest_line = max(lines, key=len)
-            # print(longest_line)
-            prompt_result.append(longest_line)
+            if generation=='on':
+                prompt =text_generate(text_pipe,t,seed)
+                # 多条，还是单条
+                lines = prompt.split("\n")
+                longest_line = max(lines, key=len)
+                # print(longest_line)
+                prompt_result.append(longest_line)
+            else:
+                prompt_result.append(t)
             pbar.update(1)
 
         text_pipe.model.to('cpu')
         
         
-
         return {
             "ui":{
                     "prompt": prompt_result
