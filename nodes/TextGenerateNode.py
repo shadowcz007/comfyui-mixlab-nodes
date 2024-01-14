@@ -74,7 +74,7 @@ def correct_prompt_syntax(prompt):
     print("input prompt",prompt)
     corrected_elements = []
     # 处理成统一的英文标点
-    prompt = prompt.replace('（', '(').replace('）', ')').replace(';', ',').replace('。', '.').replace('：',':')
+    prompt = prompt.replace('（', '(').replace('）', ')').replace('，', ',').replace(';', ',').replace('。', '.').replace('：',':')
     # 删除多余的空格
     prompt = re.sub(r'\s+', ' ', prompt).strip()
 
@@ -159,6 +159,8 @@ class ChinesePrompt:
 
         # 进度条
         pbar = comfy.utils.ProgressBar(len(text)+1)
+
+        text = correct_prompt_syntax(text[0])
 
         if zh_en_model==None:
             zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
