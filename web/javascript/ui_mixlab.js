@@ -771,7 +771,7 @@ app.registerExtension({
               options: Array.from(apps_map[category], a => {
                 // console.log('#二级',a)
                 return {
-                  content: a.name,
+                  content: `${a.name}_${a.version}`,
                   callback: async () => {
                     try {
                       let item = (await get_my_app(a.filename, a.category))[0]
