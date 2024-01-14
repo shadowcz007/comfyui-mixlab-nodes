@@ -739,7 +739,7 @@ app.registerExtension({
         if (category === '0') {
           apps_opts.push(
             ...Array.from(apps_map[category], a => {
-              console.log('#1级',a)
+              // console.log('#1级',a)
               return {
                 content: `${a.name}_${a.version}`,
                 has_submenu: false,
