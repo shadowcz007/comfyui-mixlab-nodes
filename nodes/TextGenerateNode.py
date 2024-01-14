@@ -36,9 +36,8 @@ def translate(zh_en_tokenizer,zh_en_model,texts):
         sequences = zh_en_model.generate(**encoded)
         return zh_en_tokenizer.batch_decode(sequences, skip_special_tokens=True)
 
-# input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
+input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
 # print(input, translate(input))
-
 
 
 def text_generate(text_pipe,input,seed=None):
@@ -66,6 +65,55 @@ def text_generate(text_pipe,input,seed=None):
 
 # input = "Youth can't turn back, so there's no end to youth."
 # print(input, text_generate(input))
+
+    
+import re
+
+def correct_prompt_syntax(prompt):
+
+    print("input prompt",prompt)
+    corrected_elements = []
+    # 处理成统一的英文标点
+    prompt = prompt.replace('（', '(').replace('）', ')').replace('，', ',').replace(';', ',').replace('。', '.').replace('：',':')
+    # 删除多余的空格
+    prompt = re.sub(r'\s+', ' ', prompt).strip()
+
+    # 分词
+    prompt_elements = prompt.split(',')
+
+    for element in prompt_elements:
+        element = element.strip()
+
+        # 处理空元素
+        if not element:
+            continue
+
+        # 检查并处理圆括号、方括号、尖括号
+        if element[0] in '([':
+            corrected_element = balance_brackets(element, '(', ')') if element[0] == '(' else balance_brackets(element, '[', ']')
+        elif element[0] == '<':
+            corrected_element = balance_brackets(element, '<', '>')
+        else:
+            # 删除开头的右括号或右方括号
+            corrected_element = element.lstrip(')]')
+
+        corrected_elements.append(corrected_element)
+
+    # 重组修正后的prompt
+    corrected_prompt = ', '.join(corrected_elements)
+    print("output prompt",corrected_prompt)
+    return corrected_prompt
+
+def balance_brackets(element, open_bracket, close_bracket):
+    open_brackets_count = element.count(open_bracket)
+    close_brackets_count = element.count(close_bracket)
+    return element + close_bracket * (open_brackets_count - close_brackets_count)
+
+# # 示例使用
+# test_prompt = "((middle-century castles)), [forsaken: 0.8], (mystery dragons: 1.3, mist forests, sunsets, quiet; (((dummy)), [fisting city: 0.5] background, radiant, soft and flavoured,] promising mountains, ((starry: 1.6), [[crowds], [middle-century castle: urban landscapes of the future: 0.5], [yellow: bright sun: 0.7], overlooking"
+# corrected_prompt = correct_prompt_syntax(test_prompt)
+# print(corrected_prompt)
+
         
         
 class ChinesePrompt:
@@ -76,13 +124,13 @@ class ChinesePrompt:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-            "text": ("STRING",{"multiline": True,"default": "", "dynamicPrompts": False}),
-            
+               "text": ("STRING",{"multiline": True,"default": "", "dynamicPrompts": False}),
+               "generation": (["on","off"],{"default": "off"}), 
                              },
-
+               
                 "optional":{
                     "seed":("INT", {"default": 100, "min": 100, "max": 1000000}), 
-                    "generation": (["on","off"],), 
+                    
                 },
 
                 }
@@ -112,6 +160,8 @@ class ChinesePrompt:
         # 进度条
         pbar = comfy.utils.ProgressBar(len(text)+1)
 
+        text = correct_prompt_syntax(text[0])
+
         if zh_en_model==None:
             zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
             zh_en_tokenizer = AutoTokenizer.from_pretrained(zh_en_model_path)
@@ -127,7 +177,9 @@ class ChinesePrompt:
 
         # print('zh_en_model device',zh_en_model.device,text_pipe.model.device,torch.cuda.current_device() )
         en_text=translate(zh_en_tokenizer,zh_en_model,text)
+        
         zh_en_model.to('cpu')
+        print("test en_text",en_text)
         # en_text.to("cuda" if torch.cuda.is_available() else "cpu")
 
         pbar.update(1)
@@ -144,7 +196,7 @@ class ChinesePrompt:
             pbar.update(1)
 
         text_pipe.model.to('cpu')
-        
+        prompt_result = [correct_prompt_syntax(prompt_result[0])]
         
         return {
             "ui":{
