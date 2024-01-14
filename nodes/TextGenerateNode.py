@@ -29,14 +29,14 @@ if not os.path.exists(zh_en_model_path):
 
 
 
-def translate(zh_en_tokenizer,zh_en_model,texts):
+def translate(zh_en_tokenizer,zh_en_model,text):
     with torch.no_grad():
-        encoded = zh_en_tokenizer(texts, return_tensors="pt")
+        encoded = zh_en_tokenizer([text], return_tensors="pt")
         encoded.to(zh_en_model.device)
         sequences = zh_en_model.generate(**encoded)
-        return zh_en_tokenizer.batch_decode(sequences, skip_special_tokens=True)
+        return zh_en_tokenizer.batch_decode(sequences, skip_special_tokens=True)[0]
 
-input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
+# input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
 # print(input, translate(input))
 
 
@@ -159,12 +159,12 @@ class ChinesePrompt:
 
         # 进度条
         pbar = comfy.utils.ProgressBar(len(text)+1)
-
-        text = correct_prompt_syntax(text[0])
-
+        
+        texts = [correct_prompt_syntax(t) for t in text]
+        print('correct_prompt_syntax::',texts)
         if zh_en_model==None:
             zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
-            zh_en_tokenizer = AutoTokenizer.from_pretrained(zh_en_model_path)
+            zh_en_tokenizer = AutoTokenizer.from_pretrained(zh_en_model_path,padding=True, truncation=True)
         
         zh_en_model.to("cuda" if torch.cuda.is_available() else "cpu")
             # zh_en_tokenizer.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -176,14 +176,17 @@ class ChinesePrompt:
         prompt_result=[]
 
         # print('zh_en_model device',zh_en_model.device,text_pipe.model.device,torch.cuda.current_device() )
-        en_text=translate(zh_en_tokenizer,zh_en_model,text)
-        
+        en_texts=[]
+        for t in texts:
+            en_text=translate(zh_en_tokenizer,zh_en_model,t)
+            en_texts.append(en_text)
+
         zh_en_model.to('cpu')
-        print("test en_text",en_text)
+        print("test en_text",en_texts)
         # en_text.to("cuda" if torch.cuda.is_available() else "cpu")
 
         pbar.update(1)
-        for t in en_text:
+        for t in en_texts:
             if generation=='on':
                 prompt =text_generate(text_pipe,t,seed)
                 # 多条，还是单条
@@ -196,7 +199,7 @@ class ChinesePrompt:
             pbar.update(1)
 
         text_pipe.model.to('cpu')
-        prompt_result = [correct_prompt_syntax(prompt_result[0])]
+        prompt_result = [correct_prompt_syntax(p) for p in prompt_result]
         
         return {
             "ui":{
