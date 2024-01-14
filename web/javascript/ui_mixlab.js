@@ -739,8 +739,9 @@ app.registerExtension({
         if (category === '0') {
           apps_opts.push(
             ...Array.from(apps_map[category], a => {
+              console.log('#1级',a)
               return {
-                content: a.name,
+                content: `${a.name}_${a.version}`,
                 has_submenu: false,
                 callback: async () => {
                   try {
@@ -768,6 +769,7 @@ app.registerExtension({
             disabled: false,
             submenu: {
               options: Array.from(apps_map[category], a => {
+                // console.log('#二级',a)
                 return {
                   content: a.name,
                   callback: async () => {
