@@ -36,7 +36,7 @@ def translate(zh_en_tokenizer,zh_en_model,texts):
         sequences = zh_en_model.generate(**encoded)
         return zh_en_tokenizer.batch_decode(sequences, skip_special_tokens=True)
 
-input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
+# input = "青春不能回头，所以青春没有终点。 ——《火影忍者》"
 # print(input, translate(input))
 
 
