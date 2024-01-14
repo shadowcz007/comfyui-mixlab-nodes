@@ -52,6 +52,8 @@ def run_bg(model_name= "unet",images=[]):
     # model_name = "unet" # "isnet-general-use"
     rembg_session = new_session(model_name)
     masks=[]
+    rgba_images=[]
+    rgb_images=[]
     # 进度条
     pbar = comfy.utils.ProgressBar(len(images) )
     for img in images:
@@ -66,15 +68,36 @@ def run_bg(model_name= "unet",images=[]):
                 top = i * img.height
                 bottom = (i + 1) * img.height
                 slice_image = mask.crop((0, top, width, bottom))
-                slice_image=slice_image.convert('L')
-                masks.append(slice_image)
+                slice_mask=slice_image.convert('L')
+                masks.append(slice_mask)
+
+                # rgba图
+                image_rgba = img.convert("RGBA")
+                image_rgba.putalpha(slice_mask)
+                rgba_images.append(image_rgba)
+
+                #rgb
+                rgb_image = Image.new("RGB", image_rgba.size, (0, 0, 0))
+                rgb_image.paste(image_rgba, mask=image_rgba.split()[3])
+                rgb_images.append(rgb_image)
+
         else:
             mask=mask.convert('L')    
             # mask.save(output_path)
             masks.append(mask)
+
+            # rgba图
+            image_rgba = img.convert("RGBA")
+            image_rgba.putalpha(mask)
+            rgba_images.append(image_rgba)
+
+            #rgb
+            rgb_image = Image.new("RGB", image_rgba.size, (0, 0, 0))
+            rgb_image.paste(image_rgba, mask=image_rgba.split()[3])
+            rgb_images.append(rgb_image)
             
         pbar.update(1)
-    return masks
+    return (masks,rgba_images,rgb_images)
 
 
 # Tensor to PIL
@@ -108,28 +131,34 @@ class RembgNode_:
                              },
                 }
     
-    RETURN_TYPES = ("MASK",)
-    # RETURN_NAMES = ("prompt","random_samples",)
+    RETURN_TYPES = ("MASK","IMAGE","RGBA",)
+    RETURN_NAMES = ("masks","images","RGBAs")
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Mask"
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (True,True,True,)
   
     def run(self,image,model_name):
+        # 兼容list输入和batch输入
 
         model_name=model_name[0]
 
         images=[]
+        
         for ims in image:
             for im in ims:
                 im=tensor2pil(im)
                 images.append(im)
 
-        masks=run_bg(model_name,images)
+        masks,rgba_images,rgb_images=run_bg(model_name,images)
 
         masks=[pil2tensor(m) for m in masks]
 
-        return (masks,)
+        rgba_images=[pil2tensor(m) for m in rgba_images]
+
+        rgb_images=[pil2tensor(m) for m in rgb_images]
+
+        return (masks,rgb_images,rgba_images,)

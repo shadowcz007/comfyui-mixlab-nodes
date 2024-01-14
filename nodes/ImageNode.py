@@ -989,7 +989,7 @@ class TransparentImage:
 
     # 运行的函数
     def run(self,images,masks,invert,save,filename_prefix,prompt=None, extra_pnginfo=None):
-        print('TransparentImage',images.shape,images.size())
+        # print('TransparentImage',images.shape,images.size(),masks.shape,masks.size())
         # print(masks.shape,masks.size())
 
         ui_images=[]
@@ -999,11 +999,16 @@ class TransparentImage:
         masks_new=[]
         nh=masks.shape[0]//count
 
-        #INPUT_IS_LIST = False, 一个batch传进来
-        if nh*count==masks.shape[0]:
-            masks_new=split_mask_by_new_height(masks,nh)
+        masks_new=masks
+
+        if images.shape[0]==masks.shape[0] and  images.shape[1]==masks.shape[1] and  images.shape[2]==masks.shape[2]:
+            print('TransparentImage',images.shape,images.size(),masks.shape,masks.size())
         else:
-            masks_new=split_mask_by_new_height(masks,masks.shape[0])
+            #INPUT_IS_LIST = False, 一个batch传进来
+            if nh*count==masks.shape[0]:
+                masks_new=split_mask_by_new_height(masks,nh)
+            else:
+                masks_new=split_mask_by_new_height(masks,masks.shape[0])
 
 
         is_save=True if save=='yes' else False
