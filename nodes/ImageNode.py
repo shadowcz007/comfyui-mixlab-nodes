@@ -14,6 +14,8 @@ import math
 from .Watcher import FolderWatcher
 
 
+
+
 FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 
 MAX_RESOLUTION=8192
@@ -70,6 +72,48 @@ def color_transfer(source,target):
 
 
 
+# 组合
+def create_big_image(image_folder, image_count):
+    # 计算行数和列数
+    rows = math.ceil(math.sqrt(image_count))
+    cols = math.ceil(image_count / rows)
+
+    # 获取每个小图的尺寸
+    small_width = 100
+    small_height = 100
+
+    # 计算大图的尺寸
+    big_width = small_width * cols
+    big_height = small_height * rows
+
+    # 创建一个新的大图
+    big_image = Image.new('RGB', (big_width, big_height))
+
+    # 获取所有图片文件的路径
+    image_files = [f for f in os.listdir(image_folder) if os.path.isfile(os.path.join(image_folder, f))]
+
+    # 遍历所有图片文件
+    for i, image_file in enumerate(image_files):
+        # 打开图片并调整大小
+        image = Image.open(os.path.join(image_folder, image_file))
+        image = image.resize((small_width, small_height))
+
+        # 计算当前小图的位置
+        row = i // cols
+        col = i % cols
+        x = col * small_width
+        y = row * small_height
+
+        # 将小图粘贴到大图上
+        big_image.paste(image, (x, y))
+
+    return big_image
+
+# # 调用方法并保存大图
+# image_folder = 'path/to/folder/containing/images'
+# image_count = 100
+# big_image = create_big_image(image_folder, image_count)
+# big_image.save('path/to/save/big_image.jpg')
 
 
 
@@ -2127,5 +2171,6 @@ class ImageColorTransfer:
                 res.append(image)
 
         return (res,)
+
 
 

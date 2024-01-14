@@ -622,7 +622,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptSlide":"PromptSlide ♾️Mixlab",
     "PromptGenerate_Mix":"PromptGenerate ♾️Mixlab",
     "ChinesePrompt_Mix":"ChinesePrompt ♾️Mixlab",
-    "GamePal":"GamePal ♾️Mixlab"
+    "GamePal":"GamePal ♾️Mixlab",
+    "RembgNode_Mix":"Removebg"
 }
 
 # web ui的节点功能
@@ -658,5 +659,12 @@ try:
 except:
     print('TextGenerateNode.available',False)
  
+try:
+    from .nodes.RembgNode import RembgNode_
+    print('RembgNode_.available',RembgNode_.available)
+    if RembgNode_.available:
+        NODE_CLASS_MAPPINGS['RembgNode_Mix']=RembgNode_
+except:
+    print('RembgNode_.available',False)
 
 print('\033[93m -------------- \033[0m')
