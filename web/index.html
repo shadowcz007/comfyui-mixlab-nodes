@@ -761,18 +761,43 @@
             } catch (error) {
                 isURL = false;
             }
+
+            let isAElement = undefined;
+            try {
+                let div = document.createElement('div');
+                div.innerHTML = link;
+                let a = div.querySelector('a');
+                if (a.href) {
+                    new URL(a.href);
+                    isAElement = div.innerHTML;
+                }
+            } catch (error) {
+
+            }
             // new URL(link)
-            if (isURL) {
+            if (isURL || isAElement) {
                 const linkBtn = document.createElement('button');
-                // linkBtn.href = link;
-                linkBtn.innerText = 'go to'
+
+                if (isURL) {
+                    // linkBtn.href = link;
+                    linkBtn.innerText = 'go to'
+                } else if (isAElement) {
+                    linkBtn.innerHTML = isAElement
+                }
+
                 action.appendChild(linkBtn)
                 linkBtn.style.marginLeft = '18px';
                 linkBtn.addEventListener('click', e => {
-                    e.preventDefault();
-                    window.open(link);
+
+                    if (isURL) {
+                        e.preventDefault();
+                        window.open(link);
+                    }
+                    //   if(isURL)  window.open(link);
                 })
+
             }
+
 
             const output_card = document.createElement("div");
             output_card.className = 'output_card'
@@ -1826,7 +1851,7 @@
                                     p.className = 'prompt_image'
                                     p.innerText = prompt;
                                     a.appendChild(p)
-                                    img.alt=prompt
+                                    img.alt = prompt
                                 }
 
                                 // imgDiv.parentElement.appendChild(a);
