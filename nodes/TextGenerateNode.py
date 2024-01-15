@@ -6,7 +6,7 @@ import os,sys
 import folder_paths
 
 # from PIL import Image
-# import importlib.util
+import importlib.util
 
 import comfy.utils
 # import numpy as np
@@ -26,6 +26,39 @@ zh_en_model_path=os.path.join(folder_paths.models_dir, "prompt_generator/opus-mt
 if not os.path.exists(zh_en_model_path):
     print(f"## zh_en_model not found: {zh_en_model_path}, pls download from https://huggingface.co/Helsinki-NLP/opus-mt-zh-en/tree/main")
     zh_en_model_path='Helsinki-NLP/opus-mt-zh-en'
+
+
+
+def is_installed(package):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        return False
+    return spec is not None
+
+
+try:
+    if is_installed('sentencepiece')==False:
+        import subprocess
+
+        # 安装
+        print('#pip install sentencepiece')
+
+        result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'sentencepiece'], capture_output=True, text=True)
+
+        #检查命令执行结果
+        if result.returncode == 0 and is_installed('sentencepiece'):
+            print("#install success")
+            _available=True
+        else:
+            print("#install error")
+            _available=False
+        
+    else:
+        _available=True
+
+except:
+    _available=False
 
 
 

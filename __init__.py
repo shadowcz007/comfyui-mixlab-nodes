@@ -637,16 +637,16 @@ try:
     print('LaMaInpainting.available',LaMaInpainting.available)
     if LaMaInpainting.available:
         NODE_CLASS_MAPPINGS['LaMaInpainting']=LaMaInpainting
-except:
-    print('LaMaInpainting.available',False)
+except Exception as e:
+    print('LaMaInpainting.available',False,e)
 
 try:
     from .nodes.ClipInterrogator import ClipInterrogator
     print('ClipInterrogator.available',ClipInterrogator.available)
     if ClipInterrogator.available:
         NODE_CLASS_MAPPINGS['ClipInterrogator']=ClipInterrogator
-except:
-    print('ClipInterrogator.available',False)
+except Exception as e:
+    print('ClipInterrogator.available',False,e)
 
 try:
     from .nodes.TextGenerateNode import PromptGenerate,ChinesePrompt
@@ -656,15 +656,15 @@ try:
     print('ChinesePrompt.available',ChinesePrompt.available)
     if ChinesePrompt.available:
         NODE_CLASS_MAPPINGS['ChinesePrompt_Mix']=ChinesePrompt
-except:
-    print('TextGenerateNode.available',False)
- 
+except Exception as e:
+    print('TextGenerateNode.available',False,e)
+
 try:
     from .nodes.RembgNode import RembgNode_
     print('RembgNode_.available',RembgNode_.available)
     if RembgNode_.available:
         NODE_CLASS_MAPPINGS['RembgNode_Mix']=RembgNode_
-except:
-    print('RembgNode_.available',False)
+except Exception as e:
+    print('RembgNode_.available',False,e)
 
 print('\033[93m -------------- \033[0m')
