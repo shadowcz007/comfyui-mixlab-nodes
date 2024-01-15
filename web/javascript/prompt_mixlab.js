@@ -178,8 +178,7 @@ app.registerExtension({
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
-        name
-
+         
         const mutable_prompt = this.widgets.filter(
           w => w.name == 'mutable_prompt'
         )[0]

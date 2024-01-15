@@ -12,6 +12,17 @@ from PIL.PngImagePlugin import PngInfo
 #     req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
 #     request.urlopen(req)    
 
+embeddings_path=os.path.join(folder_paths.models_dir, "embeddings")
+
+def get_files_with_extension(directory, extension):
+    file_list = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(extension):
+                file_name = os.path.splitext(file)[0]
+                file_list.append(file_name)
+    return file_list
+
 
 default_prompt1='''Swing
                                                 Slide
@@ -334,7 +345,10 @@ class RandomPrompt:
             for w2 in words2:
                 w2=w2.strip()
                 if '``' not in w2:
-                    w2=w2+',``'
+                    if w2=="":
+                        w2='``'
+                    else:
+                        w2=w2+',``'
                 if w1!='' and w2!='':
                     prompts.append(w2.replace('``', w1))
                 pbar.update(1)
@@ -357,62 +371,33 @@ class RandomPrompt:
 
 
 
-# class RunWorkflow:
-#     @classmethod
-#     def INPUT_TYPES(s):
-#         return {
-#             "required": {
-#                 "workflow": ("STRING", {
-#                             "multiline": False, 
-#                             "default": ''
-#                           }),
-#                 "prompt": ("STRING", {
-#                             "multiline": False, 
-#                             "default": ''
-#                           }),
-#                  "image": ("IMAGE",),
-#                  "input_node": ("STRING", {
-#                             "multiline": False, 
-#                             "default": ''
-#                           }),
-#                  "output_node": ("STRING", {
-#                             "multiline": False, 
-#                             "default": ''
-#                           }),
-#                 },
+
+class EmbeddingPrompt:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "embedding":(get_files_with_extension(embeddings_path,'.pt'),),
+                "weight": ("FLOAT", {"default": 1, "min": -2, "max": 2,"step":0.01 ,"display": "slider"}),
+                },
                 
-#             }
+            }
     
-    
+    RETURN_TYPES = ("STRING",)
 
-#     RETURN_TYPES = ("IMAGE","STRING",)
+    FUNCTION = "run"
 
-#     FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Prompt"
 
-#     CATEGORY = "♾️Mixlab/workflow"
+    OUTPUT_IS_LIST = (False,)
+    # OUTPUT_NODE = True
 
-#     OUTPUT_IS_LIST = (True,)
-#     OUTPUT_NODE = True
-
-
-#     # 运行的函数
-#     def run(self,workflow,prompt,image,input_node,output_node):
-#         print('#运行的函数',prompt,image,input_node,output_node)
-#         workflow=json.loads(workflow)
-#         input_node=input_node.split(".")
-#         workflow[input_node[0]][input_node[1]][input_node[2]]=prompt
-
-#         workflow_new={}
-#         # 遍历，seed设为随机
-#         for key, value in workflow.items():
-#             if 'inputs' in value:
-#                 if 'seed' in value['inputs']:
-#                     value['inputs']['seed']= random.randint(1, 18446744073709551614)
-#             workflow_new[key]=value
-
-#         queue_prompt(workflow_new)
-#         print('#运行的函数',workflow_new[input_node[0]])
-
-#         # return (new_prompt)
-#         return  {"ui":{"images": []},"result": ([image],['text'],)}
+    # 运行的函数
+    def run(self,embedding,weight):
+        prompt='embedding:'+embedding
+        if weight!=1:
+            prompt='('+prompt+':'+str(weight)+')'
+        prompt=" "+prompt+' ' 
+        # return (new_prompt)
+        return (prompt,)
 
