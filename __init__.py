@@ -542,7 +542,7 @@ from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
-
+from .nodes.Mask import OutlineMask
 
 
 # 要导出的所有节点及其名称的字典
@@ -598,6 +598,7 @@ NODE_CLASS_MAPPINGS = {
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
+    "OutlineMask":OutlineMask
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
