@@ -1,0 +1,58 @@
+Residential space
+Apartment building
+Villa
+Bungalow
+Condominium
+Commercial space
+Shopping mall
+Supermarket
+Restaurant
+Store
+Market
+Office space
+Office building
+Office
+Meeting room
+Co-working space
+Educational space
+School
+University
+Training institution
+Library
+Laboratory
+Medical space
+Hospital
+Clinic
+Pharmacy
+Nursing home
+Rehabilitation center
+Cultural space
+Museum
+Library
+Theater
+Concert hall
+Gallery
+Sports space
+Sports stadium
+Gym
+Swimming pool
+Basketball court
+Football field
+Transportation space
+Airport
+Train station
+Subway station
+Bus stop
+Parking lot
+Public space
+Park
+Square
+Street
+Pedestrian street
+Community center
+Industrial space
+Factory
+Warehouse
+Production workshop
+Mine
+Power plant
