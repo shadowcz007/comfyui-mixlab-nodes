@@ -1331,7 +1331,13 @@ app.registerExtension({
           let w = 360,
             s = widget.preview.videoWidth / widget.preview.videoHeight,
             h = w / s || w
-          console.log(h)
+          // console.log(h)
+
+          if (!window.documentPictureInPicture) {
+            window.alert(
+              'This feature is available only in secure contexts (HTTPS), in some or all supporting browsers. https://developer.mozilla.org/en-US/docs/Web/API/Document_Picture-in-Picture_API'
+            )
+          }
 
           const pipWindow = await documentPictureInPicture.requestWindow({
             width: w,
@@ -2137,8 +2143,8 @@ const node = {
   loadedGraphNode (node, app) {
     if (node.type === 'RandomPrompt') {
       try {
-        let max_count = node.widgets.filter(w => w.name === "max_count")[0];
-        max_count.value= node.widgets_values[0]
+        let max_count = node.widgets.filter(w => w.name === 'max_count')[0]
+        max_count.value = node.widgets_values[0]
         // console.log('RandomPrompt',max_count,node.widgets_values[0])
       } catch (error) {
         console.log(error)

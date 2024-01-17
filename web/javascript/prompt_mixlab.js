@@ -266,16 +266,7 @@ app.registerExtension({
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'RandomPrompt') {
-      // try {
-      //   let mutable_prompt = node.widgets.filter(w => w.name === 'mutable_prompt')[0]
-      //   // let ks = getLocalData(`_mixlab_PromptSlide`)
-      //   let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
-      //   // console.log('##widget', uploadWidget.value)
-      //   let keywords = JSON.parse(uploadWidget.value)
-      //   if (keywords && keywords[0]) {
-      //     mutable_prompt.value=keywords.join('\n')
-      //   }
-      // } catch (error) {}
+     
     }
   }
 })

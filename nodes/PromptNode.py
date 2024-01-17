@@ -308,7 +308,9 @@ class RandomPrompt:
                             "default": 'sticker, Cartoon, ``'
                           }),
                 "random_sample": (["enable", "disable"],),
-                }
+                # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
+                },
+           
             }
     
     
@@ -400,4 +402,3 @@ class EmbeddingPrompt:
         prompt=" "+prompt+' ' 
         # return (new_prompt)
         return (prompt,)
-
