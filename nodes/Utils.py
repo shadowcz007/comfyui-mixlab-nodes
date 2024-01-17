@@ -341,11 +341,18 @@ class MultiplicationNode:
     def INPUT_TYPES(s):
         return {"required": {
                     "numberA":(any_type,),
-                    "numberB":("FLOAT", {
+                    "multiply_by":("FLOAT", {
                         "default": 0, 
-                        "min": -1, #Minimum value
+                        "min": -2, #Minimum value
                         "max": 0xffffffffffffffff,
-                        "step": 0.1, #Slider's step
+                        "step": 0.01, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                     "add_by":("FLOAT", {
+                        "default": 0, 
+                        "min": -2000, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, #Slider's step
                         "display": "number" # Cosmetic only: display as "number" or "slider"
                     })
                              },
@@ -360,9 +367,9 @@ class MultiplicationNode:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
 
-    def run(self,numberA,numberB):
-        b=int(numberA*numberB)
-        a=float(numberA*numberB)
+    def run(self,numberA,multiply_by,add_by):
+        b=int(numberA*multiply_by+add_by)
+        a=float(numberA*multiply_by+add_by)
         return (a,b,) 
 
 class TextInput:
