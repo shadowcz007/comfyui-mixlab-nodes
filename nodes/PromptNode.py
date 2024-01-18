@@ -23,6 +23,19 @@ def get_files_with_extension(directory, extension):
                 file_list.append(file_name)
     return file_list
 
+def join_with_(text_list,delimiter):
+    joined_text = delimiter.join(text_list)
+    return joined_text
+
+
+class AnyType(str):
+  """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
+
+  def __ne__(self, __value: object) -> bool:
+    return False
+
+any_type = AnyType("*")
+
 
 default_prompt1='''Swing
                                                 Slide
@@ -65,7 +78,7 @@ def addWeight(text, weight=1):
     if weight == 1:
         return text
     else:
-        return f"({text}:{round(weight,2)})"
+        return f"({text}:{round(weight,3)})"
 
 def prompt_delete_words(sentence, new_words_length):
     # 使用逗号分割句子，并去除空格
@@ -396,9 +409,41 @@ class EmbeddingPrompt:
 
     # 运行的函数
     def run(self,embedding,weight):
+        weight = round(weight, 3)
         prompt='embedding:'+embedding
         if weight!=1:
             prompt='('+prompt+':'+str(weight)+')'
         prompt=" "+prompt+' ' 
         # return (new_prompt)
         return (prompt,)
+
+RETURN_TYPES = (any_type,)
+
+class JoinWithDelimiter:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "text_list": (any_type,),
+                    "delimiter":(["newline","comma"],),
+                             },
+                }
+    
+    RETURN_TYPES = ("STRING",) 
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Prompt"
+
+    INPUT_IS_LIST = True # 当true的时候，输入时list，当false的时候，如果输入是list，则会自动包一层for循环调用
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,text_list,delimiter):
+        delimiter=delimiter[0]
+        if delimiter =='newline':
+            delimiter='\n'
+        elif delimiter=='comma':
+            delimiter=','
+        t=''
+        if isinstance(text_list, list):
+            t=join_with_(text_list,delimiter)
+        return (t,)

@@ -534,7 +534,7 @@ PromptServer.add_routes=new_add_routes
 
 
 # 导入节点
-from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage
+from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
 from .nodes.ImageNode import GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,AreaToMask,SmoothMask,FeatheredMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
@@ -598,7 +598,8 @@ NODE_CLASS_MAPPINGS = {
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
-    "OutlineMask":OutlineMask
+    "OutlineMask":OutlineMask,
+    "JoinWithDelimiter":JoinWithDelimiter
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
