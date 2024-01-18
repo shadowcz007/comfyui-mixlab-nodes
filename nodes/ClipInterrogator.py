@@ -24,6 +24,7 @@ def is_installed(package):
         return False
     return spec is not None
 
+
 try:
     if is_installed('clip_interrogator')==False:
         import subprocess
@@ -36,19 +37,24 @@ try:
         #检查命令执行结果
         if result.returncode == 0:
             print("#install success")
-            from transformers import AutoProcessor, BlipForConditionalGeneration
             from clip_interrogator import Config, Interrogator
             _available=True
         else:
             print("#install error")
         
     else:
-        from transformers import AutoProcessor, BlipForConditionalGeneration
         from clip_interrogator import Config, Interrogator
         _available=True
 
 except:
     _available=False
+
+try:
+    from transformers import AutoProcessor, BlipForConditionalGeneration
+except:
+    _available=False
+    print('pls check  transformers.__version__>=4.36.0:: AutoProcessor, BlipForConditionalGeneration')
+
 
 
 def load_caption_model(model_path,config,t='blip-base'):
