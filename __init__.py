@@ -192,7 +192,7 @@ def read_workflow_json_files(folder_path ):
 def get_workflows():
     # print("#####path::", current_path)
     workflow_path=os.path.join(current_path, "workflow")
-    print('workflow_path: ',workflow_path)
+    # print('workflow_path: ',workflow_path)
     if not os.path.exists(workflow_path):
         # 使用mkdir()方法创建新目录
         os.mkdir(workflow_path)
@@ -231,8 +231,14 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                     })
                 else:
                     category=''
+                    input=None
+                    output=None
                     if 'category' in x['app']:
                         category=x['app']['category']
+                    if 'input' in x['app']:
+                        input=x['app']['input']
+                    if 'output' in x['app']:
+                        output=x['app']['output']
                     apps.append({
                         "filename":item["filename"],
                         "category":category,
@@ -244,6 +250,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
                                 "name":x['app']['name'],
                                 "version":x['app']['version'],
+                                "input":input,
+                                "output":output
                             }
                         },
                         "date":item["date"]
@@ -271,8 +279,14 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                 # print(apps[0]['filename'] ,item["filename"])
                 if apps[0]['filename']!=item["filename"]:
                     category=''
+                    input=None
+                    output=None
                     if 'category' in x['app']:
                         category=x['app']['category']
+                    if 'input' in x['app']:
+                        input=x['app']['input']
+                    if 'output' in x['app']:
+                        output=x['app']['output']
                     apps.append({
                         "filename":item["filename"],
                         # "category":category,
@@ -284,6 +298,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                                 "icon":(x['app']['icon'] if 'icon' in x['app'] else None),
                                 "name":x['app']['name'],
                                 "version":x['app']['version'],
+                                "input":input,
+                                "output":output
                             }
                         },
                         "date":item["date"]
