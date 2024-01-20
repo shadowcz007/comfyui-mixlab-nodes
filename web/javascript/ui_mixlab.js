@@ -697,6 +697,17 @@ app.registerExtension({
             })
           } // and the callback
         },
+        {
+          content: `Remove Group&Nodes ♾️Mixlab`, // with a name
+          callback: async (value, opts, e, menu, group) => {
+            // console.log(group)
+            let nodes = group._nodes
+            for (const node of nodes) {
+              app.graph.remove(node);
+            }
+            app.graph.remove(group);
+          } // and the callback
+        },
         null,
         ...options
       ] // and return the options
