@@ -1671,6 +1671,112 @@ class NewLayer:
 
         return (layer_n,)
 
+
+def splitImage(image, num):
+    width, height = image.size
+
+    num_rows = int(num ** 0.5)
+    num_cols = int(num / num_rows)
+    
+    grid_width = width // num_cols
+    grid_height = height // num_rows
+
+    grid_coordinates = []
+    for i in range(num_rows):
+        for j in range(num_cols):
+            x = j * grid_width
+            y = i * grid_height
+            grid_coordinates.append((x, y, grid_width, grid_height))
+
+    return grid_coordinates
+
+# # 读取图片
+# image = Image.open("path_to_your_image.jpg")
+
+# # 定义要切割的区域数量
+# num = 9
+
+# # 切割图片
+# grid_coordinates = splitImage(image, num)
+
+# # 输出切割区域坐标
+# for i, coordinates in enumerate(grid_coordinates):
+#     print(f"Region {i + 1}: x={coordinates[0]}, y={coordinates[1]}, width={coordinates[2]}, height={coordinates[3]}")
+
+
+class SplitImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { 
+            "required": { 
+                "image": ("IMAGE",), 
+                "num": ("INT",{
+                    "default": 4, 
+                    "min": 1, #Minimum value
+                    "max": 500, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "seed": ("INT",{
+                    "default": 4, 
+                    "min": 1, #Minimum value
+                    "max": 500, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+            }
+                }
+    
+    RETURN_TYPES = ("_GRID","_GRID",)
+    RETURN_NAMES = ("grids","grid")
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Layer"
+
+    INPUT_IS_LIST = False
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self,image,num,seed):
+        image=tensor2pil(image)
+
+        grids=splitImage(image,num)
+
+        if seed>=num:
+            num=int(seed / 500 * num)-1
+        else:
+            num=seed-1
+
+        num=max(0,num) 
+
+        g=grids[num]
+
+        return (grids,g,)
+
+
+class GridOutput:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { 
+            "required": {
+                "grid": ("_GRID",)
+            }
+                }
+    
+    RETURN_TYPES = ("INT","INT","INT","INT",)
+    RETURN_NAMES = ("x","y","width","height",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Layer"
+
+    INPUT_IS_LIST = False
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self,grid):
+        x,y,w,h=grid
+        return (x,y,w,h,)
+
 class ShowLayer:
     @classmethod
     def INPUT_TYPES(s):

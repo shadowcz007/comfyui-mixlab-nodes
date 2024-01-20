@@ -4761,6 +4761,8 @@
     ],
     "https://github.com/shadowcz007/comfyui-mixlab-nodes": [
         [
+            "GridOutput",
+            "SplitImage",
             "PromptGenerate_Mix",
             "JoinWithDelimiter",
             "ChinesePrompt_Mix",
