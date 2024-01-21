@@ -399,7 +399,7 @@ app.registerExtension({
     }
   },
   async loadedGraphNode (node, app) {
-    console.log('#loadedGraphNode1111')
+    // console.log('#loadedGraphNode1111')
     window._mixlab_app_json = null //切换workflow需要清空
     if (node.type === 'AppInfo') {
       let auto_save = node.widgets.filter(w => w.name == 'auto_save')[0]
@@ -408,6 +408,9 @@ app.registerExtension({
           auto_save.value = 'enable'
         }
       }
+
+      app.canvas.centerOnNode(node)
+      app.canvas.setZoom(0.45)
     }
   }
 })

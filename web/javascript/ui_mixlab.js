@@ -1,13 +1,69 @@
 import { app } from '../../../scripts/app.js'
-import { api } from '../../../scripts/api.js'
-import { ComfyWidgets } from '../../../scripts/widgets.js'
-import { $el } from '../../../scripts/ui.js'
 import { closeIcon } from './svg_icons.js'
 
 import {
   GroupNodeConfig,
   GroupNodeHandler
 } from '../../../extensions/core/groupNode.js'
+
+function copyNodeValues (src, dest) {
+  // title
+  dest.title = src.title
+
+  // copy input connections
+
+  for (let i in src.inputs) {
+    let input = src.inputs[i]
+    if (input.link) {
+      let link = app.graph.links[input.link]
+      let src_node = app.graph.getNodeById(link.origin_id)
+      if (dest.inputs.filter(inp => inp.name === input.name).length === 0) {
+        // 没有，name换了
+        let dInp = dest.inputs.filter(inp => inp.type === input.type)
+        if (dInp.length === 1) {
+          src_node.connect(link.origin_slot, dest.id, dInp[0].name)
+        }
+      } else {
+        src_node.connect(link.origin_slot, dest.id, input.name)
+      }
+    }
+  }
+
+  // copy output connections
+  let output_links = {}
+  for (let i in src.outputs) {
+    let output = src.outputs[i]
+    if (output.links) {
+      let links = []
+      for (let j in output.links) {
+        links.push(app.graph.links[output.links[j]])
+      }
+      output_links[output.name] = links
+    }
+  }
+
+  for (let i in dest.outputs) {
+    let links = output_links[dest.outputs[i].name]
+    if (links) {
+      for (let j in links) {
+        let link = links[j]
+        let target_node = app.graph.getNodeById(link.target_id)
+        dest.connect(parseInt(i), target_node, link.target_slot)
+      }
+    }
+  }
+
+  // copy  widgets
+  for (const w of src.widgets) {
+    for (const d of dest.widgets) {
+      if (w.name === d.name) {
+        d.value = w.value
+      }
+    }
+  }
+
+  app.graph.afterChange()
+}
 
 function deepEqual (obj1, obj2) {
   if (typeof obj1 !== typeof obj2) {
@@ -575,6 +631,14 @@ app.registerExtension({
       }
     }
 
+    LGraphCanvas.prototype.fixTheNode = function (node) {
+      let new_node = LiteGraph.createNode(node.comfyClass)
+      new_node.pos = [node.pos[0], node.pos[1]]
+      app.canvas.graph.add(new_node, false)
+      copyNodeValues(node, new_node)
+      app.canvas.graph.remove(node)
+    }
+
     const getNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions // store the existing method
     LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
       // replace it
@@ -587,6 +651,12 @@ app.registerExtension({
           callback: () => {
             LGraphCanvas.prototype.helpAboutNode(node)
           } // and the callback
+        },
+        {
+          content: 'Fix node v2♾️Mixlab', // with a name
+          callback: () => {
+            LGraphCanvas.prototype.fixTheNode(node)
+          }
         },
         null,
         ...options
@@ -703,9 +773,9 @@ app.registerExtension({
             // console.log(group)
             let nodes = group._nodes
             for (const node of nodes) {
-              app.graph.remove(node);
+              app.graph.remove(node)
             }
-            app.graph.remove(group);
+            app.graph.remove(group)
           } // and the callback
         },
         null,
@@ -733,7 +803,7 @@ app.registerExtension({
 
       const apps = await get_my_app()
 
-      let apps_map = { '0': [] }
+      let apps_map = { 0: [] }
 
       for (const app of apps) {
         if (app.category) {
@@ -746,7 +816,7 @@ app.registerExtension({
 
       let apps_opts = []
       for (const category in apps_map) {
-        console.log('category',typeof(category))
+        console.log('category', typeof category)
         if (category === '0') {
           apps_opts.push(
             ...Array.from(apps_map[category], a => {
@@ -775,7 +845,7 @@ app.registerExtension({
         } else {
           // 二级
           apps_opts.push({
-            content:  '🚀 '+category,
+            content: '🚀 ' + category,
             has_submenu: true,
             disabled: false,
             submenu: {
@@ -1058,7 +1128,7 @@ app.registerExtension({
             has_submenu: true,
             disabled: false,
             submenu: {
-              options:apps_opts
+              options: apps_opts
             }
           }
         )
