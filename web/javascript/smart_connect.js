@@ -22,6 +22,12 @@ const smart_connect_config_input = [
     node_widget_name: 'ckpt_name',
     inputNodeName: 'CkptNames_',
     inputNode_output_name: 'ckpt_names'
+  },
+  {
+    node_type: 'KSampler',
+    node_widget_name: 'sampler_name',
+    inputNodeName: 'SamplerNames_',
+    inputNode_output_name: 'sampler_names'
   }
 ]
 

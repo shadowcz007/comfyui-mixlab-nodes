@@ -7,6 +7,8 @@ import folder_paths
 import matplotlib.font_manager as fm
 import torch
 
+
+
 def recursive_search(directory, excluded_dir_names=None):
     if not os.path.isdir(directory):
         return [], {}
@@ -766,3 +768,32 @@ class CreateCkptNames:
         ckpt_names=ckpt_names.split('\n')
         ckpt_names = [name for name in ckpt_names if name.strip()]
         return (ckpt_names,)
+    
+
+class CreateSampler_names:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "sampler_names": ("STRING",{"multiline": True,"default": "\n".join(comfy.samplers.KSampler.SAMPLERS),"dynamicPrompts": False}),
+            }
+        }
+
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("sampler_names",)
+    
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (True,)
+
+    # OUTPUT_NODE = True
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Utils"
+
+    def run(self, sampler_names):
+        sampler_names=sampler_names.split('\n')
+        sampler_names = [name for name in sampler_names if name.strip()]
+        return (sampler_names,)

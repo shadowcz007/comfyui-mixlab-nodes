@@ -4780,6 +4780,7 @@
             "Color",
             "Seed_",
             "CkptNames_",
+            "SamplerNames_",
             "CombineMasks_",
             "EnhanceImage",
             "GradientImage",
