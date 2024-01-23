@@ -4778,6 +4778,7 @@
             "CharacterInText",
             "ChatGPTOpenAI",
             "Color",
+            "Seed_",
             "CombineMasks_",
             "EnhanceImage",
             "GradientImage",

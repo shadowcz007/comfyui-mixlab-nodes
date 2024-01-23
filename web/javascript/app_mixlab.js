@@ -409,8 +409,8 @@ app.registerExtension({
         }
       }
 
-      app.canvas.centerOnNode(node)
-      app.canvas.setZoom(0.45)
+      // app.canvas.centerOnNode(node)
+      // app.canvas.setZoom(0.45)
     }
   }
 })

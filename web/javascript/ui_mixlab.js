@@ -6,6 +6,8 @@ import {
   GroupNodeHandler
 } from '../../../extensions/core/groupNode.js'
 
+import { smart_init, addSmartMenu } from './smart_connect.js'
+
 function copyNodeValues (src, dest) {
   // title
   dest.title = src.title
@@ -639,13 +641,16 @@ app.registerExtension({
       app.canvas.graph.remove(node)
     }
 
+    smart_init()
+
     const getNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions // store the existing method
     LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
       // replace it
       const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
       node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
+      console.log('getNodeMenuOptions', node.type == 'CLIPTextEncode')
 
-      return [
+      let opts = [
         {
           content: 'Help ♾️Mixlab', // with a name
           callback: () => {
@@ -653,14 +658,46 @@ app.registerExtension({
           } // and the callback
         },
         {
-          content: 'Fix node v2♾️Mixlab', // with a name
+          content: 'Fix node v2', // with a name
           callback: () => {
             LGraphCanvas.prototype.fixTheNode(node)
           }
-        },
-        null,
-        ...options
-      ] // and return the options
+        }
+      ]
+
+      opts = addSmartMenu(opts,node)
+
+      // if (node.type == 'CLIPTextEncode') {
+      //   // 则出现 randomPrompt
+      //   // CLIPTextEncode 的widget ，name== 'text'
+      //   let node_widget_name = 'text'
+      //   const widget = node.widgets.filter(w => w.name === node_widget_name)[0]
+
+      //  let mixlab_nodes_smart_connect= [{node_type:'CLIPTextEncode',
+      //   node_widget_name:'text',
+      //   inputNodeName:'RandomPrompt',
+      //   inputNode_output_type:'STRING'}]
+
+      //   if (widget) {
+      //     opts = [
+      //       {
+      //         content: 'RandomPrompt',
+      //         callback: () => {
+      //           LGraphCanvas.prototype._createNodeForInput(
+      //             node, //当前node
+      //             widget,//当前node里需要自动连线的widget
+      //             'RandomPrompt',//作为input的node type
+      //             'STRING'// 作为input的node的outputs的type. the input slot type of the target node
+      //           )
+      //         }
+      //       },
+      //       null,
+      //       ...opts
+      //     ]
+      //   }
+      // }
+
+      return [...opts, null, ...options] // and return the options
     }
 
     const getGroupMenuOptions = LGraphCanvas.prototype.getGroupMenuOptions // store the existing method
@@ -1136,5 +1173,19 @@ app.registerExtension({
         return options
       }
     }, 1000)
+  },
+  async loadedGraphNode (node, app) {
+    // console.log(
+    //   '#ui init',
+    //   app.graph._nodes[app.graph._nodes.length - 1].id,
+    //   node.id
+    // )
+    try {
+      // 用来居中显示节点
+      if ((app.graph._nodes[app.graph._nodes.length - 1].id, node.id)) {
+        app.canvas.centerOnNode(node)
+        app.canvas.setZoom(0.45)
+      }
+    } catch (error) {}
   }
 })
