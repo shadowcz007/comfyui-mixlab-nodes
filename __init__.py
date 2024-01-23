@@ -557,7 +557,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
 
 
@@ -618,7 +618,8 @@ NODE_CLASS_MAPPINGS = {
     "LimitNumber":LimitNumber, 
     "OutlineMask":OutlineMask,
     "JoinWithDelimiter":JoinWithDelimiter,
-    "Seed_":CreateSeedNode
+    "Seed_":CreateSeedNode,
+    "CkptNames_":CreateCkptNames
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }

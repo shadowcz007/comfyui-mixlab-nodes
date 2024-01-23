@@ -425,7 +425,7 @@ class DynamicDelayProcessor:
             },
             "optional":{
                 "any_input":(any_type,),
-                "delay_by_text":("STRING",{"multiline":True,}),
+                "delay_by_text":("STRING",{"multiline":True,"dynamicPrompts": False,}),
                 "words_per_seconds":("FLOAT",{ "default":1.50,"min": 0.0,"max": 1000.00,"display":"Chars per second?"}),
                 "replace_output": (["disable","enable"],),
                 "replace_value":("INT",{ "default":-1,"min": 0,"max": 1000000,"display":"Replacement value"})
@@ -737,3 +737,32 @@ class CreateSeedNode:
 
     def run(self, seed):
         return (seed,)
+    
+
+class CreateCkptNames:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "ckpt_names": ("STRING",{"multiline": True,"default": "\n".join(folder_paths.get_filename_list("checkpoints")),"dynamicPrompts": False}),
+            }
+        }
+
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("ckpt_names",)
+    
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (True,)
+
+    # OUTPUT_NODE = True
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Utils"
+
+    def run(self, ckpt_names):
+        ckpt_names=ckpt_names.split('\n')
+        ckpt_names = [name for name in ckpt_names if name.strip()]
+        return (ckpt_names,)

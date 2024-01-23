@@ -4779,6 +4779,7 @@
             "ChatGPTOpenAI",
             "Color",
             "Seed_",
+            "CkptNames_",
             "CombineMasks_",
             "EnhanceImage",
             "GradientImage",

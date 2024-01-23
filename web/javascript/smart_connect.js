@@ -16,6 +16,12 @@ const smart_connect_config_input = [
     node_widget_name: 'text',
     inputNodeName: 'ChinesePrompt_Mix',
     inputNode_output_name: 'prompt'
+  },
+  {
+    node_type: 'CheckpointLoaderSimple',
+    node_widget_name: 'ckpt_name',
+    inputNodeName: 'CkptNames_',
+    inputNode_output_name: 'ckpt_names'
   }
 ]
 
@@ -25,6 +31,12 @@ const smart_connect_config_output = [
     node_output_name: 'IMAGE',
     outputNodeName: 'ClipInterrogator',
     outputNode_input_name: 'image'
+  },
+  {
+    node_type: 'VAEDecode',
+    node_output_name: 'IMAGE',
+    outputNodeName: 'PromptImage',
+    outputNode_input_name: 'images'
   }
 ]
 
@@ -146,7 +158,7 @@ export function smart_init () {
         //  console.log(links)
         if (!links || links?.length === 0) output_node = n
       })
-      console.log('output_node', output_node)
+      console.log('output_node', output_node, widget.name)
 
       if (!output_node) {
         // 新建
@@ -157,14 +169,16 @@ export function smart_init () {
         output_node.pos = [node.pos[0] + node.size[0] + 24, node.pos[1] - 48]
       }
 
-      console.log(output_node)
       const config = getConfig.call(node, widget.name) ?? [
         widget.type,
         widget.options || {}
       ]
       let node_slotType = config[0]
-
-      node.connectByType(node_slotType, output_node, outputNode_slot)
+      console.log(node_slotType, output_node, outputNode_slot)
+      let type = output_node.inputs.filter(
+        inp => inp.name == outputNode_slot
+      )[0].type
+      node.connectByType(node_slotType, output_node, type)
     }
   }
 }
@@ -214,7 +228,9 @@ export function addSmartMenu (options, node) {
       if (node.outputs.filter(inp => inp.name === node_output_name)[0]) {
         isLinkNull =
           node.outputs.filter(inp => inp.name === node_output_name)[0].links
-            .length === 0
+            ?.length === 0
+        if (!node.outputs.filter(inp => inp.name === node_output_name)[0].links)
+          isLinkNull = true
       }
 
       if (widget && isLinkNull) {
