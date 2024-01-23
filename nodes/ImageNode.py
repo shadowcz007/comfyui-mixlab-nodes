@@ -13,7 +13,13 @@ import cv2
 import math
 from .Watcher import FolderWatcher
 
+class AnyType(str):
+  """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
 
+  def __ne__(self, __value: object) -> bool:
+    return False
+
+any_type = AnyType("*")
 
 
 FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
@@ -1250,6 +1256,9 @@ class LoadImagesFromURL:
         return {"required": { 
                     "url": ("STRING",{"multiline": True,"default": "https://","dynamicPrompts": False}),
                              },
+                "optional":{
+                    "seed": (any_type,  {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                }
                 }
     
     RETURN_TYPES = ("IMAGE","MASK",)
@@ -1266,7 +1275,7 @@ class LoadImagesFromURL:
     global urls_image
     urls_image={}
 
-    def run(self,url):
+    def run(self,url,seed=0):
         global urls_image
         print(urls_image)
         def filter_http_urls(urls):

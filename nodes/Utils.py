@@ -712,3 +712,28 @@ class TESTNODE_:
         result = list_stats.count_types(ANY)
             
         return {"ui": {"data": result,"type":[str(type(ANY[0]))]}, "result": (ANY,)}
+
+
+
+class CreateSeedNode:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+            }
+        }
+
+    RETURN_TYPES = ("INT",)
+    RETURN_NAMES = ("seed",)
+  
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Utils"
+
+    def run(self, seed):
+        return (seed,)
