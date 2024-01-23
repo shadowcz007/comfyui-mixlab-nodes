@@ -115,6 +115,11 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 - [Added DynamicDelayByText, enabling delayed execution based on input text length.](./workflow/audio-chatgpt-workflow.json)
 
+- [使用CkptNames 对比不同的模型效果](./workflow/ckpts-image-workflow.json)
+
+- [CkptNames compare the effects of different models.](./workflow/ckpts-image-workflow.json)
+
+
 
 ## Other Nodes
 

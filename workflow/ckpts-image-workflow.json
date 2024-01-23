@@ -1,0 +1,558 @@
+{
+  "last_node_id": 69,
+  "last_link_id": 72,
+  "nodes": [
+    {
+      "id": 37,
+      "type": "CLIPTextEncode",
+      "pos": [
+        6705,
+        -216
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            34
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "CLIPTextEncode",
+      "pos": [
+        6693,
+        61
+      ],
+      "size": {
+        "0": 425.27801513671875,
+        "1": 180.6060791015625
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 6
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 25,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark"
+      ]
+    },
+    {
+      "id": 3,
+      "type": "EmptyLatentImage",
+      "pos": [
+        6689,
+        306
+      ],
+      "size": {
+        "0": 315,
+        "1": 106
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        512,
+        512,
+        1
+      ]
+    },
+    {
+      "id": 27,
+      "type": "EmbeddingPrompt",
+      "pos": [
+        6104,
+        23
+      ],
+      "size": {
+        "0": 399.6408996582031,
+        "1": 82
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            25
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "EmbeddingPrompt"
+      },
+      "widgets_values": [
+        "negative-embed-verybadimagenegative_v1.3",
+        1
+      ]
+    },
+    {
+      "id": 67,
+      "type": "VAEDecode",
+      "pos": [
+        7551,
+        -184
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 70
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 69
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            71
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 1,
+      "type": "KSampler",
+      "pos": [
+        7187,
+        -145
+      ],
+      "size": {
+        "0": 315,
+        "1": 262
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 34
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 3
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            70
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        408562451564429,
+        "fixed",
+        20,
+        8,
+        "euler",
+        "normal",
+        1
+      ]
+    },
+    {
+      "id": 61,
+      "type": "PromptImage",
+      "pos": [
+        7853,
+        -238
+      ],
+      "size": [
+        465.6378949342379,
+        760.4568424013569
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 71
+        },
+        {
+          "name": "prompts",
+          "type": "STRING",
+          "link": 72,
+          "widget": {
+            "name": "prompts"
+          }
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PromptImage"
+      },
+      "widgets_values": [
+        "",
+        "disable",
+        {
+          "_images": [
+            [
+              {
+                "filename": "mixlab_PromptImage_0_00027_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ],
+            [
+              {
+                "filename": "mixlab_PromptImage_1_00028_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ],
+            [
+              {
+                "filename": "mixlab_PromptImage_2_00029_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ],
+            [
+              {
+                "filename": "mixlab_PromptImage_3_00030_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ],
+            [
+              {
+                "filename": "mixlab_PromptImage_4_00031_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ],
+            [
+              {
+                "filename": "mixlab_PromptImage_5_00032_.png",
+                "subfolder": "",
+                "type": "output"
+              }
+            ]
+          ],
+          "prompts": [
+            "512-inpainting-ema.safetensors",
+            "SSD-1B.safetensors",
+            "awportrait_v12.safetensors",
+            "cardosAnime_v20.safetensors",
+            "deliberate_v2.safetensors",
+            "gameIconInstitute_v40.safetensors"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        6105,
+        -139
+      ],
+      "size": {
+        "0": 315,
+        "1": 98
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "ckpt_name",
+          "type": [
+            "512-inpainting-ema.safetensors",
+            "SSD-1B.safetensors",
+            "awportrait_v12.safetensors",
+            "cardosAnime_v20.safetensors",
+            "deliberate_v2.safetensors",
+            "gameIconInstitute_v40.safetensors",
+            "illuminatiDiffusionV1_v11-unclip-h-fp16.safetensors",
+            "sd_xl_turbo_1.0_fp16.safetensors",
+            "svd.safetensors"
+          ],
+          "link": 64,
+          "widget": {
+            "name": "ckpt_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            6,
+            33
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            69
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "deliberate_v2.safetensors"
+      ]
+    },
+    {
+      "id": 56,
+      "type": "CkptNames_",
+      "pos": [
+        7860,
+        -494
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "ckpt_names",
+          "type": "*",
+          "links": [
+            64,
+            72
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CkptNames_"
+      },
+      "widgets_values": [
+        "512-inpainting-ema.safetensors\nSSD-1B.safetensors\nawportrait_v12.safetensors\ncardosAnime_v20.safetensors\ndeliberate_v2.safetensors\ngameIconInstitute_v40.safetensors"
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      1,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      5,
+      0,
+      1,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      4,
+      3,
+      0,
+      1,
+      3,
+      "LATENT"
+    ],
+    [
+      6,
+      2,
+      1,
+      5,
+      0,
+      "CLIP"
+    ],
+    [
+      25,
+      27,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      33,
+      2,
+      1,
+      37,
+      0,
+      "CLIP"
+    ],
+    [
+      34,
+      37,
+      0,
+      1,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      64,
+      56,
+      0,
+      2,
+      0,
+      [
+        "512-inpainting-ema.safetensors",
+        "SSD-1B.safetensors",
+        "awportrait_v12.safetensors",
+        "cardosAnime_v20.safetensors",
+        "deliberate_v2.safetensors",
+        "gameIconInstitute_v40.safetensors",
+        "illuminatiDiffusionV1_v11-unclip-h-fp16.safetensors",
+        "sd_xl_turbo_1.0_fp16.safetensors",
+        "svd.safetensors"
+      ]
+    ],
+    [
+      69,
+      2,
+      2,
+      67,
+      1,
+      "VAE"
+    ],
+    [
+      70,
+      1,
+      0,
+      67,
+      0,
+      "LATENT"
+    ],
+    [
+      71,
+      67,
+      0,
+      61,
+      0,
+      "IMAGE"
+    ],
+    [
+      72,
+      56,
+      0,
+      61,
+      1,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {},
+  "version": 0.4
+}
