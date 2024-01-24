@@ -30,6 +30,18 @@ const smart_connect_config_input = [
     inputNode_output_name: 'sampler_names'
   },
   {
+    node_type: 'LoraLoaderModelOnly',
+    node_widget_name: 'lora_name',
+    inputNodeName: 'LoraNames_',
+    inputNode_output_name: 'lora_names'
+  },
+  {
+    node_type: 'LoadLoRA',
+    node_widget_name: 'lora_name',
+    inputNodeName: 'LoraNames_',
+    inputNode_output_name: 'lora_names'
+  },
+  {
     node_type: 'Moondream',
     node_widget_name: 'image',
     inputNodeName: 'LoadImage',
@@ -224,9 +236,9 @@ export function addSmartMenu (options, node) {
       // CLIPTextEncode 的widget ，name== 'text'
       let node_widget_name = sc.node_widget_name
       let widget = node.widgets.filter(w => w.name === node_widget_name)[0]
-      if(!widget){
+      if (!widget) {
         // 控件没有，则查找inputs
-        widget= node.inputs.filter(w => w.name === node_widget_name)[0]
+        widget = node.inputs.filter(w => w.name === node_widget_name)[0]
       }
 
       let isLinkNull = true
@@ -239,7 +251,7 @@ export function addSmartMenu (options, node) {
 
       if (widget && isLinkNull) {
         sopts.push({
-          content: sc.inputNodeName.split('_')[0]+'➡️',
+          content: sc.inputNodeName.split('_')[0] + '➡️',
           callback: () => {
             LGraphCanvas.prototype._createNodeForInput(
               node, //当前node
@@ -270,7 +282,7 @@ export function addSmartMenu (options, node) {
 
       if (widget && isLinkNull) {
         sopts.push({
-          content: '➡️'+ sc.outputNodeName.split('_')[0],
+          content: '➡️' + sc.outputNodeName.split('_')[0],
           callback: () => {
             LGraphCanvas.prototype._createNodeForOutput(
               node, //当前node

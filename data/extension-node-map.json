@@ -4781,6 +4781,7 @@
             "Seed_",
             "CkptNames_",
             "SamplerNames_",
+            "LoraNames_",
             "CombineMasks_",
             "EnhanceImage",
             "GradientImage",

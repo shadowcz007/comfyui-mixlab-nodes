@@ -557,7 +557,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
 
 
@@ -620,7 +620,8 @@ NODE_CLASS_MAPPINGS = {
     "JoinWithDelimiter":JoinWithDelimiter,
     "Seed_":CreateSeedNode,
     "CkptNames_":CreateCkptNames,
-    "SamplerNames_":CreateSampler_names
+    "SamplerNames_":CreateSampler_names,
+    "LoraNames_":CreateLoraNames
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -647,7 +648,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptGenerate_Mix":"PromptGenerate ♾️Mixlab",
     "ChinesePrompt_Mix":"ChinesePrompt ♾️Mixlab",
     "GamePal":"GamePal ♾️Mixlab",
-    "RembgNode_Mix":"Removebg"
+    "RembgNode_Mix":"Removebg",
+    "LoraNames_":"LoraName_TriggerWords.safetensors"
 }
 
 # web ui的节点功能

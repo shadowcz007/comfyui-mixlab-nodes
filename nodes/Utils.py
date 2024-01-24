@@ -768,7 +768,38 @@ class CreateCkptNames:
         ckpt_names=ckpt_names.split('\n')
         ckpt_names = [name for name in ckpt_names if name.strip()]
         return (ckpt_names,)
+
+
+class CreateLoraNames:
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "lora_names": ("STRING",{"multiline": True,"default": "\n".join(folder_paths.get_filename_list("loras")),"dynamicPrompts": False}),
+            }
+        }
+
+    RETURN_TYPES = (any_type,"STRING",)
+    RETURN_NAMES = ("lora_names","prompt",)
     
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (True,True,)
+
+    # OUTPUT_NODE = True
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Utils"
+
+    def run(self, lora_names):
+        lora_names=lora_names.split('\n')
+        lora_names = [name for name in lora_names if name.strip()]
+        prompts=[os.path.splitext(n)[0] for n in lora_names]
+        return (lora_names,prompts,)
+   
+
 
 class CreateSampler_names:
     def __init__(self):
