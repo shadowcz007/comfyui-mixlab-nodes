@@ -156,6 +156,32 @@ const parseSvg = async svgContent => {
   return { data, image: base64, svgElement }
 }
 
+
+function findImages(nodeId) {
+  // 检查当前节点是否有 imgs 字段
+  const n = app.graph.getNodeById(nodeId)
+  if (n.imgs) {
+    return n.imgs;
+  }
+
+  // 检查当前节点的 inputs 是否有 image 字段
+  if (n.inputs) {
+    for (let i = 0; i < n.inputs.length; i++) {
+      if (n.inputs[i].name==='image'||n.inputs[i].name==='images') {
+        // 获取新的 nodeId，并递归调用 findImages 函数
+        var linkId = n.inputs[i]?.link;
+        var origin_id = app.graph.links[linkId].origin_id
+        return findImages(origin_id);
+      }
+    }
+  }
+
+  // 如果没有找到 imgs 字段或者 image 字段，则返回 null
+  return null;
+}
+
+ 
+
 async function setArea (cw, ch, topBase64, base64, data, fn) {
   let displayHeight = Math.round(window.screen.availHeight * 0.8)
   let div = document.createElement('div')
@@ -571,15 +597,19 @@ app.registerExtension({
               }
             }
             try {
-              console.log('this.inputs', this.inputs)
-              let topLinkId = this.inputs[0].link
-              let topNodeId = app.graph.links[topLinkId].origin_id
-              let topIm = app.graph.getNodeById(topNodeId).imgs[0]
+              console.log('this.inputs', this.id)
+              let imgs=findImages(this.id)
+              
+              // let topLinkId = this.inputs[0].link
+              // let topNodeId = app.graph.links[topLinkId].origin_id
+              let topIm = imgs[0]
 
               let linkId = this.inputs[3].link
               let nodeId = app.graph.links[linkId].origin_id
               // console.log(linkId,this.inputs)
-              let im = app.graph.getNodeById(nodeId).imgs[0]
+              let imgs2=findImages(nodeId)
+              let im = imgs2[0]
+              console.log(topIm,im)
               // let src = im.src
               setArea(
                 im.naturalWidth,
@@ -589,7 +619,9 @@ app.registerExtension({
                 data,
                 updateValue
               )
-            } catch (error) {}
+            } catch (error) {
+              console.log(error)
+            }
           })
         }
       }

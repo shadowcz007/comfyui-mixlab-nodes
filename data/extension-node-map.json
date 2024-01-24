@@ -4813,7 +4813,8 @@
             "TextToNumber",
             "TextInput_",
             "DynamicDelayProcessor",
-            "LaMaInpainting"
+            "LaMaInpainting",
+            "Moondream"
         ],
         {
             "title_aux": "comfyui-mixlab-nodes"

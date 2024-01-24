@@ -28,6 +28,12 @@ const smart_connect_config_input = [
     node_widget_name: 'sampler_name',
     inputNodeName: 'SamplerNames_',
     inputNode_output_name: 'sampler_names'
+  },
+  {
+    node_type: 'Moondream',
+    node_widget_name: 'image',
+    inputNodeName: 'LoadImage',
+    inputNode_output_name: 'IMAGE'
   }
 ]
 
@@ -43,6 +49,24 @@ const smart_connect_config_output = [
     node_output_name: 'IMAGE',
     outputNodeName: 'PromptImage',
     outputNode_input_name: 'images'
+  },
+  {
+    node_type: 'VAEDecode',
+    node_output_name: 'IMAGE',
+    outputNodeName: 'PreviewImage',
+    outputNode_input_name: 'images'
+  },
+  {
+    node_type: 'VAEDecode',
+    node_output_name: 'IMAGE',
+    outputNodeName: 'SaveImage',
+    outputNode_input_name: 'images'
+  },
+  {
+    node_type: 'Moondream',
+    node_output_name: 'STRING',
+    outputNodeName: 'ShowTextForGPT',
+    outputNode_input_name: 'text'
   }
 ]
 
@@ -195,10 +219,15 @@ export function addSmartMenu (options, node) {
   for (const sc of smart_connect_config_input) {
     // 有智能推荐，则出现
     if (node.type === sc.node_type) {
+      // console.log('smart',node)
       // 则出现 randomPrompt
       // CLIPTextEncode 的widget ，name== 'text'
       let node_widget_name = sc.node_widget_name
-      const widget = node.widgets.filter(w => w.name === node_widget_name)[0]
+      let widget = node.widgets.filter(w => w.name === node_widget_name)[0]
+      if(!widget){
+        // 控件没有，则查找inputs
+        widget= node.inputs.filter(w => w.name === node_widget_name)[0]
+      }
 
       let isLinkNull = true
       // 如果input里已经有，但是link为空
@@ -210,7 +239,7 @@ export function addSmartMenu (options, node) {
 
       if (widget && isLinkNull) {
         sopts.push({
-          content: sc.inputNodeName.split('_')[0],
+          content: sc.inputNodeName.split('_')[0]+'➡️',
           callback: () => {
             LGraphCanvas.prototype._createNodeForInput(
               node, //当前node
@@ -241,7 +270,7 @@ export function addSmartMenu (options, node) {
 
       if (widget && isLinkNull) {
         sopts.push({
-          content: sc.outputNodeName.split('_')[0],
+          content: '➡️'+ sc.outputNodeName.split('_')[0],
           callback: () => {
             LGraphCanvas.prototype._createNodeForOutput(
               node, //当前node
