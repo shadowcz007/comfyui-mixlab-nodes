@@ -2120,7 +2120,7 @@ class ResizeImage:
                     average_images.append(a_im)
                     hexs.append(hex)
 
-            if mask!=None:
+            try:
                 for mas in mask:
                     for ma in mas:
                         ma=tensor2pil(ma)
@@ -2129,6 +2129,8 @@ class ResizeImage:
                         ma=ma.convert('L')
                         ma=pil2tensor(ma)
                         masks.append(ma)
+            except:
+                print('')
         
         return (imgs,average_images,hexs,masks,)
 
