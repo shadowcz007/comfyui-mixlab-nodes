@@ -1182,7 +1182,7 @@ class ImageCropByAlpha:
                 if a != 0:
                     new_pixel_data[x, y] = (255, 255, 255, 255)
                 else:
-                    new_pixel_data[x, y] = (r, g, b, a)
+                    new_pixel_data[x, y] = (0,0,0,0)
 
         # 保存修改后的图像
         # new_image.save("output.png")
