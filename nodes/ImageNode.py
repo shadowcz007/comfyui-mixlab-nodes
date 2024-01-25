@@ -2120,14 +2120,15 @@ class ResizeImage:
                     average_images.append(a_im)
                     hexs.append(hex)
 
-            for mas in mask:
-                for ma in mas:
-                    ma=tensor2pil(ma)
-                    ma=ma.convert('RGB')
-                    ma=resize_image(ma,scale_option,w,h,fill_color)
-                    ma=ma.convert('L')
-                    ma=pil2tensor(ma)
-                    masks.append(ma)
+            if mask!=None:
+                for mas in mask:
+                    for ma in mas:
+                        ma=tensor2pil(ma)
+                        ma=ma.convert('RGB')
+                        ma=resize_image(ma,scale_option,w,h,fill_color)
+                        ma=ma.convert('L')
+                        ma=pil2tensor(ma)
+                        masks.append(ma)
         
         return (imgs,average_images,hexs,masks,)
 
