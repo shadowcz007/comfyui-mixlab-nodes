@@ -2067,20 +2067,21 @@ class ResizeImage:
                     "image": ("IMAGE",),
                     "average_color": (["on",'off'],),
                     "fill_color":("STRING",{"multiline": False,"default": "#FFFFFF","dynamicPrompts": False}),
+                    "mask": ("MASK",),
             }
                 }
     
-    RETURN_TYPES = ("IMAGE","IMAGE","STRING",)
-    RETURN_NAMES = ("image","average_image","average_hex",)
+    RETURN_TYPES = ("IMAGE","IMAGE","STRING","MASK",)
+    RETURN_NAMES = ("image","average_image","average_hex","mask",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Image"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,True,True,)
+    OUTPUT_IS_LIST = (True,True,True,True,)
 
-    def run(self,width,height,scale_option,image=None,average_color=['on'],fill_color=["#FFFFFF"]):
+    def run(self,width,height,scale_option,image=None,average_color=['on'],fill_color=["#FFFFFF"],mask=None):
         
         w=width[0]
         h=height[0]
@@ -2089,6 +2090,7 @@ class ResizeImage:
         fill_color=fill_color[0]
 
         imgs=[]
+        masks=[]
         average_images=[]
         hexs=[]
 
@@ -2117,8 +2119,17 @@ class ResizeImage:
                     a_im=pil2tensor(a_im)
                     average_images.append(a_im)
                     hexs.append(hex)
+
+            for mas in mask:
+                for ma in mas:
+                    ma=tensor2pil(ma)
+                    ma=ma.convert('RGB')
+                    ma=resize_image(ma,scale_option,w,h,fill_color)
+                    ma=ma.convert('L')
+                    ma=pil2tensor(ma)
+                    masks.append(ma)
         
-        return (imgs,average_images,hexs,)
+        return (imgs,average_images,hexs,masks,)
 
 
 class MirroredImage:
