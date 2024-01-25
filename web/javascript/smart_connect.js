@@ -181,7 +181,7 @@ export function smart_init () {
       ]
       let node_slotType = config[0]
       // 如果input没有，则创建
-      if (!node.inputs.filter(inp => inp.name === widget.name)[0])
+      if (!node.inputs?.filter(inp => inp.name === widget.name)[0]||!node.inputs)
         convertToInput(node, widget, config)
       input_node.connectByType(inputNode_slot, node, node_slotType)
     }
@@ -243,7 +243,7 @@ export function addSmartMenu (options, node) {
 
       let isLinkNull = true
       // 如果input里已经有，但是link为空
-      if (node.inputs.filter(inp => inp.name === node_widget_name)[0]) {
+      if (node.inputs?.filter(inp => inp.name === node_widget_name)[0]) {
         isLinkNull =
           node.inputs.filter(inp => inp.name === node_widget_name)[0].link ===
           null
@@ -272,7 +272,7 @@ export function addSmartMenu (options, node) {
 
       let isLinkNull = true
       // 如果output里 link为空
-      if (node.outputs.filter(inp => inp.name === node_output_name)[0]) {
+      if (node.outputs?.filter(inp => inp.name === node_output_name)[0]) {
         isLinkNull =
           node.outputs.filter(inp => inp.name === node_output_name)[0].links
             ?.length === 0
