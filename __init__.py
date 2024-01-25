@@ -430,7 +430,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 PromptServer.start=new_start
 
 # 创建路由表
-routes = web.RouteTableDef()
+routes = PromptServer.instance.routes
 
 @routes.post('/mixlab')
 async def mixlab_hander(request):
@@ -515,27 +515,6 @@ async def nodes_map_hander(request):
             print(e)
 
     return web.json_response(result)
-
-# 把插件自定义的路由添加到comfyui server里
-def new_add_routes(self):
-        import nodes
-        try:
-            self.user_manager.add_routes(self.routes)
-        except:
-            print('pls update')
-        
-        self.app.add_routes(routes)
-        self.app.add_routes(self.routes)
-        for name, dir in nodes.EXTENSION_WEB_DIRS.items():
-            self.app.add_routes([
-                web.static('/extensions/' + urllib.parse.quote(name), dir, follow_symlinks=True),
-            ])
-        self.app.add_routes([
-            web.static('/', self.web_root, follow_symlinks=True),
-        ])
-
-PromptServer.add_routes=new_add_routes
-
 
 
 # 扩展api接口
