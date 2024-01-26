@@ -2235,3 +2235,72 @@ class ImageColorTransfer:
 
 
 
+class SaveImageToLocal:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.compress_level = 4
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": 
+                    {"images": ("IMAGE", ),
+                     "file_path": ("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
+                     },
+                "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+                
+                }
+
+    RETURN_TYPES = ()
+    FUNCTION = "save_images"
+
+    OUTPUT_NODE = True
+
+    CATEGORY = "♾️Mixlab/Image"
+
+    def save_images(self, images,file_path , prompt=None, extra_pnginfo=None):
+        filename_prefix = os.path.basename(file_path)
+        if file_path=='':
+            filename_prefix="ComfyUI"
+            
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        
+        if not os.path.exists(file_path):
+            # 使用os.makedirs函数创建新目录
+            os.makedirs(file_path)
+            print("目录已创建")
+        else:
+            print("目录已存在")
+
+        results = list()
+        for image in images:
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            metadata = None
+            if not args.disable_metadata:
+                metadata = PngInfo()
+                if prompt is not None:
+                    metadata.add_text("prompt", json.dumps(prompt))
+                if extra_pnginfo is not None:
+                    for x in extra_pnginfo:
+                        metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+
+            file = f"{filename}_{counter:05}_.png"
+            if file_path=="":
+                img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+                results.append({
+                    "filename": file,
+                    "subfolder": subfolder,
+                    "type": self.type
+                })
+            
+            else:
+                img.save(os.path.join(file_path, file), pnginfo=metadata, compress_level=self.compress_level)
+                results.append({
+                    "filename": file,
+                    "subfolder": file_path,
+                    "type": self.type
+                })
+            counter += 1
+
+        return 

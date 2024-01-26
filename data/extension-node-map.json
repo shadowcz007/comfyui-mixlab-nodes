@@ -4773,6 +4773,7 @@
             "ResizeImage",
             "NoiseImage",
             "PromptImage",
+            "SaveImageToLocal",
             "AreaToMask",
             "CLIPSeg_",
             "CharacterInText",
