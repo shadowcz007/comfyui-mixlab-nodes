@@ -341,7 +341,7 @@ class RandomPrompt:
 
 
     # 运行的函数
-    def run(self,max_count,mutable_prompt,immutable_prompt,random_sample,seed):
+    def run(self,max_count,mutable_prompt,immutable_prompt,random_sample,seed=0):
         # print('#运行的函数',mutable_prompt,immutable_prompt,max_count,random_sample)
         
         # Split the text into an array of words
