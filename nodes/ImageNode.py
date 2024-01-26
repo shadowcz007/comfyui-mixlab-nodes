@@ -10,7 +10,7 @@ import folder_paths
 import json,io
 from comfy.cli_args import args
 import cv2 
-import math
+import math,glob
 from .Watcher import FolderWatcher
 
 class AnyType(str):
@@ -2272,6 +2272,16 @@ class SaveImageToLocal:
         else:
             print("目录已存在")
 
+        # 使用glob模块获取当前目录下的所有文件
+        if file_path=="":
+            files = glob.glob(full_output_folder + '/*')
+        else:
+            files = glob.glob(file_path + '/*')
+        # 统计文件数量
+        file_count = len(files)
+        counter+=file_count
+        print('统计文件数量',file_count,counter)
+
         results = list()
         for image in images:
             i = 255. * image.cpu().numpy()
@@ -2286,6 +2296,7 @@ class SaveImageToLocal:
                         metadata.add_text(x, json.dumps(extra_pnginfo[x]))
 
             file = f"{filename}_{counter:05}_.png"
+            
             if file_path=="":
                 img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
                 results.append({
@@ -2303,4 +2314,4 @@ class SaveImageToLocal:
                 })
             counter += 1
 
-        return 
+        return ()
