@@ -200,14 +200,17 @@ class TextToNumber:
         return {"required": { 
                     "text": ("STRING",{"multiline": False,"default": "1"}),
                     "random_number": (["enable", "disable"],),
-                    "number":("INT", {
-                        "default": 0, 
-                        "min": 0, #Minimum value
+                    "max_num":("INT", {
+                        "default": 10, 
+                        "min":2, #Minimum value
                         "max": 10000000000, #Maximum value
                         "step": 1, #Slider's step
                         "display": "number" # Cosmetic only: display as "number" or "slider"
                     }),
                              },
+                 "optional":{
+                    "seed": (any_type,  {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                }
                 }
     
     RETURN_TYPES = ("INT",)
@@ -220,7 +223,7 @@ class TextToNumber:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,text,random_number,number):
+    def run(self,text,random_number,max_num,seed):
         
         numbers = re.findall(r'\d+', text)
         result=0
@@ -229,7 +232,7 @@ class TextToNumber:
             # print(result)
         
         if random_number=='enable' and result>0:
-            result= random.randint(1, 10000000000)
+            result= random.randint(1, max_num)
         return {"ui": {"text": [text],"num":[result]}, "result": (result,)}
     
 

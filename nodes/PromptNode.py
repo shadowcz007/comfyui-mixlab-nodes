@@ -323,7 +323,9 @@ class RandomPrompt:
                 "random_sample": (["enable", "disable"],),
                 # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
                 },
-           
+            "optional":{
+                    "seed": (any_type,  {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                }
             }
     
     
@@ -339,7 +341,7 @@ class RandomPrompt:
 
 
     # 运行的函数
-    def run(self,max_count,mutable_prompt,immutable_prompt,random_sample):
+    def run(self,max_count,mutable_prompt,immutable_prompt,random_sample,seed):
         # print('#运行的函数',mutable_prompt,immutable_prompt,max_count,random_sample)
         
         # Split the text into an array of words
