@@ -223,7 +223,7 @@ class TextToNumber:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def run(self,text,random_number,max_num,seed):
+    def run(self,text,random_number,max_num,seed=0):
         
         numbers = re.findall(r'\d+', text)
         result=0
