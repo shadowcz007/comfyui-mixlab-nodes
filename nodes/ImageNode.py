@@ -9,9 +9,14 @@ from io import BytesIO
 import folder_paths
 import json,io
 from comfy.cli_args import args
-import cv2 
+import cv2
+import string
 import math,glob
 from .Watcher import FolderWatcher
+
+def generate_random_string(length):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))
 
 class AnyType(str):
   """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
@@ -2298,7 +2303,11 @@ class SaveImageToLocal:
             file = f"{filename}_{counter:05}_.png"
             
             if file_path=="":
-                img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+                fp=os.path.join(full_output_folder, file)
+                if os.path.exists(fp):
+                    file = f"{filename}_{counter:05}_{generate_random_string(8)}.png"
+                    fp=os.path.join(full_output_folder, file)
+                img.save(fp, pnginfo=metadata, compress_level=self.compress_level)
                 results.append({
                     "filename": file,
                     "subfolder": subfolder,
@@ -2306,6 +2315,11 @@ class SaveImageToLocal:
                 })
             
             else:
+                fp=os.path.join(file_path, file)
+                if os.path.exists(fp):
+                    file = f"{filename}_{counter:05}_{generate_random_string(8)}.png"
+                    fp=os.path.join(file_path, file)
+
                 img.save(os.path.join(file_path, file), pnginfo=metadata, compress_level=self.compress_level)
                 results.append({
                     "filename": file,
