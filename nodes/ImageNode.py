@@ -140,10 +140,10 @@ def naive_cutout(img, mask,invert=True):
     image using the mask.
     """
 
-    img=img.convert("RGBA")
+    # img=img.convert("RGBA")
     mask=mask.convert("RGBA")
 
-    empty = Image.new("RGBA", (img.size), 0)
+    empty = Image.new("RGBA", (mask.size), 0)
 
     red, green, blue, alpha = mask.split()
 
@@ -972,6 +972,7 @@ class TransparentImage:
         # ui.images 节点里显示图片，和 传参，image_path自定义的数据，需要写节点的自定义ui
         # result 里输出给下个节点的数据 
         # print('TransparentImage',len(images_rgb))
+        
         return {"ui":{"images": ui_images,"image_paths":image_paths},"result": (image_paths,images_rgb,images_rgba)}
 
 
@@ -1147,7 +1148,12 @@ class ImageCropByAlpha:
 
         # print(RGBA)
         im=tensor2pil(RGBA)
-        im=naive_cutout(im,im)
+
+        # 要把im的alpha通道转为mask
+        im=im.convert('RGBA')
+        red, green, blue, alpha = im.split()
+
+        im=naive_cutout(bf_im,alpha)
         x, y, w, h=get_not_transparent_area(im)
         # print('#ForImageCrop:',w, h,x, y,)
 
@@ -1162,11 +1168,12 @@ class ImageCropByAlpha:
         height_1=h
 
         img = image[:,y:to_y, x:to_x, :]
-
+        # tensor2pil(img).save('test2.png')
 
         # 原图的mask
         ori=RGBA[:,y:to_y, x:to_x, :]
         ori=tensor2pil(ori)
+        # ori.save('test.png')
 
         # 创建一个新的图像对象，大小和模式与原始图像相同
         new_image = Image.new("RGBA", ori.size)
