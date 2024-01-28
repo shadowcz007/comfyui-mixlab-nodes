@@ -4795,6 +4795,7 @@
             "LoadImagesFromURL",
             "MergeLayers",
             "NewLayer",
+            "CenterImage",
             "RandomPrompt",
             "PromptSlide",
             "PromptSimplification",

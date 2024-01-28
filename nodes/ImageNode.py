@@ -1631,6 +1631,19 @@ def splitImage(image, num):
 
     return grid_coordinates
 
+
+def centerImage(margin,canvas):
+    w,h=canvas.size
+
+    l,t,r,b=margin
+
+    x=l
+    y=t
+    width=w-r-l
+    height=h-t-b
+
+    return (x,y,width,height)
+
 # # 读取图片
 # image = Image.open("path_to_your_image.jpg")
 
@@ -1693,6 +1706,64 @@ class SplitImage:
         g=grids[num]
 
         return (grids,g,)
+
+
+
+class CenterImage:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { 
+            "required": { 
+                "canvas": ("IMAGE",), 
+                "left": ("INT",{
+                    "default":24, 
+                    "min": 0, #Minimum value
+                    "max": 5000, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+               "top": ("INT",{
+                    "default":24, 
+                    "min": 0, #Minimum value
+                    "max": 5000, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                "right": ("INT",{
+                    "default": 24, 
+                    "min": 0, #Minimum value
+                    "max": 5000, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+                 "bottom": ("INT",{
+                    "default": 24, 
+                    "min": 0, #Minimum value
+                    "max": 5000, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+            }
+                }
+    
+    RETURN_TYPES = ("_GRID",)
+    RETURN_NAMES = ("grid",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Layer"
+
+    INPUT_IS_LIST = False
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self,canvas,left,top,right,bottom):
+        canvas=tensor2pil(canvas)
+
+        grid=centerImage((left,top,right,bottom),canvas)
+
+        return (grid,)
+
+
 
 
 class GridOutput:
