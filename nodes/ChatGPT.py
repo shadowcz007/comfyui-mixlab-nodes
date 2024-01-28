@@ -1,7 +1,15 @@
 import openai 
 import time
 import urllib.error
-import re,json
+import re,json,os,string,random
+import folder_paths
+
+
+def generate_random_string(length):
+    letters = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters) for _ in range(length))
+
+
 
 #  判断是否是azure服务
 def is_azure_url(url):
@@ -73,8 +81,8 @@ class ChatGPTNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "api_key":("KEY", {"default": "", "multiline": True}),
-                "api_url":("URL", {"default": "", "multiline": True}),
+                "api_key":("KEY", {"default": "", "multiline": True,"dynamicPrompts": False}),
+                "api_url":("URL", {"default": "", "multiline": True,"dynamicPrompts": False}),
                 "prompt": ("STRING", {"multiline": True,"dynamicPrompts": False}),
                 "system_content": ("STRING", 
                                    {
@@ -168,7 +176,10 @@ class ShowTextForGPT:
         return {
             "required": {
                 "text": ("STRING", {"forceInput": True,"dynamicPrompts": False}),
-            }
+            },
+            "optional":{ 
+                    "output_dir": ("STRING",{"default": "","multiline": True,"dynamicPrompts": False}), 
+                }
         }
 
     INPUT_IS_LIST = True
@@ -179,7 +190,16 @@ class ShowTextForGPT:
 
     CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, text):
+    def run(self, text,output_dir):
+        output_dir=output_dir[0]
+        filename=generate_random_string(4)+'.txt'
+
+        if output_dir=='':
+            output_dir = folder_paths.get_temp_directory()
+        
+        save_to_dirpath=os.path.join(output_dir,filename)
+        with open(save_to_dirpath, 'w') as file:
+            file.write("\n".join(text))
         # print(text)
         return {"ui": {"text": text}, "result": (text,)}
         
