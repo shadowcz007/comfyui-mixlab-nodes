@@ -42,6 +42,9 @@ else:
     _available=True
 
 
+lama_path=os.path.join(folder_paths.models_dir, "lama")
+if not os.path.exists(lama_path):
+    os.mkdir(lama_path)
  
 llma_model_path=os.path.join(folder_paths.models_dir, "lama/big-lama.pt")
 if not os.path.exists(llma_model_path):

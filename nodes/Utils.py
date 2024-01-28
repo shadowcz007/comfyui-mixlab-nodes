@@ -1,10 +1,9 @@
 import os,platform
 import re,random,json
-from PIL import Image
-import numpy as np
+
 # FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
 import folder_paths
-import matplotlib.font_manager as fm
+# import matplotlib.font_manager as fm
 import torch
 
 
@@ -65,37 +64,7 @@ def get_system_font_path():
 #     return hash_value
     
 
-
-def tensor2pil(image):
-    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
-
-
-def create_temp_file(image):
-    output_dir = folder_paths.get_temp_directory()
-
-    (
-            full_output_folder,
-            filename,
-            counter,
-            subfolder,
-            _,
-        ) = folder_paths.get_save_image_path('tmp', output_dir)
-
-    
-    im=tensor2pil(image)
  
-    image_file = f"{filename}_{counter:05}.png"
-     
-    image_path=os.path.join(full_output_folder, image_file)
-
-    im.save(image_path,compress_level=4)
-
-    return [{
-                "filename": image_file,
-                "subfolder": subfolder,
-                "type": "temp"
-                }]
-
 def get_font_files(directory):
     font_files = {}
 
@@ -413,6 +382,7 @@ class AnyType(str):
     return False
 
 any_type = AnyType("*")
+
 import time
 
 class DynamicDelayProcessor:
@@ -489,69 +459,6 @@ class DynamicDelayProcessor:
         return (max(0, replace_value),) if replace_output == "enable" else (any_input,)
         
 
-
-
-# app 配置节点
-class AppInfo:
-    @classmethod
-    def INPUT_TYPES(s):
-        return {"required": { 
-                    "name": ("STRING",{"multiline": False,"default": "Mixlab-App","dynamicPrompts": False}),
-                    "input_ids":("STRING",{"multiline": True,"default": "\n".join(["1","2","3"]),"dynamicPrompts": False}),
-                    "output_ids":("STRING",{"multiline": True,"default": "\n".join(["5","9"]),"dynamicPrompts": False}),
-                             },
-
-                "optional":{
-                    "IMAGE": ("IMAGE",),
-                    "description":("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
-                    "version":("INT", {
-                        "default": 1, 
-                        "min": 1, 
-                        "max": 10000, 
-                        "step": 1, 
-                        "display": "number"  
-                    }),
-                    "share_prefix":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
-                    "link":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
-                    "category":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
-                    "auto_save": (["enable","disable"],),
-                }
-
-                }
-    
-    RETURN_TYPES = ()
-    # RETURN_NAMES = ("IMAGE",)
-
-    FUNCTION = "run"
-
-    CATEGORY = "♾️Mixlab"
-
-    OUTPUT_NODE = True
-    INPUT_IS_LIST = True
-    # OUTPUT_IS_LIST = (True,)
-
-    def run(self,name,input_ids,output_ids,IMAGE,description,version,share_prefix,link,category,auto_save):
-        name=name[0]
-        
-        im=None
-        if IMAGE:
-            im=IMAGE[0][0]
-            #TODO batch 的方式需要处理
-            im=create_temp_file(im)
-        # image [img,] img[batch,w,h,a] 列表里面是batch，
-
-        input_ids=input_ids[0]
-        output_ids=output_ids[0]
-        description=description[0]
-        version=version[0]
-        share_prefix=share_prefix[0]
-        link=link[0]
-        category=category[0]
-        
-        # id=get_json_hash([name,im,input_ids,output_ids,description,version])
-
-        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category]}, "result": ()}
-    
 
     
 

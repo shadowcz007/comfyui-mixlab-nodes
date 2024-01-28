@@ -77,7 +77,8 @@ if not os.path.exists(caption_model_path):
     caption_model_path='Salesforce/blip-image-captioning-base'
 
 cache_path=os.path.join(folder_paths.models_dir, "clip_interrogator")
-
+if not os.path.exists(cache_path):
+    os.mkdir(cache_path)
 
 # Tensor to PIL
 def tensor2pil(image):

@@ -287,7 +287,7 @@ function getInputsAndOutputs () {
 }
 
 app.registerExtension({
-  name: 'Mixlab.utils.AppInfo',
+  name: 'Mixlab.app.AppInfo',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'AppInfo') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
@@ -435,4 +435,68 @@ api.addEventListener('executed', async ({ detail }) => {
       }
     }
   }
+})
+
+app.registerExtension({
+  name: 'Mixlab.app.AppNode',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'AppNode') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+        console.log('#orig_nodeCreated', this)
+        let node=this;
+
+        const name = this.widgets.filter(w => w.name === 'name')[0]
+
+        name.callback = async e => {
+          let es = e.split('/')
+          let filename = '',
+            category = ''
+          if (es.length == 2) {
+            category = es[0]
+            filename = es[1]
+          } else if (es.length === 1) {
+            filename = e
+          }
+          const res = await api.fetchApi('/mixlab/workflow', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              task: 'my_app',
+              filename,
+              category
+            })
+          })
+
+          if (res.status !== 200) {
+            throw {
+              response: await res.json()
+            }
+          }
+          let result=await res.json()
+          const {app,output:workflow,}=result.data[0].data;
+          let input=app.input
+          console.log(input)
+
+          if(input.length==1){
+            let widget = node.inputs.filter(w => w.name === 'input')[0];
+            let sc=input[0];
+            LGraphCanvas.prototype._createNodeForInput(
+              node, //当前node
+              widget, //当前node里需要自动连线的widget
+              sc.class_type, //作为input的node type
+              'IMAGE' // 作为input的node的outputs的name. the input slot type of the target node
+            )
+          }
+
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {}
 })

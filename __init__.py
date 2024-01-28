@@ -192,7 +192,7 @@ def read_workflow_json_files(folder_path ):
 def get_workflows():
     # print("#####path::", current_path)
     workflow_path=os.path.join(current_path, "workflow")
-    # print('workflow_path: ',workflow_path)
+    # print('##workflow_path: ',workflow_path)
     if not os.path.exists(workflow_path):
         # 使用mkdir()方法创建新目录
         os.mkdir(workflow_path)
@@ -391,6 +391,9 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         site = web.TCPSite(runner, address, port)
         await site.start()
 
+        PromptServer.instance.port=port
+
+
         import ssl
         crt, key = create_for_https()
         ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -493,6 +496,7 @@ async def mixlab_workflow_hander(request):
                     'status':'success',
                 }
             elif data['task']=='list':
+                # 暂时没有用到
                 result={
                     'data':get_workflows(),
                     'status':'success',
@@ -536,14 +540,15 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
-
+from .nodes.App import AppInfo,AppNode
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
 NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
+    "AppNode":AppNode,
     "TESTNODE_":TESTNODE_,
     "RandomPrompt":RandomPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,

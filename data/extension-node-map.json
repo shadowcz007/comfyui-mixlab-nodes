@@ -4768,6 +4768,7 @@
             "ChinesePrompt_Mix",
             "3DImage",
             "AppInfo",
+            "AppNode",
             "IntNumber",
             "FloatSlider",
             "ResizeImage",
