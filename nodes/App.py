@@ -1,4 +1,4 @@
-import os
+import os,sys
 # import re,random,json
 from PIL import Image
 import numpy as np
@@ -11,6 +11,16 @@ import datetime
 
 import folder_paths
 from server import PromptServer
+import importlib.util
+
+
+def is_installed(package):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        return False
+    return spec is not None
+
 
 class AnyType(str):
   """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
@@ -89,10 +99,31 @@ def create_temp_file(image):
 
 
 
+try:
+    if is_installed('websocket')==False:
+        import subprocess
+
+        # 安装
+        print('#pip install websocket-client')
+
+        result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'websocket-client'], capture_output=True, text=True)
+
+        #检查命令执行结果
+        if result.returncode == 0:
+            print("#install success")
+            import websocket 
+        else:
+            print("#install error")
+        
+    else:
+        import websocket 
+        # NOTE: websocket-client (https://github.com/websocket-client/websocket-client)
+
+except:
+    print("#websocket-client error")
 #This is an example that uses the websockets api to know when a prompt execution is done
 #Once the prompt execution is done it downloads the images using the /history endpoint
 
-import websocket #NOTE: websocket-client (https://github.com/websocket-client/websocket-client)
 import uuid
 import json
 import urllib.request
