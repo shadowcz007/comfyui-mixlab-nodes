@@ -68,7 +68,7 @@ app.registerExtension({
           size: [128, 32], // a default size
           draw (ctx, node, width, y) {},
           computeSize (...args) {
-            return [128,32] // a method to compute the current size of the widget
+            return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
             let data = getLocalData('_mixlab_api_key')
@@ -203,76 +203,76 @@ app.registerExtension({
 
 app.registerExtension({
   name: 'Mixlab.GPT.ShowTextForGPT',
-  async beforeRegisterNodeDef(nodeType, nodeData, app) {
-		if (nodeData.name === "ShowTextForGPT") {
-			function populate(text) {
-				if (this.widgets) {
-          
-					const pos = this.widgets.findIndex((w) => w.name === "text");
-					if (pos !== -1) {
-						for (let i = pos; i < this.widgets.length; i++) {
-							this.widgets[i].onRemove?.();
-						}
-						this.widgets.length = pos;
-					}
-				}
-        // console.log('ShowTextForGPT',text)
-				for (let list of text) {
-					const w = ComfyWidgets["STRING"](this, "text", ["STRING", { multiline: true }], app).widget;
-					w.inputEl.readOnly = true;
-					w.inputEl.style.opacity = 0.6;
-
-          try {
-            let data=JSON.parse(list);
-            data=Array.from(data,d=>{
-              return {
-                ...d,
-                content:decodeURIComponent(d.content)
-              }
-            })
-            list=JSON.stringify(data,null,2)
-          } catch (error) {
-            // console.log(error)
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeData.name === 'ShowTextForGPT') {
+      function populate (text) {
+        if (this.widgets) {
+          // const pos = this.widgets.findIndex(w => w.name === 'text')
+          for (let i = 0; i < this.widgets.length; i++) {
+            if (this.widgets[i].name == 'text') this.widgets[i].onRemove?.()
           }
-
-					w.value =list;
-        
-				}
+          // this.widgets.length = pos
+        }
+        console.log('ShowTextForGPT',text)
+        for (let list of text) {
+          if(list){
+            const w = ComfyWidgets['STRING'](
+              this,
+              'text',
+              ['STRING', { multiline: true }],
+              app
+            ).widget
+            w.inputEl.readOnly = true
+            w.inputEl.style.opacity = 0.6
+  
+            try {
+              let data = JSON.parse(list)
+              data = Array.from(data, d => {
+                return {
+                  ...d,
+                  content: decodeURIComponent(d.content)
+                }
+              })
+              list = JSON.stringify(data, null, 2)
+            } catch (error) {
+              // console.log(error)
+            }
+  
+            w.value = list
+          }
+         
+        }
         // console.log('ShowTextForGPT',this.widgets.length)
-				requestAnimationFrame(() => {
-					const sz = this.computeSize();
-					if (sz[0] < this.size[0]) {
-						sz[0] = this.size[0];
-					}
-					if (sz[1] < this.size[1]) {
-						sz[1] = this.size[1];
-					}
-					this.onResize?.(sz);
-					app.graph.setDirtyCanvas(true, false);
-				});
-			}
+        requestAnimationFrame(() => {
+          const sz = this.computeSize()
+          if (sz[0] < this.size[0]) {
+            sz[0] = this.size[0]
+          }
+          if (sz[1] < this.size[1]) {
+            sz[1] = this.size[1]
+          }
+          this.onResize?.(sz)
+          app.graph.setDirtyCanvas(true, false)
+        })
+      }
 
-			// When the node is executed we will be sent the input text, display this in the widget
-			const onExecuted = nodeType.prototype.onExecuted;
-			nodeType.prototype.onExecuted = function (message) {
-				onExecuted?.apply(this, arguments);
-        console.log('##',message.text)
-				populate.call(this, message.text);
-			};
+      // When the node is executed we will be sent the input text, display this in the widget
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('##', message.text)
+        populate.call(this, message.text)
+      }
 
-			const onConfigure = nodeType.prototype.onConfigure;
-			nodeType.prototype.onConfigure = function () {
-				onConfigure?.apply(this, arguments);
-				if (this.widgets_values?.length) {
-          
-					populate.call(this, this.widgets_values);
-				}
-			};
+      const onConfigure = nodeType.prototype.onConfigure
+      nodeType.prototype.onConfigure = function () {
+        onConfigure?.apply(this, arguments)
+        if (this.widgets_values?.length) {
+          populate.call(this, this.widgets_values)
+        }
+      }
 
       this.serialize_widgets = true //需要保存参数
-
-		}
-
-
-	},
+    }
+  }
 })

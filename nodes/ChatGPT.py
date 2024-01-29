@@ -178,7 +178,7 @@ class ShowTextForGPT:
                 "text": ("STRING", {"forceInput": True,"dynamicPrompts": False}),
             },
             "optional":{ 
-                    "output_dir": ("STRING",{"default": "","multiline": True,"dynamicPrompts": False}), 
+                    "output_dir": ("STRING",{"forceInput": True,"default": "","multiline": True,"dynamicPrompts": False}), 
                 }
         }
 
