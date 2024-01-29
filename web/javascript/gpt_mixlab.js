@@ -211,17 +211,17 @@ app.registerExtension({
         if (this.widgets) {
           // const pos = this.widgets.findIndex(w => w.name === 'text')
           for (let i = 0; i < this.widgets.length; i++) {
-            if (this.widgets[i].name == 'text') this.widgets[i].onRemove?.()
+            if (this.widgets[i].name == 'show_text') this.widgets[i].onRemove?.()
           }
           this.widgets.length = 1
         }
         // console.log('ShowTextForGPT',text)
         for (let list of text) {
           if (list) {
-            console.log('#####', list)
+            // console.log('#####', list)
             const w = ComfyWidgets['STRING'](
               this,
-              'text',
+              'show_text',
               ['STRING', { multiline: true }],
               app
             ).widget
@@ -266,7 +266,7 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        console.log('##onExecuted', this, message)
+        // console.log('##onExecuted', this, message)
         if (message.text) populate.call(this, message.text)
       }
 

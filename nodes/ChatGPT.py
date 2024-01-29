@@ -196,21 +196,50 @@ class ShowTextForGPT:
     CATEGORY = "♾️Mixlab/GPT"
 
     def run(self, text,output_dir=[""]):
-        output_dir=output_dir[0]
 
-        t="\n".join(text)
+        if len(output_dir)==1 and (output_dir[0]=='' or os.path.dirname(output_dir[0])==''):
+            t='\n'.join(text)
+            output_dir=[
+                os.path.join(folder_paths.get_temp_directory(),
+                             get_unique_hash(t)+'.txt'
+                             )
+            ]
+        elif len(output_dir)==1:
+            base=os.path.basename(output_dir[0])
+            t='\n'.join(text)
+            if base=='' or os.path.splitext(base)[1]=='':
+                base=get_unique_hash(t)+'.txt'
+            output_dir=[
+                os.path.join(output_dir[0],
+                             base
+                             )
+            ]
+        # elif len(output_dir)>1:
+
         
-        filename=get_unique_hash(t)+'.txt'
 
-        if output_dir=='':
-            output_dir = folder_paths.get_temp_directory()
+        if len(output_dir)==1 and len(text)>1:
+            output_dir=[output_dir[0] for _ in range(len(text))]
+        
+        for i in range(len(text)):
 
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
+            o_fp=output_dir[i]
+            dirp=os.path.dirname(o_fp)
+            if dirp=='':
+                dirp=folder_paths.get_temp_directory()
+                o_fp=os.path.join(folder_paths.get_temp_directory(),o_fp
+                             )
 
-        save_to_dirpath=os.path.join(output_dir,filename)
-        with open(save_to_dirpath, 'w') as file:
-            file.write(t)
+            if not os.path.exists(dirp):
+                os.mkdir(dirp)
+
+            if not os.path.splitext(o_fp)[1].lower()=='.txt':
+                o_fp=o_fp+'.txt'
+
+            t=text[i]
+            with open(o_fp, 'w') as file:
+                file.write(t)
+
         # print(text)
         return {"ui": {"text": text}, "result": (text,)}
         
