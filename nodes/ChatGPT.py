@@ -190,7 +190,7 @@ class ShowTextForGPT:
 
     CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, text,output_dir):
+    def run(self, text,output_dir=""):
         output_dir=output_dir[0]
         filename=generate_random_string(4)+'.txt'
 
