@@ -3,7 +3,12 @@ import time
 import urllib.error
 import re,json,os,string,random
 import folder_paths
+import hashlib
 
+def get_unique_hash(string):
+    hash_object = hashlib.sha1(string.encode())
+    unique_hash = hash_object.hexdigest()
+    return unique_hash
 
 def generate_random_string(length):
     letters = string.ascii_letters + string.digits
@@ -192,14 +197,17 @@ class ShowTextForGPT:
 
     def run(self, text,output_dir=[""]):
         output_dir=output_dir[0]
-        filename=generate_random_string(4)+'.txt'
+
+        t="\n".join(text)
+        
+        filename=get_unique_hash(t)+'.txt'
 
         if output_dir=='':
             output_dir = folder_paths.get_temp_directory()
         
         save_to_dirpath=os.path.join(output_dir,filename)
         with open(save_to_dirpath, 'w') as file:
-            file.write("\n".join(text))
+            file.write(t)
         # print(text)
         return {"ui": {"text": text}, "result": (text,)}
         
