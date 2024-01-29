@@ -222,7 +222,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
             # print(item)
             try:
                 x=item["data"]
-                if i==0:
+                # 管理员模式，读取全部数据
+                if i==0 or is_all:
                     apps.append({
                         "filename":item["filename"],
                         # "category":item['category'],
