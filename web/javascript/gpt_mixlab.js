@@ -206,14 +206,15 @@ app.registerExtension({
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeData.name === 'ShowTextForGPT') {
       function populate (text) {
+        text=text.filter(t=>t.trim());
         if (this.widgets) {
           // const pos = this.widgets.findIndex(w => w.name === 'text')
           for (let i = 0; i < this.widgets.length; i++) {
             if (this.widgets[i].name == 'text') this.widgets[i].onRemove?.()
           }
-          // this.widgets.length = pos
+          this.widgets.length = text.length+1;
         }
-        console.log('ShowTextForGPT',text)
+        // console.log('ShowTextForGPT',text)
         for (let list of text) {
           if(list){
             const w = ComfyWidgets['STRING'](
