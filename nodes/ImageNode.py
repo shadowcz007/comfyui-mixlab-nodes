@@ -380,6 +380,7 @@ def get_images_filepath(f,white_bg=False):
         for root, dirs, files in os.walk(f):
             for file in files:
                 file_path = os.path.join(root, file)
+                file_name=os.path.basename(file_path)
                 try:
                     imgs=load_image(file_path,white_bg)
                     for img in imgs:
@@ -387,6 +388,7 @@ def get_images_filepath(f,white_bg=False):
                             "image":img['image'],
                             "mask":img['mask'],
                             "file_path":file_path,
+                            "file_name":file_name,
                             "psd":len(imgs)>1
                         })
                 except:
@@ -394,12 +396,15 @@ def get_images_filepath(f,white_bg=False):
  
     elif os.path.isfile(f):
         try:
+            file_path = os.path.join(root, f)
+            file_name=os.path.basename(file_path)
             imgs=load_image(f,white_bg)
             for img in imgs:
                 images.append({
                     "image":img['image'],
                     "mask":img['mask'],
                     "file_path":file_path,
+                    "file_name":file_name,
                     "psd":len(imgs)>1
                 })
         except:
@@ -1059,14 +1064,15 @@ class LoadImagesFromPath:
                 }
             }
     
-    RETURN_TYPES = ('IMAGE','MASK','STRING',)
+    RETURN_TYPES = ('IMAGE','MASK','STRING','STRING',)
+    RETURN_NAMES = ("IMAGE","MASK","prompt_for_FloatingVideo","filepaths",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Image"
 
     # INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,True,False,)
+    OUTPUT_IS_LIST = (True,True,False,True,)
   
     global watcher_folder
     watcher_folder=None
@@ -1102,10 +1108,12 @@ class LoadImagesFromPath:
 
         imgs=[]
         masks=[]
+        file_names=[]
 
         for im in sorted_files:
             imgs.append(im['image'])
             masks.append(im['mask'])
+            file_names.append(im['file_name'])
         
         # print('index_variable',index_variable)
         
@@ -1113,11 +1121,12 @@ class LoadImagesFromPath:
             if index_variable!=-1:
                 imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
                 masks=[masks[index_variable]] if index_variable < len(masks) else None
+                file_names=[file_names[index_variable]] if index_variable < len(file_names) else None
         except Exception as e:
             print("发生了一个未知的错误：", str(e))
 
         # print('#prompt::::',prompt)
-        return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,)}
+        return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,file_names,)}
 
 
 # TODO 扩大选区的功能,重新输出mask

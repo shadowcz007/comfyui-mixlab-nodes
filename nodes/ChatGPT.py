@@ -204,7 +204,10 @@ class ShowTextForGPT:
 
         if output_dir=='':
             output_dir = folder_paths.get_temp_directory()
-        
+
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
         save_to_dirpath=os.path.join(output_dir,filename)
         with open(save_to_dirpath, 'w') as file:
             file.write(t)

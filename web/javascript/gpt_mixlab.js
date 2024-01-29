@@ -206,17 +206,19 @@ app.registerExtension({
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeData.name === 'ShowTextForGPT') {
       function populate (text) {
-        text=text.filter(t=>t.trim());
+        text = text.filter(t => t && t?.trim())
+
         if (this.widgets) {
           // const pos = this.widgets.findIndex(w => w.name === 'text')
           for (let i = 0; i < this.widgets.length; i++) {
             if (this.widgets[i].name == 'text') this.widgets[i].onRemove?.()
           }
-          this.widgets.length = text.length+1;
+          this.widgets.length = 1
         }
         // console.log('ShowTextForGPT',text)
         for (let list of text) {
-          if(list){
+          if (list) {
+            console.log('#####', list)
             const w = ComfyWidgets['STRING'](
               this,
               'text',
@@ -225,35 +227,38 @@ app.registerExtension({
             ).widget
             w.inputEl.readOnly = true
             w.inputEl.style.opacity = 0.6
-  
+
             try {
-              let data = JSON.parse(list)
-              data = Array.from(data, d => {
-                return {
-                  ...d,
-                  content: decodeURIComponent(d.content)
-                }
-              })
-              list = JSON.stringify(data, null, 2)
+              if (typeof list != 'string') {
+                let data = JSON.parse(list)
+                data = Array.from(data, d => {
+                  return {
+                    ...d,
+                    content: decodeURIComponent(d.content)
+                  }
+                })
+                list = JSON.stringify(data, null, 2)
+              }
             } catch (error) {
-              // console.log(error)
+              console.log(error)
             }
-  
+
             w.value = list
           }
-         
         }
         // console.log('ShowTextForGPT',this.widgets.length)
         requestAnimationFrame(() => {
-          const sz = this.computeSize()
-          if (sz[0] < this.size[0]) {
-            sz[0] = this.size[0]
+          if (this) {
+            const sz = this.computeSize()
+            if (sz[0] < this.size[0]) {
+              sz[0] = this.size[0]
+            }
+            if (sz[1] < this.size[1]) {
+              sz[1] = this.size[1]
+            }
+            this.onResize?.(sz)
+            app.graph.setDirtyCanvas(true, false)
           }
-          if (sz[1] < this.size[1]) {
-            sz[1] = this.size[1]
-          }
-          this.onResize?.(sz)
-          app.graph.setDirtyCanvas(true, false)
         })
       }
 
@@ -261,8 +266,8 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        console.log('##', message.text)
-        populate.call(this, message.text)
+        console.log('##onExecuted', this, message)
+        if (message.text) populate.call(this, message.text)
       }
 
       const onConfigure = nodeType.prototype.onConfigure
