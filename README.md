@@ -213,6 +213,11 @@ If you are using a venv, make sure you have it activated before installation and
 pip3 install -r requirements.txt
 ```
 
+#### 
+[comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
+[comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
+
+
 #### Chinese community
 访问 [www.mixcomfy.com](https://www.mixcomfy.com)，获得更多内测功能，关注微信公众号：Mixlab无界社区
 
