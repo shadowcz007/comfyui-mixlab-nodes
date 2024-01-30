@@ -1778,8 +1778,8 @@ class CenterImage:
             }
                 }
     
-    RETURN_TYPES = ("_GRID",)
-    RETURN_NAMES = ("grid",)
+    RETURN_TYPES = ("_GRID","MASK",)
+    RETURN_NAMES = ("grid","mask",)
 
     FUNCTION = "run"
 
@@ -1793,7 +1793,9 @@ class CenterImage:
 
         grid=centerImage((left,top,right,bottom),canvas)
 
-        return (grid,)
+        mask=createMask(canvas,left,top,canvas.width-left-right,canvas.height-top-bottom)
+
+        return (grid,pil2tensor(mask),)
 
 
 
