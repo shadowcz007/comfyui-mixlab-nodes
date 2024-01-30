@@ -1,5 +1,6 @@
 import { app } from '../../../scripts/app.js'
 import { closeIcon } from './svg_icons.js'
+import { api } from '../../../scripts/api.js'
 
 import {
   GroupNodeConfig,
@@ -7,6 +8,180 @@ import {
 } from '../../../extensions/core/groupNode.js'
 
 import { smart_init, addSmartMenu } from './smart_connect.js'
+
+let isScriptLoaded = {};
+
+function loadExternalScript(url) {
+  return new Promise((resolve, reject) => {
+    if (isScriptLoaded[url]) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      isScriptLoaded[url]= true;
+      resolve();
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+
+//
+
+function createChart(chartDom,nodes){
+
+  var myChart = echarts.init(chartDom);
+  var option;
+
+  console.log(nodes)
+  option = {
+    series: [
+      {
+        type: 'treemap',
+        data: [
+          {
+            name: 'nodeA',
+            value: 10,
+            children: Array.from(nodes,n=>{
+              return {
+                name:n.type,
+                value:n.count
+              }
+            })
+          },
+          
+        ]
+      }
+    ]
+  };
+  
+  option && myChart.setOption(option);
+}
+
+async function createNodesCharts () {
+  await loadExternalScript('/extensions/comfyui-mixlab-nodes/lib/echarts.min.js')
+  const templates = await loadTemplate()
+  var nodes = {}
+  Array.from(templates, t => {
+    let j = JSON.parse(t.data)
+    for (let node of j.nodes) {
+      if (!nodes[node.type]) nodes[node.type] = { type: node.type, count: 0 }
+      nodes[node.type].count++
+    }
+  })
+  nodes = Object.values(nodes).sort((a, b) => b.count - a.count)
+ 
+
+  const menu = document.querySelector('.comfy-menu')
+  const separator = document.createElement('div')
+  separator.style = `margin: 20px 0px;
+  width: 100%;
+  height: 1px;
+  background: var(--border-color);
+  `
+  menu.append(separator)
+
+  const appsButton = document.createElement('button')
+  appsButton.textContent = 'Nodes';
+
+  
+
+  appsButton.onclick = () => { 
+    let div = document.querySelector('#mixlab_apps')
+    if (!div) {
+      div = document.createElement('div')
+      div.id = 'mixlab_apps'
+      document.body.appendChild(div)
+
+      let btn = document.createElement('div')
+      btn.style = `display: flex;
+     width: calc(100% - 24px);
+     justify-content: space-between;
+     align-items: center;
+     padding: 0 12px;
+     height: 44px;`
+      let btnB = document.createElement('button')
+      let textB = document.createElement('p')
+      btn.appendChild(textB)
+      btn.appendChild(btnB)
+      textB.style.fontSize = '12px'
+      textB.innerText = `Nodes`
+
+      btnB.style = `float: right; border: none; color: var(--input-text);
+     background-color: var(--comfy-input-bg); border-color: var(--border-color);cursor: pointer;`
+      btnB.addEventListener('click', () => {
+        div.style.display = 'none'
+      })
+      btnB.innerText = 'X'
+
+      // 悬浮框拖动事件
+      div.addEventListener('mousedown', function (e) {
+        var startX = e.clientX
+        var startY = e.clientY
+        var offsetX = div.offsetLeft
+        var offsetY = div.offsetTop
+
+        function moveBox (e) {
+          var newX = e.clientX
+          var newY = e.clientY
+          var deltaX = newX - startX
+          var deltaY = newY - startY
+          div.style.left = offsetX + deltaX + 'px'
+          div.style.top = offsetY + deltaY + 'px'
+          localStorage.setItem(
+            'mixlab_app_pannel',
+            JSON.stringify({ x: div.style.left, y: div.style.top })
+          )
+        }
+
+        function stopMoving () {
+          document.removeEventListener('mousemove', moveBox)
+          document.removeEventListener('mouseup', stopMoving)
+        }
+
+        document.addEventListener('mousemove', moveBox)
+        document.addEventListener('mouseup', stopMoving)
+      })
+
+      div.appendChild(btn)
+
+      let chartDom = document.createElement('div')
+      chartDom.style=`height:80vh;width:450px`
+      chartDom.className='chart'
+      div.appendChild(chartDom)
+      
+    }
+    if (div.style.display == 'flex') {
+      div.style.display = 'none'
+    } else {
+      let pos = JSON.parse(
+        localStorage.getItem('mixlab_app_pannel') ||
+          JSON.stringify({ x: 0, y: 0 })
+      )
+
+      div.style = `
+      flex-direction: column;
+      align-items: end;
+      display:flex;
+      position: absolute; 
+      top: ${pos.y}; left: ${pos.x}; width: 450px; 
+      color: var(--descrip-text);
+      background-color: var(--comfy-menu-bg);
+      padding: 10px; 
+      border: 1px solid black;z-index: 999999999;padding-top: 0;`
+    };
+
+   
+    createChart(div.querySelector('.chart'),nodes)
+
+  }
+  menu.append(appsButton)
+
+}
 
 function copyNodeValues (src, dest) {
   // title
@@ -616,6 +791,39 @@ function createModal (url, markdown, title) {
   div.appendChild(bgElement)
 }
 
+const loadTemplate = async () => {
+  const id = 'Comfy.NodeTemplates'
+  const file = 'comfy.templates.json'
+
+  let templates = []
+  if (app.storageLocation === 'server') {
+    if (app.isNewUserSession) {
+      // New user so migrate existing templates
+      const json = localStorage.getItem(id)
+      if (json) {
+        templates = JSON.parse(json)
+      }
+      await api.storeUserData(file, json, { stringify: false })
+    } else {
+      const res = await api.getUserData(file)
+      if (res.status === 200) {
+        try {
+          templates = await res.json()
+        } catch (error) {}
+      } else if (res.status !== 404) {
+        console.error(res.status + ' ' + res.statusText)
+      }
+    }
+  } else {
+    const json = localStorage.getItem(id)
+    if (json) {
+      templates = JSON.parse(json)
+    }
+  }
+
+  return templates ?? []
+}
+
 app.registerExtension({
   name: 'Comfy.Mixlab.ui',
   init () {
@@ -665,7 +873,7 @@ app.registerExtension({
         }
       ]
 
-      opts = addSmartMenu(opts,node)
+      opts = addSmartMenu(opts, node)
 
       // if (node.type == 'CLIPTextEncode') {
       //   // 则出现 randomPrompt
@@ -705,16 +913,6 @@ app.registerExtension({
       // replace it
       const options = getGroupMenuOptions.apply(this, arguments) // start by calling the stored one
       node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
-
-      // templete
-      const key = 'Comfy.NodeTemplates'
-      let templates = localStorage.getItem(key)
-      if (templates) {
-        templates = JSON.parse(templates)
-      } else {
-        templates = []
-      }
-      const store = () => localStorage.setItem(key, JSON.stringify(templates))
 
       return [
         {
@@ -773,7 +971,7 @@ app.registerExtension({
               localStorage.setItem('litegrapheditor_clipboard', old)
             }
 
-            clipboardAction(() => {
+            clipboardAction(async () => {
               let name = group.title + ' ♾️Mixlab'
               let nodes = group._nodes
 
@@ -786,6 +984,8 @@ app.registerExtension({
                 const nodeData = node.serialize()
 
                 let groupData = GroupNodeHandler.getGroupData(node)
+
+                // console.log('groupData',GroupNodeHandler.isGroupNode(node),groupData)
                 if (groupData) {
                   groupData = groupData.nodeData
                   if (!data.groupNodes) {
@@ -796,11 +996,32 @@ app.registerExtension({
                 }
               }
 
-              templates.push({
+              // templete
+              const store = async nt => {
+                const id = 'Comfy.NodeTemplates'
+                const file = 'comfy.templates.json'
+                let templates = await loadTemplate()
+                templates.push(nt)
+                if (app.storageLocation === 'server') {
+                  const ts = JSON.stringify(templates, undefined, 4)
+                  localStorage.setItem(id, ts) // Backwards compatibility
+                  try {
+                    await api.storeUserData(file, ts, {
+                      stringify: false
+                    })
+                  } catch (error) {
+                    console.error(error)
+                    alert(error.message)
+                  }
+                } else {
+                  localStorage.setItem(id, JSON.stringify(templates))
+                }
+              }
+              console.log('data', data)
+              store({
                 name,
                 data: JSON.stringify(data)
               })
-              store()
             })
           } // and the callback
         },
@@ -1173,6 +1394,8 @@ app.registerExtension({
         return options
       }
     }, 1000)
+
+    // createNodesCharts()
   },
   async loadedGraphNode (node, app) {
     // console.log(
