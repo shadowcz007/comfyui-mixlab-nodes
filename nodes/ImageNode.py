@@ -1629,6 +1629,18 @@ class NewLayer:
         return (layer_n,)
 
 
+
+def createMask(image,x,y,w,h):
+    mask = Image.new("L", image.size)
+    pixels = mask.load()
+    # 遍历指定区域的像素，将其设置为黑色（0 表示黑色）
+    for i in range(int(x), int(x + w)):
+        for j in range(int(y), int(y + h)):
+            pixels[i, j] = 255
+    # mask.save("mask.png")
+    return mask
+
+
 def splitImage(image, num):
     width, height = image.size
 
@@ -1697,8 +1709,8 @@ class SplitImage:
             }
                 }
     
-    RETURN_TYPES = ("_GRID","_GRID",)
-    RETURN_NAMES = ("grids","grid")
+    RETURN_TYPES = ("_GRID","_GRID","MASK",)
+    RETURN_NAMES = ("grids","grid","mask",)
 
     FUNCTION = "run"
 
@@ -1709,10 +1721,10 @@ class SplitImage:
 
     def run(self,image,num,seed):
         image=tensor2pil(image)
-
+        
         grids=splitImage(image,num)
 
-        if seed>=num:
+        if seed>num:
             num=int(seed / 500 * num)-1
         else:
             num=seed-1
@@ -1721,7 +1733,11 @@ class SplitImage:
 
         g=grids[num]
 
-        return (grids,g,)
+        x,y,w,h=g
+        mask=createMask(image, x,y,w,h)
+        mask=pil2tensor(mask)
+
+        return (grids,g,mask,)
 
 
 

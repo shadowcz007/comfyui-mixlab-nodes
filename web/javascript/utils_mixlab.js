@@ -1,8 +1,5 @@
 import { app } from '../../../scripts/app.js'
-import { api } from '../../../scripts/api.js'
-import { ComfyWidgets } from '../../../scripts/widgets.js'
-import { $el } from '../../../scripts/ui.js'
-import { addValueControlWidget } from '../../../scripts/widgets.js'
+import { $el } from '../../../scripts/ui.js' 
 
 const getLocalData = key => {
   let data = {}
