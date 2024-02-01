@@ -2372,10 +2372,21 @@ class SaveImageToLocal:
         filename_prefix = os.path.basename(file_path)
         if file_path=='':
             filename_prefix="ComfyUI"
+        
+        filename_prefix, _ = os.path.splitext(filename_prefix)
+
+        _, extension = os.path.splitext(file_path)
+
+        if extension:
+            # 是文件名，需要处理
+            file_path=os.path.dirname(file_path)
+            # filename_prefix=
+
             
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         
-        if not os.path.exists(file_path):
+    
+        if not os.path.exists(file_path) and not extension:
             # 使用os.makedirs函数创建新目录
             os.makedirs(file_path)
             print("目录已创建")
@@ -2420,6 +2431,7 @@ class SaveImageToLocal:
                 })
             
             else:
+
                 fp=os.path.join(file_path, file)
                 if os.path.exists(fp):
                     file = f"{filename}_{counter:05}_{generate_random_string(8)}.png"
