@@ -532,7 +532,7 @@ async def nodes_map_hander(request):
 # 导入节点
 from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
 from .nodes.ImageNode import SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
-from .nodes.Vae import VAELoader,VAEDecode
+# from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.Clipseg import CLIPSeg,CombineMasks
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
@@ -575,9 +575,9 @@ NODE_CLASS_MAPPINGS = {
     "FaceToMask":FaceToMask,
     "AreaToMask":AreaToMask,
     "ImageCropByAlpha":ImageCropByAlpha,
-    "VAELoaderConsistencyDecoder":VAELoader,
+    # "VAELoaderConsistencyDecoder":VAELoader,
     "SaveImageToLocal":SaveImageToLocal,
-    "VAEDecodeConsistencyDecoder":VAEDecode,
+    # "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
     "CLIPSeg_":CLIPSeg,
