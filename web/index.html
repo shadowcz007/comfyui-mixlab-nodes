@@ -643,7 +643,7 @@
             return true
         }
 
-
+        // 种子的处理
         function randomSeed(seed, data) {
             for (const id in data) {
                 if (data[id].inputs.seed != undefined
@@ -1316,6 +1316,7 @@
                         }
                     }), value);
 
+                    // 选择事件绑定
                     selectDom.addEventListener('change', e => {
                         e.preventDefault();
                         // console.log(selectDom.value)
@@ -1550,6 +1551,7 @@
 
         }
 
+        // 创建下拉选择
         function createSelect(options, defaultValue) {
             var selectElement = document.createElement("select");
             selectElement.className = "select"
@@ -1558,7 +1560,7 @@
             for (var i = 0; i < options.length; i++) {
                 var option = document.createElement("option");
                 option.value = options[i].value;
-                option.text = options[i].text;
+                option.innerText = options[i].text;
                 selectElement.appendChild(option);
                 // if(options[i].selected) 
             }
@@ -1569,6 +1571,7 @@
             return selectElement
         }
 
+        // 创建下拉选择 - 带说明
         function createSelectWithOptions(title, options, defaultValue) {
 
             const div = document.createElement("div");
