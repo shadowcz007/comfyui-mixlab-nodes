@@ -68,8 +68,8 @@ async function drawImageToCanvas (imageUrl) {
 
 function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
   const data = jsonData
-  const input = []
-  const output = []
+  let input = []
+  let output = []
   const seed = {}
 
   for (const id in data) {
