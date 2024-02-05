@@ -2286,19 +2286,36 @@ class GetImageSize_:
         return {
             "required": {
                 "image": ("IMAGE",),
-            }
+            },
+             "optional":{
+                    "min_width":("INT", {
+                        "default": 512, 
+                        "min":1, #Minimum value
+                        "max": 2048, #Maximum value
+                        "step": 8, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    })
+                },
         }
 
-    RETURN_TYPES = ("INT", "INT")
-    RETURN_NAMES = ("width", "height")
+    RETURN_TYPES = ("INT", "INT","INT", "INT",)
+    RETURN_NAMES = ("width", "height","min_width", "min_height",)
 
     FUNCTION = "get_size"
 
     CATEGORY = "♾️Mixlab/Image"
 
-    def get_size(self, image):
+    def get_size(self, image,min_width):
         _, height, width, _ = image.shape
-        return (width, height)
+
+        # 如果比min_widht,还小，则输出 min width
+        im=tensor2pil(image)
+        im=resize_image(im,'width',min_width,min_width,"white")
+        im=im.convert('RGB')
+
+        min_width,min_height=im.size
+
+        return (width, height,min_width,min_height,)
 
 
 
