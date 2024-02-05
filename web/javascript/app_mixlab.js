@@ -215,7 +215,7 @@ async function save (json, download = false, showInfo = true) {
   try {
     let data = await app.graphToPrompt()
 
-    const { input, output, seed } = extractInputAndOutputData(
+    let { input, output, seed } = extractInputAndOutputData(
       data.output,
       inputIds,
       outputIds
