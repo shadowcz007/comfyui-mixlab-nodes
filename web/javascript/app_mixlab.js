@@ -138,6 +138,10 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
     }
   }
 
+  // 修复bug，当节点不存在时
+  input = input.filter(i => i)
+  output = output.filter(i => i)
+
   return { input, output, seed }
 }
 
