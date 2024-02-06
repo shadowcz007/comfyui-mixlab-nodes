@@ -67,7 +67,11 @@ async function drawImageToCanvas (imageUrl) {
 }
 
 function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
-  const data = jsonData
+  // workflow
+  // const workflow=jsonData.workflow;
+  // const nodes=workflow.nodes;
+
+  const data = jsonData.output
   let input = []
   let output = []
   const seed = {}
@@ -77,7 +81,7 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
       let node = app.graph.getNodeById(id)
       if (inputIds.includes(id)) {
         // let node = app.graph.getNodeById(id)
-        let options = []
+        let options = {}
         // 模型
         try {
           if (node.type === 'CheckpointLoaderSimple') {
@@ -111,6 +115,15 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         }
 
         if (node.type == 'Color') {
+        }
+
+        // loadImage的mask支持
+        if (node.type === 'LoadImage') {
+          let output = node.outputs.filter(ot => ot.type == 'MASK')[0]
+          if (output.links) {
+            // 有输出
+            options.hasMask = true
+          }
         }
 
         input[inputIds.indexOf(id)] = {
@@ -216,7 +229,7 @@ async function save (json, download = false, showInfo = true) {
     let data = await app.graphToPrompt()
 
     let { input, output, seed } = extractInputAndOutputData(
-      data.output,
+      data,
       inputIds,
       outputIds
     )
