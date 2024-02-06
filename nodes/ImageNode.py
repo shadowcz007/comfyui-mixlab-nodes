@@ -2307,13 +2307,18 @@ class GetImageSize_:
 
     def get_size(self, image,min_width):
         _, height, width, _ = image.shape
-
+        
         # 如果比min_widht,还小，则输出 min width
-        im=tensor2pil(image)
-        im=resize_image(im,'width',min_width,min_width,"white")
-        im=im.convert('RGB')
+        if min_width>width:
+            im=tensor2pil(image)
+            im=resize_image(im,'width',min_width,min_width,"white")
+            im=im.convert('RGB')
 
-        min_width,min_height=im.size
+            min_width,min_height=im.size
+
+        else:
+            min_width=width
+            min_height=height
 
         return (width, height,min_width,min_height,)
 
