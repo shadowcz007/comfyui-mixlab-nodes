@@ -14,7 +14,13 @@ def generate_random_string(length):
     letters = string.ascii_letters + string.digits
     return ''.join(random.choice(letters) for _ in range(length))
 
+class AnyType(str):
+  """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
 
+  def __ne__(self, __value: object) -> bool:
+    return False
+
+any_type = AnyType("*")
 
 #  判断是否是azure服务
 def is_azure_url(url):
@@ -196,6 +202,15 @@ class ShowTextForGPT:
     CATEGORY = "♾️Mixlab/GPT"
 
     def run(self, text,output_dir=[""]):
+        
+        # 类型纠正
+        texts=[]
+        for t in text:
+            if not isinstance(t, str):
+                t = str(t)
+            texts.append(t)
+
+        text=texts
 
         if len(output_dir)==1 and (output_dir[0]=='' or os.path.dirname(output_dir[0])==''):
             t='\n'.join(text)
@@ -272,7 +287,7 @@ class CharacterInText:
 
     def run(self, text,character,start_index):
         # print(text,character,start_index)
-        b=1 if character in text else 0
+        b=1 if character.lower() in text.lower() else 0
         
         return (b+start_index,)
 
