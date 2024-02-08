@@ -4,7 +4,9 @@
 
 #### 
 [comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
+
 [comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
+
 [comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg)
 
 
