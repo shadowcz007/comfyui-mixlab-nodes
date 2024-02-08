@@ -157,6 +157,12 @@ Add edges to an image.
 from [simple-lama-inpainting](https://github.com/enesmsahin/simple-lama-inpainting)
 
 
+> rembgNode
+
+"briarmbg","u2net","u2netp","u2net_human_seg","u2net_cloth_seg","silueta","isnet-general-use","isnet-anime"
+
+
+
 ### Improvement 
 
 - Add "help" option to the context menu for each node.
