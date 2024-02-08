@@ -534,7 +534,7 @@ from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSim
 from .nodes.ImageNode import SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
-from .nodes.Clipseg import CLIPSeg,CombineMasks
+
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
@@ -580,8 +580,6 @@ NODE_CLASS_MAPPINGS = {
     # "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
-    "CLIPSeg_":CLIPSeg,
-    "CombineMasks_":CombineMasks,
     "ChatGPTOpenAI":ChatGPTNode,
     "ShowTextForGPT":ShowTextForGPT,
     "CharacterInText":CharacterInText,
