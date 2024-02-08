@@ -2,6 +2,12 @@
 
 > [discord](https://discord.gg/cXs9vZSqeK)
 
+#### 
+[comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
+[comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
+[comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg)
+
+
 ## 🚀🚗🚚🏃 Workflow-to-APP 
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
 - 支持多个web app 切换
@@ -202,10 +208,7 @@ If you are using a venv, make sure you have it activated before installation and
 pip3 install -r requirements.txt
 ```
 
-#### 
-[comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
-[comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
-[comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg)
+
 
 
 
@@ -213,12 +216,8 @@ pip3 install -r requirements.txt
 访问 [www.mixcomfy.com](https://www.mixcomfy.com)，获得更多内测功能，关注微信公众号：Mixlab无界社区
 
 
-#### Thanks:
-[ComfyUI-CLIPSeg](https://github.com/biegert/ComfyUI-CLIPSeg/tree/main)
-
 #### discussions:
 [discussions](https://github.com/shadowcz007/comfyui-mixlab-nodes/discussions)
-
 
 
 <picture>
