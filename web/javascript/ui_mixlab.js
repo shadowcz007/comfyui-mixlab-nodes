@@ -1487,7 +1487,11 @@ app.registerExtension({
     // 右上角的badge是否已经绘制
     if (!node.badge_enabled) {
       node.getNickname = function () {
-        return getNickname(node, node.comfyClass.trim())
+        if(node.nickname) {
+          return node.nickname;
+        }
+        return ""
+        // return getNickname(node, node.comfyClass.trim())
       }
       const orig = node.__proto__.onDrawForeground
       node.onDrawForeground = function (ctx) {
