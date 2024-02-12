@@ -9,33 +9,31 @@ import {
 
 import { smart_init, addSmartMenu } from './smart_connect.js'
 
-let isScriptLoaded = {};
+let isScriptLoaded = {}
 
-function loadExternalScript(url) {
+function loadExternalScript (url) {
   return new Promise((resolve, reject) => {
     if (isScriptLoaded[url]) {
-      resolve();
-      return;
+      resolve()
+      return
     }
 
-    const script = document.createElement('script');
-    script.src = url;
+    const script = document.createElement('script')
+    script.src = url
     script.onload = () => {
-      isScriptLoaded[url]= true;
-      resolve();
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+      isScriptLoaded[url] = true
+      resolve()
+    }
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
 }
-
 
 //
 
-function createChart(chartDom,nodes){
-
-  var myChart = echarts.init(chartDom);
-  var option;
+function createChart (chartDom, nodes) {
+  var myChart = echarts.init(chartDom)
+  var option
 
   console.log(nodes)
   option = {
@@ -46,24 +44,25 @@ function createChart(chartDom,nodes){
           {
             name: 'nodeA',
             value: 10,
-            children: Array.from(nodes,n=>{
+            children: Array.from(nodes, n => {
               return {
-                name:n.type,
-                value:n.count
+                name: n.type,
+                value: n.count
               }
             })
-          },
-          
+          }
         ]
       }
     ]
-  };
-  
-  option && myChart.setOption(option);
+  }
+
+  option && myChart.setOption(option)
 }
 
 async function createNodesCharts () {
-  await loadExternalScript('/extensions/comfyui-mixlab-nodes/lib/echarts.min.js')
+  await loadExternalScript(
+    '/extensions/comfyui-mixlab-nodes/lib/echarts.min.js'
+  )
   const templates = await loadTemplate()
   var nodes = {}
   Array.from(templates, t => {
@@ -74,7 +73,6 @@ async function createNodesCharts () {
     }
   })
   nodes = Object.values(nodes).sort((a, b) => b.count - a.count)
- 
 
   const menu = document.querySelector('.comfy-menu')
   const separator = document.createElement('div')
@@ -86,11 +84,9 @@ async function createNodesCharts () {
   menu.append(separator)
 
   const appsButton = document.createElement('button')
-  appsButton.textContent = 'Nodes';
+  appsButton.textContent = 'Nodes'
 
-  
-
-  appsButton.onclick = () => { 
+  appsButton.onclick = () => {
     let div = document.querySelector('#mixlab_apps')
     if (!div) {
       div = document.createElement('div')
@@ -150,10 +146,9 @@ async function createNodesCharts () {
       div.appendChild(btn)
 
       let chartDom = document.createElement('div')
-      chartDom.style=`height:80vh;width:450px`
-      chartDom.className='chart'
+      chartDom.style = `height:80vh;width:450px`
+      chartDom.className = 'chart'
       div.appendChild(chartDom)
-      
     }
     if (div.style.display == 'flex') {
       div.style.display = 'none'
@@ -173,14 +168,11 @@ async function createNodesCharts () {
       background-color: var(--comfy-menu-bg);
       padding: 10px; 
       border: 1px solid black;z-index: 999999999;padding-top: 0;`
-    };
+    }
 
-   
-    createChart(div.querySelector('.chart'),nodes)
-
+    createChart(div.querySelector('.chart'), nodes)
   }
   menu.append(appsButton)
-
 }
 
 function copyNodeValues (src, dest) {
@@ -366,7 +358,14 @@ injectCSS(`::-webkit-scrollbar {
   animation-name: loading_mixlab;
   animation-duration: 2s;
   animation-iteration-count: infinite;
-}`)
+}
+
+.dynamic_prompt{
+  border-left: 2px solid var(--input-text);
+
+}
+
+`)
 
 async function getCustomnodeMappings (mode = 'url') {
   // mode = "local";
@@ -822,6 +821,73 @@ const loadTemplate = async () => {
   }
 
   return templates ?? []
+}
+
+function drawBadge (node, orig, restArgs) {
+  let ctx = restArgs[0]
+  const r = orig?.apply?.(node, restArgs)
+
+  if (
+    !node.flags.collapsed &&
+    node.constructor.title_mode != LiteGraph.NO_TITLE
+  ) {
+    let text = `#${node.id} `
+
+    let nick = node.getNickname()
+    if (nick) {
+      if (nick == 'ComfyUI') {
+        nick = '🦊'
+      }
+
+      if (nick.length > 25) {
+        text += nick.substring(0, 23) + '..'
+      } else {
+        text += nick
+      }
+    }
+
+    if (text != '') {
+      let fgColor = 'white'
+      let bgColor = '#0F1F0F'
+      let visible = true
+
+      ctx.save()
+      ctx.font = '12px sans-serif'
+      const sz = ctx.measureText(text)
+      ctx.fillStyle = bgColor
+      ctx.beginPath()
+      ctx.roundRect(
+        node.size[0] - sz.width - 12,
+        -LiteGraph.NODE_TITLE_HEIGHT - 20,
+        sz.width + 12,
+        20,
+        5
+      )
+      ctx.fill()
+
+      ctx.fillStyle = fgColor
+      ctx.fillText(
+        text,
+        node.size[0] - sz.width - 6,
+        -LiteGraph.NODE_TITLE_HEIGHT - 6
+      )
+      ctx.restore()
+
+      if (node.has_errors) {
+        ctx.save()
+        ctx.font = 'bold 14px sans-serif'
+        const sz2 = ctx.measureText(node.type)
+        ctx.fillStyle = 'white'
+        ctx.fillText(
+          node.type,
+          node.size[0] / 2 - sz2.width / 2,
+          node.size[1] / 2
+        )
+        ctx.restore()
+      }
+    }
+  }
+  return r
 }
 
 app.registerExtension({
@@ -1396,6 +1462,39 @@ app.registerExtension({
     }, 1000)
 
     // createNodesCharts()
+  },
+  nodeCreated (node) {
+    if (node.widgets) {
+      // Locate dynamic prompt text widgets
+      // Include any widgets with dynamicPrompts set to true, and customtext
+
+      for (let index = 0; index < node.widgets.length; index++) {
+        const widget = node.widgets[index]
+        if (
+          (widget.type === 'customtext' && widget.dynamicPrompts !== false) ||
+          widget.dynamicPrompts
+        ) {
+          widget.element.classList.add('dynamic_prompt');
+
+          widget.element.addEventListener('mouseover',e=>{
+            // console.log(node.widgets_values[index])
+            widget.element.setAttribute('title',node.widgets_values[index])
+          })
+        }
+      }
+    }
+
+    // 右上角的badge是否已经绘制
+    if (!node.badge_enabled) {
+      node.getNickname = function () {
+        return getNickname(node, node.comfyClass.trim())
+      }
+      const orig = node.__proto__.onDrawForeground
+      node.onDrawForeground = function (ctx) {
+        drawBadge(node, orig, arguments)
+      }
+      node.badge_enabled = true
+    }
   },
   async loadedGraphNode (node, app) {
     // console.log(
