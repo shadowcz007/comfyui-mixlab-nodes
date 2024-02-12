@@ -1474,11 +1474,11 @@ app.registerExtension({
           (widget.type === 'customtext' && widget.dynamicPrompts !== false) ||
           widget.dynamicPrompts
         ) {
-          widget.element.classList.add('dynamic_prompt');
+          widget.element.classList.add('dynamic_prompt')
 
-          widget.element.addEventListener('mouseover',e=>{
+          widget.element.addEventListener('mouseover', e => {
             // console.log(node.widgets_values[index])
-            widget.element.setAttribute('title',node.widgets_values[index])
+            widget.element.setAttribute('title', node.widgets_values[index])
           })
         }
       }
@@ -1486,13 +1486,16 @@ app.registerExtension({
 
     // 右上角的badge是否已经绘制
     if (!node.badge_enabled) {
-      node.getNickname = function () {
-        if(node.nickname) {
-          return node.nickname;
+      if (!node.getNickname) {
+        node.getNickname = function () {
+          if (node.nickname) {
+            return node.nickname
+          }
+          return
+          // return getNickname(node, node.comfyClass.trim())
         }
-        return ""
-        // return getNickname(node, node.comfyClass.trim())
       }
+
       const orig = node.__proto__.onDrawForeground
       node.onDrawForeground = function (ctx) {
         drawBadge(node, orig, arguments)
