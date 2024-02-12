@@ -537,7 +537,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
 
 
@@ -546,6 +546,7 @@ from .nodes.Mask import OutlineMask,FeatheredMask
 NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
     "TESTNODE_":TESTNODE_,
+    "TESTNODE_TOKEN":TESTNODE_TOKEN,
     "RandomPrompt":RandomPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,
     "PromptSlide":PromptSlide,

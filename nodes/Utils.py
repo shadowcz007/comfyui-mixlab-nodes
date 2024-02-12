@@ -381,7 +381,7 @@ class TextInput:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {
-                    "text": ("STRING",{"multiline": True,"default": ""}),
+                    "text": ("STRING",{"multiline": True,"default": ""})
                              },
                 }
     
@@ -695,7 +695,9 @@ class ListStatistics:
 class TESTNODE_:
     @classmethod
     def INPUT_TYPES(s):
-        return {"required": { "ANY":(any_type,), },
+        return {"required": { 
+            "ANY":(any_type,),                
+                              },
                 }
     
     RETURN_TYPES = (any_type,)
@@ -715,8 +717,40 @@ class TESTNODE_:
 
         # 调用count_types方法进行统计
         result = list_stats.count_types(ANY)
-            
+
+
         return {"ui": {"data": result,"type":[str(type(ANY[0]))]}, "result": (ANY,)}
+
+
+class TESTNODE_TOKEN:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+            "text":("STRING", {"forceInput": True,}),
+            "clip": ("CLIP", )                 
+                              },
+                }
+    
+    RETURN_TYPES = ("STRING",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/__TEST"
+
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,text,clip=None):
+        # print(text)
+        
+        tokens = clip.tokenize(text)
+        
+        tokens=[v for v in tokens.values()][0][0]
+
+        tokens=json.dumps(tokens)
+        
+        return (tokens,)
 
 
 
