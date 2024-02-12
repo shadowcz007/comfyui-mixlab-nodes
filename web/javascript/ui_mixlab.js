@@ -361,9 +361,9 @@ injectCSS(`::-webkit-scrollbar {
 }
 
 .dynamic_prompt{
-  border-left: 2px solid var(--input-text);
-
+  border-left: 2px solid var(--input-text); 
 }
+ 
 
 `)
 
