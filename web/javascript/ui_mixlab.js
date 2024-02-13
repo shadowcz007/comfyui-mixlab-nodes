@@ -59,6 +59,12 @@ function createChart (chartDom, nodes) {
   option && myChart.setOption(option)
 }
 
+
+// fetch(`${get_url}/manager/badge_mode`)
+// 			.then(response => response.text())
+// 			.then(data => { console.log('#badge_mode',data)});
+
+
 async function createNodesCharts () {
   await loadExternalScript(
     '/extensions/comfyui-mixlab-nodes/lib/echarts.min.js'
@@ -1485,8 +1491,10 @@ app.registerExtension({
       }
     }
 
-    // 右上角的badge是否已经绘制
-    if (!node.badge_enabled) {
+   setTimeout(()=>{
+    // node.badge_enabled=false
+     // 右上角的badge是否已经绘制
+     if (!node.badge_enabled) {
       if (!node.getNickname) {
         node.getNickname = function () {
           if (node.nickname) {
@@ -1503,6 +1511,7 @@ app.registerExtension({
       }
       node.badge_enabled = true
     }
+   },8000)
   },
   async loadedGraphNode (node, app) {
     // console.log(
