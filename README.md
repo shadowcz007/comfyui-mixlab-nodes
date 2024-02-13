@@ -39,11 +39,13 @@ APP-JSON:
 - [image-to-image](./example/Image-to-Image_2.json)
 - text-to-text
 
-> 暂时支持8种节点作为界面上的输入节点：Load Image、CLIPTextEncode、PromptSlide、TextInput_、Color、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
+> 暂时支持 9 种节点作为界面上的输入节点：Load Image、VHS_LoadVideo、CLIPTextEncode、PromptSlide、TextInput_、Color、FloatSlider、IntNumber、CheckpointLoaderSimple、LoraLoader
 
 > 输出节点：PreviewImage 、SaveImage、ShowTextForGPT、VHS_VideoCombine、PromptImage
 
 > seed统一输入控件，支持：SamplerCustom、KSampler
+
+> [ps插件](https://github.com/shadowcz007/comfyui-ps-plugin)
 
 
 ## 🏃🚗🚚🚀  Real-time Design
