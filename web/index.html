@@ -435,8 +435,9 @@
                 body
             })
 
-            // console.log(resp)
+
             let data = await resp.json()
+            // console.log(data)
             let { name, subfolder } = data
             let src = `${url}/view?filename=${encodeURIComponent(
                 name
@@ -888,6 +889,52 @@
         }
 
 
+        function generateRainbowVideo() {
+            // 创建一个canvas元素
+            const canvas = document.createElement('canvas');
+            canvas.width = 640; // 设置canvas宽度
+            canvas.height = 480; // 设置canvas高度
+            const context = canvas.getContext('2d');
+
+            // 绘制第一帧彩虹
+            context.fillStyle = 'red';
+            context.fillRect(0, 0, canvas.width / 2, canvas.height);
+            context.fillStyle = 'orange';
+            context.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+
+            // 绘制第二帧彩虹
+            context.fillStyle = 'yellow';
+            context.fillRect(0, 0, canvas.width / 2, canvas.height);
+            context.fillStyle = 'green';
+            context.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+
+            // 创建一个新的video元素
+            const video = document.createElement('video');
+            video.setAttribute('controls', true)
+            // 将canvas绘制到video中
+            const stream = canvas.captureStream();
+            video.srcObject = stream;
+
+            // 导出视频
+            const mediaRecorder = new MediaRecorder(stream);
+            const chunks = [];
+            mediaRecorder.ondataavailable = function (event) {
+                chunks.push(event.data);
+            };
+            mediaRecorder.onstop = function () {
+                const blob = new Blob(chunks, { type: 'video/mp4' });
+                const url = URL.createObjectURL(blob);
+                video.src = url;
+            };
+            mediaRecorder.start();
+            setTimeout(function () {
+                mediaRecorder.stop();
+            }, 1000); // 设置录制时长，这里设置为1秒
+
+            return video;
+        }
+
+
         async function calculateImageHash(blob) {
             const buffer = await blob.arrayBuffer();
             const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -1081,16 +1128,19 @@
             inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
             inputData.forEach(data => {
-                // console.log(data)
+                console.log(data)
                 // Check if the class_type is "LoadImage"
-                if (data.class_type === "LoadImage") {
+                if (data.class_type === "LoadImage" || data.class_type === "VHS_LoadVideo") {
+
+                    let isVideoUpload = data.class_type === "VHS_LoadVideo";
+
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
 
                     // Create a label for the upload control
                     const nameLabel = document.createElement("label");
-                    nameLabel.textContent = data.title || "LoadImage: ";
+                    nameLabel.textContent = data.title || (isVideoUpload ? "LoadVideo: " : "LoadImage: ");
                     nameLabel.style.marginBottom = '12px'
                     uploadContainer.appendChild(nameLabel);
 
@@ -1109,25 +1159,48 @@
                     const btnFromClipboard = document.createElement("button");
                     btnFromClipboard.style = `width: 156px; margin-left: 18px;`
                     btnFromClipboard.innerText = 'paste from clipboard'
-                    actionDiv.appendChild(btnFromClipboard);
+                    if (!isVideoUpload) actionDiv.appendChild(btnFromClipboard);
 
                     const btnForImageEdit = document.createElement("button");
                     btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
                     btnForImageEdit.innerHTML = '<?xml version="1.0" ?><svg version="1.1" style="width: 24px;" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1_1_"><path d="M18.293,31.707h6.414l24-24l-6.414-6.414l-24,24V31.707z M45.879,7.707l-3.586,3.586l-3.586-3.586l3.586-3.586   L45.879,7.707z M20.293,26.121l17-17l3.586,3.586l-17,17h-3.586V26.121z"/><polygon points="43.293,19.707 41.293,19.707 41.293,46.707 3.293,46.707 3.293,8.707 31.293,8.707 31.293,6.707 1.293,6.707    1.293,48.707 43.293,48.707  "/></g></svg>'
-                    actionDiv.appendChild(btnForImageEdit);
+                    if (!isVideoUpload) actionDiv.appendChild(btnForImageEdit);
 
 
                     uploadContainer.appendChild(actionDiv)
 
                     // Create an image element to display the uploaded image
-                    const imageElement = document.createElement("img");
-                    imageElement.src = base64Df
+                    let imageElement = document.createElement("img");
+                    if (isVideoUpload) {
+                        imageElement = document.createElement('video');
+                        imageElement.setAttribute('controls', true)
+                        let [subfolder, name] = data.inputs.video.split('/');
+                        //    console.log(subfolder,name)
+                        if (!name) {
+                            subfolder = "";
+                            name = data.inputs.video;
+                        }
+                        let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        imageElement.src = url;
+                    } else {
+                        // 图片
+                        let [subfolder, name] = data.inputs.image.split('/');
+                        if (!name) {
+                            subfolder = "";
+                            name = data.inputs.image;
+                        }
+                        // imageElement.src = base64Df
+                        let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        imageElement.src = url;
+                    }
+
                     imageElement.style.maxWidth = '200px';
 
 
-                    btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
 
-                    btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
+                    if (!isVideoUpload) btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
+
+                    if (!isVideoUpload) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
 
 
                     uploadImageInput.addEventListener('click', (event) => {
@@ -1145,15 +1218,24 @@
                         reader.onloadend = async function () {
                             // 获取读取的文件内容，即 Blob 对象
                             const fileBlob = new Blob([reader.result], { type: file.type });
-
+                            // console.log( file.type.split('/')[1])
                             let hashId = await calculateImageHash(fileBlob)
 
                             if (hashId == window._appData.data[data.id].hashId) return
 
-                            let { url, name } = await uploadImage(fileBlob)
+                            let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
+                            if (isVideoUpload) {
+                                imageElement.srcObject = null;
+                            }
                             // 在这里可以对 Blob 对象进行进一步处理
                             imageElement.src = url;
-                            window._appData.data[data.id].inputs.image = name;
+
+                            if (isVideoUpload) {
+                                window._appData.data[data.id].inputs.video = name;
+                            } else {
+                                window._appData.data[data.id].inputs.image = name;
+                            }
+
                             window._appData.data[data.id].hashId = hashId;
 
                             console.log("上传的文件：", url, data.id, name);
