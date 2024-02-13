@@ -59,9 +59,6 @@ function createChart (chartDom, nodes) {
   option && myChart.setOption(option)
 }
 
-
-
-
 async function createNodesCharts () {
   await loadExternalScript(
     '/extensions/comfyui-mixlab-nodes/lib/echarts.min.js'
@@ -1488,34 +1485,28 @@ app.registerExtension({
       }
     }
 
-
-    try {
-      fetch(`/manager/badge_mode`)
-			.then(response => response.text())
-			.then(data => { console.log('#badge_mode',data)});
-    } catch (error) {
-         // node.badge_enabled=false
-     // 右上角的badge是否已经绘制
-     if (!node.badge_enabled) {
-      if (!node.getNickname) {
-        node.getNickname = function () {
-          if (node.nickname) {
-            return node.nickname
+    fetch('manager/badge_mode').then(r => {
+      if (r.status === 404) {
+        // 右上角的badge是否已经绘制
+        if (!node.badge_enabled) {
+          if (!node.getNickname) {
+            node.getNickname = function () {
+              if (node.nickname) {
+                return node.nickname
+              }
+              return
+              // return getNickname(node, node.comfyClass.trim())
+            }
           }
-          return
-          // return getNickname(node, node.comfyClass.trim())
+
+          const orig = node.__proto__.onDrawForeground
+          node.onDrawForeground = function (ctx) {
+            drawBadge(node, orig, arguments)
+          }
+          node.badge_enabled = true
         }
       }
-
-      const orig = node.__proto__.onDrawForeground
-      node.onDrawForeground = function (ctx) {
-        drawBadge(node, orig, arguments)
-      }
-      node.badge_enabled = true
-    }
-    }
-    
- 
+    })
   },
   async loadedGraphNode (node, app) {
     // console.log(

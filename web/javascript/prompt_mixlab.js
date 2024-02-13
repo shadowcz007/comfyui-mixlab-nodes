@@ -408,7 +408,7 @@ const _createResult = async (node, widget, message) => {
   const width = node.size[0] * 0.5 - 12
 
   let height_add = 0
-
+  
   for (let index = 0; index < message._images.length; index++) {
     const imgs = message._images[index]
 
@@ -559,8 +559,7 @@ app.registerExtension({
 
       let cards = widget.div.querySelectorAll('.card')
       if (cards.length == 0) node.size = [280, 120]
-
-      _createResult(node, widget, widget.value)
+      if(widget.value) _createResult(node, widget, widget.value)
     }
   }
 })
