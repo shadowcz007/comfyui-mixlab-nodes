@@ -60,9 +60,6 @@ function createChart (chartDom, nodes) {
 }
 
 
-// fetch(`${get_url}/manager/badge_mode`)
-// 			.then(response => response.text())
-// 			.then(data => { console.log('#badge_mode',data)});
 
 
 async function createNodesCharts () {
@@ -1491,8 +1488,13 @@ app.registerExtension({
       }
     }
 
-   setTimeout(()=>{
-    // node.badge_enabled=false
+
+    try {
+      fetch(`/manager/badge_mode`)
+			.then(response => response.text())
+			.then(data => { console.log('#badge_mode',data)});
+    } catch (error) {
+         // node.badge_enabled=false
      // 右上角的badge是否已经绘制
      if (!node.badge_enabled) {
       if (!node.getNickname) {
@@ -1511,7 +1513,9 @@ app.registerExtension({
       }
       node.badge_enabled = true
     }
-   },8000)
+    }
+    
+ 
   },
   async loadedGraphNode (node, app) {
     // console.log(
