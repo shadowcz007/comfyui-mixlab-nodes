@@ -1478,7 +1478,7 @@ app.registerExtension({
 
           widget.element.addEventListener('mouseover', e => {
             // console.log(node.widgets_values[index])
-            if (node.widgets_values[index])
+            if (node.widgets_values&&node.widgets_values[index])
               widget.element.setAttribute('title', node.widgets_values[index])
           })
         }

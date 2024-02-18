@@ -530,7 +530,7 @@ async def nodes_map_hander(request):
 
 
 # 导入节点
-from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
+from .nodes.PromptNode import LoraPrompt,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
 from .nodes.ImageNode import SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
@@ -548,6 +548,7 @@ NODE_CLASS_MAPPINGS = {
     "TESTNODE_":TESTNODE_,
     "TESTNODE_TOKEN":TESTNODE_TOKEN,
     "RandomPrompt":RandomPrompt,
+    "LoraPrompt":LoraPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,
     "PromptSlide":PromptSlide,
     "PromptSimplification":PromptSimplification,

@@ -6,6 +6,12 @@ from urllib import request, parse
 import folder_paths
 from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
+
+import hashlib
+import requests
+import json
+
+
 # def queue_prompt(prompt_workflow):
 #     p = {"prompt": prompt_workflow}
 #     data = json.dumps(p).encode('utf-8')
@@ -26,6 +32,49 @@ def get_files_with_extension(directory, extension):
 def join_with_(text_list,delimiter):
     joined_text = delimiter.join(text_list)
     return joined_text
+
+
+
+def load_json(file_path):
+    try:
+        with open(file_path, 'r') as json_file:
+            data = json.load(json_file)
+            return data
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+        return None
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON in file: {file_path}")
+        return None
+
+def save_json(data_dict, file_path):
+    try:
+        with open(file_path, 'w') as json_file:
+            json.dump(data_dict, json_file, indent=4)
+            print(f"Data saved to {file_path}")
+    except Exception as e:
+        print(f"Error saving JSON to file: {e}")
+
+def get_model_version_info(hash_value):
+    # http://127.0.0.1:1082
+    proxies = {'http': 'http://127.0.0.1:1082', 'https': 'https://127.0.0.1:1082'}
+    api_url = f"https://civitai.com/api/v1/model-versions/by-hash/{hash_value}"
+    print(api_url)
+    response = requests.get(api_url,proxies=proxies, verify=False)
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
+    
+def calculate_sha256(file_path):
+    sha256_hash = hashlib.sha256()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            sha256_hash.update(chunk)
+    return sha256_hash.hexdigest()
+
+
 
 
 class AnyType(str):
@@ -385,7 +434,82 @@ class RandomPrompt:
         return {"ui": {"prompts": prompts}, "result": (prompts,)}
 
 
+class LoraPrompt:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "lora_name":(sorted(folder_paths.get_filename_list("loras"), key=str.lower),),
+                "weight": ("FLOAT", {"default": 1, "min": -2, "max": 2,"step":0.01 ,"display": "slider"}),
+                "force_update": ("BOOLEAN", {"default": False}),
+                },
+                
+            }
+    
+    RETURN_TYPES = ("STRING","STRING",any_type)
+    RETURN_NAMES = ("lora_name","prompt","tags",)
 
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Prompt"
+
+    OUTPUT_IS_LIST = (False,False,True,)
+    # OUTPUT_NODE = True
+
+    # 运行的函数
+    def run(self,lora_name,weight,force_update=False):
+       
+        # print('##LoraPrompt',__file__)
+        # 从本地数据库读取
+        json_tags_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),r'data/loras_tags.json')
+
+        if not os.path.exists(json_tags_path):
+            save_json({},json_tags_path)
+
+        lora_tags = load_json(json_tags_path)
+        output_tags = lora_tags.get(lora_name, None) if lora_tags is not None else None
+        if output_tags is not None:
+            output_tags = ",".join(output_tags)
+            print("trainedWords:",output_tags)
+        else:
+            output_tags = ""
+
+
+        lora_path = folder_paths.get_full_path("loras", lora_name)
+        if output_tags == "" or force_update:
+            print("calculating lora hash")
+            LORAsha256 = calculate_sha256(lora_path)
+            print("requesting infos")
+            model_info = get_model_version_info(LORAsha256)
+            if model_info is not None:
+                if "trainedWords" in model_info:
+                    print("tags found!")
+                    if lora_tags is None:
+                        lora_tags = {}
+                    lora_tags[lora_name] = model_info["trainedWords"]
+                    save_json(lora_tags,json_tags_path)
+                    output_tags = ",".join(model_info["trainedWords"])
+                    print("trainedWords:",output_tags)
+            else:
+                print("No informations found.")
+                if lora_tags is None:
+                    lora_tags = {}
+                lora_tags[lora_name] = []
+                save_json(lora_tags,json_tags_path)
+
+
+        weight = round(weight, 3)
+        prompt=[]
+        for p in output_tags.split(','):
+            
+            if weight!=1:
+                prompt.append('('+p+':'+str(weight)+')')
+            else:
+                prompt.append(p)
+
+        prompt=",".join(prompt)
+
+        return (lora_name,prompt,output_tags.split(','),)
 
 
 
