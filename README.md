@@ -1,6 +1,6 @@
 > 适配了最新版comfyui的py3.11 ，torch 2.1.2+cu121
 
-> [discord](https://discord.gg/cXs9vZSqeK)
+> [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
 #### 
 [comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
@@ -224,6 +224,14 @@ pip3 install -r requirements.txt
 
 #### Chinese community
 访问 [www.mixcomfy.com](https://www.mixcomfy.com)，获得更多内测功能，关注微信公众号：Mixlab无界社区
+
+
+
+
+#### 
+File / LoadImagesFromPath SaveImageToLocal LoadImagesFromURL
+
+
 
 
 #### discussions:
