@@ -2408,7 +2408,7 @@ class SaveImageToLocal:
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
         
     
-        if not os.path.exists(file_path) and not extension:
+        if not os.path.exists(file_path):
             # 使用os.makedirs函数创建新目录
             os.makedirs(file_path)
             print("目录已创建")

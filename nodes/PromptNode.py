@@ -426,7 +426,7 @@ class JoinWithDelimiter:
     def INPUT_TYPES(s):
         return {"required": {
                     "text_list": (any_type,),
-                    "delimiter":(["newline","comma"],),
+                    "delimiter":(["newline","comma","backslash"],),
                              },
                 }
     
@@ -445,6 +445,8 @@ class JoinWithDelimiter:
             delimiter='\n'
         elif delimiter=='comma':
             delimiter=','
+        elif delimiter=='backslash':
+            delimiter='\\'
         t=''
         if isinstance(text_list, list):
             t=join_with_(text_list,delimiter)

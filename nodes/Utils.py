@@ -347,7 +347,7 @@ class MultiplicationNode:
         return {"required": {
                     "numberA":(any_type,),
                     "multiply_by":("FLOAT", {
-                        "default": 0, 
+                        "default": 1, 
                         "min": -2, #Minimum value
                         "max": 0xffffffffffffffff,
                         "step": 0.01, #Slider's step
@@ -560,9 +560,11 @@ class SwitchByIndex:
     @classmethod
     def INPUT_TYPES(cls):
         return {
-            "required": {
-                "A":(any_type,),
-                "B":(any_type,),
+             "optional":{
+                  "A":(any_type,),
+                  "B":(any_type,),
+            },
+            "required": { 
                 "index":("INT", {
                         "default": -1, 
                         "min": -1, 
@@ -574,17 +576,17 @@ class SwitchByIndex:
             }
         }
 
-    RETURN_TYPES = (any_type,)
-    RETURN_NAMES = ("C",)
+    RETURN_TYPES = (any_type,"INT",)
+    RETURN_NAMES = ("C","count",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,)
+    OUTPUT_IS_LIST = (True,False,)
 
-    def run(self, A,B,index,flat):
+    def run(self, A=[],B=[],index=-1,flat='on'):
 
         flat=flat[0]
 
@@ -604,8 +606,8 @@ class SwitchByIndex:
                 C=[C[index]]
             except Exception as e:
                 C=[]
-        
-        return (C,)
+
+        return (C,len(C),)
 
 
 
