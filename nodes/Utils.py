@@ -6,7 +6,7 @@ import numpy as np
 import folder_paths
 import matplotlib.font_manager as fm
 import torch
-
+import importlib.util
 
 
 def recursive_search(directory, excluded_dir_names=None):
@@ -713,12 +713,26 @@ class TESTNODE_:
     OUTPUT_IS_LIST = (True,)
 
     def run(self,ANY):
-        print(ANY)
+        # print(ANY)
         # data=ANY
         list_stats = ListStatistics()
 
         # 调用count_types方法进行统计
         result = list_stats.count_types(ANY)
+ 
+
+        # 假设我们有一个模块文件名为 my_module.py，它位于 'importables' 目录下
+        module_path = os.path.join(os.path.dirname(__file__),'test.py')
+
+        # 使用 spec_from_file_location 获取模块的元数据（名称、定义等）
+        spec = importlib.util.spec_from_file_location('test', module_path)
+
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        functions = getattr(module, 'run')  # 获取函数
+        
+        functions(ANY)
 
 
         return {"ui": {"data": result,"type":[str(type(ANY[0]))]}, "result": (ANY,)}
