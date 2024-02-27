@@ -55,6 +55,7 @@ def save_json(data_dict, file_path):
     except Exception as e:
         print(f"Error saving JSON to file: {e}")
 
+# pysss的lora加载器
 def get_model_version_info(hash_value):
     # http://127.0.0.1:1082
     proxies = {'http': 'http://127.0.0.1:1082', 'https': 'https://127.0.0.1:1082'}
