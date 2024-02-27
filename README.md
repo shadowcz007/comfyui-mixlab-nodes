@@ -163,6 +163,7 @@ from [simple-lama-inpainting](https://github.com/enesmsahin/simple-lama-inpainti
 
 "briarmbg","u2net","u2netp","u2net_human_seg","u2net_cloth_seg","silueta","isnet-general-use","isnet-anime"
 
+*** briarmbg ***  model was developed by BRlA Al and can be used as an open-source model for non-commercial purposes
 
 
 ### Improvement 
