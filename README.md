@@ -45,7 +45,12 @@ APP-JSON:
 
 > seed统一输入控件，支持：SamplerCustom、KSampler
 
-> [ps插件](https://github.com/shadowcz007/comfyui-ps-plugin)
+> 配套[ps插件](https://github.com/shadowcz007/comfyui-ps-plugin)
+
+> 如果遇到上传图片不成功，请检查下：局域网或者是云服务，请使用https，端口8189这个服务（ 感谢 @Damien 反馈问题）
+
+> If you encounter difficulties in uploading images, please check the following: for local network or cloud services, please use HTTPS and the service on port 8189. (Thanks to @Damien for reporting the issue.)
+
 
 
 ## 🏃🚗🚚🚀  Real-time Design
