@@ -2104,6 +2104,7 @@
                 console.log("status", detail, detail.exec_info?.queue_remaining);
                 try {
                     ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
+                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}` }, '*');
                     if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.submitButton.reset()
@@ -2365,7 +2366,7 @@
             const url = new URL(window.location.href);
             const params = new URLSearchParams(url.search);
             const innerApp = params.get("innerApp");
-            console.log(window.location.href, innerApp == 1, document.body);
+            // console.log(window.location.href, innerApp == 1, document.body);
             if (innerApp == 1) {
                 document.body.querySelector('.header').style.display = 'none';
                 window.parent.postMessage({ innerApp, cmd: 'init' }, '*');
@@ -2381,9 +2382,13 @@
 
                     window._appData = window._apps[0];
 
-                    createAppList(window._apps, innerApp);
+                    if (window._appData) {
+                        createAppList(window._apps, innerApp);
 
-                    createApp(window._appData);
+                        createApp(window._appData);
+                    }
+
+
 
                 });
 
