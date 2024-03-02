@@ -11,6 +11,12 @@
             padding: 0;
         }
 
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
         .app {
             display: flex;
             width: 90%;
@@ -378,9 +384,7 @@
 
 <body>
     <div id="editor_container"></div>
-    <div style="display: flex;
-    align-items: center;
-    justify-content: space-around;">
+    <div class="header">
         <div style="margin: 0 24px;
             margin-bottom: 24px;
             padding: 8px;
@@ -2337,22 +2341,58 @@
 
             document.body.appendChild(details);
         }
-
         async function init_app() {
 
-            const { category, filename } = getFilenameAndCategoryFromUrl(location.href);
-            window._apps = await get_my_app(category, filename);
+            const innerApp = checkIsInnerApp();
 
-            window._appData = window._apps[0];
+            if (!innerApp) {
+                const { category, filename } = getFilenameAndCategoryFromUrl(location.href);
+                window._apps = await get_my_app(category, filename);
 
-            createAppList(window._apps);
+                window._appData = window._apps[0];
 
-            createApp(window._appData);
+                createAppList(window._apps);
+
+                createApp(window._appData);
+            }
 
         };
 
         init_app();
 
+        // 支持内嵌app
+        function checkIsInnerApp() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const innerApp = params.get("innerApp");
+            console.log(window.location.href, innerApp == 1, document.body);
+            if (innerApp == 1) {
+                document.body.querySelector('.header').style.display = 'none';
+                window.parent.postMessage({ innerApp, cmd: 'init' }, '*');
+
+                // 在iframe中监听来自父窗口的消息
+                window.addEventListener("message", function (event) {
+                    console.log("Received message from parent:", event.data);
+                    const { init, url } = event.data;
+
+                    window._hostUrl = url;
+
+                    window._apps = init;
+
+                    window._appData = window._apps[0];
+
+                    createAppList(window._apps, innerApp);
+
+                    createApp(window._appData);
+
+                });
+
+
+            }
+
+            return innerApp == 1
+
+        }
 
 
     </script>
