@@ -2115,7 +2115,7 @@
                 console.log("status", detail, detail?.exec_info?.queue_remaining);
                 try {
                     ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
-                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}`  }, '*');
+                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}` }, '*');
                     if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.submitButton.reset()
@@ -2303,7 +2303,7 @@
         }
 
         // 创建app的选择菜单
-        function createAppList(apps = []) {
+        function createAppList(apps = [], innerApp = false) {
             let details = document.createElement('details');
             details.className = 'apps';
 
@@ -2349,8 +2349,10 @@
                 // console.log(div)
             };
 
-            let uploadApp = createUploadJson(details);
-            div.appendChild(uploadApp);
+            if (!innerApp) {
+                let uploadApp = createUploadJson(details);
+                div.appendChild(uploadApp);
+            }
 
             document.body.appendChild(details);
         }
