@@ -148,6 +148,10 @@
             word-wrap: break-word;
         }
 
+        .description img {
+            min-height: unset !important;
+        }
+
         .panel {
             display: flex;
             flex-direction: column;
@@ -178,6 +182,7 @@
             width: fit-content;
             max-width: 100%;
             margin-left: 12px;
+            min-height: 200px;
         }
 
         .input_card {
@@ -894,6 +899,7 @@
 
 
         function generateRainbowVideo() {
+
             // 创建一个canvas元素
             const canvas = document.createElement('canvas');
             canvas.width = 640; // 设置canvas宽度
@@ -912,30 +918,26 @@
             context.fillStyle = 'green';
             context.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
 
-            // 创建一个新的video元素
-            const video = document.createElement('video');
-            video.setAttribute('controls', true)
-            // 将canvas绘制到video中
             const stream = canvas.captureStream();
-            video.srcObject = stream;
 
-            // 导出视频
-            const mediaRecorder = new MediaRecorder(stream);
-            const chunks = [];
-            mediaRecorder.ondataavailable = function (event) {
-                chunks.push(event.data);
-            };
-            mediaRecorder.onstop = function () {
-                const blob = new Blob(chunks, { type: 'video/mp4' });
-                const url = URL.createObjectURL(blob);
-                video.src = url;
-            };
-            mediaRecorder.start();
-            setTimeout(function () {
-                mediaRecorder.stop();
-            }, 1000); // 设置录制时长，这里设置为1秒
+            return new Promise((res, rej) => {
+                // 导出视频
+                const mediaRecorder = new MediaRecorder(stream);
+                const chunks = [];
+                mediaRecorder.ondataavailable = function (event) {
+                    chunks.push(event.data);
+                };
+                mediaRecorder.onstop = function () {
+                    const blob = new Blob(chunks, { type: 'video/mp4' });
+                    const url = URL.createObjectURL(blob);
+                    res(url)
+                };
+                mediaRecorder.start();
+                setTimeout(function () {
+                    mediaRecorder.stop();
+                }, 1000); // 设置录制时长，这里设置为1秒
+            })
 
-            return video;
         }
 
 
@@ -1133,7 +1135,8 @@
             // console.log('inputData',inputData)
             inputData.forEach(data => {
                 console.log(data)
-                // Check if the class_type is "LoadImage"
+
+                // 图片 or 视频输入
                 if (data.class_type === "LoadImage" || data.class_type === "VHS_LoadVideo") {
 
                     let isVideoUpload = data.class_type === "VHS_LoadVideo";
@@ -1149,6 +1152,7 @@
                     uploadContainer.appendChild(nameLabel);
 
                     let actionDiv = document.createElement('div');
+                    actionDiv.style = `padding: 0 8px;`
 
                     // Create an input field for the image name
                     const uploadImageInput = document.createElement("button");
@@ -1176,6 +1180,7 @@
                     // Create an image element to display the uploaded image
                     let imageElement = document.createElement("img");
                     if (isVideoUpload) {
+                        // 视频
                         imageElement = document.createElement('video');
                         imageElement.setAttribute('controls', true)
                         let [subfolder, name] = data.inputs.video.split('/');
@@ -1186,6 +1191,9 @@
                         }
                         let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
                         imageElement.src = url;
+
+                        // imageElement.innerHTML=`<img src="${base64Df}"/>`
+
                     } else {
                         // 图片
                         let [subfolder, name] = data.inputs.image.split('/');
@@ -1258,6 +1266,7 @@
                     container.appendChild(uploadContainer);
                 }
 
+                // 滑块输入
                 if (["PromptSlide"].includes(data.class_type)) {
                     // 滑块输入
                     let options = data.options || {
@@ -1287,6 +1296,7 @@
                 }
 
 
+                // 数字输入支持
                 if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
                     // console.log('data.options',data.options)
                     // 滑块输入
@@ -1309,7 +1319,7 @@
                     container.appendChild(silde);
                 }
 
-                // Check if the class_type is "CLIPTextEncode"
+                // 文本输入支持
                 if (["TextInput_", "CLIPTextEncode", "PromptSimplification"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
@@ -1375,7 +1385,7 @@
                     container.appendChild(uploadContainer);
                 }
 
-
+                // lora的输入支持
                 if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
                     let value = data.inputs.ckpt_name || data.inputs.lora_name;
 
@@ -1419,6 +1429,7 @@
                     container.appendChild(div);
                 }
 
+                // 色彩选择器
                 if (["Color"].includes(data.class_type)) {
                     let value = data.inputs.color.hex || '#000000';
                     let d = document.createElement('div');
@@ -2101,10 +2112,10 @@
             };
 
             api.addEventListener("status", ({ detail }) => {
-                console.log("status", detail, detail.exec_info?.queue_remaining);
+                console.log("status", detail, detail?.exec_info?.queue_remaining);
                 try {
                     ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
-                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}` }, '*');
+                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}`  }, '*');
                     if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.submitButton.reset()
@@ -2112,6 +2123,7 @@
                     }
                 } catch (error) {
                     console.log(error)
+                    window.parent.postMessage({ cmd: 'status' }, '*');
                 }
 
             });
@@ -2211,6 +2223,7 @@
             api.addEventListener("execution_error", ({ detail }) => {
 
                 console.log("execution_error", detail)
+                window.parent.postMessage({ cmd: 'status', data: `execution_error:${JSON.stringify(detail)}` }, '*');
                 // show(URL.createObjectURL(detail));
             });
 
@@ -2240,7 +2253,6 @@
             api.init();
 
             // 外挂的UI
-
             createAllColorInput();
 
 
@@ -2386,6 +2398,9 @@
                         createAppList(window._apps, innerApp);
 
                         createApp(window._appData);
+                    } else {
+                        // todo welcome页面
+                        document.body.innerHTML = `<h3>Welcome to Mixlab Nodes App!</h3>`
                     }
 
 
