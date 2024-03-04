@@ -1204,6 +1204,9 @@
                         // imageElement.src = base64Df
                         let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
                         imageElement.src = url;
+                        imageElement.setAttribute('onerror',`this.src='${base64Df}'`)
+                       
+                        
                     }
 
                     imageElement.style.maxWidth = '200px';
