@@ -535,7 +535,7 @@ from .nodes.ImageNode import SaveImageToLocal,SplitImage,GridOutput,GetImageSize
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
-from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText
+from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
@@ -548,6 +548,7 @@ NODE_CLASS_MAPPINGS = {
     "TESTNODE_":TESTNODE_,
     "TESTNODE_TOKEN":TESTNODE_TOKEN,
     "RandomPrompt":RandomPrompt,
+    # "LoraPrompt":LoraPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,
     "PromptSlide":PromptSlide,
     "PromptSimplification":PromptSimplification,
@@ -584,6 +585,7 @@ NODE_CLASS_MAPPINGS = {
     "ChatGPTOpenAI":ChatGPTNode,
     "ShowTextForGPT":ShowTextForGPT,
     "CharacterInText":CharacterInText,
+    "TextSplitByDelimiter":TextSplitByDelimiter,
     "SpeechRecognition":SpeechRecognition,
     "SpeechSynthesis":SpeechSynthesis,
     "Color":ColorInput,
