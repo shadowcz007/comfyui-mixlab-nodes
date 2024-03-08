@@ -4,7 +4,7 @@ import urllib.error
 import re,json,os,string,random
 import folder_paths
 import hashlib
-
+from zhipuai import ZhipuAI
 def get_unique_hash(string):
     hash_object = hashlib.sha1(string.encode())
     unique_hash = hash_object.hexdigest()
@@ -45,6 +45,11 @@ def openai_client(key,url):
     api_key=key,
     base_url=url
     )
+    return client
+def ZhipuAI_client(key):
+    client = ZhipuAI(
+        api_key=key, # 填写您的 APIKey
+    ) 
     return client
 
 
@@ -100,7 +105,7 @@ class ChatGPTNode:
                                        "default": "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.", 
                                        "multiline": True,"dynamicPrompts": False
                                        }),
-                "model": (["gpt-3.5-turbo","gpt-35-turbo","gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview"], 
+                "model": (["gpt-3.5-turbo","gpt-35-turbo","gpt-3.5-turbo-16k", "gpt-3.5-turbo-16k-0613", "gpt-4-0613","gpt-4-1106-preview","glm-4"], 
                           {"default": "gpt-3.5-turbo"}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
                 "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
@@ -143,8 +148,13 @@ class ChatGPTNode:
         if is_azure_url(api_url):
             client=azure_client(api_key,api_url)
         else:
-            client=openai_client(api_key,api_url)
-            print('openai url')
+            # 根据用户选择的模型，设置相应的接口和模型名称
+            if model == "glm-4" :
+                client = ZhipuAI_client(api_key)  # 使用 Zhipuai 的接口
+                print('using Zhipuai interface')
+            else :
+                client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
+                print('using ChatGPT interface')
 
         # 把用户的提示添加到会话历史中
         # 调用API时传递整个会话历史
@@ -340,5 +350,3 @@ class TextSplitByDelimiter:
         arr= arr[start_index:start_index + max_count * (skip_every+1):(skip_every+1)]
 
         return (arr,)
-
-
