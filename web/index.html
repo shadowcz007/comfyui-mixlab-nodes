@@ -1323,7 +1323,7 @@
                 }
 
                 // 文本输入支持
-                if (["TextInput_", "CLIPTextEncode", "PromptSimplification"].includes(data.class_type)) {
+                if (["TextInput_", "CLIPTextEncode", "PromptSimplification","ChinesePrompt_Mix"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
