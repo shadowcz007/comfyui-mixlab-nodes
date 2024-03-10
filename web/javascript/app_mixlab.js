@@ -2,6 +2,9 @@ import { app } from '../../../scripts/app.js'
 import { $el } from '../../../scripts/ui.js'
 import { api } from '../../../scripts/api.js'
 
+const base64Df =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 12 // the margin around the html element
 
@@ -28,7 +31,7 @@ function get_position_style (ctx, widget_width, y, node_height) {
     // height: `${node_height * 0.3 - MARGIN * 2}px`,
     // background: '#EEEEEE',
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     // alignItems: 'center',
     justifyContent: 'flex-start'
   }
@@ -234,6 +237,14 @@ async function save (json, download = false, showInfo = true) {
       outputIds
     )
 
+    let authorAvatar =
+        localStorage.getItem('_mixlab_author_avatar') || base64Df,
+      authorName =
+        localStorage.getItem('_mixlab_author_name') ||
+        localStorage.getItem('Comfy.userName'),
+        authorLink =
+        localStorage.getItem('_mixlab_author_link') || ''
+
     data.app = {
       name,
       description,
@@ -244,7 +255,12 @@ async function save (json, download = false, showInfo = true) {
       share_prefix,
       link,
       category,
-      filename: `${name}_${version}.json`
+      filename: `${name}_${version}.json`,
+      author: {
+        avatar: authorAvatar,
+        name: authorName,
+        link:authorLink
+      }
     }
 
     try {
@@ -377,10 +393,167 @@ app.registerExtension({
           }
         })
 
-        document.body.appendChild(widget.div)
-        widget.div.appendChild(btn)
-        widget.div.appendChild(download)
+        // author
+        let author = document.createElement('div')
+        // author.style=`display: flex`
 
+        let authorAvatar = document.createElement('img')
+        authorAvatar.className = `${'comfy-multiline-input'}`
+        authorAvatar.style = `outline: none;
+          border: none;
+          padding: 4px;
+          width: 32px;
+          cursor: pointer;
+          height: 32px;`
+
+        if (localStorage.getItem('_mixlab_author_avatar')) {
+          authorAvatar.src =
+            localStorage.getItem('_mixlab_author_avatar') || base64Df
+        }
+
+        let authorAvatarUpload = document.createElement('input')
+        authorAvatarUpload.type = 'file'
+        authorAvatarUpload.style = `display:none`
+
+        let authorAvatarInput = document.createElement('div')
+        authorAvatarInput.style = `display: flex;justify-content: flex-start;
+        align-items: center;`
+        let authorAvatarInputLabel = document.createElement('p')
+        authorAvatarInputLabel.innerText = 'Author Avatar'
+        authorAvatarInputLabel.className = `${'comfy-multiline-input'}`
+        authorAvatarInputLabel.style = `font-size:12px`
+
+        authorAvatar.addEventListener('click', e => {
+          authorAvatarUpload.click()
+        })
+
+        authorAvatarInputLabel.addEventListener('click', e => {
+          authorAvatarUpload.click()
+        })
+
+        authorAvatarUpload.addEventListener('change', event => {
+          const file = event.target.files[0]
+          const reader = new FileReader()
+
+          reader.onload = async e => {
+            let im = new Image()
+            im.src = e.target.result
+            authorAvatar.src = e.target.result
+            im.onload = () => {
+              let c = document.createElement('canvas')
+              let ctx = c.getContext('2d')
+              c.width = 72
+              c.height = 72
+              ctx.drawImage(
+                im,
+                0,
+                0,
+                im.naturalWidth,
+                im.naturalHeight,
+                0,
+                0,
+                c.width,
+                c.height
+              )
+              window._mixlab_author_avatar = c.toDataURL()
+              localStorage.setItem(
+                '_mixlab_author_avatar',
+                window._mixlab_author_avatar
+              )
+            }
+          }
+
+          // 以文本形式读取文件
+          reader.readAsDataURL(file)
+        })
+
+        author.appendChild(authorAvatarInput)
+        authorAvatarInput.appendChild(authorAvatarInputLabel)
+        authorAvatarInput.appendChild(authorAvatar)
+        authorAvatarInput.appendChild(authorAvatarUpload)
+
+        let authorName = document.createElement('input')
+        authorName.type = 'text'
+        authorName.value =
+          localStorage.getItem('_mixlab_author_name') ||
+          localStorage.getItem('Comfy.userName')
+        authorName.placeholder = 'author name'
+        authorName.className = `${'comfy-multiline-input'}`
+        authorName.style = `
+          outline: none;
+          border: none;
+          padding: 4px;
+          width: 100%;
+          cursor: pointer;
+          height: 32px;`
+
+        let authorNameInput = document.createElement('div')
+        authorNameInput.style = `display: flex;justify-content: flex-start;
+          align-items: center;`
+        let authorNameInputLabel = document.createElement('p')
+        authorNameInputLabel.innerText = 'Author Name'
+        authorNameInputLabel.className = `${'comfy-multiline-input'}`
+        authorNameInputLabel.style = `font-size:12px;width: 110px`
+
+        authorName.addEventListener('change', e => {
+          window._mixlab_author_name = authorName.value.trim()
+          localStorage.setItem(
+            '_mixlab_author_name',
+            window._mixlab_author_name
+          )
+        })
+
+        author.appendChild(authorNameInput)
+        authorNameInput.appendChild(authorNameInputLabel)
+        authorNameInput.appendChild(authorName)
+
+
+        // 社交链接
+        let authorLink = document.createElement('input')
+        authorLink.type = 'text'
+        authorLink.value =
+          localStorage.getItem('_mixlab_author_link') ||''
+          authorLink.placeholder = 'author link'
+          authorLink.className = `${'comfy-multiline-input'}`
+          authorLink.style = `
+          outline: none;
+          border: none;
+          padding: 4px;
+          width: 100%;
+          cursor: pointer;
+          height: 32px;`
+
+        let authorLinkInput = document.createElement('div')
+        authorLinkInput.style = `display: flex;justify-content: flex-start;
+          align-items: center;`
+        let authorLinkInputLabel = document.createElement('p')
+        authorLinkInputLabel.innerText = 'Author Link'
+        authorLinkInputLabel.className = `${'comfy-multiline-input'}`
+        authorLinkInputLabel.style = `font-size:12px;width: 110px`
+
+        authorLink.addEventListener('change', e => {
+          window._mixlab_author_link = authorLink.value.trim()
+          localStorage.setItem(
+            '_mixlab_author_link',
+            window._mixlab_author_link
+          )
+        })
+
+        author.appendChild(authorLinkInput)
+        authorLinkInput.appendChild(authorLinkInputLabel)
+        authorLinkInput.appendChild(authorLink)
+
+
+        widget.div.appendChild(author)
+
+        let btns = document.createElement('div')
+
+        widget.div.appendChild(btns)
+
+        btns.appendChild(btn)
+        btns.appendChild(download)
+
+        document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
 
         const onRemoved = this.onRemoved

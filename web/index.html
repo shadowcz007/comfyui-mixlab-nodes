@@ -411,7 +411,7 @@
 
         </a>
     </div>
-
+    <a id="author"></a>
     <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
     <script type="module">
         import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
@@ -1203,9 +1203,9 @@
                         // imageElement.src = base64Df
                         let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
                         imageElement.src = url;
-                        imageElement.setAttribute('onerror',`this.src='${base64Df}'`)
-                       
-                        
+                        imageElement.setAttribute('onerror', `this.src='${base64Df}'`)
+
+
                     }
 
                     imageElement.style.maxWidth = '200px';
@@ -1322,7 +1322,7 @@
                 }
 
                 // 文本输入支持
-                if (["TextInput_", "CLIPTextEncode", "PromptSimplification","ChinesePrompt_Mix"].includes(data.class_type)) {
+                if (["TextInput_", "CLIPTextEncode", "PromptSimplification", "ChinesePrompt_Mix"].includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
@@ -2301,6 +2301,16 @@
             //     // (also applies to touchmove/mousemove)
             //     return true;
             // });
+
+            // author信息
+            if (appData.author) {
+                let div = document.body.querySelector('#author');
+                if (appData.author.link) div.href = appData.author.link
+                div.style = `display: flex;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
+                div.innerHTML = `<img style="width:32px;height:32px;border-radius: 100%;" 
+                src="${appData.author.avatar || base64Df}"/>
+                <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p>`
+            }
 
         }
 

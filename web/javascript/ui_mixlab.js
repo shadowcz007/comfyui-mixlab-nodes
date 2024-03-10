@@ -1159,6 +1159,26 @@ app.registerExtension({
                     if (!ddd) return
                     let item = ddd[0]
                     if (item) {
+                      if (item.author) {
+                        // 有作者信息
+                        if (item.author.avatar)
+                          localStorage.setItem(
+                            '_mixlab_author_avatar',
+                            item.author.avatar
+                          )
+                        if (item.author.name)
+                          localStorage.setItem(
+                            '_mixlab_author_name',
+                            item.author.name
+                          )
+
+                        if (item.author.link)
+                          localStorage.setItem(
+                            '_mixlab_author_link',
+                            item.author.link
+                          )
+                      }
+
                       // console.log(item.data)
                       app.loadGraphData(item.data)
                       setTimeout(() => {
@@ -1187,9 +1207,30 @@ app.registerExtension({
                   callback: async () => {
                     try {
                       let ddd = await get_my_app(a.filename, a.category)
+
                       if (!ddd) return
                       let item = ddd[0]
                       if (item) {
+                        console.log(item)
+                        if (item.author) {
+                          // 有作者信息
+                          if (item.author.avatar)
+                            localStorage.setItem(
+                              '_mixlab_author_avatar',
+                              item.author.avatar
+                            )
+                          if (item.author.name)
+                            localStorage.setItem(
+                              '_mixlab_author_name',
+                              item.author.name
+                            )
+                          if (item.author.link)
+                            localStorage.setItem(
+                              '_mixlab_author_link',
+                              item.author.link
+                            )
+                        }
+
                         // console.log(item.data)
                         app.loadGraphData(item.data)
                         setTimeout(() => {
