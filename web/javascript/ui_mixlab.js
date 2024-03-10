@@ -282,18 +282,22 @@ function get_url () {
 
 async function get_my_app (filename = null, category = '') {
   let url = get_url()
-  const res = await fetch(`${url}/mixlab/workflow`, {
-    method: 'POST',
-    body: JSON.stringify({
-      task: 'my_app',
-      filename,
-      category,
-      admin: true
-    })
-  })
-  let result = await res.json()
-  let data = []
+  let data = null
+
   try {
+    const res = await fetch(`${url}/mixlab/workflow`, {
+      method: 'POST',
+      body: JSON.stringify({
+        task: 'my_app',
+        filename,
+        category,
+        admin: true
+      })
+    })
+    let result = await res.json()
+
+    data = []
+
     for (const res of result.data) {
       let { app, workflow } = res.data
       if (app.filename)
@@ -1126,6 +1130,7 @@ app.registerExtension({
       const orig = LGraphCanvas.prototype.getCanvasMenuOptions
 
       const apps = await get_my_app()
+      if (!apps) return
 
       let apps_map = { 0: [] }
 
@@ -1150,7 +1155,9 @@ app.registerExtension({
                 has_submenu: false,
                 callback: async () => {
                   try {
-                    let item = (await get_my_app(a.filename))[0]
+                    let ddd = await get_my_app(a.filename)
+                    if (!ddd) return
+                    let item = ddd[0]
                     if (item) {
                       // console.log(item.data)
                       app.loadGraphData(item.data)
@@ -1179,7 +1186,9 @@ app.registerExtension({
                   content: `${a.name}_${a.version}`,
                   callback: async () => {
                     try {
-                      let item = (await get_my_app(a.filename, a.category))[0]
+                      let ddd = await get_my_app(a.filename, a.category)
+                      if (!ddd) return
+                      let item = ddd[0]
                       if (item) {
                         // console.log(item.data)
                         app.loadGraphData(item.data)
@@ -1478,7 +1487,7 @@ app.registerExtension({
 
           widget.element.addEventListener('mouseover', e => {
             // console.log(node.widgets_values[index])
-            if (node.widgets_values&&node.widgets_values[index])
+            if (node.widgets_values && node.widgets_values[index])
               widget.element.setAttribute('title', node.widgets_values[index])
           })
         }
