@@ -6,7 +6,7 @@ import sys,json
 import urllib
 import hashlib
 import datetime
-
+import folder_paths
 
 python = sys.executable
 
@@ -517,6 +517,19 @@ async def nodes_map_hander(request):
 
     return web.json_response(result)
 
+
+@routes.post("/mixlab/folder_paths")
+async def get_checkpoints(request):
+    data = await request.json()
+    t="checkpoints"
+    try:
+        t=data['type']
+    except Exception as e:
+        print('/mixlab/folder_paths',False,e)
+    
+    names = folder_paths.get_filename_list(t)
+
+    return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
 
 # 扩展api接口
 # from server import PromptServer
