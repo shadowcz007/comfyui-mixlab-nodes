@@ -23,6 +23,7 @@
             min-width: 400px;
             margin-left: 5%;
             user-select: none;
+            margin-top: 32px;
         }
 
         .apps {
@@ -50,20 +51,30 @@
             user-select: none;
         }
 
-        .apps .selected {
+        #history_container .card {
+            width: 200px;
+            margin: 12px;
+            display: flex;
+            flex-direction: row;
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .selected {
             box-shadow: 0px 0px 10px 10px #fbe9f0
         }
 
-        .apps .card:hover {
+        .card:hover {
             box-shadow: 0px 0px 10px 10px #e9fbfa
         }
 
-        .apps .card h5 {
+        .card h5 {
             font-size: 14px;
-            margin: 10px 0;
+            margin: 0 0 10px 0
         }
 
-        .apps .card p {
+        .card p {
             margin: 0;
             padding: 0;
             max-height: 35px;
@@ -77,14 +88,20 @@
             margin: 0px;
         }
 
-        .apps .card .item {
+        #history_container .card img {
+            width: auto;
+            height: 100%;
+            margin: 0px;
+        }
+
+        .card .item {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: flex-start;
         }
 
-        .apps .card .icon {
+        .card .icon {
             width: 48px;
             height: 48px;
             overflow: hidden;
@@ -95,9 +112,8 @@
         }
 
 
-        .apps .card .version {
+        .card .version {
             font-size: 12px;
-
         }
 
         .card .toggle {
@@ -254,6 +270,7 @@
             border-radius: 100%;
             cursor: pointer;
             border: 3px solid;
+            z-index: 100;
         }
 
         button:hover {
@@ -1714,9 +1731,22 @@
 
         function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
-            const { input: inputData, output: outputData, data: workflow, seed, link } = data;
+            const { input: inputData, output: outputData, data: workflow, seed, link, name } = data;
 
             let mainDiv = document.createElement('div');
+
+            if (document.body.querySelector('#app_container')) document.body.querySelector('#app_container').remove()
+            let appDetails = document.createElement('details');
+            appDetails.id = "app_container"
+            appDetails.setAttribute('open', true)
+            appDetails.innerHTML = `<summary>${name}</summary>`;
+            appDetails.style = `background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+            margin: 8px 44px;`
+
+
             let leftDetails = document.createElement('details');
             leftDetails.setAttribute('open', 'true')
             leftDetails.innerHTML = `<summary>INPUT</summary>
@@ -1864,7 +1894,8 @@
             mainDiv.appendChild(leftDetails);
             mainDiv.appendChild(rightDiv);
 
-            document.body.appendChild(mainDiv)
+            appDetails.appendChild(mainDiv);
+            document.body.appendChild(appDetails)
 
             // 返回每个UI元素的引用和对应的更新方法
             return {
@@ -2308,10 +2339,10 @@
             if (appData.author) {
                 let div = document.body.querySelector('#author');
                 if (appData.author.link) div.href = appData.author.link
-                div.style = `display: flex;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
-                div.innerHTML = `<img style="width:32px;height:32px;border-radius: 100%;" 
+                div.style = `display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
+                div.innerHTML = `<p style="font-size:12px">Author:</p><div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
-                <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p>`
+                <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
             }
 
         }
