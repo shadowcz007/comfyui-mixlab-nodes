@@ -252,7 +252,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                                 "name":x['app']['name'],
                                 "version":x['app']['version'],
                                 "input":input,
-                                "output":output
+                                "output":output,
+                                "id":x['app']['id']
                             }
                         },
                         "date":item["date"]
@@ -300,7 +301,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                                 "name":x['app']['name'],
                                 "version":x['app']['version'],
                                 "input":input,
-                                "output":output
+                                "output":output,
+                                "id":x['app']['id']
                             }
                         },
                         "date":item["date"]
@@ -328,7 +330,9 @@ def get_prompt_result():
     if os.path.exists(prompt_result_path):
         with open(prompt_result_path) as json_file:
             prompt_result = json.load(json_file)
-    return prompt_result
+    res=list(prompt_result.values())
+    # print(res)
+    return res
 
 
 def save_workflow_json(data):
@@ -559,12 +563,12 @@ async def get_checkpoints(request):
 async def post_prompt_result(request):
     data = await request.json()
     res=None
-    print(data)
+    # print(data)
     try:
         action=data['action']
-        result=data['data']
         if action=='save':
-            res=save_prompt_result(result['id'],result)
+            result=data['data']
+            res=save_prompt_result(result['prompt_id'],result)
         elif action=='all':
             res=get_prompt_result()
     except Exception as e:

@@ -94,6 +94,10 @@
             margin: 0px;
         }
 
+        .toggle {
+            border: none;
+        }
+
         .card .item {
             display: flex;
             flex-direction: column;
@@ -698,7 +702,7 @@
         }
 
 
-        function queuePrompt(promptWorkflow, seed, client_id) {
+        function queuePrompt(appInfo, promptWorkflow, seed, client_id) {
             // appinfo升级后 兼容，补丁
             for (const id in promptWorkflow) {
                 if (promptWorkflow[id].class_type == 'AppInfo') {
@@ -717,9 +721,14 @@
                 },
                 body: data,
             })
-                .then(response => {
+                .then(async response => {
                     // Handle response here
-                    console.log(response)
+                    // console.log(response)
+                    let res = await response.json();
+                    window.prompt_ids[res.prompt_id] = {
+                        appInfo,
+                        prompt_id: res.prompt_id
+                    }
                 })
                 .catch(error => {
                     // Handle error here
@@ -757,6 +766,31 @@
                 }
             } catch (error) {
             }
+
+            // 排序 
+            let appSelected = localStorage.getItem('app_selected')
+            if (appSelected) {
+                async function moveElementToFront(array, targetId) {
+
+                    for (let i = 0; i < array.length; i++) {
+                        if (array[i].id === targetId) {
+
+                            if (i !== 0) {
+                                const targetElement = array.splice(i, 1)[0];
+
+                                let nt = (await get_my_app(targetElement.category, targetElement.filename))[0];
+
+                                array.unshift(nt);
+                            }
+                            break;
+                        }
+                    }
+
+                    return array;
+                }
+                data = await moveElementToFront(data, appSelected)
+            }
+
             return data
         }
 
@@ -1749,6 +1783,7 @@
 
             let leftDetails = document.createElement('details');
             leftDetails.setAttribute('open', 'true')
+            leftDetails.id = 'app_input_pannel'
             leftDetails.innerHTML = `<summary>INPUT</summary>
                 <div class="content"></div>`
 
@@ -2108,6 +2143,71 @@
             return div
         }
 
+        function executed(detail, show) {
+            console.log('#executed', window.prompt_ids, detail)
+            if (detail?.node
+                && window.prompt_ids[detail.prompt_id]
+                && window._appData?.output.filter(f => f.id === detail.node)[0]) {
+                // 保存结果到记录里
+                window.prompt_ids[detail.prompt_id].data = detail
+                window.prompt_ids[detail.prompt_id].createTime = (new Date()).getTime()
+                savePromptResult({
+                    ...window.prompt_ids[detail.prompt_id],
+                    prompt_id: detail.prompt_id
+                })
+            }
+            // if (!enabled) return;
+            const images = detail?.output?.images;
+            const text = detail?.output?.text;
+            const gifs = detail?.output?.gifs;
+
+            const prompt = detail?.output?.prompt;
+            const analysis = detail?.output?.analysis;
+
+            const _images = detail?.output?._images;
+            const prompts = detail?.output?.prompts;
+
+            if (images) {
+                // if (!images) return;
+
+                let url = get_url();
+
+                show(Array.from(images, img => {
+                    return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
+                }), detail.node, 'images');
+
+            } else if (_images && prompts) {
+                let url = get_url();
+
+                let items = [];
+                // 支持图片的batch
+                Array.from(_images, (imgs, i) => {
+
+                    for (const img of imgs) {
+                        items.push([`${url}/view?filename=${encodeURIComponent(img.filename)
+                            }&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)
+                            }&t=${+new Date()}`, prompts[i]])
+                    }
+
+                })
+
+                show(items, detail.node, 'images_prompts');
+
+            } else if (text) {
+                show(Array.isArray(text) ? text.join('\n\n') : text, detail.node, 'text')
+            } else if (gifs && gifs[0]) {
+                // if (!images) return; 
+                const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
+                    }&&format=${gifs[0].format}&t=${+new Date()}`;
+
+                show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
+            } else if (prompt && analysis) {
+                // #ClipInterrogator: …… 
+                show(`${prompt.join('\n\n')}\n${JSON.stringify(analysis, null, 2)}`, detail.node, 'text')
+            }
+        }
+
+
 
         async function createApp(appData, share = true) {
             // console.log(appData)
@@ -2129,7 +2229,13 @@
             ui.submitButton.update(
                 () => {
                     // 在提交按钮点击时执行的逻辑
-                    queuePrompt(window._appData.data, window._appData.seed, api.clientId);
+                    queuePrompt({
+                        name: window._appData.name,
+                        id: window._appData.id,
+                        icon: window._appData.icon,
+                        category: window._appData.category,
+                        filename: window._appData.filename
+                    }, window._appData.data, window._appData.seed, api.clientId);
                 }, () => {
                     // 取消
                     if (api.runningCancel) {
@@ -2145,6 +2251,8 @@
                 // console.log(src)
                 ui.output.update(type, src, id)
             };
+            // 暴露给history使用
+            window._show = show;
 
             api.addEventListener("status", ({ detail }) => {
                 console.log("status", detail, detail?.exec_info?.queue_remaining);
@@ -2176,57 +2284,7 @@
 
             api.addEventListener("executed", async ({ detail }) => {
                 console.log("executed", detail)
-                // if (!enabled) return;
-                const images = detail?.output?.images;
-                const text = detail?.output?.text;
-                const gifs = detail?.output?.gifs;
-
-                const prompt = detail?.output?.prompt;
-                const analysis = detail?.output?.analysis;
-
-                const _images = detail?.output?._images;
-                const prompts = detail?.output?.prompts;
-
-                if (images) {
-                    // if (!images) return;
-
-                    let url = get_url();
-
-                    show(Array.from(images, img => {
-                        return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
-                    }), detail.node, 'images');
-
-                } else if (_images && prompts) {
-                    let url = get_url();
-
-                    let items = [];
-                    // 支持图片的batch
-                    Array.from(_images, (imgs, i) => {
-
-                        for (const img of imgs) {
-                            items.push([`${url}/view?filename=${encodeURIComponent(img.filename)
-                                }&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)
-                                }&t=${+new Date()}`, prompts[i]])
-                        }
-
-                    })
-
-                    show(items, detail.node, 'images_prompts');
-
-                } else if (text) {
-                    ui.output.update("text", Array.isArray(text) ? text.join('\n\n') : text, detail.node)
-                } else if (gifs && gifs[0]) {
-                    // if (!images) return; 
-                    const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
-                        }&&format=${gifs[0].format}&t=${+new Date()}`;
-
-                    show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
-                } else if (prompt && analysis) {
-                    // #ClipInterrogator: …… 
-                    ui.output.update("text", `${prompt.join('\n\n')}\n${JSON.stringify(analysis, null, 2)}`, detail.node)
-                }
-
-
+                executed(detail, show);
 
                 try {
                     ui.status.update(`executed_#${window._appData.data[detail.node]?.class_type}`);
@@ -2349,6 +2407,7 @@
 
         // 创建app的选择菜单
         function createAppList(apps = [], innerApp = false) {
+            window.prompt_ids = {};
             let details = document.createElement('details');
             details.className = 'apps';
 
@@ -2385,11 +2444,11 @@
                     Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
                     dd.className = 'card selected'
                     // console.log(app.filename)
-
+                    details.removeAttribute('open');
                     window._appData = (await get_my_app(app.category, app.filename))[0];
                     if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
                     createApp(window._appData);
-
+                    localStorage.setItem('app_selected', window._appData.id)
                 })
                 // console.log(div)
             };
@@ -2401,6 +2460,156 @@
 
             document.body.appendChild(details);
         }
+
+        // 请求历史数据
+        async function getPromptResult() {
+            let url = get_url()
+            try {
+                const response = await fetch(`${url}/mixlab/prompt_result`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        action: "all",
+                    }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log("Response:", data);
+                    return data.result
+                    // 处理返回的数据
+                } else {
+                    console.log("Error:", response.status);
+                    // 处理错误情况
+                }
+            } catch (error) {
+                console.log("Error:", error);
+                // 处理异常情况
+            }
+        }
+        // 保存历史数据
+        async function savePromptResult(data) {
+            let url = get_url()
+            try {
+                const response = await fetch(`${url}/mixlab/prompt_result`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        action: "save",
+                        data
+                    }),
+                });
+
+                if (response.ok) {
+                    const res = await response.json();
+                    console.log("Response:", res);
+                    return res
+                    // 处理返回的数据
+                } else {
+                    console.log("Error:", response.status);
+                    // 处理错误情况
+                }
+            } catch (error) {
+                console.log("Error:", error);
+                // 处理异常情况
+            }
+        }
+
+
+
+        async function createHistoryList() {
+            if (document.body.querySelector('#history_container')) document.body.querySelector('#history_container').remove();
+
+            window._historyData = await getPromptResult();
+
+            if (!window._historyData || (window._historyData && window._historyData.length === 0)) return
+
+            let details = document.createElement('details');
+            details.id = "history_container"
+            details.innerHTML = `<summary>历史</summary>`;
+            details.style = `background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+            margin: 8px 44px;`;
+
+            details.addEventListener('toggle', function (event) {
+                if (details.open) {
+                    // console.log('details被展开了');
+                    // 在这里执行展开后的回调操作
+                    if (document.body.querySelector('#app_container')) {
+                        document.body.querySelector('#app_container').removeAttribute('open')
+                    }
+                    if (document.body.querySelector('.apps')) {
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    }
+                } else {
+                    // console.log('details被收起了');
+                    // 在这里执行收起后的回调操作
+                    if (document.body.querySelector('#app_container')) {
+                        document.body.querySelector('#app_container').removeAttribute('open')
+                    }
+                    if (document.body.querySelector('.apps')) {
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    }
+                }
+            });
+
+
+            let cards = document.createElement('div');
+            cards.style = `display: flex;flex-wrap: wrap;`
+
+            const addCard = (title, createTime, imgurl) => {
+                let card = document.createElement('div')
+                card.className = 'card';
+                card.innerHTML = `<div class="item icon">
+                            <img src="${imgurl || base64Df}"/>
+                            </div>
+                        <div class="item" style="margin-left: 24px;">
+                            <div>
+                                <h5>${title}</h5>
+                                <p></p>
+                            </div>
+                            <div>
+                                <p class="version">${new Date(createTime || (new Date()))}</p>
+                                
+                            </div>
+                        </div>`
+                return card
+            }
+
+            for (const c of window._historyData) {
+                let card = addCard(c.appInfo.name, c.createTime, c.appInfo.icon)
+                cards.appendChild(card)
+                card.addEventListener('click', async e => {
+                    e.preventDefault();
+                    // console.log(c)
+                    try {
+                        document.body.querySelector('#app_container').setAttribute('open', true)
+                        document.body.querySelector('#app_input_pannel').removeAttribute('open')
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    } catch (error) {
+
+                    }
+
+                    const { category, filename } = c.appInfo;
+                    window._appData = (await get_my_app(category, filename))[0];
+
+                    createApp(window._appData);
+
+                    executed(c.data, window._show);
+                })
+            }
+
+            details.appendChild(cards);
+
+            document.body.appendChild(details);
+        }
+
         async function init_app() {
 
             const innerApp = checkIsInnerApp();
@@ -2412,6 +2621,8 @@
                 window._appData = window._apps[0];
 
                 createAppList(window._apps);
+
+                await createHistoryList();
 
                 createApp(window._appData);
             }
@@ -2431,7 +2642,7 @@
                 window.parent.postMessage({ innerApp, cmd: 'init' }, '*');
 
                 // 在iframe中监听来自父窗口的消息
-                window.addEventListener("message", function (event) {
+                window.addEventListener("message",async function (event) {
                     console.log("Received message from parent:", event.data);
                     const { init, url } = event.data;
 
@@ -2443,6 +2654,8 @@
 
                     if (window._appData) {
                         createAppList(window._apps, innerApp);
+
+                        await createHistoryList();
 
                         createApp(window._appData);
                     } else {
