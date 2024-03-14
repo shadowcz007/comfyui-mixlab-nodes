@@ -1932,6 +1932,11 @@
             appDetails.appendChild(mainDiv);
             document.body.appendChild(appDetails)
 
+            appDetails.addEventListener('toggle', e => {
+                e.preventDefault();
+                document.body.querySelector('#author').style.display = appDetails.open ? 'flex' : 'none'
+            })
+
             // 返回每个UI元素的引用和对应的更新方法
             return {
                 title: {
@@ -2397,7 +2402,7 @@
             if (appData.author) {
                 let div = document.body.querySelector('#author');
                 if (appData.author.link) div.href = appData.author.link
-                div.style = `display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
+                div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
                 div.innerHTML = `<p style="font-size:12px">Author:</p><div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
                 <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
@@ -2459,6 +2464,13 @@
             }
 
             document.body.appendChild(details);
+            details.addEventListener('toggle', e => {
+                e.preventDefault();
+                if (document.body.querySelector('#app_container')) {
+                    document.body.querySelector('#app_container').removeAttribute('open');
+                    document.body.querySelector('#author').style.display = 'none'
+                }
+            })
         }
 
         // 请求历史数据
