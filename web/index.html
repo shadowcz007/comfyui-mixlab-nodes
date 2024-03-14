@@ -2474,7 +2474,7 @@
         }
 
         // 请求历史数据
-        async function getPromptResult() {
+        async function getPromptResult(category) {
             let url = get_url()
             try {
                 const response = await fetch(`${url}/mixlab/prompt_result`, {
@@ -2489,8 +2489,9 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Response:", data);
-                    return data.result
+                    console.log("#getPromptResult:", category, data);
+
+                    return data.result.filter(r => r.appInfo.category == category)
                     // 处理返回的数据
                 } else {
                     console.log("Error:", response.status);
@@ -2533,10 +2534,10 @@
 
 
 
-        async function createHistoryList() {
+        async function createHistoryList(category) {
             if (document.body.querySelector('#history_container')) document.body.querySelector('#history_container').remove();
 
-            window._historyData = await getPromptResult();
+            window._historyData = await getPromptResult(category);
 
             if (!window._historyData || (window._historyData && window._historyData.length === 0)) return
 
@@ -2634,7 +2635,7 @@
 
                 createAppList(window._apps);
 
-                await createHistoryList();
+                if (window._apps.length > 0) await createHistoryList(category||'');
 
                 createApp(window._appData);
             }
@@ -2654,7 +2655,7 @@
                 window.parent.postMessage({ innerApp, cmd: 'init' }, '*');
 
                 // 在iframe中监听来自父窗口的消息
-                window.addEventListener("message",async function (event) {
+                window.addEventListener("message", async function (event) {
                     console.log("Received message from parent:", event.data);
                     const { init, url } = event.data;
 
@@ -2667,7 +2668,7 @@
                     if (window._appData) {
                         createAppList(window._apps, innerApp);
 
-                        await createHistoryList();
+                        // await createHistoryList();
 
                         createApp(window._appData);
                     } else {
