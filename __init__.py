@@ -308,6 +308,29 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
 
     return apps
 
+# 历史记录
+def save_prompt_result(id,data):
+    prompt_result_path=os.path.join(current_path, "workflow/prompt_result.json")
+    prompt_result={}
+    if os.path.exists(prompt_result_path):
+        with open(prompt_result_path) as json_file:
+            prompt_result = json.load(json_file)
+    
+    prompt_result[id]=data
+    
+    with open(prompt_result_path, 'w') as file:
+        json.dump(prompt_result, file)
+    return prompt_result_path
+
+def get_prompt_result():
+    prompt_result_path=os.path.join(current_path, "workflow/prompt_result.json")
+    prompt_result={}
+    if os.path.exists(prompt_result_path):
+        with open(prompt_result_path) as json_file:
+            prompt_result = json.load(json_file)
+    return prompt_result
+
+
 def save_workflow_json(data):
     workflow_path=os.path.join(current_path, "workflow/my_workflow.json")
     with open(workflow_path, 'w') as file:
@@ -530,6 +553,27 @@ async def get_checkpoints(request):
     names = folder_paths.get_filename_list(t)
 
     return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
+
+
+@routes.post("/mixlab/prompt_result")
+async def post_prompt_result(request):
+    data = await request.json()
+    res=None
+    print(data)
+    try:
+        action=data['action']
+        result=data['data']
+        if action=='save':
+            res=save_prompt_result(result['id'],result)
+        elif action=='all':
+            res=get_prompt_result()
+    except Exception as e:
+        print('/mixlab/prompt_result',False,e)
+    
+    return web.json_response({"result":res})
+
+
+
 
 # 扩展api接口
 # from server import PromptServer
