@@ -21,6 +21,7 @@ import json
 embeddings_path=os.path.join(folder_paths.models_dir, "embeddings")
 
 def get_files_with_extension(directory, extension):
+    
     file_list = []
     for root, dirs, files in os.walk(directory):
         for file in files:
@@ -513,13 +514,14 @@ class RandomPrompt:
 #         return (lora_name,prompt,output_tags.split(','),)
 
 
-
+import folder_paths
 class EmbeddingPrompt:
     @classmethod
     def INPUT_TYPES(s):
+
         return {
             "required": {
-                "embedding":(get_files_with_extension(embeddings_path,'.pt'),),
+                "embedding":(folder_paths.get_filename_list("embeddings"),),
                 "weight": ("FLOAT", {"default": 1, "min": -2, "max": 2,"step":0.01 ,"display": "slider"}),
                 },
                 
