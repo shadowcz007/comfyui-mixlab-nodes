@@ -42,7 +42,7 @@
 
 
         .apps .card {
-            width: 200px;
+            width: 320px;
             margin: 12px;
             display: flex;
             flex-direction: row;
@@ -77,9 +77,9 @@
         .card p {
             margin: 0;
             padding: 0;
-            max-height: 35px;
+            /* max-height: 35px; */
             overflow: hidden;
-            width: 98px;
+            /* width: 98px; */
         }
 
         .apps .card img {
@@ -2403,7 +2403,8 @@
                 let div = document.body.querySelector('#author');
                 if (appData.author.link) div.href = appData.author.link
                 div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
-                div.innerHTML = `<p style="font-size:12px">Author:</p><div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
+                div.innerHTML = `<p style="font-size:12px">Author:</p>
+                <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
                 <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
             }
@@ -2437,11 +2438,18 @@
                                 <p>${app.description}</p>
                             </div>
                             <div >
-                                <p class="version">version: ${app.version}</p>
-                                
+                                <p class="version">Version: ${app.version}</p> 
                             </div>
+                            <br>
+                            ${app.author && app.author.name ? `<p class="version">Author:</p><div 
+                            style="display: flex;justify-content: center;align-items: center;margin-top: 8px;"> 
+                                <img style="width:28px;height:28px;border-radius: 100%;" 
+                                src="${app.author.avatar || base64Df}"/>
+                                <p class="version" style="margin-left: 12px;">${app.author.name}</p> 
+                            </div>`: ''}
                         </div>
                       `
+
 
                 div.appendChild(d);
                 dd.addEventListener('click', async e => {
