@@ -1185,7 +1185,7 @@
             // ];
             inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
-            inputData.forEach(data => {
+            inputData.forEach(async data => {
                 console.log(data)
 
                 // 图片 or 视频输入
@@ -1443,6 +1443,22 @@
                 // lora的输入支持
                 if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
                     let value = data.inputs.ckpt_name || data.inputs.lora_name;
+
+
+                    try {
+                        const response = await fetch('/mixlab/folder_paths', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ type: 'checkpoints' })
+                        });
+                        const data = await response.json();
+                        console.log(data);
+                    } catch (error) {
+                        console.error(error);
+                    }
+
 
                     try {
                         let v = localStorage.getItem(`_model_${data.id}_${data.class_type}`)
@@ -2643,7 +2659,7 @@
 
                 createAppList(window._apps);
 
-                if (window._apps.length > 0) await createHistoryList(category||'');
+                if (window._apps.length > 0) await createHistoryList(category || '');
 
                 createApp(window._appData);
             }
