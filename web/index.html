@@ -1446,15 +1446,25 @@
 
 
                     try {
-                        const response = await fetch('/mixlab/folder_paths', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({ type: 'checkpoints' })
-                        });
-                        const data = await response.json();
-                        console.log(data);
+                        let t = '';
+                        if (data.class_type == 'CheckpointLoaderSimple') {
+                            t = 'checkpoints'
+                        } else if (data.class_type == 'LoraLoader') {
+                            t = 'loras'
+                        }
+                        if (t) {
+                            const response = await fetch(`${get_url()}/mixlab/folder_paths`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ type: t })
+                            });
+                            const data = await response.json();
+                            data.options = data.names;
+                            console.log(data.names);
+                        }
+
                     } catch (error) {
                         console.error(error);
                     }
