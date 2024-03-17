@@ -2482,12 +2482,17 @@
                     e.preventDefault();
                     Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
                     dd.className = 'card selected'
-                    // console.log(app.filename)
+
                     details.removeAttribute('open');
-                    window._appData = (await get_my_app(app.category, app.filename))[0];
-                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
-                    createApp(window._appData);
-                    localStorage.setItem('app_selected', window._appData.id)
+                    let res = (await get_my_app(app.category, app.filename)).filter(n => n.filename === app.filename)[0];
+
+                    if (res) {
+                        window._appData = res;
+                        if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                        createApp(window._appData);
+                        localStorage.setItem('app_selected', window._appData.id)
+                    }
+
                 })
                 // console.log(div)
             };
