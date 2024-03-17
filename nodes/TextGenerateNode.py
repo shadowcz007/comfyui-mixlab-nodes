@@ -211,13 +211,15 @@ class ChinesePromptTranslate(Transformer):
         return "[" + "".join(args) + "]"
     
     def embedding(self,*args):
+        print('prompt embedding',args[0])
         if len(args) == 1:
             # print('prompt embedding',str(args[0]))
             # 只传递了一个参数，意味着只有embedding名称没有数字
             embedding_name = str(args[0])
             return f"embedding:{embedding_name}"
         elif len(args) > 1:
-            _,embedding_name,*numbers = args
+            embedding_name,*numbers = args
+           
             if len(numbers)==2:
                 return f"embedding:{embedding_name}:{numbers[0]}:{numbers[1]}"
             elif len(numbers)==1:
