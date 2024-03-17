@@ -62,7 +62,14 @@ except:
 
 
 
-def translate(zh_en_tokenizer,zh_en_model,text):
+def translate(text):
+    global text_pipe,zh_en_model,zh_en_tokenizer
+    
+    if zh_en_model==None:
+        zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
+        zh_en_tokenizer = AutoTokenizer.from_pretrained(zh_en_model_path,padding=True, truncation=True)
+    
+    zh_en_model.to("cuda" if torch.cuda.is_available() else "cpu")
     with torch.no_grad():
         encoded = zh_en_tokenizer([text], return_tensors="pt")
         encoded.to(zh_en_model.device)
@@ -104,15 +111,21 @@ import re
 
 def correct_prompt_syntax(prompt):
 
-    print("input prompt",prompt)
+    # print("input prompt",prompt)
     corrected_elements = []
     # 处理成统一的英文标点
     prompt = prompt.replace('（', '(').replace('）', ')').replace('，', ',').replace(';', ',').replace('。', '.').replace('：',':')
     # 删除多余的空格
     prompt = re.sub(r'\s+', ' ', prompt).strip()
+    prompt = prompt.replace("< ","<").replace(" >",">").replace("( ","(").replace(" )",")").replace("[ ","[").replace(' ]',']')
 
     # 分词
     prompt_elements = prompt.split(',')
+
+    def balance_brackets(element, open_bracket, close_bracket):
+        open_brackets_count = element.count(open_bracket)
+        close_brackets_count = element.count(close_bracket)
+        return element + close_bracket * (open_brackets_count - close_brackets_count)
 
     for element in prompt_elements:
         element = element.strip()
@@ -133,21 +146,116 @@ def correct_prompt_syntax(prompt):
         corrected_elements.append(corrected_element)
 
     # 重组修正后的prompt
-    corrected_prompt = ', '.join(corrected_elements)
-    print("output prompt",corrected_prompt)
-    return corrected_prompt
+    return  ','.join(corrected_elements)
 
-def balance_brackets(element, open_bracket, close_bracket):
-    open_brackets_count = element.count(open_bracket)
-    close_brackets_count = element.count(close_bracket)
-    return element + close_bracket * (open_brackets_count - close_brackets_count)
 
 # # 示例使用
 # test_prompt = "((middle-century castles)), [forsaken: 0.8], (mystery dragons: 1.3, mist forests, sunsets, quiet; (((dummy)), [fisting city: 0.5] background, radiant, soft and flavoured,] promising mountains, ((starry: 1.6), [[crowds], [middle-century castle: urban landscapes of the future: 0.5], [yellow: bright sun: 0.7], overlooking"
 # corrected_prompt = correct_prompt_syntax(test_prompt)
 # print(corrected_prompt)
 
+def detect_language(input_str):
+    # 统计中文和英文字符的数量
+    count_cn = count_en = 0
+    for char in input_str:
+        if '\u4e00' <= char <= '\u9fff':
+            count_cn += 1
+        elif char.isalpha():
+            count_en += 1
+
+    # 根据统计的字符数量判断主要语言
+    if count_cn > count_en:
+        return "cn"
+    elif count_en > count_cn:
+        return "en"
+    else:
+        return "unknow"
+
+
+
+
+#定义Prompt文法
+grammar = """
+start: sentence
+sentence: phrase ("," phrase)*
+phrase: emphasis | weight | word | lora | embedding | schedule
+emphasis: "(" sentence ")" -> emphasis
+        | "[" sentence "]" -> weak_emphasis
+weight: "(" word ":" NUMBER ")"
+schedule: "[" word ":" word ":" NUMBER "]"
+lora: "<" WORD ":" WORD (":" NUMBER)? (":" NUMBER)? ">"
+embedding: "embedding" ":" WORD (":" NUMBER)? (":" NUMBER)?
+word: WORD
+
+NUMBER: /\s*-?\d+(\.\d+)?\s*/
+WORD: /[^,:\(\)\[\]<>]+/
+"""
+
+from lark import Lark, Transformer, v_args
+
+@v_args(inline=True)  # Decorator to flatten the tree directly into the function arguments
+class ChinesePromptTranslate(Transformer):
+ 
+    def sentence(self, *args):
+        return ", ".join(args)
+
+    def phrase(self, *args):
+        return "".join(args)
+
+    def emphasis(self, *args):
+        # Reconstruct the emphasis with translated content
+        return "(" + "".join(args) + ")"
+
+    def weak_emphasis(self, *args):
+        print('weak_emphasis:',args)
+        return "[" + "".join(args) + "]"
+    
+    def embedding(self,*args):
+        if len(args) == 1:
+            # print('prompt embedding',str(args[0]))
+            # 只传递了一个参数，意味着只有embedding名称没有数字
+            embedding_name = str(args[0])
+            return f"embedding:{embedding_name}"
+        elif len(args) > 1:
+            _,embedding_name,*numbers = args
+            if len(numbers)==2:
+                return f"embedding:{embedding_name}:{numbers[0]}:{numbers[1]}"
+            elif len(numbers)==1:
+                return f"embedding:{embedding_name}:{numbers[0]}"
+            else:
+                return f"embedding:{embedding_name}"
+
+    def lora(self,*args):
+        print('lora prompt',*args)
+        if len(args) == 1:
+            return f"<lora:{loar_name}>"
+        elif len(args) > 1: 
+            # print('lora', args)
+            _,loar_name,*numbers = args
+            loar_name = str(loar_name).strip()
+            if len(numbers)==2:
+                return f"<lora:{loar_name}:{numbers[0]}:{numbers[1]}>"
+            elif len(numbers)==1:
+                return f"<lora:{loar_name}:{numbers[0]}>"
+            else:
+                return f"<lora:{loar_name}>"
+    
+    def weight(self, word,number):
+        translated_word = translate(str(word)).rstrip('.')
+        return f"({translated_word}:{str(number).strip()})"
+    
+    def schedule(self,*args):
+        print('prompt schedule',args)
+        data = [str(arg).strip() for arg in args] 
         
+        return f"[{':'.join(data)}]"
+
+    def word(self, word):
+        # Translate each word using the dictionary
+        if detect_language(str(word)) == "cn":
+            return  translate(str(word)).rstrip('.')
+        else:
+            return str(word).rstrip('.')
         
 class ChinesePrompt:
 
@@ -185,16 +293,17 @@ class ChinesePrompt:
     zh_en_tokenizer=None 
 
     def run(self,text,seed,generation):
-        global text_pipe,zh_en_model,zh_en_tokenizer
+        
 
         seed=seed[0]
         generation=generation[0]
 
         # 进度条
         pbar = comfy.utils.ProgressBar(len(text)+1)
-        
         texts = [correct_prompt_syntax(t) for t in text]
-        print('correct_prompt_syntax::',texts)
+
+
+        global text_pipe,zh_en_model,zh_en_tokenizer
         if zh_en_model==None:
             zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
             zh_en_tokenizer = AutoTokenizer.from_pretrained(zh_en_model_path,padding=True, truncation=True)
@@ -210,9 +319,15 @@ class ChinesePrompt:
 
         # print('zh_en_model device',zh_en_model.device,text_pipe.model.device,torch.cuda.current_device() )
         en_texts=[]
+
         for t in texts:
-            en_text=translate(zh_en_tokenizer,zh_en_model,t)
-            en_texts.append(en_text)
+            # translated_text =  translated_word = translate(zh_en_tokenizer,zh_en_model,str(t))
+            parser = Lark(grammar, start="start", parser="lalr", transformer=ChinesePromptTranslate())
+            # print('t',t)
+            result = parser.parse(t).children
+            # print('en_result',result)        
+            # en_text=translate(zh_en_tokenizer,zh_en_model,text_without_syntax)
+            en_texts.append(result[0])
 
         zh_en_model.to('cpu')
         print("test en_text",en_texts)
@@ -232,13 +347,17 @@ class ChinesePrompt:
             pbar.update(1)
 
         text_pipe.model.to('cpu')
-        prompt_result = [correct_prompt_syntax(p) for p in prompt_result]
+
+        print('prompt_result',prompt_result,)
+        # prompt_result = [','.join(correct_prompt_syntax(p)) for p in prompt_result]
         
         return {
             "ui":{
                     "prompt": prompt_result
                 },
             "result": (prompt_result,)}
+
+
 
 
 class PromptGenerate:
