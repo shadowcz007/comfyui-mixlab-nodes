@@ -42,7 +42,7 @@
 
 
         .apps .card {
-            width: 200px;
+            width: 320px;
             margin: 12px;
             display: flex;
             flex-direction: row;
@@ -77,9 +77,9 @@
         .card p {
             margin: 0;
             padding: 0;
-            max-height: 35px;
+            /* max-height: 35px; */
             overflow: hidden;
-            width: 98px;
+            /* width: 98px; */
         }
 
         .apps .card img {
@@ -1185,7 +1185,7 @@
             // ];
             inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
-            inputData.forEach(data => {
+            inputData.forEach(async data => {
                 console.log(data)
 
                 // 图片 or 视频输入
@@ -1443,6 +1443,32 @@
                 // lora的输入支持
                 if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
                     let value = data.inputs.ckpt_name || data.inputs.lora_name;
+
+
+                    try {
+                        let t = '';
+                        if (data.class_type == 'CheckpointLoaderSimple') {
+                            t = 'checkpoints'
+                        } else if (data.class_type == 'LoraLoader') {
+                            t = 'loras'
+                        }
+                        if (t) {
+                            const response = await fetch(`${get_url()}/mixlab/folder_paths`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ type: t })
+                            });
+                            const data = await response.json();
+                            data.options = data.names;
+                            console.log(data.names);
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                    }
+
 
                     try {
                         let v = localStorage.getItem(`_model_${data.id}_${data.class_type}`)
@@ -2403,7 +2429,8 @@
                 let div = document.body.querySelector('#author');
                 if (appData.author.link) div.href = appData.author.link
                 div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
-                div.innerHTML = `<p style="font-size:12px">Author:</p><div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
+                div.innerHTML = `<p style="font-size:12px">Author:</p>
+                <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
                 <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
             }
@@ -2437,23 +2464,35 @@
                                 <p>${app.description}</p>
                             </div>
                             <div >
-                                <p class="version">version: ${app.version}</p>
-                                
+                                <p class="version">Version: ${app.version}</p> 
                             </div>
+                            <br>
+                            ${app.author && app.author.name ? `<p class="version">Author:</p><div 
+                            style="display: flex;justify-content: center;align-items: center;margin-top: 8px;"> 
+                                <img style="width:28px;height:28px;border-radius: 100%;" 
+                                src="${app.author.avatar || base64Df}"/>
+                                <p class="version" style="margin-left: 12px;">${app.author.name}</p> 
+                            </div>`: ''}
                         </div>
                       `
+
 
                 div.appendChild(d);
                 dd.addEventListener('click', async e => {
                     e.preventDefault();
                     Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
                     dd.className = 'card selected'
-                    // console.log(app.filename)
+
                     details.removeAttribute('open');
-                    window._appData = (await get_my_app(app.category, app.filename))[0];
-                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
-                    createApp(window._appData);
-                    localStorage.setItem('app_selected', window._appData.id)
+                    let res = (await get_my_app(app.category, app.filename)).filter(n => n.filename === app.filename)[0];
+
+                    if (res) {
+                        window._appData = res;
+                        if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                        createApp(window._appData);
+                        localStorage.setItem('app_selected', window._appData.id)
+                    }
+
                 })
                 // console.log(div)
             };
@@ -2635,7 +2674,7 @@
 
                 createAppList(window._apps);
 
-                if (window._apps.length > 0) await createHistoryList(category||'');
+                if (window._apps.length > 0) await createHistoryList(category || '');
 
                 createApp(window._appData);
             }
