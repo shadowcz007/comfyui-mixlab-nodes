@@ -1736,7 +1736,8 @@ class SplitImage:
         print('#SplitImage',seed)
 
         num=max(0,num) 
-
+        num=min(num,len(grids)-1)
+        
         g=grids[num]
 
         x,y,w,h=g
