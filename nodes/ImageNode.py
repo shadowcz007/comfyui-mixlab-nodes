@@ -1720,7 +1720,7 @@ class SplitImage:
     # OUTPUT_IS_LIST = (True,)
 
     def run(self,image,num,seed):
-
+        
         if type(seed) == list and len(seed)==1:
             seed=seed[0]
 
@@ -1729,9 +1729,11 @@ class SplitImage:
         grids=splitImage(image,num)
 
         if seed>num:
-            num=int(seed / 500 * num)-1
+            num=seed % (num + 1)
         else:
             num=seed-1
+        
+        print('#SplitImage',seed)
 
         num=max(0,num) 
 
