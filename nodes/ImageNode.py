@@ -1720,6 +1720,10 @@ class SplitImage:
     # OUTPUT_IS_LIST = (True,)
 
     def run(self,image,num,seed):
+
+        if type(seed) == list and len(seed)==1:
+            seed=seed[0]
+
         image=tensor2pil(image)
         
         grids=splitImage(image,num)
