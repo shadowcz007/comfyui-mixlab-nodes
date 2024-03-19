@@ -601,7 +601,9 @@ from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
 
-from .nodes.Style import ApplyVisualStylePrompting
+from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
+
+
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -667,7 +669,10 @@ NODE_CLASS_MAPPINGS = {
     "CkptNames_":CreateCkptNames,
     "SamplerNames_":CreateSampler_names,
     "LoraNames_":CreateLoraNames,
-    "ApplyVisualStylePrompting_":ApplyVisualStylePrompting
+    "ApplyVisualStylePrompting_":ApplyVisualStylePrompting,
+    "StyleAlignedReferenceSampler_": StyleAlignedReferenceSampler,
+    "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
+    "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -696,7 +701,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GamePal":"GamePal ♾️Mixlab",
     "RembgNode_Mix":"Removebg",
     "LoraNames_":"LoraName",
-    "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting"
+    "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting",
+    "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler",
+    "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents",
+    "StyleAlignedBatchAlign_": "StyleAligned Batch Align",
 }
 
 # web ui的节点功能
