@@ -37,14 +37,14 @@ function get_position_style (ctx, widget_width, y, node_height) {
   }
 }
 
-async function drawImageToCanvas (imageUrl) {
+async function drawImageToCanvas (imageUrl, sFactor = 320) {
   var canvas = document.createElement('canvas')
   var ctx = canvas.getContext('2d')
   var img = new Image()
 
   await new Promise((resolve, reject) => {
     img.onload = function () {
-      var scaleFactor = 320 / img.width
+      var scaleFactor = sFactor / img.width
       var canvasWidth = img.width * scaleFactor
       var canvasHeight = img.height * scaleFactor
 
@@ -69,7 +69,11 @@ async function drawImageToCanvas (imageUrl) {
   // 可以在这里执行其他操作，比如将Base64数据保存到服务器或显示在页面上
 }
 
-function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
+async function extractInputAndOutputData (
+  jsonData,
+  inputIds = [],
+  outputIds = []
+) {
   // workflow
   // const workflow=jsonData.workflow;
   // const nodes=workflow.nodes;
@@ -120,13 +124,18 @@ function extractInputAndOutputData (jsonData, inputIds = [], outputIds = []) {
         if (node.type == 'Color') {
         }
 
-        // loadImage的mask支持
         if (node.type === 'LoadImage') {
+          // loadImage的mask支持
           let output = node.outputs.filter(ot => ot.type == 'MASK')[0]
           if (output.links) {
             // 有输出
             options.hasMask = true
           }
+          // loadImage的默认图，转为base64
+          let imgurl = app.graph.getNodeById(id).imgs[0].src
+          
+          options.defaultImage = await drawImageToCanvas(imgurl, 512)
+          console.log('#loadImage的默认图',options)
         }
 
         input[inputIds.indexOf(id)] = {
@@ -231,7 +240,7 @@ async function save (json, download = false, showInfo = true) {
   try {
     let data = await app.graphToPrompt()
 
-    let { input, output, seed } = extractInputAndOutputData(
+    let { input, output, seed } = await extractInputAndOutputData(
       data,
       inputIds,
       outputIds
@@ -242,8 +251,7 @@ async function save (json, download = false, showInfo = true) {
       authorName =
         localStorage.getItem('_mixlab_author_name') ||
         localStorage.getItem('Comfy.userName'),
-        authorLink =
-        localStorage.getItem('_mixlab_author_link') || ''
+      authorLink = localStorage.getItem('_mixlab_author_link') || ''
 
     data.app = {
       name,
@@ -259,7 +267,7 @@ async function save (json, download = false, showInfo = true) {
       author: {
         avatar: authorAvatar,
         name: authorName,
-        link:authorLink
+        link: authorLink
       }
     }
 
@@ -507,15 +515,13 @@ app.registerExtension({
         authorNameInput.appendChild(authorNameInputLabel)
         authorNameInput.appendChild(authorName)
 
-
         // 社交链接
         let authorLink = document.createElement('input')
         authorLink.type = 'text'
-        authorLink.value =
-          localStorage.getItem('_mixlab_author_link') ||''
-          authorLink.placeholder = 'author link'
-          authorLink.className = `${'comfy-multiline-input'}`
-          authorLink.style = `
+        authorLink.value = localStorage.getItem('_mixlab_author_link') || ''
+        authorLink.placeholder = 'author link'
+        authorLink.className = `${'comfy-multiline-input'}`
+        authorLink.style = `
           outline: none;
           border: none;
           padding: 4px;
@@ -542,7 +548,6 @@ app.registerExtension({
         author.appendChild(authorLinkInput)
         authorLinkInput.appendChild(authorLinkInputLabel)
         authorLinkInput.appendChild(authorLink)
-
 
         widget.div.appendChild(author)
 

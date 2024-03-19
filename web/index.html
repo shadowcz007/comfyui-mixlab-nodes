@@ -1255,9 +1255,9 @@
                         }
                         // imageElement.src = base64Df
                         let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
-                        imageElement.src = url;
+                        // 如果有默认图                        
+                        imageElement.src = data.options?.defaultImage || url;
                         imageElement.setAttribute('onerror', `this.src='${base64Df}'`)
-
 
                     }
 
