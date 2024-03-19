@@ -601,6 +601,7 @@ from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import OutlineMask,FeatheredMask
 
+from .nodes.Style import ApplyVisualStylePrompting
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -665,7 +666,8 @@ NODE_CLASS_MAPPINGS = {
     "Seed_":CreateSeedNode,
     "CkptNames_":CreateCkptNames,
     "SamplerNames_":CreateSampler_names,
-    "LoraNames_":CreateLoraNames
+    "LoraNames_":CreateLoraNames,
+    "ApplyVisualStylePrompting_":ApplyVisualStylePrompting
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -693,7 +695,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ChinesePrompt_Mix":"ChinesePrompt ♾️Mixlab",
     "GamePal":"GamePal ♾️Mixlab",
     "RembgNode_Mix":"Removebg",
-    "LoraNames_":"LoraName_TriggerWords.safetensors"
+    "LoraNames_":"LoraName",
+    "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting"
 }
 
 # web ui的节点功能

@@ -125,6 +125,12 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 > Conveniently load images from a fixed address on the internet to ensure that default images in the workflow can be executed.
 
 
+## Style
+> Apply VisualStyle Prompting , Modified from [ComfyUI_VisualStylePrompting](https://github.com/ExponentialML/ComfyUI_VisualStylePrompting) 
+
+![](./assets/VisualStylePrompting.png)
+
+
 ## Utils
 > The Color node provides a color picker for easy color selection, the Font node offers built-in font selection for use with TextImage to generate text images, and the DynamicDelayByText node allows delayed execution based on the length of the input text.
 

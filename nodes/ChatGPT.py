@@ -119,7 +119,7 @@ class ChatGPTNode:
     RETURN_TYPES = ("STRING","STRING","STRING",)
     RETURN_NAMES = ("text","messages","session_history",)
     FUNCTION = "generate_contextual_text"
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Prompt/GPT"
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,)
 
@@ -209,7 +209,7 @@ class ShowTextForGPT:
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
 
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Prompt/GPT"
 
     def run(self, text,output_dir=[""]):
         
@@ -293,7 +293,7 @@ class CharacterInText:
     # OUTPUT_NODE = True
     OUTPUT_IS_LIST = (False,)
 
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Prompt/GPT"
 
     def run(self, text,character,start_index):
         # print(text,character,start_index)
@@ -338,7 +338,7 @@ class TextSplitByDelimiter:
     # OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,)
 
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Prompt/GPT"
 
     def run(self, text,delimiter,start_index,skip_every,max_count):
         arr=[]
