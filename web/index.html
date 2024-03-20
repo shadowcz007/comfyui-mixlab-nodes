@@ -902,7 +902,7 @@
                     output_card.appendChild(div);
                 };
 
-                if (["SaveImage", "PreviewImage", "PromptImage"].includes(node.class_type)) {
+                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
