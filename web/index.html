@@ -479,6 +479,26 @@
         };
 
 
+        const parseImageToBase64 = url => {
+            return new Promise((res, rej) => {
+                fetch(url)
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                            const base64data = reader.result
+                            res(base64data)
+                            // 在这里可以将base64数据用于进一步处理或显示图片
+                        }
+                        reader.readAsDataURL(blob)
+                    })
+                    .catch(error => {
+                        console.log('发生错误:', error)
+                    })
+            })
+        }
+
+
         function base64ToBlob(base64) {
             // 去除base64编码中的前缀
             const base64WithoutPrefix = base64.replace(/^data:image\/\w+;base64,/, '');
@@ -1185,10 +1205,10 @@
             inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
             inputData.forEach(async data => {
-                console.log(data)
+                console.log('inputData', data);
 
                 // 图片 or 视频输入
-                if (data.class_type === "LoadImage" || data.class_type === "VHS_LoadVideo") {
+                if (data.class_type === "LoadImage" || data.class_type === "VHS_LoadVideo" || data.class_type === 'ImagesPrompt_') {
 
                     let isVideoUpload = data.class_type === "VHS_LoadVideo";
 
@@ -1245,7 +1265,7 @@
 
                         // imageElement.innerHTML=`<img src="${base64Df}"/>`
 
-                    } else {
+                    } else if (data.class_type === 'LoadImage') {
                         // 图片
                         let [subfolder, name] = data.inputs.image.split('/');
                         if (!name) {
@@ -1258,11 +1278,15 @@
                         imageElement.src = data.options?.defaultImage || url;
                         imageElement.setAttribute('onerror', `this.src='${base64Df}'`)
 
+                    } else if (data.class_type === 'ImagesPrompt_') {
+                        // 图片库模式
+                        const [imgDiv,] = createSelectForImages(data.title, data.options.images, data.inputs.imageIndex)
+                        uploadContainer.appendChild(imgDiv);
+                        window._appData.data[data.id].inputs.image_base64 = imgDiv.querySelector('.images_prompt_main').src;
                     }
 
+
                     imageElement.style.maxWidth = '200px';
-
-
 
                     if (!isVideoUpload) btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
 
@@ -1290,17 +1314,28 @@
                             if (hashId == window._appData.data[data.id].hashId) return
 
                             let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
-                            if (isVideoUpload) {
-                                imageElement.srcObject = null;
-                            }
-                            // 在这里可以对 Blob 对象进行进一步处理
-                            imageElement.src = url;
 
-                            if (isVideoUpload) {
-                                window._appData.data[data.id].inputs.video = name;
+                            if (data.class_type === 'ImagesPrompt_') {
+                                // 
+                                let base64 = await parseImageToBase64(url);
+                                uploadContainer.querySelector('.images_prompt_main').src = base64
+                                window._appData.data[data.id].inputs.image_base64 = base64;
                             } else {
-                                window._appData.data[data.id].inputs.image = name;
+                                if (isVideoUpload) {
+                                    imageElement.srcObject = null;
+                                }
+                                // 在这里可以对 Blob 对象进行进一步处理
+                                imageElement.src = url;
+
+
+                                if (isVideoUpload) {
+                                    window._appData.data[data.id].inputs.video = name;
+                                } else {
+                                    window._appData.data[data.id].inputs.image = name;
+                                }
+
                             }
+
 
                             window._appData.data[data.id].hashId = hashId;
 
@@ -1314,7 +1349,7 @@
                     })
 
                     // imageElement.src = `${get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
-                    uploadContainer.appendChild(imageElement);
+                    if (data.class_type !== 'ImagesPrompt_') uploadContainer.appendChild(imageElement);
 
                     // Append the upload container to the main container
                     container.appendChild(uploadContainer);
@@ -1727,6 +1762,67 @@
             return container;
 
         }
+
+        function createImageForSelect(isMain, imgurl, keyword) {
+            let im = new Image();
+            im.className = isMain?'images_prompt_main':''
+            im.src = imgurl;
+            im.title = keyword
+            im.style = `
+            width:${isMain ? 120 : 56}px;
+            height:${isMain ? 120 : 56}px;
+            min-height:${isMain ? 120 : 56}px;
+            filter: brightness(${isMain ? 1 : 0.8});
+            ${isMain ? 'filter: drop-shadow(1px 1px 4px black);' : ''}
+            `
+            let p = document.createElement('p');
+            p.innerText = keyword;
+            p.style = `position: absolute;
+    top: 14px;
+    left: 20px;
+    background-color: #00000075;
+    padding: 2px 4px;
+    color: white;
+    font-size: 12px;`
+            const div = document.createElement("div");
+            // div.className = 'card';
+            div.appendChild(im)
+            if (isMain) div.appendChild(p)
+            im.setAttribute('onerror', `this.src='${base64Df}'`)
+            return div
+        }
+
+        // 创建图库选择
+        function createSelectForImages(title, options, index = 0) {
+
+            const div = document.createElement("div");
+            // div.className = 'card';
+
+            // Create a label for the upload control
+            const nameLabel = document.createElement("label");
+            nameLabel.textContent = title;
+            div.appendChild(nameLabel);
+
+            var mainImg = createImageForSelect(true, options[index].imgurl, options[index].keyword);
+            div.appendChild(mainImg);
+            
+
+            let imgs = document.createElement('div');
+            div.appendChild(imgs);
+            imgs.style = `display:flex; flex-wrap: wrap;`
+            for (const opt of options) {
+                var selectElement = createImageForSelect(false, opt.imgurl, opt.keyword);
+                imgs.appendChild(selectElement);
+                selectElement.addEventListener('click', e => {
+                    e.preventDefault();
+                    mainImg.querySelector('p').innerText = opt.keyword;
+                    mainImg.querySelector('img').src = opt.imgurl;
+                })
+            }
+
+            return [div, mainImg];
+        }
+
 
         // 创建下拉选择
         function createSelect(options, defaultValue) {

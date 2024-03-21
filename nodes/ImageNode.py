@@ -982,6 +982,34 @@ class TransparentImage:
 
 
 
+class ImagesPrompt:
+    @classmethod
+    def INPUT_TYPES(s):
+        # input_dir = folder_paths.get_input_directory()
+        # files = [f for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+        return {
+            "required": { 
+               "image_base64": ("STRING",{"multiline": True,"default": "","dynamicPrompts": False}),
+            }
+            }
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Input"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+    OUTPUT_NODE = False
+
+    # 运行的函数
+    def run(self,image_base64):
+        image = base64_to_image(image_base64)
+        image=image.convert('RGB')
+        image=pil2tensor(image)
+        return (image,)
 
 
 class EnhanceImage:

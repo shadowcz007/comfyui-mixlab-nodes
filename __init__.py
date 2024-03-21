@@ -592,7 +592,7 @@ async def post_prompt_result(request):
 
 # 导入节点
 from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -641,6 +641,7 @@ NODE_CLASS_MAPPINGS = {
     "FaceToMask":FaceToMask,
     "AreaToMask":AreaToMask,
     "ImageCropByAlpha":ImageCropByAlpha,
+    "ImagesPrompt_":ImagesPrompt,
     # "VAELoaderConsistencyDecoder":VAELoader,
     "SaveImageToLocal":SaveImageToLocal,
     "SaveImageAndMetadata_":SaveImageAndMetadata,
@@ -685,6 +686,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "TextInput_":"Text Input ♾️MixlabApp",
     "FloatSlider":"Float Slider Input ♾️MixlabApp",
     "IntNumber":"Int Input ♾️MixlabApp",
+    "ImagesPrompt_":"Images Input ♾️MixlabApp",
     "SaveImageAndMetadata_":"Save Image Output ♾️MixlabApp",
     "ResizeImageMixlab":"Resize Image ♾️Mixlab",
     "RandomPrompt": "Random Prompt ♾️Mixlab",

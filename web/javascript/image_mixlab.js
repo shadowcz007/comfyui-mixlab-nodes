@@ -28,6 +28,9 @@ async function uploadImage (blob, fileType = '.svg', filename) {
   return src
 }
 
+const base64Df =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
 function base64ToBlobFromURL (base64URL, contentType) {
   return fetch(base64URL).then(response => response.blob())
 }
@@ -108,7 +111,7 @@ function createImage (url) {
   })
 }
 
-const parseImage = url => {
+const parseImageToBase64 = url => {
   return new Promise((res, rej) => {
     fetch(url)
       .then(response => response.blob())
@@ -406,9 +409,7 @@ app.registerExtension({
 
         this.serialize_widgets = true //需要保存参数
       }
-    };
-
- 
+    }
   },
   async loadedGraphNode (node, app) {
     // Fires every time a node is constructed
@@ -439,6 +440,183 @@ app.registerExtension({
 
       const uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
       uploadWidget.value = await uploadWidget.serializeValue()
+    }
+  }
+})
+
+const createSelect = (imgDiv, select, opts, targetWidget) => {
+  select.style.display = 'block'
+  let html = ''
+  let isMatch = false
+  for (const opt of opts) {
+    html += `<option value='${opt.keyword}' ${opt.selected ? 'selected' : ''}>${
+      opt.keyword
+    }</option>`
+    if (opt.selected) {
+      isMatch = true
+      imgDiv.src = opt.imgurl
+      // targetWidget.value = opt.keyword
+    }
+  }
+  select.innerHTML = html
+  if (!isMatch) {
+    // targetWidget.value = opts[0].keyword
+    imgDiv.src = opts[0].imgurl
+  }
+
+  // 添加change事件监听器
+  select.addEventListener('change', async function () {
+    // 获取选中的选项的值
+    var selectedOption = select.options[select.selectedIndex].value
+    let t = opts.filter(opt => opt.keyword === selectedOption)[0]
+
+    targetWidget.value = await parseImageToBase64(t.imgurl)
+    imgDiv.src = targetWidget.value
+  })
+  // console.log(select)
+}
+
+app.registerExtension({
+  name: 'Mixlab.prompt.ImagesPrompt_',
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'ImagesPrompt_') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = async function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        const image_prompt = this.widgets.filter(
+          w => w.name == 'image_base64'
+        )[0]
+
+        const node = this
+
+        const widget = {
+          type: 'div',
+          name: 'upload',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, y, node.size[1])
+            )
+          }
+        }
+
+        widget.div = $el('div', {})
+
+        console.log('image_prompt',image_prompt)
+        const img = new Image()
+        img.src = image_prompt?.value || base64Df
+        widget.div.appendChild(img)
+
+        const btn = document.createElement('button')
+        btn.innerText = 'Upload Images JSON'
+
+        btn.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 122px;
+       `
+
+        const select = document.createElement('select')
+        select.style = `display:none;cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 100px;
+       `
+        widget.select = select
+
+        // const btn=document.createElement('button');
+        // btn.innerText='Upload'
+        btn.addEventListener('click', () => {
+          let inp = document.createElement('input')
+          inp.type = 'file'
+          inp.accept = '.json'
+          inp.click()
+          inp.addEventListener('change', event => {
+            // 获取选择的文件
+            // [{title,imageUrl}]
+            const file = event.target.files[0]
+            this.title = file.name.split('.')[0]
+
+            // console.log(file.name.split('.')[0])
+            // 创建文件读取器
+            const reader = new FileReader()
+
+            // 定义读取完成事件的回调函数
+            reader.onload = async event => {
+              // 读取完成后的文本内容
+              const json = JSON.parse(event.target.result)
+              console.log(node, json)
+
+              widget.value = JSON.stringify(json)
+
+              let img = widget.div.querySelector('img')
+
+              createSelect(img, select, json, image_prompt)
+
+              image_prompt.value = await parseImageToBase64(json[0].imgurl)
+
+              if (img) {
+                img.src = image_prompt.value
+              }
+
+              inp.remove()
+            }
+
+            // 以文本方式读取文件
+            reader.readAsText(file)
+          })
+        })
+
+        widget.div.appendChild(btn)
+        widget.div.appendChild(select)
+        document.body.appendChild(widget.div)
+        this.addCustomWidget(widget)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        if (this.onResize) {
+          this.onResize(this.size)
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'ImagesPrompt_') {
+      try {
+        let prompt = node.widgets.filter(w => w.name === 'image_base64')[0]
+        let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
+        // console.log('##prompt',prompt.value)
+        let img = uploadWidget.div.querySelector('img')
+        let json = JSON.parse(uploadWidget.value)
+
+        for (let index = 0; index < json.length; index++) {
+          const j = json[index]
+          let base64 = await parseImageToBase64(j.imgurl)
+          if (base64 === prompt.value) {
+            json[index].selected = true
+          }
+        }
+
+        if (json && json[0]) {
+          uploadWidget.select.style.display = 'block'
+          createSelect(img, uploadWidget.select, json, prompt)
+        }
+      } catch (error) {}
     }
   }
 })

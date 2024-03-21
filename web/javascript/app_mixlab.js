@@ -5,6 +5,25 @@ import { api } from '../../../scripts/api.js'
 const base64Df =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
+const parseImageToBase64 = url => {
+  return new Promise((res, rej) => {
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          const base64data = reader.result
+          res(base64data)
+          // 在这里可以将base64数据用于进一步处理或显示图片
+        }
+        reader.readAsDataURL(blob)
+      })
+      .catch(error => {
+        console.log('发生错误:', error)
+      })
+  })
+}
+
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 12 // the margin around the html element
 
@@ -121,6 +140,28 @@ async function extractInputAndOutputData (
           }
         }
 
+        if (node.type == 'ImagesPrompt_') {
+          //图库
+          // console.log('ImagesPrompt_', data[id])
+          let image_base64 = data[id].inputs.image_base64
+          let img_index = 0
+          let imgsData = JSON.parse(data[id].inputs.upload)
+          for (let index = 0; index < imgsData.length; index++) {
+            const imgd = imgsData[index].imgurl
+            imgsData[index].index = index
+            //TODO缩放大小
+            imgsData[index].imgurl = await parseImageToBase64(imgd)
+            if (image_base64 == imgsData[index].imgurl) {
+              img_index = index
+            }
+          }
+          options.images = imgsData
+          delete data[id].inputs.upload
+          delete data[id].inputs.image_base64
+
+          data[id].inputs.imageIndex = img_index
+        }
+
         if (node.type == 'Color') {
         }
 
@@ -133,9 +174,9 @@ async function extractInputAndOutputData (
           }
           // loadImage的默认图，转为base64
           let imgurl = app.graph.getNodeById(id).imgs[0].src
-          
+
           options.defaultImage = await drawImageToCanvas(imgurl, 512)
-          console.log('#loadImage的默认图',options)
+          console.log('#loadImage的默认图', options)
         }
 
         input[inputIds.indexOf(id)] = {
@@ -301,12 +342,13 @@ async function save (json, download = false, showInfo = true) {
 
 function getInputsAndOutputs () {
   const inputs =
-      `LoadImage VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
+      `LoadImage ImagesPrompt_ VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
         ' '
       ),
-    outputs = `PreviewImage,SaveImage,ShowTextForGPT,VHS_VideoCombine,Image Save,SaveImageAndMetadata_`.split(
-      ','
-    )
+    outputs =
+      `PreviewImage,SaveImage,ShowTextForGPT,VHS_VideoCombine,Image Save,SaveImageAndMetadata_`.split(
+        ','
+      )
 
   let inputsId = [],
     outputsId = []
