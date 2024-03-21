@@ -680,7 +680,12 @@ NODE_CLASS_MAPPINGS = {
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "AppInfo":"Workflow to App ♾️Mixlab",
+    "AppInfo":"App Info ♾️MixlabApp",
+    "Color":"Color Input ♾️MixlabApp",
+    "TextInput_":"Text Input ♾️MixlabApp",
+    "FloatSlider":"Float Slider Input ♾️MixlabApp",
+    "IntNumber":"Int Input ♾️MixlabApp",
+    "SaveImageAndMetadata_":"Save Image Output ♾️MixlabApp",
     "ResizeImageMixlab":"Resize Image ♾️Mixlab",
     "RandomPrompt": "Random Prompt ♾️Mixlab",
     "PromptImage":"Output Prompt and Image",
@@ -690,12 +695,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ScreenShare":"Screen Share ♾️Mixlab",
     "FloatingVideo":"FloatingVideo ♾️Mixlab",
     "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
-    "ShowTextForGPT":"Show Text ♾️Mixlab",
+    "ShowTextForGPT":"Show Text ♾️MixlabApp",
     "MergeLayers":"Merge Layers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
-    "SaveImageAndMetadata_":"Save Image And Metadata",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
     "PromptSlide":"Prompt Slide ♾️Mixlab",
