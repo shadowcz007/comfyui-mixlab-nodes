@@ -1286,7 +1286,7 @@
 
                     } else if (data.class_type === 'ImagesPrompt_') {
                         // 图片库模式
-                        const [imgDiv,] = createSelectForImages(
+                        const [imgDiv,mainImage] = createSelectForImages(
                             data.title,
                             data.options.images,
                             data.inputs.imageIndex,
@@ -1294,7 +1294,7 @@
                                 window._appData.data[data.id].inputs.image_base64 = base64;
                             })
                         uploadContainer.appendChild(imgDiv);
-                        window._appData.data[data.id].inputs.image_base64 = imgDiv.querySelector('.images_prompt_main').src;
+                        window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
                     }
 
 
