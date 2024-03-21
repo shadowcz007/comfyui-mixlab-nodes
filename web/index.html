@@ -413,9 +413,7 @@
 
     <div id="editor_container"></div>
     <div class="header">
-        <div 
-        id="logo"
-        style="margin: 0 24px;
+        <div id="logo" style="margin: 0 24px;
             margin-bottom: 24px;
             padding: 8px;
             color: #4a4a4a;
@@ -710,7 +708,10 @@
                     && !Array.isArray(data[id].inputs.noise_seed) //如果是数组，则由其他节点控制
                     && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
                     data[id].inputs.noise_seed = Math.round(Math.random() * 1849378600828930)
-
+                }
+                // class_type:"Seed_"
+                if (data[id].class_type == "Seed_") {
+                    data[id].inputs.seed = Math.round(Math.random() * 1849378600828930)
                 }
                 console.log('new Seed', data[id])
             }
@@ -1286,7 +1287,7 @@
 
                     } else if (data.class_type === 'ImagesPrompt_') {
                         // 图片库模式
-                        const [imgDiv,mainImage] = createSelectForImages(
+                        const [imgDiv, mainImage] = createSelectForImages(
                             data.title,
                             data.options.images,
                             data.inputs.imageIndex,
