@@ -189,7 +189,7 @@ class PromptImage:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Prompt"
+    CATEGORY = "♾️Mixlab/Output"
 
     # 运行的函数
     def run(self,prompts,images,save_to_image):
@@ -514,7 +514,7 @@ class RandomPrompt:
 #         return (lora_name,prompt,output_tags.split(','),)
 
 
-import folder_paths
+
 class EmbeddingPrompt:
     @classmethod
     def INPUT_TYPES(s):
@@ -561,7 +561,7 @@ class JoinWithDelimiter:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Prompt"
+    CATEGORY = "♾️Mixlab/Text"
 
     INPUT_IS_LIST = True # 当true的时候，输入时list，当false的时候，如果输入是list，则会自动包一层for循环调用
     OUTPUT_IS_LIST = (False,)

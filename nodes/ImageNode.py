@@ -2329,7 +2329,57 @@ class GetImageSize_:
 
         return (width, height,min_width,min_height,)
 
+class SaveImageAndMetadata:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = ""
+        self.compress_level = 4
 
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": 
+                    {"images": ("IMAGE", ),
+                     "filename_prefix": ("STRING", {"default": "Mixlab"}),
+                     "metadata": (["disable","enable"],),
+                     },
+                "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
+                }
+
+    RETURN_TYPES = ()
+    FUNCTION = "save_images"
+
+    OUTPUT_NODE = True
+
+    CATEGORY = "♾️Mixlab/Output"
+
+    def save_images(self, images, filename_prefix="Mixlab",metadata="disable", prompt=None, extra_pnginfo=None):
+        filename_prefix += self.prefix_append
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+        results = list()
+        for image in images:
+            i = 255. * image.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+            metadata = None
+            if (not args.disable_metadata) and (metadata=="enable"):
+                print('##enable_metadata')
+                metadata = PngInfo()
+                if prompt is not None:
+                    metadata.add_text("prompt", json.dumps(prompt))
+                if extra_pnginfo is not None:
+                    for x in extra_pnginfo:
+                        metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+
+            file = f"{filename}_{counter:05}_.png"
+            img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+            results.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            counter += 1
+
+        return { "ui": { "images": results } }
 
 class ImageColorTransfer:
     @classmethod
@@ -2347,7 +2397,7 @@ class ImageColorTransfer:
     FUNCTION = "run"
 
     # 右键菜单目录
-    CATEGORY = "♾️Mixlab/Image"
+    CATEGORY = "♾️Mixlab/Color"
 
     # 输入是否为列表
     INPUT_IS_LIST = True
@@ -2395,7 +2445,7 @@ class SaveImageToLocal:
 
     OUTPUT_NODE = True
 
-    CATEGORY = "♾️Mixlab/Image"
+    CATEGORY = "♾️Mixlab/Output"
 
     def save_images(self, images,file_path , prompt=None, extra_pnginfo=None):
         filename_prefix = os.path.basename(file_path)

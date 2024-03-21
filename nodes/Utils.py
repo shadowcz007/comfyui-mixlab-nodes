@@ -156,7 +156,7 @@ class ColorInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Color"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,False,False,)
@@ -185,7 +185,7 @@ class FontInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Input"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -218,7 +218,7 @@ class TextToNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Text"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -276,7 +276,7 @@ class FloatSlider:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Input"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -329,7 +329,7 @@ class IntNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Input"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -389,7 +389,7 @@ class TextInput:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Input"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -639,7 +639,7 @@ class LimitNumber:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Input"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
@@ -706,7 +706,7 @@ class TESTNODE_:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/__TEST"
+    CATEGORY = "♾️Mixlab/Test"
 
     OUTPUT_NODE = True
     INPUT_IS_LIST = True
@@ -751,7 +751,7 @@ class TESTNODE_TOKEN:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/__TEST"
+    CATEGORY = "♾️Mixlab/Test"
 
     OUTPUT_NODE = True
     INPUT_IS_LIST = False
@@ -788,7 +788,7 @@ class CreateSeedNode:
     OUTPUT_NODE = True
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Experiment"
 
     def run(self, seed):
         return (seed,)
@@ -815,7 +815,7 @@ class CreateCkptNames:
     # OUTPUT_NODE = True
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Experiment"
 
     def run(self, ckpt_names):
         ckpt_names=ckpt_names.split('\n')
@@ -844,7 +844,7 @@ class CreateLoraNames:
     # OUTPUT_NODE = True
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Experiment"
 
     def run(self, lora_names):
         lora_names=lora_names.split('\n')
@@ -875,7 +875,7 @@ class CreateSampler_names:
     # OUTPUT_NODE = True
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Utils"
+    CATEGORY = "♾️Mixlab/Experiment"
 
     def run(self, sampler_names):
         sampler_names=sampler_names.split('\n')

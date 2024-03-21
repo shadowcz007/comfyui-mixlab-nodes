@@ -592,7 +592,7 @@ async def post_prompt_result(request):
 
 # 导入节点
 from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -643,6 +643,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageCropByAlpha":ImageCropByAlpha,
     # "VAELoaderConsistencyDecoder":VAELoader,
     "SaveImageToLocal":SaveImageToLocal,
+    "SaveImageAndMetadata_":SaveImageAndMetadata,
     # "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
@@ -679,27 +680,29 @@ NODE_CLASS_MAPPINGS = {
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "AppInfo":"AppInfo ♾️Mixlab",
-    "ResizeImageMixlab":"ResizeImage ♾️Mixlab",
+    "AppInfo":"Workflow to App ♾️Mixlab",
+    "ResizeImageMixlab":"Resize Image ♾️Mixlab",
     "RandomPrompt": "Random Prompt ♾️Mixlab",
+    "PromptImage":"Output Prompt and Image",
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
     "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
-    "ScreenShare":"ScreenShare ♾️Mixlab",
+    "ScreenShare":"Screen Share ♾️Mixlab",
     "FloatingVideo":"FloatingVideo ♾️Mixlab",
     "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
-    "ShowTextForGPT":"ShowTextForGPT ♾️Mixlab",
-    "MergeLayers":"MergeLayers ♾️Mixlab",
+    "ShowTextForGPT":"Show Text ♾️Mixlab",
+    "MergeLayers":"Merge Layers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
+    "SaveImageAndMetadata_":"Save Image And Metadata",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
-    "PromptSlide":"PromptSlide ♾️Mixlab",
-    "PromptGenerate_Mix":"PromptGenerate ♾️Mixlab",
-    "ChinesePrompt_Mix":"ChinesePrompt ♾️Mixlab",
+    "PromptSlide":"Prompt Slide ♾️Mixlab",
+    "PromptGenerate_Mix":"Prompt Generate ♾️Mixlab",
+    "ChinesePrompt_Mix":"Chinese Prompt ♾️Mixlab",
     "GamePal":"GamePal ♾️Mixlab",
-    "RembgNode_Mix":"Removebg",
+    "RembgNode_Mix":"Remove Background",
     "LoraNames_":"LoraName",
     "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting",
     "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler",

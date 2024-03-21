@@ -869,7 +869,6 @@
             copyText.addEventListener('click', e => {
                 e.preventDefault();
                 copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
-
             })
 
             copyImage.addEventListener('click', e => {
@@ -902,7 +901,7 @@
                     output_card.appendChild(div);
                 };
 
-                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save"].includes(node.class_type)) {
+                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save","SaveImageAndMetadata"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
