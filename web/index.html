@@ -1243,7 +1243,7 @@
                     const btnForImageEdit = document.createElement("button");
                     btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
                     btnForImageEdit.innerHTML = '<?xml version="1.0" ?><svg version="1.1" style="width: 24px;" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1_1_"><path d="M18.293,31.707h6.414l24-24l-6.414-6.414l-24,24V31.707z M45.879,7.707l-3.586,3.586l-3.586-3.586l3.586-3.586   L45.879,7.707z M20.293,26.121l17-17l3.586,3.586l-17,17h-3.586V26.121z"/><polygon points="43.293,19.707 41.293,19.707 41.293,46.707 3.293,46.707 3.293,8.707 31.293,8.707 31.293,6.707 1.293,6.707    1.293,48.707 43.293,48.707  "/></g></svg>'
-                    if (!isVideoUpload) actionDiv.appendChild(btnForImageEdit);
+                    if (!isVideoUpload && data.class_type !== 'ImagesPrompt_') actionDiv.appendChild(btnForImageEdit);
 
 
                     uploadContainer.appendChild(actionDiv)
@@ -1803,15 +1803,15 @@
 
             const div = document.createElement("div");
             // div.className = 'card';
+            div.style = `margin-top: 24px;`
 
             // Create a label for the upload control
-            const nameLabel = document.createElement("label");
-            nameLabel.textContent = title;
-            div.appendChild(nameLabel);
+            // const nameLabel = document.createElement("label");
+            // nameLabel.textContent = title;
+            // div.appendChild(nameLabel);
 
             var mainImg = createImageForSelect(true, options[index].imgurl, options[index].keyword);
             div.appendChild(mainImg);
-
 
             let imgs = document.createElement('div');
             div.appendChild(imgs);
