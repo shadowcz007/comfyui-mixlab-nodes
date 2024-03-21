@@ -811,11 +811,6 @@
             action.appendChild(copyImage)
             copyImage.style.marginLeft = '18px';
 
-            const copyText = document.createElement('button');
-            copyText.innerText = 'copy text for share'
-            action.appendChild(copyText)
-            copyText.style.marginLeft = '18px';
-
             let isURL = false;
             try {
                 new URL(link)
@@ -865,11 +860,16 @@
             output_card.className = 'output_card'
             container.appendChild(output_card)
 
-
-            copyText.addEventListener('click', e => {
-                e.preventDefault();
-                copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
-            })
+            if (window._appData.share_prefix) {
+                const copyText = document.createElement('button');
+                copyText.innerText = 'copy text for share'
+                action.appendChild(copyText)
+                copyText.style.marginLeft = '18px';
+                copyText.addEventListener('click', e => {
+                    e.preventDefault();
+                    copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
+                })
+            }
 
             copyImage.addEventListener('click', e => {
                 e.preventDefault();
@@ -901,7 +901,7 @@
                     output_card.appendChild(div);
                 };
 
-                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save","SaveImageAndMetadata_"].includes(node.class_type)) {
+                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save", "SaveImageAndMetadata_"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
