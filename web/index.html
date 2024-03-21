@@ -413,7 +413,9 @@
 
     <div id="editor_container"></div>
     <div class="header">
-        <div style="margin: 0 24px;
+        <div 
+        id="logo"
+        style="margin: 0 24px;
             margin-bottom: 24px;
             padding: 8px;
             color: #4a4a4a;
@@ -767,6 +769,10 @@
             let url = get_url()
             const res = await fetch(`${url}/mixlab/workflow`, {
                 method: 'POST',
+                mode: 'cors', // 允许跨域请求
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                     task: 'my_app',
                     filename,
