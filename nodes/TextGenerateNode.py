@@ -12,6 +12,8 @@ import comfy.utils
 # import numpy as np
 import torch
 import random
+from lark import Lark, Transformer, v_args
+
 
 global _available
 _available=True
@@ -109,7 +111,7 @@ def text_generate(text_pipe,input,seed=None):
     
 import re
 
-def correct_prompt_syntax(prompt):
+def correct_prompt_syntax(prompt=""):
 
     # print("input prompt",prompt)
     corrected_elements = []
@@ -191,7 +193,7 @@ NUMBER: /\s*-?\d+(\.\d+)?\s*/
 WORD: /[^,:\(\)\[\]<>]+/
 """
 
-from lark import Lark, Transformer, v_args
+
 
 @v_args(inline=True)  # Decorator to flatten the tree directly into the function arguments
 class ChinesePromptTranslate(Transformer):
@@ -304,7 +306,6 @@ class ChinesePrompt:
         pbar = comfy.utils.ProgressBar(len(text)+1)
         texts = [correct_prompt_syntax(t) for t in text]
 
-
         global text_pipe,zh_en_model,zh_en_tokenizer
         if zh_en_model==None:
             zh_en_model = AutoModelForSeq2SeqLM.from_pretrained(zh_en_model_path).eval()
@@ -323,13 +324,14 @@ class ChinesePrompt:
         en_texts=[]
 
         for t in texts:
-            # translated_text =  translated_word = translate(zh_en_tokenizer,zh_en_model,str(t))
-            parser = Lark(grammar, start="start", parser="lalr", transformer=ChinesePromptTranslate())
-            # print('t',t)
-            result = parser.parse(t).children
-            # print('en_result',result)        
-            # en_text=translate(zh_en_tokenizer,zh_en_model,text_without_syntax)
-            en_texts.append(result[0])
+            if t:
+                # translated_text =  translated_word = translate(zh_en_tokenizer,zh_en_model,str(t))
+                parser = Lark(grammar, start="start", parser="lalr", transformer=ChinesePromptTranslate())
+                # print('t',t)
+                result = parser.parse(t).children
+                # print('en_result',result)        
+                # en_text=translate(zh_en_tokenizer,zh_en_model,text_without_syntax)
+                en_texts.append(result[0])
 
         zh_en_model.to('cpu')
         print("test en_text",en_texts)
@@ -352,7 +354,8 @@ class ChinesePrompt:
 
         print('prompt_result',prompt_result,)
         # prompt_result = [','.join(correct_prompt_syntax(p)) for p in prompt_result]
-        
+        if len(prompt_result)==0:
+            prompt_result=[""]
         return {
             "ui":{
                     "prompt": prompt_result

@@ -304,8 +304,8 @@ function getInputsAndOutputs () {
       `LoadImage VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
         ' '
       ),
-    outputs = `PreviewImage SaveImage ShowTextForGPT VHS_VideoCombine`.split(
-      ' '
+    outputs = `PreviewImage,SaveImage,ShowTextForGPT,VHS_VideoCombine,Image Save,SaveImageAndMetadata_`.split(
+      ','
     )
 
   let inputsId = [],
