@@ -1280,7 +1280,13 @@
 
                     } else if (data.class_type === 'ImagesPrompt_') {
                         // 图片库模式
-                        const [imgDiv,] = createSelectForImages(data.title, data.options.images, data.inputs.imageIndex)
+                        const [imgDiv,] = createSelectForImages(
+                            data.title,
+                            data.options.images,
+                            data.inputs.imageIndex,
+                            (base64) => {
+                                window._appData.data[data.id].inputs.image_base64 = base64;
+                            })
                         uploadContainer.appendChild(imgDiv);
                         window._appData.data[data.id].inputs.image_base64 = imgDiv.querySelector('.images_prompt_main').src;
                     }
@@ -1765,12 +1771,12 @@
 
         function createImageForSelect(isMain, imgurl, keyword) {
             let im = new Image();
-            im.className = isMain?'images_prompt_main':''
+            im.className = isMain ? 'images_prompt_main' : ''
             im.src = imgurl;
             im.title = keyword
             im.style = `
             width:${isMain ? 120 : 56}px;
-            height:${isMain ? 120 : 56}px;
+            height:auto;
             min-height:${isMain ? 120 : 56}px;
             filter: brightness(${isMain ? 1 : 0.8});
             ${isMain ? 'filter: drop-shadow(1px 1px 4px black);' : ''}
@@ -1793,7 +1799,7 @@
         }
 
         // 创建图库选择
-        function createSelectForImages(title, options, index = 0) {
+        function createSelectForImages(title, options, index = 0, callback) {
 
             const div = document.createElement("div");
             // div.className = 'card';
@@ -1805,7 +1811,7 @@
 
             var mainImg = createImageForSelect(true, options[index].imgurl, options[index].keyword);
             div.appendChild(mainImg);
-            
+
 
             let imgs = document.createElement('div');
             div.appendChild(imgs);
@@ -1813,10 +1819,16 @@
             for (const opt of options) {
                 var selectElement = createImageForSelect(false, opt.imgurl, opt.keyword);
                 imgs.appendChild(selectElement);
-                selectElement.addEventListener('click', e => {
+                selectElement.addEventListener('click', async e => {
                     e.preventDefault();
                     mainImg.querySelector('p').innerText = opt.keyword;
                     mainImg.querySelector('img').src = opt.imgurl;
+                    if (callback) {
+                        if (!opt.imgurl.match('data:image')) {
+                            opt.imgurl = await parseImageToBase64(opt.imgurl)
+                        }
+                        callback(opt.imgurl);
+                    }
                 })
             }
 
