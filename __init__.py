@@ -603,6 +603,7 @@ from .nodes.Mask import OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
+from .nodes.Video import LoadVideoAndSegment
 
 
 # 要导出的所有节点及其名称的字典
@@ -675,6 +676,7 @@ NODE_CLASS_MAPPINGS = {
     "StyleAlignedReferenceSampler_": StyleAlignedReferenceSampler,
     "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
     "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
+    "LoadVideoAndSegment_":LoadVideoAndSegment
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -714,6 +716,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler",
     "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents",
     "StyleAlignedBatchAlign_": "StyleAligned Batch Align",
+    "LoadVideoAndSegment_":"Load Video And Segment"
 }
 
 # web ui的节点功能
