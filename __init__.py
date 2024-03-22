@@ -599,7 +599,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
-from .nodes.Mask import OutlineMask,FeatheredMask
+from .nodes.Mask import MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
@@ -667,6 +667,7 @@ NODE_CLASS_MAPPINGS = {
     "SwitchByIndex":SwitchByIndex,
     "LimitNumber":LimitNumber, 
     "OutlineMask":OutlineMask,
+    "MaskListMerge_":MaskListMerge,
     "JoinWithDelimiter":JoinWithDelimiter,
     "Seed_":CreateSeedNode,
     "CkptNames_":CreateCkptNames,
@@ -716,7 +717,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler",
     "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents",
     "StyleAlignedBatchAlign_": "StyleAligned Batch Align",
-    "LoadVideoAndSegment_":"Load Video And Segment"
+    "LoadVideoAndSegment_":"Load Video And Segment",
+    "MaskListMerge_":"MaskList to Mask"
 }
 
 # web ui的节点功能

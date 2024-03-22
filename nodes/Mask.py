@@ -22,6 +22,19 @@ def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
 
+def add_masks(mask1, mask2):
+    mask1 = mask1.cpu()
+    mask2 = mask2.cpu()
+    cv2_mask1 = np.array(mask1) * 255
+    cv2_mask2 = np.array(mask2) * 255
+
+    if cv2_mask1.shape == cv2_mask2.shape:
+        cv2_mask = cv2.add(cv2_mask1, cv2_mask2)
+        return torch.clamp(torch.from_numpy(cv2_mask) / 255.0, min=0, max=1)
+    else:
+        return mask1
+    
+
 def grow(mask, expand, tapered_corners):
     c = 0 if tapered_corners else 1
     kernel = np.array([[c, 1, c],
@@ -87,6 +100,29 @@ class OutlineMask:
         return (m3,)
     
 
+
+class MaskListMerge:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "masks": ("MASK",),
+        }
+        }
+
+    RETURN_TYPES = ("MASK",)
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Mask"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self, masks):
+        mask=masks[0]
+        if isinstance(masks, list):
+            for m in masks:
+                # print(m.shape)
+                mask = add_masks(mask, m)
+        return (mask,)
 
 
 class FeatheredMask:

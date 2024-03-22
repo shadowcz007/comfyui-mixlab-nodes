@@ -713,7 +713,7 @@ class TESTNODE_:
     OUTPUT_IS_LIST = (True,)
 
     def run(self,ANY):
-        # print(ANY)
+        print(type(ANY))
         # data=ANY
         list_stats = ListStatistics()
 
