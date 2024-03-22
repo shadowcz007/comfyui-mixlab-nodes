@@ -73,7 +73,7 @@ class LoadVideoAndSegment:
     RETURN_TYPES = ("IMAGE", "INT",)
     RETURN_NAMES = ("IMAGE", "frame_count",)
     FUNCTION = "load_video"
-
+    OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,False,)
 
 
