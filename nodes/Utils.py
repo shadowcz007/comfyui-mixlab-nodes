@@ -9,6 +9,14 @@ import torch
 import importlib.util
 
 
+def split_list(lst, chunk_size, transition_size):
+    result = []
+    for i in range(0, len(lst), chunk_size):
+        start = i - transition_size
+        end = i + chunk_size + transition_size
+        result.append(lst[max(start, 0):end])
+    return result
+
 def recursive_search(directory, excluded_dir_names=None):
     if not os.path.isdir(directory):
         return [], {}
@@ -609,6 +617,39 @@ class SwitchByIndex:
 
         return (C,len(C),)
 
+class ListSplit:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+             "optional":{
+                  "A":(any_type,), 
+            },
+            "required": { 
+                "chunk_size": ("INT", {"default": 10, "min": 1, "step": 1}),
+                "transition_size": ("INT", {"default": 0, "min": 0, "step": 1}),
+                "index": ("INT", {"default": -1, "min": -1, "step": 1}),
+            }
+        }
+
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("B",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Utils"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,)
+
+    def run(self, A=[],chunk_size=[10],transition_size=[0],index=[-1]):
+        # print(len(A))
+        B=split_list(A,chunk_size[0],transition_size[0])
+
+        if index[0]>-1:
+            B=B[index[0]]
+
+        return (B,)
+    
 
 
 class LimitNumber:

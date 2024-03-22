@@ -598,8 +598,8 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
-from .nodes.Mask import MaskListMerge,OutlineMask,FeatheredMask
+from .nodes.Utils import ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
@@ -677,7 +677,9 @@ NODE_CLASS_MAPPINGS = {
     "StyleAlignedReferenceSampler_": StyleAlignedReferenceSampler,
     "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
     "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
-    "LoadVideoAndSegment_":LoadVideoAndSegment
+    "LoadVideoAndSegment_":LoadVideoAndSegment,
+    "ListSplit_":ListSplit,
+    "MaskListReplace_":MaskListReplace
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -718,7 +720,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents",
     "StyleAlignedBatchAlign_": "StyleAligned Batch Align",
     "LoadVideoAndSegment_":"Load Video And Segment",
-    "MaskListMerge_":"MaskList to Mask"
+    "MaskListMerge_":"MaskList to Mask",
+    "ListSplit_":"Split List",
+    "MaskListReplace_":"MaskList Replace"
 }
 
 # web ui的节点功能

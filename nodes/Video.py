@@ -71,7 +71,7 @@ class LoadVideoAndSegment:
     CATEGORY = "♾️Mixlab/Video"
 
     RETURN_TYPES = ("IMAGE", "INT",)
-    RETURN_NAMES = ("IMAGE", "frame_count",)
+    RETURN_NAMES = ("image_batch", "frame_count",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,False,)
@@ -210,3 +210,5 @@ class LoadVideoAndSegment:
             return "Invalid image file: {}".format(video)
 
         return True
+    
+
