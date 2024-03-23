@@ -444,7 +444,7 @@ app.registerExtension({
   }
 })
 
-const createSelect = (imgDiv, select, opts, targetWidget) => {
+const createSelect = (imgDiv, select, opts, targetWidget, textWidget) => {
   select.style.display = 'block'
   let html = ''
   let isMatch = false
@@ -472,6 +472,7 @@ const createSelect = (imgDiv, select, opts, targetWidget) => {
 
     targetWidget.value = await parseImageToBase64(t.imgurl)
     imgDiv.src = targetWidget.value
+    textWidget.value = t.keyword
   })
   // console.log(select)
 }
@@ -487,6 +488,7 @@ app.registerExtension({
         const image_prompt = this.widgets.filter(
           w => w.name == 'image_base64'
         )[0]
+        const image_text = this.widgets.filter(w => w.name == 'text')[0]
 
         const node = this
 
@@ -503,7 +505,7 @@ app.registerExtension({
 
         widget.div = $el('div', {})
 
-        console.log('image_prompt',image_prompt)
+        // console.log('image_prompt',image_prompt)
         const img = new Image()
         img.src = image_prompt?.value || base64Df
         widget.div.appendChild(img)
@@ -560,9 +562,10 @@ app.registerExtension({
 
               let img = widget.div.querySelector('img')
 
-              createSelect(img, select, json, image_prompt)
+              createSelect(img, select, json, image_prompt, image_text)
 
               image_prompt.value = await parseImageToBase64(json[0].imgurl)
+              image_text.value = json[0].keyword
 
               if (img) {
                 img.src = image_prompt.value
@@ -599,6 +602,7 @@ app.registerExtension({
     if (node.type === 'ImagesPrompt_') {
       try {
         let prompt = node.widgets.filter(w => w.name === 'image_base64')[0]
+        let text = node.widgets.filter(w => w.name === 'text')[0]
         let uploadWidget = node.widgets.filter(w => w.name == 'upload')[0]
         // console.log('##prompt',prompt.value)
         let img = uploadWidget.div.querySelector('img')
@@ -614,7 +618,7 @@ app.registerExtension({
 
         if (json && json[0]) {
           uploadWidget.select.style.display = 'block'
-          createSelect(img, uploadWidget.select, json, prompt)
+          createSelect(img, uploadWidget.select, json, prompt,text)
         }
       } catch (error) {}
     }

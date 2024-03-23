@@ -546,7 +546,84 @@ class EmbeddingPrompt:
         # return (new_prompt)
         return (prompt,)
 
-RETURN_TYPES = (any_type,)
+# RETURN_TYPES = (any_type,)
+    
+# conditioning ：提示，正向or负向
+# clip：clip模型
+# gligen_textbox_model：gligen模型
+# grids：矩形框的集合
+# labels：每个矩形框对应的标签的集合
+# index：选取第几个矩形框作为gligen的box
+
+class GLIGENTextBoxApply_Advanced:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {"conditioning": ("CONDITIONING", ),
+                              "clip": ("CLIP", ),
+                              "gligen_textbox_model": ("GLIGEN", ),
+                              "grids": ("_GRID",),
+                              "labels": ("STRING", 
+                                        {
+                                            "multiline": True, 
+                                            "default": "",
+                                            "forceInput": True
+                                        }),
+                              "index": ("INT", {"default": -1, "min": -1, "max": 300, "step": 1}),
+                              "max_size": ("INT", {"default": 8, "min": 1, "max": 300, "step": 1}),
+                              "random_shuffle":(["on","off"],),
+                             },
+                 "optional":{
+                    "seed": (any_type,  {"default": 0, "min": 0, "max": 0xffffffffffffffff,"step": 1}),
+                } 
+                            }
+    RETURN_TYPES = ("CONDITIONING","STRING",)
+    RETURN_NAMES = ("CONDITIONING","label",)
+
+    FUNCTION = "run"
+    INPUT_IS_LIST = True
+    CATEGORY = "♾️Mixlab/Prompt"
+
+    def run(self, conditioning, clip, gligen_textbox_model, grids, labels, index,max_size,random_shuffle,seed):
+        conditioning=conditioning[0]
+        clip=clip[0]
+        gligen_textbox_model=gligen_textbox_model[0]
+        index=index[0]
+        max_size=max_size[0]
+        random_shuffle=random_shuffle[0]
+
+        texts=labels
+        
+        if index>-1:
+            texts=[labels[index]]
+            grids=[grids[index]]
+
+        if random_shuffle=='on':
+            sss=[[texts[i],grids[i]] for i in range(len(texts))]
+            random.shuffle(sss)
+            texts=[s[0] for s in sss]
+            grids=[s[1] for s in sss]
+
+        if len(texts) > max_size:
+            texts = texts[:max_size]
+
+        c = []
+
+        for i in range(len(texts)):
+            text=texts[i]
+            grid=grids[i]
+            x,y,width,height=grid
+            cond, cond_pooled = clip.encode_from_tokens(clip.tokenize(text), return_pooled=True)
+            for t in conditioning:
+                n = [t[0], t[1].copy()]
+                position_params = [(cond_pooled, height // 8, width // 8, y // 8, x // 8)]
+                prev = []
+                if "gligen" in n[1]:
+                    prev = n[1]['gligen'][2]
+
+                n[1]['gligen'] = ("position", gligen_textbox_model, prev + position_params)
+                c.append(n)
+        return (c,texts, )
+    
 
 class JoinWithDelimiter:
     @classmethod

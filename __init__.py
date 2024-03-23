@@ -591,7 +591,7 @@ async def post_prompt_result(request):
 
 
 # 导入节点
-from .nodes.PromptNode import EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
+from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
 from .nodes.ImageNode import ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
@@ -616,6 +616,7 @@ NODE_CLASS_MAPPINGS = {
     # "LoraPrompt":LoraPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,
     "PromptSlide":PromptSlide,
+    "GLIGENTextBoxApply_Advanced":GLIGENTextBoxApply_Advanced,
     "PromptSimplification":PromptSimplification,
     "PromptImage":PromptImage,
     "MirroredImage":MirroredImage,
@@ -722,7 +723,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "LoadVideoAndSegment_":"Load Video And Segment",
     "MaskListMerge_":"MaskList to Mask",
     "ListSplit_":"Split List",
-    "MaskListReplace_":"MaskList Replace"
+    "MaskListReplace_":"MaskList Replace",
+    "SwitchByIndex":"List Switch By Index",
+    "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab"
 }
 
 # web ui的节点功能
