@@ -618,7 +618,7 @@ class GLIGENTextBoxApply_Advanced:
                 text=texts[i]
                 grid=grids[i]
                 x,y,width,height=grid
-
+                print(text)
                 cond, cond_pooled = clip.encode_from_tokens(clip.tokenize(text), return_pooled=True)
                 position_params =position_params+ [(cond_pooled, height // 8, width // 8, y // 8, x // 8)]
 
