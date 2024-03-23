@@ -583,7 +583,7 @@ class GLIGENTextBoxApply_Advanced:
     INPUT_IS_LIST = True
     CATEGORY = "♾️Mixlab/Prompt"
 
-    def run(self, conditioning, clip, gligen_textbox_model, grids, labels, index,max_size,random_shuffle,seed):
+    def run(self, conditioning, clip, gligen_textbox_model, grids, labels, index,max_size,random_shuffle,seed=0):
         conditioning=conditioning[0]
         clip=clip[0]
         gligen_textbox_model=gligen_textbox_model[0]
@@ -607,21 +607,47 @@ class GLIGENTextBoxApply_Advanced:
             texts = texts[:max_size]
 
         c = []
+        
+        for t in conditioning:
+            n = [t[0], t[1].copy()]
 
-        for i in range(len(texts)):
-            text=texts[i]
-            grid=grids[i]
-            x,y,width,height=grid
-            cond, cond_pooled = clip.encode_from_tokens(clip.tokenize(text), return_pooled=True)
-            for t in conditioning:
-                n = [t[0], t[1].copy()]
-                position_params = [(cond_pooled, height // 8, width // 8, y // 8, x // 8)]
-                prev = []
-                if "gligen" in n[1]:
-                    prev = n[1]['gligen'][2]
 
-                n[1]['gligen'] = ("position", gligen_textbox_model, prev + position_params)
-                c.append(n)
+            # 多个
+            position_params=[]
+            for i in range(len(texts)):
+                text=texts[i]
+                grid=grids[i]
+                x,y,width,height=grid
+
+                cond, cond_pooled = clip.encode_from_tokens(clip.tokenize(text), return_pooled=True)
+                position_params =position_params+ [(cond_pooled, height // 8, width // 8, y // 8, x // 8)]
+
+            # 前一个
+            prev = []
+            if "gligen" in n[1]:
+                prev = n[1]['gligen'][2]
+
+            n[1]['gligen'] = ("position", gligen_textbox_model, prev + position_params)
+            c.append(n)
+        
+        #  下面这个写法有bug
+        # for i in range(len(texts)):
+        #     text=texts[i]
+        #     grid=grids[i]
+        #     x,y,width,height=grid
+
+        #     cond, cond_pooled = clip.encode_from_tokens(clip.tokenize(text), return_pooled=True)
+        #     for t in conditioning:
+        #         n = [t[0], t[1].copy()]
+        #         position_params = [(cond_pooled, height // 8, width // 8, y // 8, x // 8)]
+        #         prev = []
+        #         if "gligen" in n[1]:
+        #             prev = n[1]['gligen'][2]
+
+        #         n[1]['gligen'] = ("position", gligen_textbox_model, prev + position_params)
+        #         c.append(n)
+
+
         return (c,texts, )
     
 

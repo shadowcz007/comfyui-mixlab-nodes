@@ -592,7 +592,7 @@ async def post_prompt_result(request):
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -636,6 +636,8 @@ NODE_CLASS_MAPPINGS = {
     "SplitImage":SplitImage,
     "CenterImage":CenterImage,
     "GridOutput":GridOutput,
+    "GridDisplayAndSave":GridDisplayAndSave,
+    "GridInput":GridInput,
     "MergeLayers":MergeLayers,
     "SplitLongMask":SplitLongMask,
     "FeatheredMask":FeatheredMask,
@@ -725,7 +727,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ListSplit_":"Split List",
     "MaskListReplace_":"MaskList Replace",
     "SwitchByIndex":"List Switch By Index",
-    "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab"
+    "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab",
+    "GridDisplayAndSave":"Grid Display And Save",
+    "GridInput":"Grid Input",
+    "GridOutput":"Grid Output"
 }
 
 # web ui的节点功能

@@ -14,9 +14,33 @@ import string
 import math,glob
 from .Watcher import FolderWatcher
 
+
+def count_files_in_directory(directory):
+    file_count = 0
+    for _, _, files in os.walk(directory):
+        file_count += len(files)
+    return file_count
+
+def save_json_to_file(data, file_path):
+    with open(file_path, 'w') as file:
+        json.dump(data, file)
+
+def draw_rectangle(image, grid, color,width):
+    x, y, w, h = grid
+    draw = ImageDraw.Draw(image)
+    draw.rectangle([(x, y), (x+w, y+h)], outline=color,width=width)
+
 def generate_random_string(length):
     letters = string.ascii_letters + string.digits
     return ''.join(random.choice(letters) for _ in range(length))
+
+def padding_rectangle(grid, padding):
+    x, y, w, h = grid
+    x -= padding
+    y -= padding
+    w += 2 * padding
+    h += 2 * padding
+    return (x, y, w, h)
 
 class AnyType(str):
   """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
@@ -1833,8 +1857,148 @@ class CenterImage:
 
         return (grid,pil2tensor(mask),)
 
+class GridDisplayAndSave:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { 
+            "required": {
+                "labels": ("STRING", 
+                                        {
+                                            "multiline": True, 
+                                            "default": "",
+                                            "forceInput": True,
+                                            "dynamicPrompts": False
+                                        }),
+                "grids": ("_GRID",),
+                
+                "image": ("IMAGE",),
+                "filename_prefix": ("STRING", {"default": "mixlab/grids"})
+            }
+                }
+    
+    RETURN_TYPES = ( )
+    RETURN_NAMES = ( )
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Layer"
+
+    INPUT_IS_LIST = True
+    OUTPUT_NODE = True
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self,labels,grids,image,filename_prefix):
+
+        # print(image.shape)
+
+        img= tensor2pil(image[0])
+
+        for grid in grids:
+            draw_rectangle(img, grid, 'red',8)
+
+        #获取临时目录：temp
+        output_dir = folder_paths.get_temp_directory()
+
+        (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('tmp_', output_dir)
+        
+        image_file = f"{filename}_{counter:05}.png"
+
+        image_path=os.path.join(full_output_folder, image_file)
+        # 保存图片
+        img.save(image_path,compress_level=6)
+        width, height = img.size
+
+        (
+            full_output_folder,
+            filename,
+            counter,
+            _,
+            _,
+        ) = folder_paths.get_save_image_path(filename_prefix[0], output_dir)
 
 
+        data_converted = [{
+            "label":labels[i],
+            "grid":[float(grids[i][0]),
+                           float(grids[i][1]),
+                           float(grids[i][2]),
+                           float(grids[i][3])
+                           ]
+        } for i in range(len(grids))]
+
+        data={
+            "width":int(width),
+            "height":int(height),
+            "grids":data_converted
+        }
+
+        save_json_to_file(data,os.path.join(full_output_folder,f"${filename}_{counter:05}.json"))
+
+        return {"ui":{"image": [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type":"temp"
+            }],
+            "json":data
+            },"result": ()}
+        # return {"ui":{"image": [ ],
+             
+        #     },"result": ()}
+
+class GridInput:
+    @classmethod
+    def INPUT_TYPES(s):
+        return { 
+            "required": {
+                "grids": ("STRING", 
+                                        {
+                                            "multiline": True, 
+                                            "default": "",
+                                            "dynamicPrompts": False
+                                        }),
+                "padding":("INT",{
+                    "default": 24, 
+                    "min": -500, #Minimum value
+                    "max": 5000, #Maximum value
+                    "step": 1, #Slider's step
+                    "display": "number" # Cosmetic only: display as "number" or "slider"
+                }),
+            }
+                }
+    
+    RETURN_TYPES = ("_GRID","STRING","IMAGE",)
+    RETURN_NAMES = ("grids","labels","image",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Input"
+
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,True,False,)
+
+    def run(self,grids,padding):
+        # print(padding[0],grids[0])
+
+        grids=grids[0]
+        data=json.loads(grids)
+        grids=data['grids']
+    
+        new_grids=[]
+        labels=[]
+        
+        for g in grids:
+            labels.append(g['label'])
+            new_grids.append(padding_rectangle(g['grid'],padding[0]))
+
+        image = Image.new("RGB", (int(data['width']),int(data["height"])), "white")
+        
+        return (new_grids,labels,pil2tensor(image),)
 
 class GridOutput:
     @classmethod

@@ -755,6 +755,9 @@ class TESTNODE_:
 
     def run(self,ANY):
         print(type(ANY))
+        print(ANY[0].shape)
+        img= tensor2pil(ANY[0])
+        print(img.size)
         # data=ANY
         list_stats = ListStatistics()
 
