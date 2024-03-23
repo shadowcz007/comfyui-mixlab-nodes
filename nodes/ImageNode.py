@@ -1945,7 +1945,7 @@ class GridDisplayAndSave:
                 "subfolder": subfolder,
                 "type":"temp"
             }],
-            "json":data
+            "json":[data["width"],data['height'],data["grids"]]
             },"result": ()}
         # return {"ui":{"image": [ ],
              
@@ -1969,7 +1969,17 @@ class GridInput:
                     "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
-            }
+                
+            },
+            "optional":{
+                    "width":("INT",{
+                        "forceInput": True,
+                    }),
+                     "height":("INT",{
+                        "forceInput": True,
+                    }),
+                }
+
                 }
     
     RETURN_TYPES = ("_GRID","STRING","IMAGE",)
@@ -1981,13 +1991,21 @@ class GridInput:
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,False,)
+    OUTPUT_NODE = True
 
-    def run(self,grids,padding):
+    def run(self,grids,padding,width=[-1],height=[-1]):
         # print(padding[0],grids[0])
+        width=width[0]
+        height=height[0]
 
         grids=grids[0]
         data=json.loads(grids)
         grids=data['grids']
+
+        if width>-1:
+            data['width']=width
+        if height>-1:
+            data['height']=height
     
         new_grids=[]
         labels=[]
@@ -1997,8 +2015,24 @@ class GridInput:
             new_grids.append(padding_rectangle(g['grid'],padding[0]))
 
         image = Image.new("RGB", (int(data['width']),int(data["height"])), "white")
-        
-        return (new_grids,labels,pil2tensor(image),)
+        im=pil2tensor(image)
+        # image=create_temp_file(im)
+
+        data_converted = [{
+            "label":labels[i],
+            "grid":[float(new_grids[i][0]),
+                           float(new_grids[i][1]),
+                           float(new_grids[i][2]),
+                           float(new_grids[i][3])
+                           ]
+        } for i in range(len(new_grids))]
+
+        # 传递到前端节点的数据 报错,需要处理成 key:[x,x,x,x]
+        return {"ui":{
+            "json":[data["width"],data["height"],data_converted]
+            },"result": (new_grids,labels,im,)}
+    
+        # return (new_grids,labels,pil2tensor(image),)
 
 class GridOutput:
     @classmethod

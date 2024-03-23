@@ -29,7 +29,7 @@ function createSelectWithOptions (options) {
     select.appendChild(optionElement)
   })
 
-  select.style = ` cursor: pointer;
+  select.style = `cursor: pointer;
   font-weight: 300; 
   height: 30px;
   min-width: 122px;
@@ -413,7 +413,7 @@ async function setArea (cw, ch, topBase64, base64, data, fn) {
 }
 
 async function setAreaTags (cw, ch, grids, fn) {
-  let base64 = drawCanvasWithText(cw, ch, '','white')
+  let base64 = drawCanvasWithText(cw, ch, '', 'white')
   let displayHeight = Math.round(window.screen.availHeight * 0.8)
   let div = document.createElement('div')
   div.innerHTML = `
@@ -917,6 +917,18 @@ app.registerExtension({
 
         widget.div = $el('div', {})
 
+        const addBtn = document.createElement('button')
+        addBtn.innerText = 'Add Box'
+        addBtn.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 122px;
+       `
+
         const vbtn = document.createElement('button')
         vbtn.innerText = 'Set Box'
         vbtn.style = `cursor: pointer;
@@ -942,20 +954,41 @@ app.registerExtension({
         border-style: solid;height: 30px;min-width: 122px;
        `
 
+        addBtn.addEventListener('click', () => {
+          const { width, height, grids } = JSON.parse(grids_widget.value)
+          grids.push({
+            label: 'background',
+            grid: [12, 12, width - 24, height - 24]
+          })
+          grids_widget.value = JSON.stringify(
+            {
+              width,
+              height,
+              grids
+            },
+            null,
+            2
+          )
+        })
+
         vbtn.addEventListener('click', () => {
           const { width, height, grids } = JSON.parse(grids_widget.value)
 
           setAreaTags(width, height, grids, (tag, x, y, w, h) => {
-            grids_widget.value = JSON.stringify({
-              width,
-              height,
-              grids: Array.from(grids, g => {
-                if (g.label === tag) {
-                  g.grid = [x, y, w, h]
-                }
-                return g
-              })
-            },null,2)
+            grids_widget.value = JSON.stringify(
+              {
+                width,
+                height,
+                grids: Array.from(grids, g => {
+                  if (g.label === tag) {
+                    g.grid = [x, y, w, h]
+                  }
+                  return g
+                })
+              },
+              null,
+              2
+            )
           })
         })
 
@@ -979,7 +1012,7 @@ app.registerExtension({
               const fileContent = JSON.parse(event.target.result)
               const grids = fileContent
               grids_widget.value = JSON.stringify(grids, null, 2)
-              widget.value = grids
+              // widget.value = grids
 
               inp.remove()
             }
@@ -989,10 +1022,29 @@ app.registerExtension({
           })
         })
 
+        widget.div.appendChild(addBtn)
         widget.div.appendChild(vbtn)
         widget.div.appendChild(btn)
         document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
+
+        const onExecuted = nodeType.prototype.onExecuted
+        nodeType.prototype.onExecuted = function (message) {
+          const r = onExecuted?.apply?.(this, arguments)
+
+          let json = message.json
+          if (json) {
+            json = {
+              width: json[0],
+              height: json[1],
+              grids: json[2]
+            }
+            grids_widget.value = JSON.stringify(json, null, 2)
+            // widget.value = json
+          }
+
+          return r
+        }
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
@@ -1067,9 +1119,9 @@ app.registerExtension({
        `
 
         btn.addEventListener('click', () => {
-          if (widget.value)
+          if (window._mixlab_grid)
             downloadJsonFile(
-              widget.value,
+              window._mixlab_grid,
               this.widgets.filter(w => w.name == 'filename_prefix')[0]?.value +
                 '_grid.json'
             )
@@ -1102,7 +1154,11 @@ app.registerExtension({
               )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
             )
 
-            save_json.value = json
+            window._mixlab_grid = {
+              width: json[0],
+              height: json[1],
+              grids: json[2]
+            }
             // console.log(src)
           }
 
