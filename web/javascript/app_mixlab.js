@@ -101,6 +101,7 @@ async function extractInputAndOutputData (
   let input = []
   let output = []
   const seed = {}
+  const seedTitle = {}
 
   for (const id in data) {
     if (data.hasOwnProperty(id)) {
@@ -193,12 +194,17 @@ async function extractInputAndOutputData (
         output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
       }
 
-      if (node.type === 'KSampler' || node.type == 'SamplerCustom') {
+      if (
+        node.type === 'KSampler' ||
+        node.type == 'SamplerCustom' ||
+        node.type === 'ChinesePrompt_Mix'
+      ) {
         // seed 的类型收集
         try {
           seed[id] = node.widgets.filter(
             w => w.name === 'seed' || w.name == 'noise_seed'
           )[0].linkedWidgets[0].value
+          seedTitle[id] = node.title
         } catch (error) {}
       }
     }
@@ -208,7 +214,7 @@ async function extractInputAndOutputData (
   input = input.filter(i => i)
   output = output.filter(i => i)
 
-  return { input, output, seed }
+  return { input, output, seed, seedTitle }
 }
 
 function getUrl () {
@@ -281,7 +287,7 @@ async function save (json, download = false, showInfo = true) {
   try {
     let data = await app.graphToPrompt()
 
-    let { input, output, seed } = await extractInputAndOutputData(
+    let { input, output, seed, seedTitle } = await extractInputAndOutputData(
       data,
       inputIds,
       outputIds
@@ -301,6 +307,7 @@ async function save (json, download = false, showInfo = true) {
       input,
       output,
       seed, //控制是fixed 还是random
+      seedTitle,
       share_prefix,
       link,
       category,

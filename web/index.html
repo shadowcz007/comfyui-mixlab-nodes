@@ -697,21 +697,23 @@
 
         // 种子的处理
         function randomSeed(seed, data) {
+            let max_seed = 4294967295
+            //1849378600828930
             for (const id in data) {
                 if (data[id].inputs.seed != undefined
                     && !Array.isArray(data[id].inputs.seed) //如果是数组，则由其他节点控制
                     && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
-                    data[id].inputs.seed = Math.round(Math.random() * 1849378600828930)
+                    data[id].inputs.seed = Math.round(Math.random() * max_seed)
                     // console.log('new Seed', data[id])
                 }
                 if (data[id].inputs.noise_seed != undefined
                     && !Array.isArray(data[id].inputs.noise_seed) //如果是数组，则由其他节点控制
                     && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
-                    data[id].inputs.noise_seed = Math.round(Math.random() * 1849378600828930)
+                    data[id].inputs.noise_seed = Math.round(Math.random() * max_seed)
                 }
                 // class_type:"Seed_"
                 if (data[id].class_type == "Seed_") {
-                    data[id].inputs.seed = Math.round(Math.random() * 1849378600828930)
+                    data[id].inputs.seed = Math.round(Math.random() * max_seed)
                 }
                 console.log('new Seed', data[id])
             }
@@ -1905,7 +1907,7 @@
 
         function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
-            const { input: inputData, output: outputData, data: workflow, seed, link, name } = data;
+            const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
 
             let mainDiv = document.createElement('div');
 
@@ -2003,7 +2005,7 @@
 
                             let em = document.createElement('em');
                             let emText = document.createElement('span');
-                            emText.innerText = `#${id} ${s.toUpperCase()}`;
+                            emText.innerText = `#${seedTitle && seedTitle[id] ? seedTitle[id] : id} ${s.toUpperCase()}`;
                             em.appendChild(emText);
 
                             seedInput.appendChild(em)
@@ -2024,7 +2026,7 @@
                                         data.seed[id] = 'randomize';
                                         inSeed.style.display = 'none'
                                     }
-                                    emText.innerText = `#${id} ${data.seed[id].toUpperCase()}`;
+                                    emText.innerText = `#${seedTitle && seedTitle[id] ? seedTitle[id] : id} ${data.seed[id].toUpperCase()}`;
                                 });
 
                                 seedInput.appendChild(inSeed);

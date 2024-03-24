@@ -730,7 +730,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab",
     "GridDisplayAndSave":"Grid Display And Save",
     "GridInput":"Grid Input",
-    "GridOutput":"Grid Output"
+    "GridOutput":"Grid Output",
+    "GetImageSize_":"Get Image Size"
 }
 
 # web ui的节点功能
