@@ -2452,10 +2452,14 @@ class ResizeImage:
             for ims in image:
                 for im in ims:
                     im=tensor2pil(im)
-                    im=resize_image(im,scale_option,w,h,fill_color)
-                    im=im.convert('RGB')
 
+                    im=im.convert('RGB')
                     a_im,hex=get_average_color_image(im)
+
+                    if average_color=='on':
+                        fill_color=hex
+                        
+                    im=resize_image(im,scale_option,w,h,fill_color)
 
                     im=pil2tensor(im)
                     imgs.append(im)
