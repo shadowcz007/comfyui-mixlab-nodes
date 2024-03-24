@@ -943,6 +943,19 @@ app.registerExtension({
         }
       ]
 
+      // let text_widget = node.widgets.filter(
+      //   w => w.name === 'text' && typeof w.value == 'string'
+      // )
+      // if (text_widget && text_widget.length == 1) {
+      //   opts.push({
+      //     content: 'Text-to-Text ♾️Mixlab', // with a name
+      //     callback: () => {
+      //       LGraphCanvas.prototype.text2text(node)
+      //     } // and the callback
+      //   })
+      // }
+
+
       opts = addSmartMenu(opts, node)
 
       // if (node.type == 'CLIPTextEncode') {
