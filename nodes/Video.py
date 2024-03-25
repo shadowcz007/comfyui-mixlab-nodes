@@ -34,6 +34,48 @@ if ffmpeg_path is None:
     except:
         print("ffmpeg could not be found. Outputs that require it have been disabled")
 
+# Tensor to PIL
+def tensor2pil(image):
+    return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
+
+# Convert PIL to Tensor
+def pil2tensor(image):
+    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
+
+def count_files(directory):
+    count = 0
+    for root, dirs, files in os.walk(directory):
+        count += len(files)
+    return count
+
+def create_temp_file(image):
+    output_dir = folder_paths.get_temp_directory()
+
+    c=count_files(output_dir)
+
+    (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path('temp_', output_dir)
+
+    
+    image=tensor2pil(image)
+ 
+    image_file = f"{filename}_{c}_{counter:05}.png"
+     
+    image_path=os.path.join(full_output_folder, image_file)
+
+    image.save(image_path,compress_level=4)
+
+    return [{
+                "filename": image_file,
+                "subfolder": subfolder,
+                "type": "temp"
+                }]
+
 
 def split_list(lst, chunk_size, transition_size):
     result = []
@@ -49,6 +91,59 @@ def split_list(lst, chunk_size, transition_size):
 
 # result = split_list(images, chunk_size, transition_size)
 # print(result)
+
+class ImageListReplace:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+            "images": ("IMAGE",),
+            "image_replace": ("IMAGE",),
+            "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
+            "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
+            "invert": ("BOOLEAN", {"default": False}),
+        }
+        }
+
+    RETURN_TYPES = ("IMAGE","IMAGE",)
+    RETURN_NAMES = ("images","select_images",)
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Video"
+
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = True
+    OUTPUT_IS_LIST = (True,True,)
+
+    def run(self, images,image_replace,start_index,end_index,invert):
+        image_replace=image_replace[0]
+        start_index=start_index[0]
+        end_index=end_index[0]
+        invert=invert[0]
+        
+        new_images=[]
+        select_images=[]
+        for i in range(len(images)):
+            if i>=start_index and i<=end_index:
+                if invert:
+                    new_images.append(images[i])
+                else:
+                    new_images.append(image_replace)
+                    select_images.append(images[i])
+            else:
+                if invert:
+                    new_images.append(image_replace)
+                    select_images.append(images[i])
+                else:
+                    new_images.append(images[i])
+
+        imss=[]
+        # print(len(images))
+        for i in range(len(images)):
+            ims=create_temp_file(images[i][0])
+            imss.append(ims[0])
+
+        image_replace=create_temp_file(image_replace)
+
+        return {"ui":{"_images": imss,"_image_replace":image_replace},"result": (new_images,select_images,)}
 
 
 class LoadVideoAndSegment:
@@ -70,11 +165,11 @@ class LoadVideoAndSegment:
 
     CATEGORY = "♾️Mixlab/Video"
 
-    RETURN_TYPES = ("IMAGE", "INT",)
-    RETURN_NAMES = ("image_batch", "frame_count",)
+    RETURN_TYPES = ("IMAGE", "INT","INT",)
+    RETURN_NAMES = ("image_batch", "frame_count","segment_count",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
-    OUTPUT_IS_LIST = (True,False,)
+    OUTPUT_IS_LIST = (True,False,False,)
 
 
     def is_gif(self, filename):
@@ -194,7 +289,7 @@ class LoadVideoAndSegment:
 
         # images = torch.from_numpy(np.stack(images))
 
-        return (imgs, len(imgs))
+        return (imgs, len(images),len(imgs),)
 
     @classmethod
     def IS_CHANGED(s, video, **kwargs):

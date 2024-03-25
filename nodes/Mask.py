@@ -108,32 +108,32 @@ class MaskListReplace:
             "mask_replace": ("MASK",),
             "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
             "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
-            "reverse": ("BOOLEAN", {"default": False}),
+            "invert": ("BOOLEAN", {"default": False}),
         }
         }
 
     RETURN_TYPES = ("MASK",)
     FUNCTION = "run"
-    CATEGORY = "♾️Mixlab/Mask"
+    CATEGORY = "♾️Mixlab/Video"
 
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,)
 
-    def run(self, masks,mask_replace,start_index,end_index,reverse):
+    def run(self, masks,mask_replace,start_index,end_index,invert):
         mask_replace=mask_replace[0]
         start_index=start_index[0]
         end_index=end_index[0]
-        reverse=reverse[0]
+        invert=invert[0]
         
         new_masks=[]
         for i in range(len(masks)):
             if i>=start_index and i<=end_index:
-                if reverse:
+                if invert:
                     new_masks.append(masks[i])
                 else:
                     new_masks.append(mask_replace)
             else:
-                if reverse:
+                if invert:
                     new_masks.append(mask_replace)
                 else:
                     new_masks.append(masks[i])

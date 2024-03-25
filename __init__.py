@@ -603,7 +603,7 @@ from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
-from .nodes.Video import LoadVideoAndSegment
+from .nodes.Video import LoadVideoAndSegment,ImageListReplace
 
 
 # 要导出的所有节点及其名称的字典
@@ -682,7 +682,8 @@ NODE_CLASS_MAPPINGS = {
     "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
     "LoadVideoAndSegment_":LoadVideoAndSegment,
     "ListSplit_":ListSplit,
-    "MaskListReplace_":MaskListReplace
+    "MaskListReplace_":MaskListReplace,
+    "ImageListReplace_":ImageListReplace
     # "LaMaInpainting":LaMaInpainting
     # "GamePal":GamePal
 }
@@ -726,6 +727,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MaskListMerge_":"MaskList to Mask",
     "ListSplit_":"Split List",
     "MaskListReplace_":"MaskList Replace",
+    "ImageListReplace_":"ImageList Replace",
     "SwitchByIndex":"List Switch By Index",
     "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab",
     "GridDisplayAndSave":"Grid Display And Save",
