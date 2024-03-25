@@ -4,7 +4,9 @@ import urllib.error
 import re,json,os,string,random
 import folder_paths
 import hashlib
+import codecs
 from zhipuai import ZhipuAI
+
 def get_unique_hash(string):
     hash_object = hashlib.sha1(string.encode())
     unique_hash = hash_object.hexdigest()
@@ -314,8 +316,8 @@ class TextSplitByDelimiter:
     def INPUT_TYPES(s):
         return {
             "required": {
-                 "text": ("STRING", {"multiline": True,"dynamicPrompts": False}),
-                "delimiter":(["newline","comma"],),
+                "text": ("STRING", {"multiline": True,"dynamicPrompts": False}),
+                "delimiter":("STRING", {"multiline": False,"default":",","dynamicPrompts": False}),
                 "start_index": ("INT", {
                     "default": 0,
                     "min": 0, #Minimum value
@@ -349,12 +351,13 @@ class TextSplitByDelimiter:
     CATEGORY = "♾️Mixlab/Text"
 
     def run(self, text,delimiter,start_index,skip_every,max_count):
-        arr=[]
-        if delimiter=='newline':
-            arr = [line for line in text.split('\n') if line.strip()]
-        elif delimiter=='comma':
-            arr = [line for line in text.split(',') if line.strip()]
-        
+         
+        if delimiter=="":
+            arr=[text.strip()]
+        else:
+            delimiter=codecs.decode(delimiter, 'unicode_escape')
+            arr= [line for line in text.split(delimiter) if line.strip()]
+
         arr= arr[start_index:start_index + max_count * (skip_every+1):(skip_every+1)]
 
         return (arr,)
