@@ -272,8 +272,8 @@ class FloatSlider:
                         }),
                     "step":("FLOAT", {
                             "default": 0.001, 
-                            "min": 0,
-                            "max": 1,
+                            "min": -0xffffffffffffffff,
+                            "max": 0xffffffffffffffff,
                             "step": 0.001, 
                             "display": "number"  
                         }),
