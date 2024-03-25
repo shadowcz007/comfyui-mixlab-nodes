@@ -272,8 +272,8 @@ class FloatSlider:
                         }),
                     "step":("FLOAT", {
                             "default": 0.001, 
-                            "min": -0xffffffffffffffff,
-                            "max": 0xffffffffffffffff,
+                            "min": 0,
+                            "max": 1,
                             "step": 0.001, 
                             "display": "number"  
                         }),
@@ -281,7 +281,7 @@ class FloatSlider:
                 }
     
     RETURN_TYPES = ("FLOAT",) 
-
+    RETURN_NAMES = ('weight(0-1)',)
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Input"
@@ -755,9 +755,13 @@ class TESTNODE_:
 
     def run(self,ANY):
         print(type(ANY))
-        print(ANY[0].shape)
-        img= tensor2pil(ANY[0])
-        print(img.size)
+        try:
+            print(ANY[0].shape)
+            img= tensor2pil(ANY[0])
+            print(img.size)
+        except:
+            print('')
+        
         # data=ANY
         list_stats = ListStatistics()
 
