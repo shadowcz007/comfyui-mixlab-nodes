@@ -68,7 +68,7 @@ function videoUpload (node, inputName, inputData, app) {
     draw (ctx, node, widget_width, y, widget_height) {
       Object.assign(
         this.div.style,
-        get_position_style(ctx, widget_width, 188, node.size[1]),
+        get_position_style(ctx, widget_width, 220, node.size[1]),
         {
           outline: '1px solid'
         }
