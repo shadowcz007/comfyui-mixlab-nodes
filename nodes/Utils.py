@@ -584,8 +584,8 @@ class SwitchByIndex:
             }
         }
 
-    RETURN_TYPES = (any_type,"INT",)
-    RETURN_NAMES = ("C","count",)
+    RETURN_TYPES = (any_type,any_type,)
+    RETURN_NAMES = ("list","count",)
 
     FUNCTION = "run"
 

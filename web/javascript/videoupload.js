@@ -98,6 +98,7 @@ function videoUpload (node, inputName, inputData, app) {
   }
 
   if (imageWidget.value) {
+    // console.log(imageWidget.value)
     displayDiv.src = `/view?filename=${
       imageWidget.value
     }&type=input&subfolder=${''}&rand=${Math.random()}`
@@ -220,6 +221,19 @@ app.registerExtension({
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeData?.name == 'LoadVideoAndSegment_') {
       nodeData.input.required.upload = ['VIDEOUPLOAD_']
+    }
+  },
+  async loadedGraphNode (node, app) {
+   
+    if (node.type === 'LoadVideoAndSegment_') {
+      const imageWidget = node.widgets.find(w => w.name === 'video')
+      const uploadPreview=node.widgets.find(w=>w.name==='upload-preview')
+      if (imageWidget.value) {
+        // console.log(imageWidget.value)
+        uploadPreview.div.querySelector('video').src = `/view?filename=${
+          imageWidget.value
+        }&type=input&subfolder=${''}&rand=${Math.random()}`
+      }
     }
   }
 })

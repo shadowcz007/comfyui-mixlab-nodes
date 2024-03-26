@@ -125,7 +125,9 @@ class ImageListReplace:
 
         # 如果image replace 为空
         if image_replace==None:
-            print('如果image replace 为空')
+            print('如果image replace 为空',images[0])
+            # [[tensor(
+            # tensor([[[[0.
             first_image=tensor2pil(images[0][0])
             width, height = first_image.size
             image_replace=Image.new("RGB", (width, height), (0, 0, 0))
@@ -177,8 +179,8 @@ class LoadVideoAndSegment:
 
     CATEGORY = "♾️Mixlab/Video"
 
-    RETURN_TYPES = ("IMAGE","IMAGE", "INT","INT",)
-    RETURN_NAMES = ("segment_batch","segment_list", "frame_count","segment_count",)
+    RETURN_TYPES = ("IMAGE","IMAGE", "INT",)
+    RETURN_NAMES = ("segment_batch","frame_count","segment_count",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,False,False,)
@@ -299,11 +301,9 @@ class LoadVideoAndSegment:
 
         imgs=[torch.from_numpy(np.stack(im)) for im in imgs]
 
-        images_list_list = [[image_batch[i:i + 1, ...] for i in range(image_batch.shape[0])] for image_batch in imgs]
-
         # images = torch.from_numpy(np.stack(images))
 
-        return (imgs,images_list_list, len(images),len(imgs),)
+        return (imgs, len(images),len(imgs),)
 
     @classmethod
     def IS_CHANGED(s, video, **kwargs):
