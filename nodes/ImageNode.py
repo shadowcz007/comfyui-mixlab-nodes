@@ -15,6 +15,42 @@ import math,glob
 from .Watcher import FolderWatcher
 
 
+def composite_images(foreground, background, mask):
+    width,height=foreground.size
+ 
+    bg_image=background
+    # 按z-index排序
+    layer = {
+            "x":0,
+            "y":0,
+            "width":width,
+            "height":height,
+            "z_index":88,
+            "scale_option":'overall',
+            "image":foreground,
+            "mask":mask
+    }
+                
+    width, height = bg_image.size
+
+    layer_image=layer['image']
+    layer_mask=layer['mask']
+    
+    bg_image=merge_images(bg_image,
+                        layer_image,
+                        layer_mask,
+                                        layer['x'],
+                                        layer['y'],
+                                        layer['width'],
+                                        layer['height'],
+                                        layer['scale_option']
+                                        )
+                   
+    bg_image=bg_image.convert('RGB')
+    
+    return bg_image
+
+
 def count_files_in_directory(directory):
     file_count = 0
     for _, _, files in os.walk(directory):
@@ -1541,6 +1577,37 @@ class FaceToMask:
         return (mask,)
 
 
+class CompositeImages:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": { 
+            "foreground": ("IMAGE",),
+            "mask":("MASK",),
+            "background": ("IMAGE",),
+            },
+                }
+    
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("IMAGE",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Layer"
+
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self, foreground,mask,background):
+        foreground= tensor2pil(foreground)
+        mask= tensor2pil(mask)
+        background= tensor2pil(background)
+        res=composite_images(foreground,background,mask)
+        
+        return (pil2tensor(res),)
+
+
+
+
 class EmptyLayer:
     @classmethod
     def INPUT_TYPES(s):
@@ -2056,6 +2123,9 @@ class GridOutput:
     def run(self,grid):
         x,y,w,h=grid
         return (x,y,w,h,)
+
+
+
 
 class ShowLayer:
     @classmethod
