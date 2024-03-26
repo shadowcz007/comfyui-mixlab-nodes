@@ -281,12 +281,10 @@ app.registerExtension({
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
         
-      
-
-        let _image_replace = message._image_replace[0]
-        _image_replace = `/view?filename=${_image_replace.filename}&type=${
-          _image_replace.type
-        }&subfolder=${_image_replace.subfolder}&rand=${Math.random()}`
+        // let _image_replace = message._image_replace[0]
+        // _image_replace = `/view?filename=${_image_replace.filename}&type=${
+        //   _image_replace.type
+        // }&subfolder=${_image_replace.subfolder}&rand=${Math.random()}`
 
         let preview = this.widgets.filter(w => w.name == 'preview')[0]
 

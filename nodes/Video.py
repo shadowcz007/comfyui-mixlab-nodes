@@ -97,12 +97,14 @@ class ImageListReplace:
     def INPUT_TYPES(s):
         return {"required": {
             "images": ("IMAGE",),
+            "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
+            "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
+            "invert": ("BOOLEAN", {"default": False}),
         },
          "optional":{
-                     "image_replace": ("IMAGE",),
-                    "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
-                    "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
-                    "invert": ("BOOLEAN", {"default": False}),
+                    "image_replace": ("IMAGE",),
+                    "images_replace": ("IMAGE",),
+                    
                     }
         }
 
@@ -115,37 +117,49 @@ class ImageListReplace:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)
 
-    def run(self, images,image_replace=None,start_index=[0],end_index=[0],invert=[False]):
-        if image_replace!=None:
-            image_replace=image_replace[0]
-            
+    def run(self, images,start_index=[0],end_index=[0],invert=[False],image_replace=None,images_replace=None):
         start_index=start_index[0]
         end_index=end_index[0]
         invert=invert[0]
 
+        image_rs=[]
+
+        if image_replace!=None:
+            for i in range(end_index-start_index+1):
+                image_rs.append(image_replace[0])
+
+        if images_replace!=None:
+            image_rs=images_replace
+
         # 如果image replace 为空
-        if image_replace==None:
-            print('如果image replace 为空',images[0])
+        if image_replace==None and images_replace==None:
+            # print('如果image replace 为空',images[0])
             # [[tensor(
             # tensor([[[[0.
             first_image=tensor2pil(images[0][0])
             width, height = first_image.size
             image_replace=Image.new("RGB", (width, height), (0, 0, 0))
             image_replace=pil2tensor(image_replace)
+            for i in range(end_index-start_index+1):
+                image_rs.append(image_replace)
+
         
         new_images=[]
         select_images=[]
+        k=0
         for i in range(len(images)):
             if i>=start_index and i<=end_index:
                 if invert:
                     new_images.append(images[i])
                 else:
-                    new_images.append(image_replace)
+                    new_images.append(image_rs[k])
                     select_images.append(images[i])
+                    k+=1
             else:
                 if invert:
-                    new_images.append(image_replace)
+                    new_images.append(image_rs[k])
                     select_images.append(images[i])
+                    k+=1
                 else:
                     new_images.append(images[i])
 
@@ -155,9 +169,9 @@ class ImageListReplace:
             ims=create_temp_file(images[i][0])
             imss.append(ims[0])
 
-        image_replace=create_temp_file(image_replace)
+        # image_replace=create_temp_file(image_replace)
 
-        return {"ui":{"_images": imss,"_image_replace":image_replace},"result": (new_images,select_images,)}
+        return {"ui":{"_images": imss},"result": (new_images,select_images,)}
 
 
 class LoadVideoAndSegment:
