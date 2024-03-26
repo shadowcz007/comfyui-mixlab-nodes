@@ -4,6 +4,28 @@ import { ComfyWidgets } from '../../../scripts/widgets.js'
 
 import { $el } from '../../../scripts/ui.js'
 
+
+function injectCSS (css) {
+  // 检查页面中是否已经存在具有相同内容的style标签
+  const existingStyle = document.querySelector('style')
+  if (existingStyle && existingStyle.textContent === css) {
+    return // 如果已经存在相同的样式，则不进行注入
+  }
+
+  // 创建一个新的style标签，并将CSS内容注入其中
+  const style = document.createElement('style')
+  style.textContent = css
+
+  // 将style标签插入到页面的head元素中
+  const head = document.querySelector('head')
+  head.appendChild(style)
+}
+
+injectCSS(`
+.hidden{
+  display:none !important
+}`)
+
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
 
@@ -229,6 +251,7 @@ app.registerExtension({
 
         widget.div = $el('div', {})
         widget.div.style.width = `120px`
+        widget.div.className='hidden'
         document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
         // console.log('#ImageListReplace', widget)
@@ -243,7 +266,8 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        // console.log('#ImageListReplace', message._images)
+        
+      
 
         let _image_replace = message._image_replace[0]
         _image_replace = `/view?filename=${_image_replace.filename}&type=${
@@ -251,6 +275,13 @@ app.registerExtension({
         }&subfolder=${_image_replace.subfolder}&rand=${Math.random()}`
 
         let preview = this.widgets.filter(w => w.name == 'preview')[0]
+
+        if(message._images.length>0){
+       
+          preview.div.className=''
+// console.log('#ImageListReplace', preview.div)
+        }
+
         preview.div.innerHTML = ''
         for (const img_ of message._images) {
           let img = new Image()

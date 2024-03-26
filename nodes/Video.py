@@ -97,11 +97,13 @@ class ImageListReplace:
     def INPUT_TYPES(s):
         return {"required": {
             "images": ("IMAGE",),
-            "image_replace": ("IMAGE",),
-            "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
-            "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
-            "invert": ("BOOLEAN", {"default": False}),
-        }
+        },
+         "optional":{
+                     "image_replace": ("IMAGE",),
+                    "start_index":("INT", {"default": 0, "min": 0, "step": 1}),
+                    "end_index":("INT", {"default": 0, "min": 0, "step": 1}),
+                    "invert": ("BOOLEAN", {"default": False}),
+                    }
         }
 
     RETURN_TYPES = ("IMAGE","IMAGE",)
@@ -113,11 +115,21 @@ class ImageListReplace:
     INPUT_IS_LIST = True
     OUTPUT_IS_LIST = (True,True,)
 
-    def run(self, images,image_replace,start_index,end_index,invert):
-        image_replace=image_replace[0]
+    def run(self, images,image_replace=None,start_index=[0],end_index=[0],invert=[False]):
+        if image_replace!=None:
+            image_replace=image_replace[0]
+            
         start_index=start_index[0]
         end_index=end_index[0]
         invert=invert[0]
+
+        # 如果image replace 为空
+        if image_replace==None:
+            print('如果image replace 为空')
+            first_image=tensor2pil(images[0][0])
+            width, height = first_image.size
+            image_replace=Image.new("RGB", (width, height), (0, 0, 0))
+            image_replace=pil2tensor(image_replace)
         
         new_images=[]
         select_images=[]
@@ -165,8 +177,8 @@ class LoadVideoAndSegment:
 
     CATEGORY = "♾️Mixlab/Video"
 
-    RETURN_TYPES = ("IMAGE", "INT","INT",)
-    RETURN_NAMES = ("image_batch", "frame_count","segment_count",)
+    RETURN_TYPES = ("IMAGE","IMAGE", "INT","INT",)
+    RETURN_NAMES = ("image_batch_list","image_list_list", "frame_count","segment_count",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,False,False,)
@@ -287,9 +299,11 @@ class LoadVideoAndSegment:
 
         imgs=[torch.from_numpy(np.stack(im)) for im in imgs]
 
+        images_list_list = [[image_batch[i:i + 1, ...] for i in range(image_batch.shape[0])] for image_batch in imgs]
+
         # images = torch.from_numpy(np.stack(images))
 
-        return (imgs, len(images),len(imgs),)
+        return (imgs,images_list_list, len(images),len(imgs),)
 
     @classmethod
     def IS_CHANGED(s, video, **kwargs):
