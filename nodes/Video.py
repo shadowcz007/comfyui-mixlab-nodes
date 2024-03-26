@@ -166,7 +166,15 @@ class ImageListReplace:
         imss=[]
         # print(len(images))
         for i in range(len(images)):
-            ims=create_temp_file(images[i][0])
+            t=images[i][0]
+            t=tensor2pil(t)
+            t = t.convert("RGB")
+            original_width, original_height = t.size
+            scale = 300 / original_width
+            new_height = int(original_height * scale)
+            t = t.resize((300, new_height))
+
+            ims=create_temp_file(pil2tensor(t))
             imss.append(ims[0])
 
         # image_replace=create_temp_file(image_replace)

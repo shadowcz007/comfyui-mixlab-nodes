@@ -613,7 +613,7 @@ class SwitchByIndex:
             try:
                 C=[C[index]]
             except Exception as e:
-                C=[]
+                C=[C[-1]] #最后一个
 
         return (C,len(C),)
 
