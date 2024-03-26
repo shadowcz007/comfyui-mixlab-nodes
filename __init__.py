@@ -603,7 +603,7 @@ from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
-from .nodes.Video import LoadVideoAndSegment,ImageListReplace
+from .nodes.Video import LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames
 
 
 # 要导出的所有节点及其名称的字典
@@ -683,8 +683,8 @@ NODE_CLASS_MAPPINGS = {
     "LoadVideoAndSegment_":LoadVideoAndSegment,
     "ListSplit_":ListSplit,
     "MaskListReplace_":MaskListReplace,
-    "ImageListReplace_":ImageListReplace
-    # "LaMaInpainting":LaMaInpainting
+    "ImageListReplace_":ImageListReplace,
+    "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames
     # "GamePal":GamePal
 }
 
@@ -733,7 +733,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GridDisplayAndSave":"Grid Display And Save",
     "GridInput":"Grid Input",
     "GridOutput":"Grid Output",
-    "GetImageSize_":"Get Image Size"
+    "GetImageSize_":"Get Image Size",
+    "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames"
 }
 
 # web ui的节点功能

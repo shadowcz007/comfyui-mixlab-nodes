@@ -180,7 +180,7 @@ function videoUpload (node, inputName, inputData, app) {
   const fileInput = document.createElement('input')
   Object.assign(fileInput, {
     type: 'file',
-    accept: 'video/webm,video/mp4,video/mkv,image/gif',
+    accept: 'video/*,.mkv,video/webm,video/mp4,video/x-matroska,image/gif',
     style: 'display: none',
     onchange: async () => {
       if (fileInput.files.length) {
