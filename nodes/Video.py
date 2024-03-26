@@ -178,7 +178,7 @@ class LoadVideoAndSegment:
     CATEGORY = "♾️Mixlab/Video"
 
     RETURN_TYPES = ("IMAGE","IMAGE", "INT","INT",)
-    RETURN_NAMES = ("image_batch_list","image_list_list", "frame_count","segment_count",)
+    RETURN_NAMES = ("segment_batch","segment_list", "frame_count","segment_count",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
     OUTPUT_IS_LIST = (True,False,False,)
