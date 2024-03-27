@@ -4,6 +4,9 @@ import { ComfyWidgets } from '../../../scripts/widgets.js'
 
 import { $el } from '../../../scripts/ui.js'
 
+// The code is based on ComfyUI-VideoHelperSuite modification.
+
+
 
 function injectCSS (css) {
   // 检查页面中是否已经存在具有相同内容的style标签
@@ -224,10 +227,9 @@ app.registerExtension({
     }
   },
   async loadedGraphNode (node, app) {
-   
     if (node.type === 'LoadVideoAndSegment_') {
       const imageWidget = node.widgets.find(w => w.name === 'video')
-      const uploadPreview=node.widgets.find(w=>w.name==='upload-preview')
+      const uploadPreview = node.widgets.find(w => w.name === 'upload-preview')
       if (imageWidget.value) {
         // console.log(imageWidget.value)
         uploadPreview.div.querySelector('video').src = `/view?filename=${
@@ -237,6 +239,102 @@ app.registerExtension({
     }
   }
 })
+
+
+function offsetDOMWidget(
+  widget,
+  ctx,
+  node,
+  widgetWidth,
+  widgetY,
+  height
+) {
+  const margin = 10
+  const elRect = ctx.canvas.getBoundingClientRect()
+  const transform = new DOMMatrix()
+    .scaleSelf(
+      elRect.width / ctx.canvas.width,
+      elRect.height / ctx.canvas.height
+    )
+    .multiplySelf(ctx.getTransform())
+    .translateSelf(0, widgetY + margin)
+
+  const scale = new DOMMatrix().scaleSelf(transform.a, transform.d)
+  Object.assign(widget.inputEl.style, {
+    transformOrigin: '0 0',
+    transform: scale,
+    left: `${transform.e}px`,
+    top: `${transform.d + transform.f}px`,
+    width: `${widgetWidth}px`,
+    height: `${(height || widget.parent?.inputHeight || 32) - margin}px`,
+    position: 'absolute',
+    background: !node.color ? '' : node.color,
+    color: !node.color ? '' : 'white',
+    zIndex: 5, //app.graph._nodes.indexOf(node),
+  })
+}
+
+export const hasWidgets = (node) => {
+  if (!node.widgets || !node.widgets?.[Symbol.iterator]) {
+    return false
+  }
+  return true
+}
+
+export const cleanupNode = (node) => {
+  if (!hasWidgets(node)) {
+    return
+  }
+
+  for (const w of node.widgets) {
+    if (w.canvas) {
+      w.canvas.remove()
+    }
+    if (w.inputEl) {
+      w.inputEl.remove()
+    }
+    // calls the widget remove callback
+    w.onRemoved?.()
+  }
+}
+
+const CreatePreviewElement = (name, val, format) => {
+  const [type] = format.split('/')  
+  const w = {
+      name,
+      type,
+      value: val,
+      draw: function (ctx, node, widgetWidth, widgetY, height) {
+        const [cw, ch] = this.computeSize(widgetWidth)
+        offsetDOMWidget(this, ctx, node, widgetWidth, widgetY, ch)
+      },
+      computeSize: function (_) {
+        const ratio = this.inputRatio || 1
+        const width = Math.max(220, this.parent.size[0])
+        return [width, (width / ratio + 10)]
+      },
+      onRemoved: function () {
+        if (this.inputEl) {
+          this.inputEl.remove()
+        }
+      },
+    }
+
+    w.inputEl = document.createElement(type === 'video' ? 'video' : 'img')
+    w.inputEl.src = w.value
+    if (type === 'video') {
+      w.inputEl.setAttribute('type', 'video/webm');
+      w.inputEl.autoplay = true
+      w.inputEl.loop = true
+      w.inputEl.controls = false;
+    }
+    w.inputEl.onload = function () {
+      w.inputRatio = w.inputEl.naturalWidth / w.inputEl.naturalHeight
+    }
+    document.body.appendChild(w.inputEl)
+    return w
+  }
+
 
 app.registerExtension({
   name: 'Mixlab.Video.ImageListReplace',
@@ -265,7 +363,7 @@ app.registerExtension({
 
         widget.div = $el('div', {})
         widget.div.style.width = `120px`
-        widget.div.className='hidden'
+        widget.div.className = 'hidden'
         document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
         // console.log('#ImageListReplace', widget)
@@ -280,7 +378,7 @@ app.registerExtension({
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
-        
+
         // let _image_replace = message._image_replace[0]
         // _image_replace = `/view?filename=${_image_replace.filename}&type=${
         //   _image_replace.type
@@ -288,10 +386,9 @@ app.registerExtension({
 
         let preview = this.widgets.filter(w => w.name == 'preview')[0]
 
-        if(message._images.length>0){
-       
-          preview.div.className=''
-// console.log('#ImageListReplace', preview.div)
+        if (message._images.length > 0) {
+          preview.div.className = ''
+          // console.log('#ImageListReplace', preview.div)
         }
 
         preview.div.innerHTML = ''
@@ -369,6 +466,49 @@ app.registerExtension({
 
         try {
         } catch (error) {}
+      }
+    }
+
+    if (nodeData?.name == 'VideoCombine_Adv') {
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        const prefix = 'vhs_gif_preview_'
+        const r = onExecuted ? onExecuted.apply(this, message) : undefined
+
+        if (this.widgets) {
+          const pos = this.widgets.findIndex(w => w.name === `${prefix}_0`)
+          if (pos !== -1) {
+            for (let i = pos; i < this.widgets.length; i++) {
+              this.widgets[i].onRemoved?.()
+            }
+            this.widgets.length = pos
+          }
+          if (message?.gifs) {
+            message.gifs.forEach((params, i) => {
+              const previewUrl = api.apiURL(
+                '/view?' + new URLSearchParams(params).toString()
+              )
+              const w = this.addCustomWidget(
+                CreatePreviewElement(
+                  `${prefix}_${i}`,
+                  previewUrl,
+                  params.format || 'image/gif'
+                )
+              )
+              w.parent = this
+            })
+          }
+          const onRemoved = this.onRemoved
+          this.onRemoved = () => {
+            cleanupNode(this)
+            return onRemoved?.()
+          }
+        }
+        this.setSize([
+          this.size[0],
+          this.computeSize([this.size[0], this.size[1]])[1]
+        ])
+        return r
       }
     }
   }

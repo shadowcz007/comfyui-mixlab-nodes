@@ -603,7 +603,7 @@ from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
-from .nodes.Video import LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames
+from .nodes.Video import VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames
 
 
 # 要导出的所有节点及其名称的字典
@@ -682,6 +682,7 @@ NODE_CLASS_MAPPINGS = {
     "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
     "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
     "LoadVideoAndSegment_":LoadVideoAndSegment,
+    "VideoCombine_Adv":VideoCombine_Adv,
     "ListSplit_":ListSplit,
     "MaskListReplace_":MaskListReplace,
     "ImageListReplace_":ImageListReplace,
@@ -726,6 +727,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents",
     "StyleAlignedBatchAlign_": "StyleAligned Batch Align",
     "LoadVideoAndSegment_":"Load Video And Segment",
+    "VideoCombine_Adv":"Video Combine",
     "MaskListMerge_":"MaskList to Mask",
     "ListSplit_":"Split List",
     "MaskListReplace_":"MaskList Replace",

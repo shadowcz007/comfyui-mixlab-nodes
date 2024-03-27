@@ -688,6 +688,17 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     return bg_image
 
 
+def resize_2(img):
+    # 检查图像的高度是否是2的倍数，如果不是，则调整高度
+    if img.height % 2 != 0:
+        img = img.resize((img.width, img.height + 1))
+
+    # 检查图像的宽度是否是2的倍数，如果不是，则调整宽度
+    if img.width % 2 != 0:
+        img = img.resize((img.width + 1, img.height))
+
+    return img
+
 # TODO 几个像素点的底
 def resize_image(layer_image, scale_option, width, height,color="white"):
     layer_image = layer_image.convert("RGB")
@@ -717,8 +728,10 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
         resized_image = Image.new("RGB", (width, height), color=color)
         resized_image.paste(layer_image.resize((new_width, new_height)), ((width - new_width) // 2, (height - new_height) // 2))
         resized_image = resized_image.convert("RGB")
+        resized_image=resize_2(resized_image)
         return resized_image
     
+    layer_image=resize_2(layer_image)
     return layer_image
 
 

@@ -181,7 +181,7 @@ class ImageListReplace:
 
         return {"ui":{"_images": imss},"result": (new_images,select_images,)}
 
-
+# The code is based on ComfyUI-VideoHelperSuite modification.
 class LoadVideoAndSegment:
     @classmethod
     def INPUT_TYPES(s):
@@ -346,7 +346,205 @@ class LoadVideoAndSegment:
         return True
     
 
+# The code is based on ComfyUI-VideoHelperSuite modification.
+class VideoCombine_Adv:
+    @classmethod
+    def INPUT_TYPES(s):
+        #Hide ffmpeg formats if ffmpeg isn't available
+        if ffmpeg_path is not None:
+            ffmpeg_formats = ["video/"+x[:-5] for x in folder_paths.get_filename_list("video_formats")]
+        else:
+            ffmpeg_formats = []
+        return {
+            "required": {
+                "image_batch": ("IMAGE",),
+                "frame_rate": (
+                    "INT",
+                    {"default": 8, "min": 1, "step": 1},
+                ),
+                "loop_count": ("INT", {"default": 0, "min": 0, "max": 100, "step": 1}),
+                "filename_prefix": ("STRING", {"default": "Comfyui"}),
+                "format": (["image/gif", "image/webp"] + ffmpeg_formats,),
+                "pingpong": ("BOOLEAN", {"default": False}),
+                "save_image": ("BOOLEAN", {"default": True}),
+                "metadata": ("BOOLEAN", {"default": False}),
+            },
+            "hidden": {
+                "prompt": "PROMPT",
+                "extra_pnginfo": "EXTRA_PNGINFO",
+            },
+        }
 
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    CATEGORY = "♾️Mixlab/Video"
+    FUNCTION = "run"
+
+    def save_with_tempfile(self, args, metadata, file_path, frames, env):
+        #Ensure temp directory exists
+        os.makedirs(folder_paths.get_temp_directory(), exist_ok=True)
+
+        metadata_path = os.path.join(folder_paths.get_temp_directory(), "metadata.txt")
+        #metadata from file should  escape = ; # \ and newline
+        #From my testing, though, only backslashes need escapes and = in particular causes problems
+        #It is likely better to prioritize future compatibility with containers that don't support
+        #or shouldn't use the comment tag for embedding metadata
+        metadata = metadata.replace("\\","\\\\")
+        metadata = metadata.replace(";","\\;")
+        metadata = metadata.replace("#","\\#")
+        #metadata = metadata.replace("=","\\=")
+        metadata = metadata.replace("\n","\\\n")
+        with open(metadata_path, "w") as f:
+            f.write(";FFMETADATA1\n")
+            f.write(metadata)
+        args = args[:1] + ["-i", metadata_path] + args[1:] + [file_path]
+        with subprocess.Popen(args, stdin=subprocess.PIPE, env=env) as proc:
+            for frame in frames:
+                proc.stdin.write(frame.tobytes())
+
+    def run(
+        self,
+        image_batch,
+        frame_rate: int,
+        loop_count: int,
+        filename_prefix="AnimateDiff",
+        format="image/gif",
+        pingpong=False,
+        save_image=True,
+        metadata=False,
+        prompt=None,
+        extra_pnginfo=None,
+    ):
+        images=image_batch
+
+        frames: List[Image.Image] = []
+        for image in images:
+            img = 255.0 * image.cpu().numpy()
+            img = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+            # resize 保证
+            # 检查图像的高度是否是2的倍数，如果不是，则调整高度
+            if img.height % 2 != 0:
+                img = img.resize((img.width, img.height + 1))
+
+            # 检查图像的宽度是否是2的倍数，如果不是，则调整宽度
+            if img.width % 2 != 0:
+                img = img.resize((img.width + 1, img.height))
+                
+            frames.append(img)
+
+        # get output information
+        output_dir = (
+            folder_paths.get_output_directory()
+            if save_image
+            else folder_paths.get_temp_directory()
+        )
+        (
+            full_output_folder,
+            filename,
+            counter,
+            subfolder,
+            _,
+        ) = folder_paths.get_save_image_path(filename_prefix, output_dir)
+
+        metadata = PngInfo()
+        video_metadata = {}
+        if prompt is not None:
+            metadata.add_text("prompt", json.dumps(prompt))
+            video_metadata["prompt"] = prompt
+        if extra_pnginfo is not None:
+            for x in extra_pnginfo:
+                metadata.add_text(x, json.dumps(extra_pnginfo[x]))
+                video_metadata[x] = extra_pnginfo[x]
+
+        # 取消保存metadata
+        if metadata==False:
+            metadata = PngInfo()
+
+        # save first frame as png to keep metadata
+        file = f"{filename}_{counter:05}_.png"
+        file_path = os.path.join(full_output_folder, file)
+        frames[0].save(
+            file_path,
+            pnginfo=metadata,
+            compress_level=4,
+        )
+        if pingpong:
+            frames = frames + frames[-2:0:-1]
+
+        format_type, format_ext = format.split("/")
+        file = f"{filename}_{counter:05}_.{format_ext}"
+        file_path = os.path.join(full_output_folder, file)
+        if format_type == "image":
+            # Use pillow directly to save an animated image
+            frames[0].save(
+                file_path,
+                format=format_ext.upper(),
+                save_all=True,
+                append_images=frames[1:],
+                duration=round(1000 / frame_rate),
+                loop=loop_count,
+                compress_level=4,
+            )
+        else:
+            # Use ffmpeg to save a video
+            if ffmpeg_path is None:
+                #Should never be reachable
+                raise ProcessLookupError("Could not find ffmpeg")
+
+            video_format_path = folder_paths.get_full_path("video_formats", format_ext + ".json")
+            with open(video_format_path, 'r') as stream:
+                video_format = json.load(stream)
+            file = f"{filename}_{counter:05}_.{video_format['extension']}"
+            file_path = os.path.join(full_output_folder, file)
+            dimensions = f"{frames[0].width}x{frames[0].height}"
+            metadata_args = ["-metadata", "comment=" + json.dumps(video_metadata)]
+            args = [ffmpeg_path, "-v", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
+                    "-s", dimensions, "-r", str(frame_rate), "-i", "-"] \
+                    + video_format['main_pass']
+            # On linux, max arg length is Pagesize * 32 -> 131072
+            # On windows, this around 32767 but seems to vary wildly by > 500
+            # in a manor not solely related to other arguments
+            if os.name == 'posix':
+                max_arg_length = 4096*32
+            else:
+                max_arg_length = 32767 - len(" ".join(args + [metadata_args[0]] + [file_path])) - 1
+            #test max limit
+            #metadata_args[1] = metadata_args[1] + "a"*(max_arg_length - len(metadata_args[1])-1)
+
+            env=os.environ.copy()
+            if  "environment" in video_format:
+                env.update(video_format["environment"])
+            if len(metadata_args[1]) >= max_arg_length:
+                print(f"Using fallback file for extremely long metadata: {len(metadata_args[1])}/{max_arg_length}")
+                self.save_with_tempfile(args, metadata_args[1], file_path, frames, env)
+            else:
+                try:
+                    with subprocess.Popen(args + metadata_args + [file_path],
+                                          stdin=subprocess.PIPE, env=env) as proc:
+                        for frame in frames:
+                            proc.stdin.write(frame.tobytes())
+                except FileNotFoundError as e:
+                    if "winerror" in dir(e) and e.winerror == 206:
+                        print("Metadata was too long. Retrying with fallback file")
+                        self.save_with_tempfile(args, metadata_args[1], file_path, frames, env)
+                    else:
+                        raise
+                except OSError as e:
+                    if "errno" in dir(e) and e.errno == 7:
+                        print("Metadata was too long. Retrying with fallback file")
+                        self.save_with_tempfile(args, metadata_args[1], file_path, frames, env)
+                    else:
+                        raise
+
+        previews = [
+            {
+                "filename": file,
+                "subfolder": subfolder,
+                "type": "output" if save_image else "temp",
+                "format": format,
+            }
+        ]
+        return {"ui": {"gifs": previews}}
 
 
 class VAEEncodeForInpaint_Frames:
