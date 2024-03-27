@@ -584,15 +584,15 @@ class SwitchByIndex:
             }
         }
 
-    RETURN_TYPES = (any_type,any_type,)
-    RETURN_NAMES = ("list","count",)
+    RETURN_TYPES = (any_type,"INT",)
+    RETURN_NAMES = ("list", "count",)
 
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Utils"
 
     INPUT_IS_LIST = True
-    OUTPUT_IS_LIST = (True,False,)
+    OUTPUT_IS_LIST = (True, False,)
 
     def run(self, A=[],B=[],index=-1,flat='on'):
 
@@ -615,7 +615,7 @@ class SwitchByIndex:
             except Exception as e:
                 C=[C[-1]] #最后一个
 
-        return (C,len(C),)
+        return (C, len(C),)
 
 class ListSplit:
     @classmethod
