@@ -580,16 +580,17 @@ class GLIGENTextBoxApply_Advanced:
     RETURN_NAMES = ("CONDITIONING","label",)
 
     FUNCTION = "run"
-    INPUT_IS_LIST = True
+    # INPUT_IS_LIST = True
     CATEGORY = "♾️Mixlab/Prompt"
 
     def run(self, conditioning, clip, gligen_textbox_model, grids, labels, index,max_size,random_shuffle,seed=0):
-        conditioning=conditioning[0]
-        clip=clip[0]
-        gligen_textbox_model=gligen_textbox_model[0]
-        index=index[0]
-        max_size=max_size[0]
-        random_shuffle=random_shuffle[0]
+        # print('grids',grids)
+        # conditioning=conditioning[0]
+        # clip=clip[0]
+        # gligen_textbox_model=gligen_textbox_model[0]
+        # index=index[0]
+        # max_size=max_size[0]
+        # random_shuffle=random_shuffle[0]
 
         texts=labels
         
