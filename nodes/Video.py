@@ -10,12 +10,79 @@ from typing import List
 import torch
 from PIL import Image, ImageOps
 from PIL.PngImagePlugin import PngInfo
-import cv2
+import cv2,random,string
 from pathlib import Path
 
 import folder_paths
 from comfy.k_diffusion.utils import FolderOfImages
 from comfy.utils import common_upscale
+
+
+
+
+def generate_folder_name(directory,video_path):
+    # Get the directory and filename from the video path
+    _, filename = os.path.split(video_path)
+    # Generate a random string of lowercase letters and digits
+    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    # Create the folder name by combining the random string and the filename
+    folder_name = random_string + '_' + filename
+    # Create the full folder path by joining the directory and the folder name
+    folder_path = os.path.join(directory, folder_name)
+    return folder_path
+
+def create_folder(directory,video_path):
+    folder_path = generate_folder_name(directory,video_path)
+    os.makedirs(folder_path)
+    return folder_path
+
+
+def split_video(video_path, video_segment_frames, transition_frames, output_dir):
+    # 读取视频文件
+    video_capture = cv2.VideoCapture(video_path)
+    
+    # 获取视频的总帧数和帧率
+    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    
+    # 计算每个视频片段的总帧数，包括过渡帧
+    segment_total_frames = video_segment_frames + transition_frames
+    
+    # 计算可以分割的片段数量，向上取整
+    num_segments = (total_frames + transition_frames - 1) // segment_total_frames
+    
+    vs=[]
+    # 计算每个片段的起始帧和结束帧
+    start_frame = 0
+    for i in range(num_segments):
+        # 计算当前片段的结束帧，注意最后一个片段可能没有过渡帧
+        end_frame = min(start_frame + segment_total_frames, total_frames)
+        
+        # 打印当前片段的起始帧和结束帧
+        print(f"Segment {i+1}: Start Frame {start_frame}, End Frame {end_frame}")
+        
+        # 保存当前片段为一个视频文件
+        segment_video_path = f"{output_dir}/segment_{i+1}.avi"
+
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        segment_video = cv2.VideoWriter(segment_video_path, fourcc, fps, (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                                                              int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+        
+        for frame_num in range(start_frame, end_frame):
+            ret, frame = video_capture.read()
+            if ret:
+                segment_video.write(frame)
+            else:
+                break  # 如果读取失败，则退出循环
+        
+        # 更新起始帧为下一个片段的起始位置
+        start_frame = end_frame + transition_frames
+        vs.append(segment_video_path)
+    
+    # 释放视频捕获对象
+    video_capture.release()
+    # print(vs)
+    return (vs,total_frames,fps)
 
 
 folder_paths.folder_names_and_paths["video_formats"] = (
@@ -201,11 +268,11 @@ class LoadVideoAndSegment:
 
     CATEGORY = "♾️Mixlab/Video"
 
-    RETURN_TYPES = ("IMAGE","IMAGE", "INT",)
-    RETURN_NAMES = ("segment_batch","frame_count","segment_count",)
+    RETURN_TYPES = ("SCENE_VIDEO","INT", "INT","INT",)
+    RETURN_NAMES = ("scenes_video","scenes_count","frame_count","fps",)
     FUNCTION = "load_video"
     OUTPUT_NODE = True
-    OUTPUT_IS_LIST = (True,False,False,)
+    OUTPUT_IS_LIST = (True,False,False,False,)
 
 
     def is_gif(self, filename):
@@ -262,73 +329,84 @@ class LoadVideoAndSegment:
         return (images, frames_added)
 
     def load_video(self, video,video_segment_frames,transition_frames ):
-        frame_load_cap=0
-        skip_first_frames=0
-
+        
         video_path = folder_paths.get_annotated_filepath(video)
         
         # check if video is a gif - will need to use cv fallback to read frames
         # use cv fallback if ffmpeg not installed or gif
-        if ffmpeg_path is None:
-            return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
+        # if ffmpeg_path is None:
+        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
         # otherwise, continue with ffmpeg
         
-        args_dummy = [ffmpeg_path, "-i", video_path, "-f", "null", "-"]
-        try:
-            with subprocess.Popen(args_dummy, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE) as proc:
-                for line in proc.stderr.readlines():
-                    match = re.search(", ([1-9]|\\d{2,})x(\\d+)",line.decode('utf-8'))
-                    if match is not None:
-                        size = [int(match.group(1)), int(match.group(2))]
-                        break
-        except Exception as e:
-            print(f"Retrying with opencv due to ffmpeg error: {e}")
-            return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
-        args_all_frames = [ffmpeg_path, "-i", video_path, "-v", "error",
-                             "-pix_fmt", "rgb24"]
+        # args_dummy = [ffmpeg_path, "-i", video_path, "-f", "null", "-"]
+        # try:
+        #     with subprocess.Popen(args_dummy, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE) as proc:
+        #         for line in proc.stderr.readlines():
+        #             match = re.search(", ([1-9]|\\d{2,})x(\\d+)",line.decode('utf-8'))
+        #             if match is not None:
+        #                 size = [int(match.group(1)), int(match.group(2))]
+        #                 break
+        # except Exception as e:
+        #     print(f"Retrying with opencv due to ffmpeg error: {e}")
+        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
+        # args_all_frames = [ffmpeg_path, "-i", video_path, "-v", "error",
+        #                      "-pix_fmt", "rgb24"]
 
-        vfilters = []
+        # vfilters = []
        
-        if skip_first_frames > 0:
-            vfilters.append(f"select=gt(n\\,{skip_first_frames-1})")
-        if frame_load_cap > 0:
-            vfilters.append(f"select=gt({frame_load_cap}\\,n)")
-        #manually calculate aspect ratio to ensure reads remain aligned
+        # if skip_first_frames > 0:
+        #     vfilters.append(f"select=gt(n\\,{skip_first_frames-1})")
+        # if frame_load_cap > 0:
+        #     vfilters.append(f"select=gt({frame_load_cap}\\,n)")
+        # #manually calculate aspect ratio to ensure reads remain aligned
         
-        if len(vfilters) > 0:
-            args_all_frames += ["-vf", ",".join(vfilters)]
+        # if len(vfilters) > 0:
+        #     args_all_frames += ["-vf", ",".join(vfilters)]
 
-        args_all_frames += ["-f", "rawvideo", "-"]
-        images = []
-        try:
-            with subprocess.Popen(args_all_frames, stdout=subprocess.PIPE) as proc:
-                #Manually buffer enough bytes for an image
-                bpi = size[0]*size[1]*3
-                current_bytes = bytearray(bpi)
-                current_offset=0
-                while True:
-                    bytes_read = proc.stdout.read(bpi - current_offset)
-                    if bytes_read is None:#sleep to wait for more data
-                        time.sleep(.2)
-                        continue
-                    if len(bytes_read) == 0:#EOF
-                        break
-                    current_bytes[current_offset:len(bytes_read)] = bytes_read
-                    current_offset+=len(bytes_read)
-                    if current_offset == bpi:
-                        images.append(np.array(current_bytes, dtype=np.float32).reshape(size[1], size[0], 3) / 255.0)
-                        current_offset = 0
-        except Exception as e:
-            print(f"Retrying with opencv due to ffmpeg error: {e}")
-            return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
+        # args_all_frames += ["-f", "rawvideo", "-"]
+        # images = []
+        # try:
+        #     with subprocess.Popen(args_all_frames, stdout=subprocess.PIPE) as proc:
+        #         #Manually buffer enough bytes for an image
+        #         bpi = size[0]*size[1]*3
+        #         current_bytes = bytearray(bpi)
+        #         current_offset=0
+        #         while True:
+        #             bytes_read = proc.stdout.read(bpi - current_offset)
+        #             if bytes_read is None:#sleep to wait for more data
+        #                 time.sleep(.2)
+        #                 continue
+        #             if len(bytes_read) == 0:#EOF
+        #                 break
+        #             current_bytes[current_offset:len(bytes_read)] = bytes_read
+        #             current_offset+=len(bytes_read)
+        #             if current_offset == bpi:
+        #                 images.append(np.array(current_bytes, dtype=np.float32).reshape(size[1], size[0], 3) / 255.0)
+        #                 current_offset = 0
+        # except Exception as e:
+        #     print(f"Retrying with opencv due to ffmpeg error: {e}")
+        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
 
-        imgs=split_list(images,video_segment_frames,transition_frames)
+        # imgs=split_list(images,video_segment_frames,transition_frames)
 
-        imgs=[torch.from_numpy(np.stack(im)) for im in imgs]
+        # temp path 
+        tp=folder_paths.get_temp_directory()
+        basename = os.path.basename(video_path)  # 获取文件名
+        name_without_extension = os.path.splitext(basename)[0]  # 去掉文件后缀
+
+        folder_path = create_folder(tp,name_without_extension)
+        
+ 
+        # 导出的数据
+        scenes_video,total_frames,fps=split_video(video_path,video_segment_frames,
+                                 transition_frames,folder_path)
+      
+
+        # imgs=[torch.from_numpy(np.stack(im)) for im in imgs]
 
         # images = torch.from_numpy(np.stack(images))
 
-        return (imgs, len(images),len(imgs),)
+        return (scenes_video,len(scenes_video), total_frames,fps,)
 
     @classmethod
     def IS_CHANGED(s, video, **kwargs):
