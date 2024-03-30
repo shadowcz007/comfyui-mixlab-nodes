@@ -8,6 +8,10 @@ import matplotlib.font_manager as fm
 import torch
 import importlib.util
 
+def create_incrementing_list(min_value, max_value, step, count):
+    l1 = [int(min_value + i * step) for i in range(count) if min_value + i * step <= max_value]
+    l2 = [float(min_value + i * step) for i in range(count) if min_value + i * step <= max_value]
+    return (l1,l2)
 
 def split_list(lst, chunk_size, transition_size):
     result = []
@@ -405,6 +409,61 @@ class TextInput:
     def run(self,text):
        
         return (text,)
+    
+
+class IncrementingListNode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {
+                    "min_value": ("FLOAT", {
+                        "default": 0, 
+                        "min": -2000, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                    "max_value": ("FLOAT", {
+                        "default": 10, 
+                        "min": -2000, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                    "step": ("FLOAT", {
+                        "default": 0, 
+                        "min": -2000, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step": 0.01, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    }),
+                    "count": ("INT", {
+                        "default": 1, 
+                        "min": 1, #Minimum value
+                        "max": 0xffffffffffffffff,
+                        "step":1, #Slider's step
+                        "display": "number" # Cosmetic only: display as "number" or "slider"
+                    })
+                             },
+                             "optional":{
+                    "seed":("INT", {"default": -1, "min": -1, "max": 1000000}), 
+                    
+                },
+                }
+    
+    RETURN_TYPES = ("INT","FLOAT",) 
+    RETURN_NAMES = ('int_list','float_list',)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Video"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (True,True,)
+
+    def run(self,min_value,max_value,step,count,seed):
+        print('create_incrementing_list',seed)
+        l1,l2=create_incrementing_list(min_value,max_value,step,count)
+        return (l1,l2,)
     
 # 接收一个值，然后根据字符串或数值长度计算延迟时间，用户可以自定义延迟"字/s"，延迟之后将转化
 

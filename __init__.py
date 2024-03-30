@@ -598,7 +598,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
@@ -686,7 +686,8 @@ NODE_CLASS_MAPPINGS = {
     "ListSplit_":ListSplit,
     "MaskListReplace_":MaskListReplace,
     "ImageListReplace_":ImageListReplace,
-    "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames
+    "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames,
+    "IncrementingListNode_":IncrementingListNode
     # "GamePal":GamePal
 }
 
@@ -738,7 +739,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GridInput":"Grid Input",
     "GridOutput":"Grid Output",
     "GetImageSize_":"Get Image Size",
-    "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames"
+    "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames",
+    "IncrementingListNode_":"Create Incrementing Number List"
 }
 
 # web ui的节点功能
