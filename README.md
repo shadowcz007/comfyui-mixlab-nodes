@@ -116,18 +116,23 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 [workflow](./workflow/3D-workflow.json)
 
 
-### LoadImagesFromLocal
+### Image
+
+#### LoadImagesToBatch
+> Upload multiple images for batch input into the IP adapter. 
+
+#### LoadImagesFromLocal
 > Monitor changes to images in a local folder, and trigger real-time execution of workflows, supporting common image formats, especially PSD format, in conjunction with Photoshop. 
 
 ![watch](./assets/4-loadfromlocal-watcher-workflow.svg)
 
 [workflow-4](./workflow/4-loadfromlocal-watcher-workflow.json)
 
-### LoadImagesFromURL
+#### LoadImagesFromURL
 > Conveniently load images from a fixed address on the internet to ensure that default images in the workflow can be executed.
 
 
-## Style
+### Style
 > Apply VisualStyle Prompting , Modified from [ComfyUI_VisualStylePrompting](https://github.com/ExponentialML/ComfyUI_VisualStylePrompting) 
 
 ![](./assets/VisualStylePrompting.png)
@@ -135,7 +140,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 > StyleAligned , Modified from [style_aligned_comfy](https://github.com/brianfitzgerald/style_aligned_comfy) 
 
 
-## Utils
+### Utils
 > The Color node provides a color picker for easy color selection, the Font node offers built-in font selection for use with TextImage to generate text images, and the DynamicDelayByText node allows delayed execution based on the length of the input text.
 
 - [添加了DynamicDelayByText功能，可以根据输入文本的长度进行延迟执行。](./workflow/audio-chatgpt-workflow.json)
@@ -148,7 +153,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 
 
-## Other Nodes
+### Other Nodes
 
 ![main](./assets/all-workflow.svg)
 ![main2](./assets/detect-face-all.png)
