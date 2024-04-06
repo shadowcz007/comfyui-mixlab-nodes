@@ -1907,6 +1907,7 @@
 
         function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
+            if(!data)return
             const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
 
             let mainDiv = document.createElement('div');
