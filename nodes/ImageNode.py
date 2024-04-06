@@ -8,12 +8,13 @@ import base64,os,random
 from io import BytesIO
 import folder_paths
 import json,io
+import comfy.utils
 from comfy.cli_args import args
 import cv2
 import string
 import math,glob
 from .Watcher import FolderWatcher
-
+import hashlib
 
 def composite_images(foreground, background, mask):
     width,height=foreground.size
@@ -1129,6 +1130,42 @@ class EnhanceImage:
         return (res,)
 
 
+
+
+class LoadImages_:
+    @classmethod
+    def INPUT_TYPES(s):
+        
+        return {"required":
+                    {"images": ("IMAGEBASE64",), 
+                     },
+                }
+
+    CATEGORY = "♾️Mixlab/Image"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "load_image"
+    def load_image(self, images):
+
+        # print(images)
+        ims=[]
+        for im in images['base64']:
+            image = base64_to_image(im)
+            image=image.convert('RGB')
+            image=pil2tensor(image)
+            ims.append(image)
+
+        image1 = ims[0]
+        for image2 in ims[1:]:
+            if image1.shape[1:] != image2.shape[1:]:
+                image2 = comfy.utils.common_upscale(image2.movedim(-1, 1), image1.shape[2], image1.shape[1], "bilinear", "center").movedim(1, -1)
+            image1 = torch.cat((image1, image2), dim=0)
+        return (image1,)
+        
+ 
 
 
 ''' 

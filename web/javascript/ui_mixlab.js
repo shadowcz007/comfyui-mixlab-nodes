@@ -1159,7 +1159,7 @@ app.registerExtension({
 
       let apps_opts = []
       for (const category in apps_map) {
-        console.log('category', typeof category)
+        // console.log('category', typeof category)
         if (category === '0') {
           apps_opts.push(
             ...Array.from(apps_map[category], a => {

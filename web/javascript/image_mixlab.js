@@ -618,9 +618,144 @@ app.registerExtension({
 
         if (json && json[0]) {
           uploadWidget.select.style.display = 'block'
-          createSelect(img, uploadWidget.select, json, prompt,text)
+          createSelect(img, uploadWidget.select, json, prompt, text)
         }
       } catch (error) {}
+    }
+  }
+})
+
+const createInputImageForBatch = (base64, widget) => {
+  let im = new Image()
+  im.src = base64
+  im.style = `width: 88px;`
+
+  im.addEventListener('click', e => {
+    let newValue = []
+    let items=widget.value?.base64||[];
+    for (const v of items) {
+      if (v != base64) newValue.push(v)
+    }
+    widget.value.base64=newValue;
+    im.remove()
+  })
+
+  return im
+}
+
+app.registerExtension({
+  name: 'Mixlab.Comfy.LoadImagesToBatch',
+  async getCustomWidgets (app) {
+    return {
+      IMAGEBASE64 (node, inputName, inputData, app) {
+        // console.log('##node', node)
+        const widget = {
+          value: {
+            base64:[]
+          }, // 不能[x,x,x]
+          type: inputData[0], // the type
+          name: inputName, // the name, slice
+          size: [128, 32], // a default size
+          draw (ctx, node, width, y) {},
+          computeSize (...args) {
+            return [128, 32] // a method to compute the current size of the widget
+          },
+          // serializeValue (nodeId, widgetIndex) {
+          //   return widget.value
+          // },
+        }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      }
+    }
+  },
+
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'LoadImagesToBatch') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        let imagesWidget = this.widgets.filter(w => w.name == 'images')[0]
+
+        const widget = {
+          type: 'div',
+          name: 'image_base64',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, 44, node.size[1])
+            )
+          },
+          serialize:false
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+
+        let imagePreview = document.createElement('div')
+        let imagesDiv = document.createElement('div') //显示图片
+        imagesDiv.className = 'images_preview'
+        imagesDiv.style = `width: calc(100% - 14px);
+        display: flex;
+        flex-wrap: wrap;
+        padding: 7px;    justify-content: space-between;
+        align-items: center;`
+        let inputImage = document.createElement('input')
+        inputImage.type = 'file'
+        inputImage.addEventListener('change', e => {
+          e.preventDefault()
+          const file = e.target.files[0]
+          const reader = new FileReader()
+          reader.onload = async event => {
+            const base64 = event.target.result
+            // console.log(base64)
+            if (!imagesWidget.value) imagesWidget.value = {base64:[]}
+            imagesWidget.value.base64.push(base64)
+            let im = createInputImageForBatch(base64,imagesWidget)
+            imagesDiv.appendChild(im)
+          }
+          reader.readAsDataURL(file)
+        })
+
+        widget.div.appendChild(imagePreview)
+        imagePreview.appendChild(imagesDiv)
+        imagePreview.appendChild(inputImage)
+
+        this.addCustomWidget(widget)
+
+        // document.addEventListener('wheel', handleMouseWheel)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          inputImage.remove()
+          widget.div.remove()
+          try {
+            // document.removeEventListener('wheel', handleMouseWheel)
+          } catch (error) {
+            console.log(error)
+          }
+
+          return onRemoved?.()
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'LoadImagesToBatch') {
+      // await sleep(0)
+      let imagesWidget = node.widgets.filter(w => w.name === 'images')[0]
+      let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
+
+      let pre = imagePreview.div.querySelector('.images_preview')
+      for (const d of imagesWidget.value?.base64 || []) {
+        let im =  createInputImageForBatch(d,imagesWidget)
+        pre.appendChild(im)
+      }
     }
   }
 })

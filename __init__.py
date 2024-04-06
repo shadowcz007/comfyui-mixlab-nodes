@@ -592,7 +592,7 @@ async def post_prompt_result(request):
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -626,6 +626,7 @@ NODE_CLASS_MAPPINGS = {
     "ResizeImageMixlab":ResizeImage,
     "LoadImagesFromPath":LoadImagesFromPath,
     "LoadImagesFromURL":LoadImagesFromURL,
+    "LoadImagesToBatch":LoadImages_,
     "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
@@ -740,7 +741,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GridOutput":"Grid Output",
     "GetImageSize_":"Get Image Size",
     "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames",
-    "IncrementingListNode_":"Create Incrementing Number List"
+    "IncrementingListNode_":"Create Incrementing Number List",
+    "LoadImagesToBatch":"Load Images To Batch"
 }
 
 # web ui的节点功能

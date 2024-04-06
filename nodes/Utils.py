@@ -158,7 +158,6 @@ class ColorInput:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-             
                     "color":("TCOLOR",), 
                              },
                 }
