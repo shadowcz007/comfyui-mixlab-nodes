@@ -1293,8 +1293,9 @@
                             data.title,
                             data.options.images,
                             data.inputs.imageIndex,
-                            (base64) => {
+                            (base64, text) => {
                                 window._appData.data[data.id].inputs.image_base64 = base64;
+                                window._appData.data[data.id].inputs.text = text;
                             })
                         uploadContainer.appendChild(imgDiv);
                         window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
@@ -1836,7 +1837,7 @@
                         if (!opt.imgurl.match('data:image')) {
                             opt.imgurl = await parseImageToBase64(opt.imgurl)
                         }
-                        callback(opt.imgurl);
+                        callback(opt.imgurl, opt.keyword);
                     }
                 })
             }
@@ -1907,7 +1908,7 @@
 
         function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
-            if(!data)return
+            if (!data) return
             const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
 
             let mainDiv = document.createElement('div');
