@@ -632,11 +632,11 @@ const createInputImageForBatch = (base64, widget) => {
 
   im.addEventListener('click', e => {
     let newValue = []
-    let items=widget.value?.base64||[];
+    let items = widget.value?.base64 || []
     for (const v of items) {
       if (v != base64) newValue.push(v)
     }
-    widget.value.base64=newValue;
+    widget.value.base64 = newValue
     im.remove()
   })
 
@@ -651,7 +651,7 @@ app.registerExtension({
         // console.log('##node', node)
         const widget = {
           value: {
-            base64:[]
+            base64: []
           }, // 不能[x,x,x]
           type: inputData[0], // the type
           name: inputName, // the name, slice
@@ -659,7 +659,7 @@ app.registerExtension({
           draw (ctx, node, width, y) {},
           computeSize (...args) {
             return [128, 32] // a method to compute the current size of the widget
-          },
+          }
           // serializeValue (nodeId, widgetIndex) {
           //   return widget.value
           // },
@@ -688,7 +688,7 @@ app.registerExtension({
               get_position_style(ctx, widget_width, 44, node.size[1])
             )
           },
-          serialize:false
+          serialize: false
         }
 
         widget.div = $el('div', {})
@@ -703,8 +703,10 @@ app.registerExtension({
         flex-wrap: wrap;
         padding: 7px;    justify-content: space-between;
         align-items: center;`
+
         let inputImage = document.createElement('input')
         inputImage.type = 'file'
+        inputImage.style.display = 'none'
         inputImage.addEventListener('change', e => {
           e.preventDefault()
           const file = e.target.files[0]
@@ -712,16 +714,35 @@ app.registerExtension({
           reader.onload = async event => {
             const base64 = event.target.result
             // console.log(base64)
-            if (!imagesWidget.value) imagesWidget.value = {base64:[]}
+            if (!imagesWidget.value) imagesWidget.value = { base64: [] }
             imagesWidget.value.base64.push(base64)
-            let im = createInputImageForBatch(base64,imagesWidget)
+            let im = createInputImageForBatch(base64, imagesWidget)
             imagesDiv.appendChild(im)
           }
           reader.readAsDataURL(file)
         })
 
+        const btn = document.createElement('button')
+        btn.innerText = 'Upload Image'
+
+        btn.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 122px;
+       `
+
+        btn.addEventListener('click', e => {
+          e.preventDefault()
+          inputImage.click()
+        })
+
         widget.div.appendChild(imagePreview)
         imagePreview.appendChild(imagesDiv)
+        imagePreview.appendChild(btn)
         imagePreview.appendChild(inputImage)
 
         this.addCustomWidget(widget)
@@ -753,7 +774,7 @@ app.registerExtension({
 
       let pre = imagePreview.div.querySelector('.images_preview')
       for (const d of imagesWidget.value?.base64 || []) {
-        let im =  createInputImageForBatch(d,imagesWidget)
+        let im = createInputImageForBatch(d, imagesWidget)
         pre.appendChild(im)
       }
     }
