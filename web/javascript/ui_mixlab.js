@@ -1511,14 +1511,14 @@ app.registerExtension({
                 document.body.appendChild(div)
             }
           },
-          {
+          apps_opts.length>0?{
             content: 'Workflow App ♾️Mixlab',
             has_submenu: true,
             disabled: false,
             submenu: {
               options: apps_opts
             }
-          }
+          }:null
         )
 
         return options
