@@ -197,7 +197,8 @@ async function extractInputAndOutputData (
       if (
         node.type === 'KSampler' ||
         node.type == 'SamplerCustom' ||
-        node.type === 'ChinesePrompt_Mix'
+        node.type === 'ChinesePrompt_Mix' ||
+        node.type === 'Seed_'
       ) {
         // seed 的类型收集
         try {
