@@ -1517,7 +1517,7 @@ class Image3D:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Image"
+    CATEGORY = "♾️Mixlab/3D"
 
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,False,False,)

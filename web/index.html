@@ -406,6 +406,7 @@
     <link href="/extensions/comfyui-mixlab-nodes/lib/classic.min.css" rel="stylesheet">
     <script src="/extensions/comfyui-mixlab-nodes/lib/pickr.min.js"></script>
     <script src="/extensions/comfyui-mixlab-nodes/lib/filerobot-image-editor.min.js"></script>
+    <script type="module" src="/extensions/comfyui-mixlab-nodes/lib/model-viewer.min.js"></script>
     <link rel="stylesheet" href="/extensions/comfyui-mixlab-nodes/lib/login.css">
 </head>
 
@@ -495,6 +496,39 @@
                     .catch(error => {
                         console.log('发生错误:', error)
                     })
+            })
+        }
+
+        //给load image to batch节点使用的输入
+        function createBase64ImageForLoadImageToBatch(imageElement, nodeId, bs) {
+            let im = new Image()
+            im.src = bs;
+            im.className = "base64"
+            imageElement.appendChild(im);
+
+            let base64s = imageElement.querySelectorAll('.base64')
+            //更新输入
+            window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+
+            // 删除
+            im.addEventListener('click', e => {
+                e.preventDefault();
+                im.remove();
+                let base64s = imageElement.querySelectorAll('.base64')
+                //更新输入
+                window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+            })
+        }
+
+        const blobToBase64 = blob => {
+            return new Promise((res, rej) => {
+                const reader = new FileReader()
+                reader.onloadend = () => {
+                    const base64data = reader.result
+                    res(base64data)
+                    // 在这里可以将base64数据用于进一步处理或显示图片
+                }
+                reader.readAsDataURL(blob)
             })
         }
 
@@ -930,7 +964,11 @@
                     output_card.appendChild(div);
                 };
 
-                if (["SaveImage", "PreviewImage", "PromptImage", "Image Save", "SaveImageAndMetadata_"].includes(node.class_type)) {
+                if (["SaveImage",
+                    "PreviewImage",
+                    "PromptImage",
+                    "Image Save",
+                    "SaveImageAndMetadata_"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
@@ -946,8 +984,24 @@
                     output_card.appendChild(a);
                 }
 
+                //3d 
+                if (["SaveTripoSRMesh"].includes(node.class_type)) {
+                    let a = document.createElement('a');
+                    a.id = `output_${node.id}`
+                    a.setAttribute('data-pswp-width', "200");
+                    a.setAttribute('data-pswp-height', "200");
+                    a.setAttribute('target', "_blank");
+                    a.setAttribute('href', base64Df);
+
+                    let img = new Image();
+                    // img;
+                    img.src = base64Df;
+                    a.appendChild(img)
+                    output_card.appendChild(a);
+                }
+
                 // video ,gif
-                if (["VHS_VideoCombine"].includes(node.class_type)) {
+                if (["VHS_VideoCombine", "VideoCombine_Adv"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
@@ -1030,6 +1084,7 @@
         }
 
         async function handleClipboardImage(imageElement, data) {
+            //data.class_type === 'LoadImagesToBatch'
             try {
                 const clipboardItems = await navigator.clipboard.read();
                 for (const clipboardItem of clipboardItems) {
@@ -1042,18 +1097,17 @@
 
                             if (hashId == window._appData.data[data.id].hashId) return
 
-                            let { url, name } = await uploadImage(fileBlob);
-                            // 在这里可以对 Blob 对象进行进一步处理
-                            imageElement.src = url;
-                            window._appData.data[data.id].inputs.image = name;
-                            window._appData.data[data.id].hashId = hashId;
-
-                            console.log("上传的文件：", url, data.id, name);
-
-                            // const img = document.createElement('img');
-                            // img.src = URL.createObjectURL(blob);
-                            // document.body.appendChild(img);
-                            // console.log( URL.createObjectURL(blob));
+                            if (data.class_type === 'LoadImagesToBatch') {
+                                let base64 = await blobToBase64(fileBlob)
+                                createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
+                            } else {
+                                let { url, name } = await uploadImage(fileBlob);
+                                // 在这里可以对 Blob 对象进行进一步处理
+                                imageElement.src = url;
+                                window._appData.data[data.id].inputs.image = name;
+                                window._appData.data[data.id].hashId = hashId;
+                                console.log("上传的文件：", url, data.id, name);
+                            }
                         }
                     }
                 }
@@ -1217,9 +1271,15 @@
                 console.log('inputData', data);
 
                 // 图片 or 视频输入
-                if (data.class_type === "LoadImage" || data.class_type === "VHS_LoadVideo" || data.class_type === 'ImagesPrompt_') {
+
+                if (["LoadImage",
+                    "VHS_LoadVideo",
+                    "ImagesPrompt_",
+                    "LoadImagesToBatch"].includes(data.class_type)) {
 
                     let isVideoUpload = data.class_type === "VHS_LoadVideo";
+
+                    let isBase64Upload = data.class_type === "LoadImagesToBatch";
 
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
@@ -1252,7 +1312,7 @@
                     const btnForImageEdit = document.createElement("button");
                     btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
                     btnForImageEdit.innerHTML = '<?xml version="1.0" ?><svg version="1.1" style="width: 24px;" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1_1_"><path d="M18.293,31.707h6.414l24-24l-6.414-6.414l-24,24V31.707z M45.879,7.707l-3.586,3.586l-3.586-3.586l3.586-3.586   L45.879,7.707z M20.293,26.121l17-17l3.586,3.586l-17,17h-3.586V26.121z"/><polygon points="43.293,19.707 41.293,19.707 41.293,46.707 3.293,46.707 3.293,8.707 31.293,8.707 31.293,6.707 1.293,6.707    1.293,48.707 43.293,48.707  "/></g></svg>'
-                    if (!isVideoUpload && data.class_type !== 'ImagesPrompt_') actionDiv.appendChild(btnForImageEdit);
+                    if ((!isVideoUpload && !isBase64Upload) && data.class_type !== 'ImagesPrompt_') actionDiv.appendChild(btnForImageEdit);
 
 
                     uploadContainer.appendChild(actionDiv)
@@ -1299,6 +1359,16 @@
                             })
                         uploadContainer.appendChild(imgDiv);
                         window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+                    } else if (data.class_type === 'LoadImagesToBatch') {
+                        // 多张base64 图片
+                        let base64 = data.inputs.images.base64
+
+                        imageElement = document.createElement('div');
+                        imageElement.className = "images"
+                        for (const bs of base64) {
+                            createBase64ImageForLoadImageToBatch(imageElement, data.id, bs)
+                        }
+
                     }
 
 
@@ -1306,7 +1376,7 @@
 
                     if (!isVideoUpload) btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
 
-                    if (!isVideoUpload) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
+                    if (!isVideoUpload && !isBase64Upload) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
 
 
                     uploadImageInput.addEventListener('click', (event) => {
@@ -1329,33 +1399,43 @@
 
                             if (hashId == window._appData.data[data.id].hashId) return
 
-                            let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
-
-                            if (data.class_type === 'ImagesPrompt_') {
-                                // 
-                                let base64 = await parseImageToBase64(url);
-                                uploadContainer.querySelector('.images_prompt_main').src = base64
-                                window._appData.data[data.id].inputs.image_base64 = base64;
+                            if (data.class_type === 'LoadImagesToBatch') {
+                                // 上传 ，转为base64
+                                let base64 = await blobToBase64(fileBlob)
+                                createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
                             } else {
-                                if (isVideoUpload) {
-                                    imageElement.srcObject = null;
-                                }
-                                // 在这里可以对 Blob 对象进行进一步处理
-                                imageElement.src = url;
+                                //上传，返回url
+                                let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
 
-
-                                if (isVideoUpload) {
-                                    window._appData.data[data.id].inputs.video = name;
+                                if (data.class_type === 'ImagesPrompt_') {
+                                    // 
+                                    let base64 = await parseImageToBase64(url);
+                                    uploadContainer.querySelector('.images_prompt_main').src = base64
+                                    window._appData.data[data.id].inputs.image_base64 = base64;
                                 } else {
-                                    window._appData.data[data.id].inputs.image = name;
+                                    if (isVideoUpload) {
+                                        imageElement.srcObject = null;
+                                    }
+                                    // 在这里可以对 Blob 对象进行进一步处理
+                                    imageElement.src = url;
+
+
+                                    if (isVideoUpload) {
+                                        window._appData.data[data.id].inputs.video = name;
+                                    } else {
+                                        window._appData.data[data.id].inputs.image = name;
+                                    }
+
                                 }
 
+
+                                window._appData.data[data.id].hashId = hashId;
+
+                                console.log("上传的文件：", url, data.id, name);
                             }
 
 
-                            window._appData.data[data.id].hashId = hashId;
 
-                            console.log("上传的文件：", url, data.id, name);
                         };
 
                         // 开始读取文件
@@ -2201,6 +2281,51 @@
 
                         if (val && type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
 
+                        // 3d meshes
+                        if (val && type == 'meshes' && output.querySelector(`#output_${id}`)) {
+
+                            let threeD = output.querySelector('.threeD')
+                            //判断默认的图片，需要去掉后创建model-viewer
+                            let imgDf = output.querySelector(`#output_${id} img`);
+                            if (!threeD) {
+                                if (imgDf) imgDf.parentElement.remove();
+                                threeD = document.createElement('div');
+                                threeD.className = 'threeD'
+                                threeD.id = `output_${id}`
+                                output.querySelector('.output_card').appendChild(threeD)
+                                // output.insertBefore(threeD, output.firstChild);
+                            };
+
+
+                            for (const meshUrl of val) {
+                                const modelViewer = document.createElement('div');
+                                modelViewer.style = `width:300px;margin:4px;height:300px;display:block`
+                                modelViewer.innerHTML = `<model-viewer  src="${meshUrl}" 
+                                    min-field-of-view="0deg" max-field-of-view="180deg"
+                                    shadow-intensity="1" 
+                                    camera-controls 
+                                    touch-action="pan-y"
+                                    style="width:300px;height:300px;"
+                                    > 
+                                    <div class="controls">
+                                        <button class="export">Save As</button>
+                                    </div>
+                                </model-viewer>`
+
+                                const btn = modelViewer.querySelector('.export');
+                                btn.addEventListener('click', async e => {
+                                    e.preventDefault();
+                                    const glTF = await (modelViewer.querySelector('model-viewer')).exportScene()
+                                    const file = new File([glTF], 'mixlab.glb')
+                                    const link = document.createElement('a')
+                                    link.download = file.name
+                                    link.href = URL.createObjectURL(file)
+                                    link.click()
+                                })
+                                threeD.appendChild(modelViewer)
+                            }
+
+                        }
                     }
                 },
                 submitButton: {
@@ -2316,6 +2441,9 @@
             const _images = detail?.output?._images;
             const prompts = detail?.output?.prompts;
 
+            // 3d模型
+            const meshes = detail?.output?.mesh;
+
             if (images) {
                 // if (!images) return;
 
@@ -2324,6 +2452,14 @@
                 show(Array.from(images, img => {
                     return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
                 }), detail.node, 'images');
+
+            } else if (meshes) {
+                //多个
+                let url = get_url();
+
+                show(Array.from(meshes, mesh => {
+                    return `${url}/view?filename=${encodeURIComponent(mesh.filename)}&type=${mesh.type}&subfolder=${encodeURIComponent(mesh.subfolder)}&t=${+new Date()}`;
+                }), detail.node, 'meshes');
 
             } else if (_images && prompts) {
                 let url = get_url();
