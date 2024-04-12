@@ -2694,6 +2694,9 @@
         // 创建app的选择菜单
         function createAppList(apps = [], innerApp = false) {
             window.prompt_ids = {};
+            if(document.body.querySelector('.apps')){
+                document.body.querySelector('.apps').remove()
+            }
             let details = document.createElement('details');
             details.className = 'apps';
 
