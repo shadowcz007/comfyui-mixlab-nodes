@@ -2894,20 +2894,21 @@
                 card.addEventListener('click', async e => {
                     e.preventDefault();
                     // console.log(c)
+
+                    const { category, filename } = c.appInfo;
+                    window._appData = (await get_my_app(category, filename))[0];
+
+                    await createApp(window._appData);
+
+                    executed(c.data, window._show);
+
                     try {
                         document.body.querySelector('#app_container').setAttribute('open', true)
                         document.body.querySelector('#app_input_pannel').removeAttribute('open')
                         document.body.querySelector('.apps').removeAttribute('open')
                     } catch (error) {
-
+                        console.log(error)
                     }
-
-                    const { category, filename } = c.appInfo;
-                    window._appData = (await get_my_app(category, filename))[0];
-
-                    createApp(window._appData);
-
-                    executed(c.data, window._show);
                 })
             }
 
