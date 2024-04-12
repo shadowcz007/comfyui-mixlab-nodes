@@ -746,7 +746,7 @@
                     data[id].inputs.noise_seed = Math.round(Math.random() * max_seed)
                 }
                 // class_type:"Seed_"
-                if (data[id].class_type == "Seed_") {
+                if (data[id].class_type == "Seed_" && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
                     data[id].inputs.seed = Math.round(Math.random() * max_seed)
                 }
                 console.log('new Seed', data[id])
