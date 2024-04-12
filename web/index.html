@@ -946,6 +946,9 @@
                 // copyImagesToClipboard(output_card.outerHTML)
             })
 
+            //是否显示复制图片，复制html两个按钮
+            let isShowImageFn = false;
+
             for (const node of outputData) {
                 // console.log('output', node)
                 if (node.class_type == "ShowTextForGPT") {
@@ -982,6 +985,7 @@
                     img.src = base64Df;
                     a.appendChild(img)
                     output_card.appendChild(a);
+                    isShowImageFn = true;
                 }
 
                 //3d 
@@ -1028,6 +1032,12 @@
                 }
 
             }
+
+            if (isShowImageFn === false) {
+                copyImage.remove();
+                copyHTML.remove();
+            }
+
             return container
         }
 
@@ -2694,7 +2704,7 @@
         // 创建app的选择菜单
         function createAppList(apps = [], innerApp = false) {
             window.prompt_ids = {};
-            if(document.body.querySelector('.apps')){
+            if (document.body.querySelector('.apps')) {
                 document.body.querySelector('.apps').remove()
             }
             let details = document.createElement('details');
