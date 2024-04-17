@@ -10,3 +10,4 @@ transformers>=4.36.0
 zhipuai
 lark-parser
 imageio-ffmpeg
+rembg[gpu]
