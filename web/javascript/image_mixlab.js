@@ -2,7 +2,7 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
-import { applyTextReplacements } from "../../scripts/utils.js";
+import { applyTextReplacements } from "../../../scripts/utils.js";
 
 
 async function uploadImage (blob, fileType = '.svg', filename) {
