@@ -576,9 +576,6 @@ async def post_prompt_result(request):
     
     return web.json_response({"result":res})
 
-
-
-
 # 扩展api接口
 # from server import PromptServer
 # from aiohttp import web
