@@ -1613,3 +1613,42 @@ app.registerExtension({
     } catch (error) {}
   }
 })
+
+
+//获取当前显存
+function fetchSystemStats () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch('/system_stats')
+      const data = await response.json()
+      resolve(data)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+//清理显存
+function postFreeData () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const postData = {
+        unload_models: true,
+        free_memory: true
+      }
+      const response = await fetch('/free', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+      })
+      if (response.ok) {
+        resolve()
+      } else {
+        reject(new Error('Request failed'))
+      }
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
