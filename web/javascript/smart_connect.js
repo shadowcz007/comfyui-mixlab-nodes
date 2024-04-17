@@ -46,6 +46,18 @@ const smart_connect_config_input = [
     node_widget_name: 'image',
     inputNodeName: 'LoadImage',
     inputNode_output_name: 'IMAGE'
+  },
+  {
+    node_type: 'TripoSRSampler_',
+    node_widget_name: 'image',
+    inputNodeName: 'LoadImagesToBatch',
+    inputNode_output_name: 'IMAGE'
+  },
+  {
+    node_type: 'TripoSRSampler_',
+    node_widget_name: 'mask',
+    inputNodeName: 'RembgNode_Mix',
+    inputNode_output_name: 'masks'
   }
 ]
 

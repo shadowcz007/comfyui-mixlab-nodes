@@ -2,6 +2,8 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
+import { applyTextReplacements } from "../../scripts/utils.js";
+
 
 async function uploadImage (blob, fileType = '.svg', filename) {
   // const blob = await (await fetch(src)).blob();
@@ -765,6 +767,20 @@ app.registerExtension({
         this.serialize_widgets = true //需要保存参数
       }
     }
+
+    if (nodeData.name === "SaveImageAndMetadata_") {
+			const onNodeCreated = nodeType.prototype.onNodeCreated;
+			// /web/extensions/core/saveImageExtraOutput.js
+			nodeType.prototype.onNodeCreated = function () {
+				const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
+				const widget = this.widgets.find((w) => w.name === "filename_prefix");
+				widget.serializeValue = () => {
+					return applyTextReplacements(app, widget.value);
+				};
+				return r;
+			};
+		}
+
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'LoadImagesToBatch') {

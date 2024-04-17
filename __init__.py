@@ -722,7 +722,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PromptGenerate_Mix":"Prompt Generate ♾️Mixlab",
     "ChinesePrompt_Mix":"Chinese Prompt ♾️Mixlab",
     "GamePal":"GamePal ♾️Mixlab",
-    "RembgNode_Mix":"Remove Background",
+    "RembgNode_Mix":"Remove Background ♾️Mixlab",
     "LoraNames_":"LoraName",
     "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting",
     "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler",
@@ -742,7 +742,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GetImageSize_":"Get Image Size",
     "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames",
     "IncrementingListNode_":"Create Incrementing Number List",
-    "LoadImagesToBatch":"Load Images To Batch"
+    "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab"
 }
 
 # web ui的节点功能
