@@ -1137,6 +1137,30 @@ app.registerExtension({
         (this.canvas.height * 0.5) / (this.ds.scale * dpr) // 考虑设备像素比
       this.setDirty(true, true)
     }
+
+    if (!window._mixlab_app_paste_listener) {
+      window._mixlab_app_paste_listener = true
+      document.addEventListener('paste', async e => {
+        // ctrl+shift+v is used to paste nodes with connections
+        // this is handled by litegraph
+        if (this.shiftDown) return
+
+        let data = e.clipboardData || window.clipboardData
+
+        // No image found. Look for node data
+        data = data.getData('text/plain')
+
+        let workflow
+        try {
+          let w = JSON.parse(data)
+          if (w.app && w.output) workflow = w.workflow
+        } catch (err) {}
+
+        if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+          await app.loadGraphData(workflow)
+        }
+      })
+    }
   },
   setup () {
     setTimeout(async () => {
@@ -1511,14 +1535,16 @@ app.registerExtension({
                 document.body.appendChild(div)
             }
           },
-          apps_opts.length>0?{
-            content: 'Workflow App ♾️Mixlab',
-            has_submenu: true,
-            disabled: false,
-            submenu: {
-              options: apps_opts
-            }
-          }:null
+          apps_opts.length > 0
+            ? {
+                content: 'Workflow App ♾️Mixlab',
+                has_submenu: true,
+                disabled: false,
+                submenu: {
+                  options: apps_opts
+                }
+              }
+            : null
         )
 
         return options
