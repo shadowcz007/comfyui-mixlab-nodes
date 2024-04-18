@@ -2,8 +2,7 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
-import { applyTextReplacements } from "../../../scripts/utils.js";
-
+import { applyTextReplacements } from '../../../scripts/utils.js'
 
 async function uploadImage (blob, fileType = '.svg', filename) {
   // const blob = await (await fetch(src)).blob();
@@ -768,19 +767,46 @@ app.registerExtension({
       }
     }
 
-    if (nodeData.name === "SaveImageAndMetadata_") {
-			const onNodeCreated = nodeType.prototype.onNodeCreated;
-			// /web/extensions/core/saveImageExtraOutput.js
-			nodeType.prototype.onNodeCreated = function () {
-				const r = onNodeCreated ? onNodeCreated.apply(this, arguments) : undefined;
-				const widget = this.widgets.find((w) => w.name === "filename_prefix");
-				widget.serializeValue = () => {
-					return applyTextReplacements(app, widget.value);
-				};
-				return r;
-			};
-		}
+    if (nodeData.name === 'SaveImageAndMetadata_') {
+      const onNodeCreated = nodeType.prototype.onNodeCreated
+      // /web/extensions/core/saveImageExtraOutput.js
+      nodeType.prototype.onNodeCreated = function () {
+        const r = onNodeCreated
+          ? onNodeCreated.apply(this, arguments)
+          : undefined
+        const widget = this.widgets.find(w => w.name === 'filename_prefix')
+        widget.serializeValue = () => {
+          return applyTextReplacements(app, widget.value)
+        }
 
+        //base64
+        // const bWidget = this.widgets.find(w => w.name === 'base64_data')
+        // console.log('bWidget', bWidget)
+        this.widgets = this.widgets.filter(w => w.name !== 'base64_data')
+
+        const bWidget = {
+          value: {
+            base64: []
+          },
+          name: 'base64_data'
+        }
+
+        this.addCustomWidget(bWidget)
+
+        return r
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('##onExecuted', this, message)
+        //TODO 是否 保存base64
+        if (message.base64) {
+          if (Array.isArray(message.base64)) {
+          }
+        }
+      }
+    }
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'LoadImagesToBatch') {
