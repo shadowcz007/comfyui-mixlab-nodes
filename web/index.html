@@ -278,8 +278,11 @@
         }
 
         button:hover {
-            border-color: yellow !important;
-            color: yellow !important;
+            /* border-color: yellow !important; */
+            color: #ffffff !important;
+            /* font-weight: 400; */
+            background: #232222;
+            cursor: pointer;
         }
 
         .disabled {
@@ -972,17 +975,18 @@
                     "PromptImage",
                     "Image Save",
                     "SaveImageAndMetadata_"].includes(node.class_type)) {
-
+                    console.log('output#image', node)
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
                     a.setAttribute('data-pswp-width', "200");
                     a.setAttribute('data-pswp-height', "200");
                     a.setAttribute('target', "_blank");
                     a.setAttribute('href', base64Df);
+                    a.setAttribute('title', node.title);
 
                     let img = new Image();
                     // img;
-                    img.src = base64Df;
+                    img.src = window._appData?.icon || base64Df;
                     a.appendChild(img)
                     output_card.appendChild(a);
                     isShowImageFn = true;
