@@ -1,6 +1,6 @@
 import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
-import { ComfyWidgets } from '../../../scripts/widgets.js'
+// import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 import { applyTextReplacements } from '../../../scripts/utils.js'
 
@@ -778,7 +778,7 @@ app.registerExtension({
         widget.serializeValue = () => {
           return applyTextReplacements(app, widget.value)
         }
- 
+
         return r
       }
 
