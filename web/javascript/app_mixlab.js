@@ -2,6 +2,24 @@ import { app } from '../../../scripts/app.js'
 import { $el } from '../../../scripts/ui.js'
 import { api } from '../../../scripts/api.js'
 
+//本机安装的插件节点全集
+window._nodesAll = null
+
+//获取当前系统的插件，节点清单
+function getObjectInfo () {
+  return new Promise(async (resolve, reject) => {
+    let url = getUrl()
+
+    try {
+      const response = await fetch(`${url}/object_info`)
+      const data = await response.json()
+      resolve(data)
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
 const base64Df =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
@@ -267,7 +285,10 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
 }
 
 async function save (json, download = false, showInfo = true) {
-  console.log('####SAVE', json[0])
+  let nodesAll = window._nodesAll || (await getObjectInfo())
+
+  console.log('####SAVE', nodesAll, json[0])
+
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
@@ -287,6 +308,13 @@ async function save (json, download = false, showInfo = true) {
 
   try {
     let data = await app.graphToPrompt()
+
+    //从output数据里把工作流的节点，插件数据统计出来
+    data.nodesMap = {}
+    for (const id in data.output) {
+      data.nodesMap[data.output[id].class_type] =
+        nodesAll[data.output[id].class_type]
+    }
 
     let { input, output, seed, seedTitle } = await extractInputAndOutputData(
       data,
@@ -379,6 +407,11 @@ function getInputsAndOutputs () {
 
 app.registerExtension({
   name: 'Mixlab.utils.AppInfo',
+  init () {
+    if (!window._nodesAll) {
+      getObjectInfo().then(r => (window._nodesAll = r))
+    }
+  },
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'AppInfo') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
