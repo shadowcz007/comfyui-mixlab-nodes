@@ -87,6 +87,18 @@ const smart_connect_config_output = [
     outputNode_input_name: 'images'
   },
   {
+    node_type: 'VAEDecode',
+    node_output_name: 'IMAGE',
+    outputNodeName: 'AppInfo',
+    outputNode_input_name: 'IMAGE'
+  },
+  {
+    node_type: 'VAEDecode',
+    node_output_name: 'IMAGE',
+    outputNodeName: 'SaveImageAndMetadata_',
+    outputNode_input_name: 'images'
+  },
+  {
     node_type: 'Moondream',
     node_output_name: 'STRING',
     outputNodeName: 'ShowTextForGPT',
@@ -193,7 +205,10 @@ export function smart_init () {
       ]
       let node_slotType = config[0]
       // 如果input没有，则创建
-      if (!node.inputs?.filter(inp => inp.name === widget.name)[0]||!node.inputs)
+      if (
+        !node.inputs?.filter(inp => inp.name === widget.name)[0] ||
+        !node.inputs
+      )
         convertToInput(node, widget, config)
       input_node.connectByType(inputNode_slot, node, node_slotType)
     }
