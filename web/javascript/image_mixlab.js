@@ -778,21 +778,7 @@ app.registerExtension({
         widget.serializeValue = () => {
           return applyTextReplacements(app, widget.value)
         }
-
-        //base64
-        // const bWidget = this.widgets.find(w => w.name === 'base64_data')
-        // console.log('bWidget', bWidget)
-        this.widgets = this.widgets.filter(w => w.name !== 'base64_data')
-
-        const bWidget = {
-          value: {
-            base64: []
-          },
-          name: 'base64_data'
-        }
-
-        this.addCustomWidget(bWidget)
-
+ 
         return r
       }
 
