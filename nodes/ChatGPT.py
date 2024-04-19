@@ -4,8 +4,17 @@ import urllib.error
 import re,json,os,string,random
 import folder_paths
 import hashlib
-import codecs
-from zhipuai import ZhipuAI
+import codecs,sys
+import importlib.util
+
+
+def is_installed(package):
+    try:
+        spec = importlib.util.find_spec(package)
+    except ModuleNotFoundError:
+        return False
+    return spec is not None
+
 
 def get_unique_hash(string):
     hash_object = hashlib.sha1(string.encode())
@@ -48,12 +57,34 @@ def openai_client(key,url):
     base_url=url
     )
     return client
+
 def ZhipuAI_client(key):
+
+    try:
+        if is_installed('zhipuai')==False:
+            import subprocess
+
+            # 安装
+            print('#pip install zhipuai')
+
+            result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'zhipuai'], capture_output=True, text=True)
+
+            #检查命令执行结果
+            if result.returncode == 0:
+                print("#install success")
+                from zhipuai import ZhipuAI
+            else:
+                print("#install error")
+            
+        else:
+            from zhipuai import ZhipuAI
+    except:
+        print("#install zhipuai error")
+
     client = ZhipuAI(
         api_key=key, # 填写您的 APIKey
     ) 
     return client
-
 
 
 def chat(client, model_name,messages ):

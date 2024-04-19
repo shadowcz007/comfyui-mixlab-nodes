@@ -7,7 +7,6 @@ openai
 simple-lama-inpainting
 clip-interrogator==0.6.0
 transformers>=4.36.0
-zhipuai
 lark-parser
 imageio-ffmpeg
 rembg[gpu]
