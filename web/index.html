@@ -974,7 +974,8 @@
                     "PreviewImage",
                     "PromptImage",
                     "Image Save",
-                    "SaveImageAndMetadata_"].includes(node.class_type)) {
+                    "SaveImageAndMetadata_",
+                    "TransparentImage"].includes(node.class_type)) {
                     console.log('output#image', node)
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
