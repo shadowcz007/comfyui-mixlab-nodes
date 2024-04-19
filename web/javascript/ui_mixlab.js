@@ -1138,8 +1138,22 @@ app.registerExtension({
       this.setDirty(true, true)
     }
 
+    // 支持app模式的json
+    const loadAppJson = async data => {
+      let workflow
+      try {
+        let w = JSON.parse(data)
+        if (w.app && w.output) workflow = w.workflow
+      } catch (err) {}
+
+      if (workflow && workflow.version && workflow.nodes && workflow.extra) {
+        await app.loadGraphData(workflow)
+      }
+    }
+
     if (!window._mixlab_app_paste_listener) {
       window._mixlab_app_paste_listener = true
+      //粘贴json的事件
       document.addEventListener('paste', async e => {
         // ctrl+shift+v is used to paste nodes with connections
         // this is handled by litegraph
@@ -1150,14 +1164,27 @@ app.registerExtension({
         // No image found. Look for node data
         data = data.getData('text/plain')
 
-        let workflow
-        try {
-          let w = JSON.parse(data)
-          if (w.app && w.output) workflow = w.workflow
-        } catch (err) {}
+        loadAppJson(data)
+      })
 
-        if (workflow && workflow.version && workflow.nodes && workflow.extra) {
-          await app.loadGraphData(workflow)
+      // 把json往里 拖
+      document.addEventListener('drop', async event => {
+        event.preventDefault()
+        event.stopPropagation()
+
+       
+
+        // Dragging from Chrome->Firefox there is a file but its a bmp, so ignore that
+        if (
+          event.dataTransfer.files.length &&
+          event.dataTransfer.files[0].type == 'application/json'
+        ) {
+          const reader = new FileReader()
+          reader.onload = async () => {
+       
+            loadAppJson(reader.result)
+          }
+          reader.readAsText(event.dataTransfer.files[0])
         }
       })
     }
@@ -1613,7 +1640,6 @@ app.registerExtension({
     } catch (error) {}
   }
 })
-
 
 //获取当前显存
 function fetchSystemStats () {
