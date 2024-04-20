@@ -299,15 +299,16 @@ async function get_my_app (filename = null, category = '') {
     data = []
 
     for (const res of result.data) {
-      let { app, workflow } = res.data
-      if (app.filename)
-        data.push({
+      let { app, workflow } = res.data;
+      if (app?.filename) data.push({
           ...app,
           data: workflow,
           date: res.date
         })
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
   return data
 }
 
@@ -1196,6 +1197,8 @@ app.registerExtension({
 
       const apps = await get_my_app()
       if (!apps) return
+
+      console.log('apps',apps)
 
       let apps_map = { 0: [] }
 
