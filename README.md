@@ -17,7 +17,9 @@
 - 支持多个web app 切换
 - 发布为app的workflow，可以在右键里再次编辑了
 - web app可以设置分类，在comfyui右键菜单可以编辑更新web app
+- 支持动态提示
 
+![](./assets/微信图片_20240421205440.png)
 
 - Support multiple web app switching.
 - Add the AppInfo node, which allows you to transform the workflow into a web app by simple configuration.

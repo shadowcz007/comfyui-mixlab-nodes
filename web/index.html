@@ -403,6 +403,46 @@
         .hidden-caption-content {
             display: none;
         }
+
+         /* 定义滚动条轨道的背景颜色 */
+
+         ::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            /* 轨道背景颜色 */
+        }
+
+        /* 定义滚动条滑块的颜色 */
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #888;
+            /* 滑块颜色 */
+            border-radius: 4px;
+            /* 滑块圆角 */
+        }
+
+        /* 鼠标悬停时滚动条滑块的颜色 */
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+            /* 悬停时滑块颜色 */
+        }
+
+        /* 定义滚动条角落的颜色 */
+
+        ::-webkit-scrollbar-corner {
+            background-color: transparent;
+            /* 角落颜色 */
+        }
+
+
+        .dynamic_prompt::after {
+            content: attr(title);
+            position: absolute; 
+            color: black;
+            padding: 4px;
+            padding-left: 25px;
+            border-radius: 4px;
+        }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
@@ -443,8 +483,39 @@
     <script type="module">
         import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
         // console.log(Lightbox)
-
         import { api } from "../../../scripts/api.js";
+
+
+        // ComfyUI\web\extensions\core\dynamicPrompts.js
+        // 官方实现修改
+        // Allows for simple dynamic prompt replacement
+        // Inputs in the format {a|b} will have a random value of a or b chosen when the prompt is queued.
+
+        /*
+         * Strips C-style line and block comments from a string
+         */
+        function stripComments(str) {
+            return str.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
+        }
+
+        function dynamicPrompts(prompt) {
+            prompt = stripComments(prompt);
+            while (prompt.replace("\\{", "").includes("{") && prompt.replace("\\}", "").includes("}")) {
+                const startIndex = prompt.replace("\\{", "00").indexOf("{");
+                const endIndex = prompt.replace("\\}", "00").indexOf("}");
+
+                const optionsString = prompt.substring(startIndex + 1, endIndex);
+                const options = optionsString.split("|");
+
+                const randomIndex = Math.floor(Math.random() * options.length);
+                const randomOption = options[randomIndex];
+
+                prompt = prompt.substring(0, startIndex) + randomOption + prompt.substring(endIndex + 1);
+            }
+            return prompt
+        }
+
+
         // console.log('api', api)
         const base64Df =
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
@@ -773,6 +844,21 @@
             }
             // 随机seed
             promptWorkflow = randomSeed(seed, promptWorkflow);
+
+            // //动态提示,改为输入的时候，手动触发
+            // for (const id in promptWorkflow) {
+            //     let node = promptWorkflow[id]
+            //     if (["TextInput_", "CLIPTextEncode", "PromptSimplification", "ChinesePrompt_Mix"].includes(
+            //         node.class_type
+            //     )) {
+            //         if (node.class_type == "PromptSimplification") {
+            //             promptWorkflow[id].inputs.prompt = dynamicPrompts(node.inputs.prompt);
+            //         } else {
+            //             promptWorkflow[id].inputs.text = dynamicPrompts(node.inputs.text);
+            //         }
+            //         console.log('#动态提示', promptWorkflow[id].inputs)
+            //     }
+            // }
 
             let url = get_url()
             const data = JSON.stringify({ prompt: promptWorkflow, client_id });
@@ -1537,7 +1623,7 @@
                         textInput.value = data.inputs.prompt;
                     } else {
                         textInput.value = data.inputs.text;
-                    }
+                    };
 
                     // uploadImageInput.type = "text";
                     let json = localStorage.getItem(`t_${data.id}`)
@@ -1553,13 +1639,33 @@
                             window._appData.data[data.id].inputs.text = textInput.value;
                         }
 
-
                     } catch (error) {
 
                     }
 
                     uploadContainer.appendChild(textInput);
                     // autoResize(textInput);
+
+
+                    //动态提示功能
+                    const dynamicPromptsBtn = document.createElement('button');
+                    dynamicPromptsBtn.className = "dynamic_prompt"
+                    dynamicPromptsBtn.innerText = 'dynamic';
+                    dynamicPromptsBtn.style.width = '88px'
+                    uploadContainer.appendChild(dynamicPromptsBtn);
+                    dynamicPromptsBtn.addEventListener('click', e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let prompt = dynamicPrompts(textInput.value)
+                        textInput.setAttribute('title', prompt)
+                        dynamicPromptsBtn.setAttribute('title', prompt)
+                        if (data.class_type == "PromptSimplification") {
+                            window._appData.data[data.id].inputs.prompt = prompt;
+                        } else {
+                            window._appData.data[data.id].inputs.text = prompt;
+                        }
+                    })
+
 
                     function autoResize(textarea) {
                         textarea.style.height = 'auto';
