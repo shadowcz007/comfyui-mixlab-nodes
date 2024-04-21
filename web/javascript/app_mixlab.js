@@ -378,11 +378,11 @@ async function save (json, download = false, showInfo = true) {
 
 function getInputsAndOutputs () {
   const inputs =
-      `LoadImage ImagesPrompt_ VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
+      `LoadImage LoadImagesToBatch ImagesPrompt_ VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
         ' '
       ),
     outputs =
-      `PreviewImage,SaveImage,ShowTextForGPT,VHS_VideoCombine,Image Save,SaveImageAndMetadata_`.split(
+      `SaveTripoSRMesh,PreviewImage,SaveImage,TransparentImage,ShowTextForGPT,VHS_VideoCombine,VideoCombine_Adv,Image Save,SaveImageAndMetadata_,ClipInterrogator`.split(
         ','
       )
 
