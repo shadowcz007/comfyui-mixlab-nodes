@@ -1810,21 +1810,20 @@ def createMask(image,x,y,w,h):
     # mask.save("mask.png")
     return mask
 
-
 def splitImage(image, num):
     width, height = image.size
 
     num_rows = int(num ** 0.5)
     num_cols = int(num / num_rows)
     
-    grid_width = width // num_cols
-    grid_height = height // num_rows
+    grid_width = int(width // num_cols)
+    grid_height = int(height // num_rows)
 
     grid_coordinates = []
     for i in range(num_rows):
         for j in range(num_cols):
-            x = j * grid_width
-            y = i * grid_height
+            x = int(j * grid_width)
+            y = int(i * grid_height)
             grid_coordinates.append((x, y, grid_width, grid_height))
 
     return grid_coordinates
