@@ -596,7 +596,7 @@ from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
 from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
-from .nodes.Mask import MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
+from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
@@ -685,7 +685,8 @@ NODE_CLASS_MAPPINGS = {
     "MaskListReplace_":MaskListReplace,
     "ImageListReplace_":ImageListReplace,
     "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames,
-    "IncrementingListNode_":IncrementingListNode
+    "IncrementingListNode_":IncrementingListNode,
+    "PreviewMask_":PreviewMask_
     # "GamePal":GamePal
 }
 
@@ -739,7 +740,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "GetImageSize_":"Get Image Size ♾️Mixlab",
     "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames ♾️Mixlab",
     "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
-    "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab"
+    "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
+    "PreviewMask_":"Preview Mask"
 }
 
 # web ui的节点功能

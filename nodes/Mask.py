@@ -2,16 +2,14 @@
 import scipy.ndimage
 import torch
 
-from nodes import MAX_RESOLUTION
-
 import numpy as np 
 # from PIL import Image, ImageDraw
 from PIL import Image, ImageOps 
 
 from comfy.cli_args import args
-import cv2
-
-
+import cv2,os
+from nodes import MAX_RESOLUTION, SaveImage, common_ksampler
+import folder_paths,random
 
 # Tensor to PIL
 def tensor2pil(image):
@@ -70,6 +68,35 @@ def combine(destination, source, x, y):
     output = torch.clamp(output, 0.0, 1.0)
 
     return output
+
+
+class PreviewMask_(SaveImage):
+    def __init__(self):
+        self.output_dir = folder_paths.get_temp_directory()
+        self.type = "temp"
+        self.prefix_append =''.join(random.choice("abcdehijklmnopqrstupvxyzfg") for x in range(5))
+        self.compress_level = 4
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+                "required": {
+                                "mask": ("MASK",), 
+                            }
+            }
+    
+    RETURN_TYPES = ()
+    OUTPUT_NODE = True
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Mask"
+
+    # 运行的函数
+    def run(self, mask ):
+        img=tensor2pil(mask)
+        img=img.convert('RGB')
+        img=pil2tensor(img) 
+        return self.save_images(img, 'temp_', None,  None)
+
 
 class OutlineMask:
 
