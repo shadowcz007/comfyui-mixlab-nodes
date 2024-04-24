@@ -682,6 +682,18 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option)
     nw, nh = layer_image.size
     mask = mask.resize((nw, nh))
 
+    # 分离出a通道
+    r, g, b, alpha = layer_image.split()
+    alpha = ImageOps.invert(alpha)
+    # 创建一个新的RGB图像
+    new_rgb_image = Image.new("RGB", layer_image.size)
+    # 将透明通道粘贴到新的RGB图像上
+    new_rgb_image.paste(layer_image, (0, 0), mask=alpha)
+   
+    new_rgb_image.paste(layer_image, (x, y), mask=mask)
+    mask=new_rgb_image.convert('L')
+    mask = ImageOps.invert(mask)
+
     # 在底图上粘贴图层
     bg_image.paste(layer_image, (x, y), mask=mask)
 
@@ -1753,7 +1765,7 @@ class NewLayer:
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
                 "scale_option": (["width","height",'overall'],),
-                "image": ("IMAGE",),
+                "image": (any_type,),
             },
              "optional":{
                     "mask": ("MASK",{"default": None}),
@@ -2338,6 +2350,8 @@ class MergeLayers:
                     
                     layer_image=tensor2pil(image)
                     layer_mask=tensor2pil(mask)
+                    # t=layer_image.convert("RGBA")
+                    # t.save('test.png') 如果layerimage传入的是rgba，则是透明的
                     bg_image=merge_images(bg_image,
                                         layer_image,
                                         layer_mask,
