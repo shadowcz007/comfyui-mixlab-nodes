@@ -3,7 +3,7 @@ import { app } from '../../../scripts/app.js'
 const repoOwner = 'shadowcz007' // 替换为仓库的所有者
 const repoName = 'comfyui-mixlab-nodes' // 替换为仓库的名称
 
-const version = 'v0.22.0'
+const version = 'v0.22.1'
 
 fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`)
   .then(response => response.json())
@@ -17,7 +17,13 @@ fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/releases/latest`)
       return
     if (latestVersion && latestVersion != version) {
       localStorage.setItem('_mixlab_nodes_vesion', latestVersion)
-      app.ui.dialog.show(`<h4 style="font-size: 18px;">${repoName} <br>
+      app.ui.dialog.show(`<a style="color: white;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }"
+    href="https://discord.gg/cXs9vZSqeK">Welcome to Mixlab nodes discord</a>
+    <h4 style="font-size: 18px;">${repoName} <br>
       Latest release version: ${latestVersion}</h4>
       <p>Please proceed to the official repository to download the latest version.</p>
       <a style="color: #2196F3;
