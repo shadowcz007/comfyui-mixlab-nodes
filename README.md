@@ -3,13 +3,15 @@
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
 #### 
+[comfyui-sd-prompt-mixlab](https://github.com/shadowcz007/comfyui-sd-prompt-mixlab)
+
 [comfyui-Image-reward](https://github.com/shadowcz007/comfyui-Image-reward)
 
 [comfyui-ultralytics-yolo](https://github.com/shadowcz007/comfyui-ultralytics-yolo)
 
 [comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
 
-[comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg)
+<!-- [comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg) -->
 
 
 ## 🚀🚗🚚🏃 Workflow-to-APP 
