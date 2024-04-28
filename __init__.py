@@ -263,7 +263,7 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                 print("发生异常：", str(e))
     else:
         app_workflow_path=os.path.join(category_path, filename)
-        # print('app_workflow_path: ',app_workflow_path)
+        print('app_workflow_path: ',app_workflow_path)
         try:
             with open(app_workflow_path) as json_file:
                 apps = [{
@@ -273,7 +273,8 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
         except Exception as e:
             print("发生异常：", str(e))
         
-        if len(apps)==1 and category!='' and category!=None:
+        # 这个代码不需要
+        # if len(apps)==1 and category!='' and category!=None:
             data=read_workflow_json_files(category_path)
             
             for item in data:
@@ -602,6 +603,8 @@ from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,
 
 from .nodes.Video import VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames
 
+from .nodes.TripoSR import LoadTripoSRModel,TripoSRSampler,SaveTripoSRMesh
+
 
 # 要导出的所有节点及其名称的字典
 # 注意：名称应全局唯一
@@ -686,7 +689,10 @@ NODE_CLASS_MAPPINGS = {
     "ImageListReplace_":ImageListReplace,
     "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames,
     "IncrementingListNode_":IncrementingListNode,
-    "PreviewMask_":PreviewMask_
+    "PreviewMask_":PreviewMask_,
+     "LoadTripoSRModel_": LoadTripoSRModel,
+    "TripoSRSampler_": TripoSRSampler,
+    "SaveTripoSRMesh": SaveTripoSRMesh
     # "GamePal":GamePal
 }
 
@@ -741,7 +747,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VAEEncodeForInpaint_Frames":"VAE Encode For Inpaint Frames ♾️Mixlab",
     "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
     "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
-    "PreviewMask_":"Preview Mask"
+    "PreviewMask_":"Preview Mask",
+    "LoadTripoSRModel_": "Load TripoSR Model",
+    "TripoSRSampler_": "TripoSR Sampler",
+    "SaveTripoSRMesh": "Save TripoSR Mesh"
 }
 
 # web ui的节点功能
