@@ -414,11 +414,25 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         runner = web.AppRunner(self.app, access_log=None)
         await runner.setup()
 
-        if not await check_port_available(address, port):
-            raise RuntimeError(f"Port {port} is already in use.")
+        # if not await check_port_available(address, port):
+        #     raise RuntimeError(f"Port {port} is already in use.")
+        
+        http_success = False
+        http_port=port
+        for i in range(11):  # 尝试最多11次
+            if await check_port_available(address, port + i):
+                http_port = port + i
+                site = web.TCPSite(runner, address, http_port)
+                await site.start()
+                http_success = True
+                break
 
-        site = web.TCPSite(runner, address, port)
-        await site.start()
+        if not http_success:
+            raise RuntimeError(f"Ports {port} to {port + 10} are all in use.")
+        
+
+        # site = web.TCPSite(runner, address, port)
+        # await site.start()
 
         import ssl
         crt, key = create_for_https()
@@ -426,22 +440,22 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         ssl_context.load_cert_chain(crt, key)
 
         success = False
-        for i in range(10):  # 尝试最多10次
-            if await check_port_available(address, port + 1 + i):
-                https_port = port + 1 + i
+        for i in range(11):  # 尝试最多11次
+            if await check_port_available(address, http_port + 1 + i):
+                https_port = http_port + 1 + i
                 site2 = web.TCPSite(runner, address, https_port, ssl_context=ssl_context)
                 await site2.start()
                 success = True
                 break
 
         if not success:
-            raise RuntimeError(f"Ports {port + 1} to {port + 10} are all in use.")
+            raise RuntimeError(f"Ports {http_port + 1} to {http_port + 10} are all in use.")
 
         if address == '':
             address = '0.0.0.0'
         if verbose:
             print("\033[93mStarting server\n")
-            print("\033[93mTo see the GUI go to: http://{}:{}".format(address, port))
+            print("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
             print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
         if call_on_start is not None:
             call_on_start(address, port)
@@ -454,6 +468,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         #     address = '127.0.0.1'
         # webbrowser.open(f"https://{address}")
         # webbrowser.open(f"http://{address}:{port}")
+
 
 
 PromptServer.start=new_start
