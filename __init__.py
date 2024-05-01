@@ -452,11 +452,17 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             raise RuntimeError(f"Ports {http_port + 1} to {http_port + 10} are all in use.")
 
         if address == '':
-            address = '0.0.0.0'
+            address = '127.0.0.1'
         if verbose:
             print("\033[93mStarting server\n")
             print("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
             print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
+            
+            with open('server.json', 'w') as file:
+                json.dump({
+                    "http":"http://{}:{}".format(address, http_port),
+                    "https":"https://{}:{}".format(address, https_port)
+                }, file)
         if call_on_start is not None:
             call_on_start(address, port)
 
