@@ -11,6 +11,7 @@ import logging
 from comfy.cli_args import args
 python = sys.executable
 
+from .nodes.ChatGPT import get_llama_models,get_llama_model_path
 
 from server import PromptServer
 
@@ -43,7 +44,7 @@ def is_installed(package, package_overwrite=None):
             print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
     else:
         print(package+'## OK')
-        
+     
 try:
     import OpenSSL
 except ImportError:
@@ -494,8 +495,6 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         # webbrowser.open(f"https://{address}")
         # webbrowser.open(f"http://{address}:{port}")
 
-
-
 PromptServer.start=new_start
 
 # 创建路由表
@@ -590,13 +589,19 @@ async def nodes_map_hander(request):
 async def get_checkpoints(request):
     data = await request.json()
     t="checkpoints"
+    names=[]
     try:
         t=data['type']
+        names = folder_paths.get_filename_list(t)
     except Exception as e:
         print('/mixlab/folder_paths',False,e)
-    
-    names = folder_paths.get_filename_list(t)
 
+    try:
+        if data['type']=='llamafile':
+            names=get_llama_models()
+    except:
+        print("llamafile none")
+    
     return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
 
 
@@ -617,15 +622,52 @@ async def post_prompt_result(request):
     
     return web.json_response({"result":res})
 
-# 扩展api接口
-# from server import PromptServer
-# from aiohttp import web
 
-# @routes.post('/ws_image')
-# async def my_hander_method(request):
-#     post = await request.post()
-#     x = post.get("something")
-#     return web.json_response({})
+# llam服务的开启
+
+
+@routes.post('/mixlab/start_llama')
+async def my_hander_method(request):
+    data = await request.json()
+
+    import threading
+    import uvicorn
+    from llama_cpp.server.app import create_app
+    from llama_cpp.server.settings import (
+                Settings,
+                ServerSettings,
+                ModelSettings,
+                ConfigFileSettings,
+            )
+    model=get_llama_model_path(data['model'])
+    port=9090
+    server_settings=ServerSettings(host="127.0.0.1",port=port)
+
+    app = create_app(
+                server_settings=server_settings,
+                model_settings=[ModelSettings(model=model)],
+            )
+
+    def run_uvicorn():
+        uvicorn.run(
+                app,
+                host=os.getenv("HOST", server_settings.host),
+                port=int(os.getenv("PORT", server_settings.port)),
+                ssl_keyfile=server_settings.ssl_keyfile,
+                ssl_certfile=server_settings.ssl_certfile,
+            )
+
+    # 创建一个子线程
+    thread = threading.Thread(target=run_uvicorn)
+
+    # 启动子线程
+    thread.start()
+
+    return web.json_response({"port":port,"model":model})
+
+
+
+
 
 
 # 导入节点
