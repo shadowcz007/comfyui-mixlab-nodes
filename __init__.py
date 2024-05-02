@@ -753,7 +753,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
     "ScreenShare":"Screen Share ♾️Mixlab",
     "FloatingVideo":"FloatingVideo ♾️Mixlab",
-    "ChatGPTOpenAI":"ChatGPT ♾️Mixlab",
+    "ChatGPTOpenAI":"ChatGPT & Local LLM ♾️Mixlab",
     "ShowTextForGPT":"Show Text ♾️MixlabApp",
     "MergeLayers":"Merge Layers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
