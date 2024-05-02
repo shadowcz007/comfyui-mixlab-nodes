@@ -13,6 +13,18 @@
 
 <!-- [comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg) -->
 
+#### 
+最新：ChatGPT节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
+
+Model download,move to :```models/llamafile/```
+
+强烈推荐：[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)
+
+备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
+
+
+
+
 
 ## 🚀🚗🚚🏃 Workflow-to-APP 
 - 新增AppInfo节点，可以通过简单的配置，把workflow转变为一个Web APP。
@@ -79,11 +91,21 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 [Voice + Real-time Face Swap Workflow](./workflow/语音+实时换脸workflow.json)
 
 ### GPT
-> Support for calling multiple GPTs.ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 .  Azure OpenAI:https://xxxx.openai.azure.com 
+> Support for calling multiple GPTs.Local LLM（llama.cpp）、 ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 .  Azure OpenAI:https://xxxx.openai.azure.com 
 
 ![gpt-workflow.svg](./assets/gpt-workflow.svg)
 
 [workflow-5](./workflow/5-gpt-workflow.json)
+
+
+最新：ChatGPT节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
+
+Model download,move to :```models/llamafile/```
+
+强烈推荐：[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)
+
+备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
+
 
 
 ## Prompt
