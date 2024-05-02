@@ -9,6 +9,15 @@ import {
 
 import { smart_init, addSmartMenu } from './smart_connect.js'
 
+import { completion_ } from './chat.js'
+
+//系统prompt
+const systemPrompt = `You are a prompt creator, your task is to create prompts for the user input request, the prompts are image descriptions that include keywords for (an adjective, type of image, framing/composition, subject, subject appearance/action, environment, lighting situation, details of the shoot/illustration, visuals aesthetics and artists), brake keywords by comas, provide high quality, non-verboose, coherent, brief, concise, and not superfluous prompts, the subject from the input request must be included verbatim on the prompt,the prompt is english`
+
+if (!localStorage.getItem('_mixlab_system_prompt')) {
+  localStorage.setItem('_mixlab_system_prompt', systemPrompt)
+}
+
 // 获取llama 模型
 async function get_llamafile_models () {
   try {
@@ -43,13 +52,45 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
     })
 
     const data = await response.json()
-    return `http://127.0.0.1:${data.port}`
+    return { url: `http://127.0.0.1:${data.port}`, model: data.model }
   } catch (error) {
     console.error(error)
   }
 }
 
+// 菜单入口
+async function createMenu () {
+  const menu = document.querySelector('.comfy-menu')
+  const separator = document.createElement('div')
+  separator.style = `margin: 20px 0px;
+  width: 100%;
+  height: 1px;
+  background: var(--border-color);
+  `
+  menu.append(separator)
 
+  if (!menu.querySelector('#mixlab_chatbot_by_llamacpp')) {
+    const appsButton = document.createElement('button')
+    appsButton.id = 'mixlab_chatbot_by_llamacpp'
+    appsButton.textContent = 'llamacpp♾️Mixlab'
+
+    // appsButton.onclick = () =>
+    appsButton.onclick = async () => {
+      if (window._mixlab_llamacpp) {
+        //显示运行的模型
+        createModelsModal([
+          window._mixlab_llamacpp.url,
+          window._mixlab_llamacpp.model
+        ])
+      } else {
+        let ms = await get_llamafile_models()
+        ms = ms.filter(m => !m.match('-mmproj-'))
+        if (ms.length > 0) createModelsModal(ms)
+      }
+    }
+    menu.append(appsButton)
+  }
+}
 
 let isScriptLoaded = {}
 
@@ -387,6 +428,33 @@ injectCSS(`::-webkit-scrollbar {
   width: 2px;
 }
 
+#mixlab_chatbot_by_llamacpp{
+  font-size:14px
+}
+
+#mixlab_chatbot_by_llamacpp::before {
+  content: attr(title);
+  position: absolute;
+  margin-top: 24px;
+  font-size: 10px;
+}
+
+.mix_tag{
+  padding:8px;cursor: pointer;font-size: 14px;
+    color: var(--input-text);
+    background-color: var(--comfy-input-bg);
+    border-radius: 8px;
+    border-color: var(--border-color);
+    border-style: solid;
+    margin-top: 2px;
+    margin-bottom: 14px;
+}
+
+.mix_tag:hover{
+  background-color: #101c19;
+  color: aquamarine;
+}
+
 @keyframes loading_mixlab {
   0% {
     background-color: green;
@@ -629,13 +697,160 @@ async function fetchReadmeContent (url) {
   }
 }
 
+function createModelsModal (models) {
+  var div =
+    document.querySelector('#model-modal') || document.createElement('div')
+  div.id = 'model-modal'
+  div.innerHTML = ''
+  div.style.cssText = `
+    width: 100%;
+    z-index: 9990;
+    height: 100vh;
+    display: flex;
+    color: var(--descrip-text);
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #000000a8;
+    `
+
+  var modal = document.createElement('div')
+
+  div.addEventListener('click', e => {
+    e.stopPropagation()
+    div.remove()
+  })
+
+  div.appendChild(modal)
+  modal.classList.add('modal-body')
+  // Set modal styles
+  modal.style.cssText = `
+  color: var(--descrip-text);
+    background-color: var(--comfy-menu-bg);
+    position: fixed;
+    overflow:hidden;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    border-radius: 4px;
+    box-shadow: 4px 4px 14px rgba(255,255,255,0.2);
+  `
+
+  // Create modal header
+  const headerElement = document.createElement('div')
+  headerElement.classList.add('modal-header')
+  headerElement.style.cssText = `
+      display: flex;
+      padding: 20px 24px 8px 24px;
+      justify-content: space-between;
+    `
+
+  const headTitleElement = document.createElement('a')
+  headTitleElement.classList.add('header-title')
+  headTitleElement.style.cssText = `
+      color: var(--descrip-text);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      flex: 1;
+      overflow: hidden;
+      text-decoration: none;
+      font-weight: bold;
+      justify-content: space-between;
+      padding: 20px;
+      cursor: pointer;
+      user-select: none;
+    `
+
+  headTitleElement.textContent = 'Models'
+  // headTitleElement.href = 'https://github.com/shadowcz007/comfyui-mixlab-nodes'
+  // headTitleElement.target = '_blank'
+  const linkIcon = document.createElement('small')
+  linkIcon.textContent = '自动开启'
+  linkIcon.style.padding = '4px'
+
+  headTitleElement.appendChild(linkIcon)
+  headerElement.appendChild(headTitleElement)
+  if (localStorage.getItem('_mixlab_auto_llama_open')) {
+    linkIcon.style.backgroundColor = '#66ff6c'
+    linkIcon.style.color = 'black'
+  }
+  linkIcon.addEventListener('click', e => {
+    e.stopPropagation()
+    if (localStorage.getItem('_mixlab_auto_llama_open')) {
+      localStorage.setItem('_mixlab_auto_llama_open', '')
+      linkIcon.style.backgroundColor = ''
+      linkIcon.style.color = 'var(--descrip-text)'
+    } else {
+      localStorage.setItem('_mixlab_auto_llama_open', 'true')
+      linkIcon.style.backgroundColor = '#66ff6c'
+      linkIcon.style.color = 'black'
+    }
+  })
+
+  modal.appendChild(headTitleElement)
+
+  // Create modal content area
+  var modalContent = document.createElement('div')
+  modalContent.classList.add('modal-content')
+
+  var input = document.createElement('textarea')
+  input.className = 'comfy-multiline-input'
+  input.style = `    height: 260px;
+  width: 480px;
+  font-size: 16px;
+  padding: 18px;`
+  input.value = localStorage.getItem('_mixlab_system_prompt')
+
+  input.addEventListener('change', e => {
+    e.stopPropagation()
+    localStorage.setItem('_mixlab_system_prompt', input.value)
+  })
+
+  input.addEventListener('click', e => {
+    e.stopPropagation()
+  })
+
+  modalContent.appendChild(input)
+
+  for (const m of models) {
+    let d = document.createElement('div')
+    d.innerText = m
+    d.className = `mix_tag`
+
+    if (!window._mixlab_llamacpp) {
+      d.addEventListener('click', async e => {
+        e.stopPropagation()
+        div.remove()
+        let res = await start_llama(m)
+        window._mixlab_llamacpp = res
+
+        localStorage.setItem('_mixlab_llama_select', res.model)
+
+        if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')) {
+          document.body
+            .querySelector('#mixlab_chatbot_by_llamacpp')
+            .setAttribute('title', window._mixlab_llamacpp.url)
+        }
+      })
+    }
+
+    modalContent.appendChild(d)
+  }
+  modal.appendChild(modalContent)
+
+  document.body.appendChild(div)
+}
+
 function createModal (url, markdown, title) {
   // Create modal element
   var div =
     document.querySelector('#mix-modal') || document.createElement('div')
   div.id = 'mix-modal'
   div.innerHTML = ''
-  div.style.cssText = `width: 100%;
+  div.style.cssText = `
+    width: 100%;
     z-index: 9990;
     height: 100vh;
     display: flex;
@@ -941,6 +1156,17 @@ function drawBadge (node, orig, restArgs) {
 app.registerExtension({
   name: 'Comfy.Mixlab.ui',
   init () {
+    //是否要自动加载模型
+    if (localStorage.getItem('_mixlab_auto_llama_open')) {
+      let model = localStorage.getItem('_mixlab_llama_select')
+      start_llama(model).then(res => {
+        window._mixlab_llamacpp = res
+        document.body
+          .querySelector('#mixlab_chatbot_by_llamacpp')
+          .setAttribute('title', res.url)
+      })
+    }
+
     LGraphCanvas.prototype.helpAboutNode = async function (node) {
       nodesMap =
         nodesMap && Object.keys(nodesMap).length > 0
@@ -965,12 +1191,57 @@ app.registerExtension({
 
     smart_init()
 
+    LGraphCanvas.prototype.text2text = async function (node) {
+      // console.log(node)
+      let widget = node.widgets.filter(
+        w => w.name === 'text' && typeof w.value == 'string'
+      )[0]
+      if (widget) {
+        let controller = new AbortController()
+        let ends = []
+        let userInput = widget.value
+        widget.value = widget.value.trim()
+        widget.value += '\n'
+        await completion_(
+          window._mixlab_llamacpp.url + '/v1/chat/completions',
+          [
+            {
+              role: 'system',
+              content: localStorage.getItem('_mixlab_system_prompt')
+            },
+            { role: 'user', content: userInput }
+          ],
+          controller,
+          t => {
+            // console.log(t)
+            widget.value += t
+          }
+        )
+        widget.value = widget.value.trim()
+        // await chat(
+        //   userInput,
+        //   await getSelectImageNode(),
+        //   t => {
+        //     widget.value += t
+        //     //有回车则终止
+        //     t = t.replace(/\n/g, '<br>')
+        //     ends.push(t.trim())
+        //     if (hasRepeatingPhrases(ends.join(' '))) t = '<br>'
+        //     if (t.trim() == '<br>') {
+        //       controller.abort()
+        //     }
+        //   },
+        //   controller
+        // )
+      }
+    }
+
     const getNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions // store the existing method
     LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
       // replace it
       const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
       node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
-      console.log('getNodeMenuOptions', node.type == 'CLIPTextEncode')
+      console.log('#getNodeMenuOptions', node.type)
 
       let opts = [
         {
@@ -988,18 +1259,38 @@ app.registerExtension({
       ]
 
       if (node.widgets) {
-        // let text_widget = node.widgets.filter(
-        //   w => w.name === 'text' && typeof w.value == 'string'
-        // )
-        // if (text_widget && text_widget.length == 1) {
-        //   opts.push({
-        //     content: 'Text-to-Text ♾️Mixlab', // with a name
-        //     callback: () => {
-        //       LGraphCanvas.prototype.text2text(node)
-        //     } // and the callback
-        //   })
-        // }
+        let text_widget = node.widgets.filter(
+          w => w.name === 'text' && typeof w.value == 'string'
+        )
+
+        let text_input = node.inputs.filter(
+          inp => inp.name == 'text' && inp.type == 'STRING'
+        )
+
+        if (
+          text_input.length == 0 &&
+          text_widget &&
+          text_widget.length == 1 &&
+          window._mixlab_llamacpp &&
+          node.type != 'ShowTextForGPT'
+        ) {
+          opts.push({
+            content: 'Text-to-Text ♾️Mixlab', // with a name
+            callback: () => {
+              LGraphCanvas.prototype.text2text(node)
+            } // and the callback
+          })
+        }
       }
+
+      // if (node.imgs && node.imgs.length > 0) {
+      //   opts.push({
+      //     content: 'Image-to-Text ♾️Mixlab', // with a name
+      //     callback: () => {
+      //       LGraphCanvas.prototype.text2text(node)
+      //     } // and the callback
+      //   })
+      // }
 
       opts = addSmartMenu(opts, node)
 
@@ -1182,6 +1473,56 @@ app.registerExtension({
       this.setDirty(true, true)
     }
 
+    LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
+      // replace it
+      const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
+      node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
+
+      let opts = []
+
+      if (node.widgets) {
+        let text_widget = node.widgets.filter(
+          w => w.name === 'text' && typeof w.value == 'string'
+        )
+
+        if (text_widget && text_widget.length == 1) {
+          opts = [
+            {
+              content: 'Text-to-Text ♾️Mixlab', // with a name
+              callback: () => {
+                LGraphCanvas.prototype.text2text(node)
+              } // and the callback
+            }
+            // {
+            //   content: 'Fix node v2', // with a name
+            //   callback: () => {
+            //     LGraphCanvas.prototype.fixTheNode(node)
+            //   }
+            // }
+          ]
+        }
+      }
+
+      if (node.imgs && node.imgs.length > 0) {
+        opts = [
+          {
+            content: 'Image-to-Text ♾️Mixlab', // with a name
+            callback: () => {
+              LGraphCanvas.prototype.text2text(node)
+            } // and the callback
+          }
+          // {
+          //   content: 'Fix node v2', // with a name
+          //   callback: () => {
+          //     LGraphCanvas.prototype.fixTheNode(node)
+          //   }
+          // }
+        ]
+      }
+
+      return [...opts, null, ...options] // and return the options
+    }
+
     // 支持app模式的json
     const loadAppJson = async data => {
       let workflow
@@ -1229,6 +1570,8 @@ app.registerExtension({
         }
       })
     }
+
+    createMenu()
   },
   setup () {
     setTimeout(async () => {

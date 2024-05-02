@@ -11,6 +11,10 @@ import logging
 from comfy.cli_args import args
 python = sys.executable
 
+
+llama_port=None
+llama_model=""
+
 from .nodes.ChatGPT import get_llama_models,get_llama_model_path
 
 from server import PromptServer
@@ -624,11 +628,13 @@ async def post_prompt_result(request):
 
 
 # llam服务的开启
-
-
 @routes.post('/mixlab/start_llama')
 async def my_hander_method(request):
     data = await request.json()
+    global llama_port,llama_model
+
+    if llama_port and llama_model:
+        return web.json_response({"port":llama_port,"model":llama_model})
 
     import threading
     import uvicorn
@@ -640,12 +646,25 @@ async def my_hander_method(request):
                 ConfigFileSettings,
             )
     model=get_llama_model_path(data['model'])
+
+    address="127.0.0.1"
     port=9090
-    server_settings=ServerSettings(host="127.0.0.1",port=port)
+    success = False
+    for i in range(11):  # 尝试最多11次
+        if await check_port_available(address, port + i):
+            port = port + i
+            success = True
+            break
+
+    if success == False:
+        return web.json_response({"port":None,"model":""})
+    
+    
+    server_settings=ServerSettings(host=address,port=port)
 
     app = create_app(
                 server_settings=server_settings,
-                model_settings=[ModelSettings(model=model)],
+                model_settings=[ModelSettings(model=model,n_gpu_layers=9999,n_ctx=4098)],
             )
 
     def run_uvicorn():
@@ -663,7 +682,10 @@ async def my_hander_method(request):
     # 启动子线程
     thread.start()
 
-    return web.json_response({"port":port,"model":model})
+    llama_port=port
+    llama_model=data['model']
+
+    return web.json_response({"port":llama_port,"model":llama_model})
 
 
 
