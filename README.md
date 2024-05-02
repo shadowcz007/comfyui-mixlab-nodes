@@ -1,8 +1,7 @@
 > 适配了最新版comfyui的py3.11 ，torch 2.1.2+cu121
-
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
-#### 
+#### `相关插件推荐`
 [comfyui-sd-prompt-mixlab](https://github.com/shadowcz007/comfyui-sd-prompt-mixlab)
 
 [comfyui-Image-reward](https://github.com/shadowcz007/comfyui-Image-reward)
@@ -13,8 +12,8 @@
 
 <!-- [comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg) -->
 
-#### 
-最新：ChatGPT节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
+##### `最新`：
+ChatGPT节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
 
 Model download,move to :```models/llamafile/```
 
