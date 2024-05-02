@@ -404,9 +404,9 @@
             display: none;
         }
 
-         /* 定义滚动条轨道的背景颜色 */
+        /* 定义滚动条轨道的背景颜色 */
 
-         ::-webkit-scrollbar-track {
+        ::-webkit-scrollbar-track {
             background-color: #f1f1f1;
             /* 轨道背景颜色 */
         }
@@ -437,7 +437,7 @@
 
         .dynamic_prompt::after {
             content: attr(title);
-            position: absolute; 
+            position: absolute;
             color: black;
             padding: 4px;
             padding-left: 25px;
@@ -2267,7 +2267,8 @@
             // leftDiv.appendChild(des);
             leftDiv.appendChild(statusDiv);
             leftDiv.appendChild(input1);
-            mainDiv.appendChild(submitButton);
+            
+            if (typeof (data.data) == 'object') mainDiv.appendChild(submitButton);
 
             rightDiv.appendChild(output);
 
