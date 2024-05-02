@@ -29,7 +29,7 @@ def opencv_to_pil(image):
     return pil_image
 
 
-def composite_images(foreground, background, mask):
+def composite_images(foreground, background, mask,is_multiply_blend=False):
     width,height=foreground.size
  
     bg_image=background
@@ -53,12 +53,12 @@ def composite_images(foreground, background, mask):
     bg_image=merge_images(bg_image,
                         layer_image,
                         layer_mask,
-                                        layer['x'],
-                                        layer['y'],
-                                        layer['width'],
-                                        layer['height'],
-                                        layer['scale_option']
-                                        )
+                        layer['x'],
+                        layer['y'],
+                        layer['width'],
+                        layer['height'],
+                        layer['scale_option'],
+                        is_multiply_blend )
                    
     bg_image=bg_image.convert('RGB')
     
@@ -704,7 +704,6 @@ def multiply_blend(image1, image2):
 # cv2.imwrite('result.jpg', result)
 
 
-
 def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,is_multiply_blend=False):
     # 打开底图
     bg_image = bg_image.convert("RGBA")
@@ -734,17 +733,17 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,
     nw, nh = layer_image.size
     mask = mask.resize((nw, nh))
 
-    # 分离出a通道
-    r, g, b, alpha = layer_image.split()
-    alpha = ImageOps.invert(alpha)
-    # 创建一个新的RGB图像
-    new_rgb_image = Image.new("RGB", layer_image.size)
-    # 将透明通道粘贴到新的RGB图像上
-    new_rgb_image.paste(layer_image, (0, 0), mask=alpha)
+    # # 分离出a通道
+    # r, g, b, alpha = layer_image.split()
+    # alpha = ImageOps.invert(alpha)
+    # # 创建一个新的RGB图像
+    # new_rgb_image = Image.new("RGB", layer_image.size)
+    # # 将透明通道粘贴到新的RGB图像上
+    # new_rgb_image.paste(layer_image, (0, 0), mask=alpha)
    
-    new_rgb_image.paste(layer_image, (x, y), mask=mask)
-    mask=new_rgb_image.convert('L')
-    mask = ImageOps.invert(mask)
+    # new_rgb_image.paste(layer_image, (x, y), mask=mask)
+    # mask=new_rgb_image.convert('L')
+    # mask = ImageOps.invert(mask)
 
     if is_multiply_blend:
         bg_image_white=Image.new("RGB", bg_image.size,(255, 255, 255))
@@ -753,8 +752,10 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,
         bg_image=multiply_blend(bg_image_white,bg_image)
         bg_image=bg_image.convert("RGBA")
     else:
-        # 在底图上粘贴图层
-        bg_image.paste(layer_image, (x, y), mask=mask)
+        transparent_img = Image.new("RGBA",layer_image.size, (0, 0, 0, 0))
+        transparent_img.paste(layer_image,(0, 0), mask)
+        bg_image.paste(transparent_img, (x, y), transparent_img)
+
 
     # 输出合成后的图片
     return bg_image
@@ -1703,10 +1704,15 @@ class CompositeImages:
     def INPUT_TYPES(s):
         return {
             "required": { 
-            "foreground": ("IMAGE",),
-            "mask":("MASK",),
-            "background": ("IMAGE",),
-            },
+                    "foreground": ("IMAGE",),
+                    "mask":("MASK",),
+                    "background": ("IMAGE",),
+                    },
+             "optional":{
+                           
+                  "is_multiply_blend":  ("BOOLEAN", {"default": False}),
+                            
+                    }
                 }
     
     RETURN_TYPES = ("IMAGE",)
@@ -1718,11 +1724,11 @@ class CompositeImages:
 
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self, foreground,mask,background):
+    def run(self, foreground,mask,background,is_multiply_blend):
         foreground= tensor2pil(foreground)
         mask= tensor2pil(mask)
         background= tensor2pil(background)
-        res=composite_images(foreground,background,mask)
+        res=composite_images(foreground,background,mask,is_multiply_blend)
         
         return (pil2tensor(res),)
 
