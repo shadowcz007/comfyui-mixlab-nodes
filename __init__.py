@@ -8,7 +8,7 @@ import hashlib
 import datetime
 import folder_paths
 import logging
-
+from comfy.cli_args import args
 python = sys.executable
 
 
@@ -435,10 +435,20 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
         # site = web.TCPSite(runner, address, port)
         # await site.start()
 
-        import ssl
-        crt, key = create_for_https()
-        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-        ssl_context.load_cert_chain(crt, key)
+        ssl_context = None
+        scheme = "http"
+        # 跟着本体修改
+        if args.tls_keyfile and args.tls_certfile:
+                scheme = "https"
+                ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_SERVER, verify_mode=ssl.CERT_NONE)
+                ssl_context.load_cert_chain(certfile=args.tls_certfile,
+                                keyfile=args.tls_keyfile)
+        else:
+            # 如果没传，则自动创建
+            import ssl
+            crt, key = create_for_https()
+            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            ssl_context.load_cert_chain(crt, key)
 
         success = False
         for i in range(11):  # 尝试最多11次
@@ -470,7 +480,10 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             # print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
 
         if call_on_start is not None:
-            call_on_start(address, port)
+            if scheme=='https':
+                call_on_start(scheme,address, https_port)
+            else:
+                call_on_start(scheme,address, http_port)
 
     except Exception as e:
         print(f"Error starting the server: {e}")
