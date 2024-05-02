@@ -9,6 +9,48 @@ import {
 
 import { smart_init, addSmartMenu } from './smart_connect.js'
 
+// 获取llama 模型
+async function get_llamafile_models () {
+  try {
+    const response = await fetch('/mixlab/folder_paths', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: 'llamafile'
+      })
+    })
+
+    const data = await response.json()
+    console.log(data)
+    return data.names
+  } catch (error) {
+    console.error(error)
+  }
+}
+// 运行llama
+async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
+  try {
+    const response = await fetch('/mixlab/start_llama', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model
+      })
+    })
+
+    const data = await response.json()
+    return `http://127.0.0.1:${data.port}`
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+
+
 let isScriptLoaded = {}
 
 function loadExternalScript (url) {
@@ -299,8 +341,9 @@ async function get_my_app (filename = null, category = '') {
     data = []
 
     for (const res of result.data) {
-      let { app, workflow } = res.data;
-      if (app?.filename) data.push({
+      let { app, workflow } = res.data
+      if (app?.filename)
+        data.push({
           ...app,
           data: workflow,
           date: res.date
@@ -1173,8 +1216,6 @@ app.registerExtension({
         event.preventDefault()
         event.stopPropagation()
 
-       
-
         // Dragging from Chrome->Firefox there is a file but its a bmp, so ignore that
         if (
           event.dataTransfer.files.length &&
@@ -1182,7 +1223,6 @@ app.registerExtension({
         ) {
           const reader = new FileReader()
           reader.onload = async () => {
-       
             loadAppJson(reader.result)
           }
           reader.readAsText(event.dataTransfer.files[0])
@@ -1198,7 +1238,7 @@ app.registerExtension({
       const apps = await get_my_app()
       if (!apps) return
 
-      console.log('apps',apps)
+      console.log('apps', apps)
 
       let apps_map = { 0: [] }
 
