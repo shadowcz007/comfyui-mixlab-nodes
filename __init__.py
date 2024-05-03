@@ -11,7 +11,6 @@ import logging
 from comfy.cli_args import args
 python = sys.executable
 
-
 llama_port=None
 llama_model=""
 
@@ -627,14 +626,10 @@ async def post_prompt_result(request):
     return web.json_response({"result":res})
 
 
-# llam服务的开启
-@routes.post('/mixlab/start_llama')
-async def my_hander_method(request):
-    data = await request.json()
+async def start_local_llm(data):
     global llama_port,llama_model
-
     if llama_port and llama_model:
-        return web.json_response({"port":llama_port,"model":llama_model})
+        return {"port":llama_port,"model":llama_model}
 
     import threading
     import uvicorn
@@ -645,7 +640,14 @@ async def my_hander_method(request):
                 ModelSettings,
                 ConfigFileSettings,
             )
-    model=get_llama_model_path(data['model'])
+    
+    if not "model" in data and "model_path" in data:
+        data['model']= os.path.basename(data["model_path"])
+        model=data["model_path"]
+
+    elif "model" in data:
+        model=get_llama_model_path(data['model'])
+    
 
     address="127.0.0.1"
     port=9090
@@ -657,7 +659,7 @@ async def my_hander_method(request):
             break
 
     if success == False:
-        return web.json_response({"port":None,"model":""})
+        return {"port":None,"model":""}
     
     
     server_settings=ServerSettings(host=address,port=port)
@@ -685,9 +687,23 @@ async def my_hander_method(request):
     llama_port=port
     llama_model=data['model']
 
-    return web.json_response({"port":llama_port,"model":llama_model})
+    return  {"port":llama_port,"model":llama_model}
 
+# llam服务的开启
+@routes.post('/mixlab/start_llama')
+async def my_hander_method(request):
+    data =await request.json()
+    # print(data)
+    result=await start_local_llm(data)
 
+    return web.json_response(result)
+
+# parser.add_argument("--llm-model", type=str, help="Path to Model file (gguf). Run the Local LLM by MixlabNodes")
+# if args.llm_model and os.path.exists(args.llm_model):
+#     start_local_llm({
+#         "model_path":args.llm_model
+#     })
+#     print("Local LLM Start")
 
 
 
