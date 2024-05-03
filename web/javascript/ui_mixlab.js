@@ -72,7 +72,7 @@ async function createMenu () {
   if (!menu.querySelector('#mixlab_chatbot_by_llamacpp')) {
     const appsButton = document.createElement('button')
     appsButton.id = 'mixlab_chatbot_by_llamacpp'
-    appsButton.textContent = 'llamacpp♾️Mixlab'
+    appsButton.textContent = '♾️Mixlab'
 
     // appsButton.onclick = () =>
     appsButton.onclick = async () => {
