@@ -484,10 +484,14 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             # print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
 
         if call_on_start is not None:
-            if scheme=='https':
-                call_on_start(scheme,address, https_port)
-            else:
-                call_on_start(scheme,address, http_port)
+            try:
+                if scheme=='https':
+                    call_on_start(scheme,address, https_port)
+                else:
+                    call_on_start(scheme,address, http_port)
+            except:
+                call_on_start(address,http_port)
+            
 
     except Exception as e:
         print(f"Error starting the server: {e}")
