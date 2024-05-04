@@ -441,18 +441,25 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
         ssl_context = None
         scheme = "http"
-        # 跟着本体修改
-        if args.tls_keyfile and args.tls_certfile:
+        try:
+            # 跟着本体修改
+            if args.tls_keyfile and args.tls_certfile:
                 scheme = "https"
                 ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_SERVER, verify_mode=ssl.CERT_NONE)
                 ssl_context.load_cert_chain(certfile=args.tls_certfile,
-                                keyfile=args.tls_keyfile)
-        else:
-            # 如果没传，则自动创建
+                                    keyfile=args.tls_keyfile)
+            else:
+                # 如果没传，则自动创建
+                import ssl
+                crt, key = create_for_https()
+                ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+                ssl_context.load_cert_chain(crt, key)
+        except:
             import ssl
             crt, key = create_for_https()
             ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
             ssl_context.load_cert_chain(crt, key)
+
 
         success = False
         for i in range(11):  # 尝试最多11次
