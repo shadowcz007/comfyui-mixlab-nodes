@@ -207,9 +207,27 @@ async function extractInputAndOutputData (
         // input.push()
       }
       if (outputIds.includes(id)) {
+        let options = {}
+        //输出的默认图
+        if (
+          node.type === 'SaveImageAndMetadata_' &&
+          app.graph.getNodeById(id).imgs
+        ) {
+          // SaveImageAndMetadata_的默认图，转为base64
+          let imgurl = app.graph.getNodeById(id).imgs[0].src
+
+          options.defaultImage = await drawImageToCanvas(imgurl, 512)
+          console.log('#SaveImageAndMetadata_的默认图', options)
+        }
+
         // let node = app.graph.getNodeById(id)
         // output.push()
-        output[outputIds.indexOf(id)] = { ...data[id], title: node.title, id }
+        output[outputIds.indexOf(id)] = {
+          ...data[id],
+          title: node.title,
+          id,
+          options
+        }
       }
 
       if (

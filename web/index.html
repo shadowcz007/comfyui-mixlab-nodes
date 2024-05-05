@@ -444,10 +444,9 @@
             border-radius: 4px;
         }
 
-        summary{
+        summary {
             user-select: none;
         }
-        
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
@@ -1067,18 +1066,19 @@
                     "Image Save",
                     "SaveImageAndMetadata_",
                     "TransparentImage"].includes(node.class_type)) {
-                    console.log('output#image', node)
+
+                    const url = node.options?.defaultImage || window._appData?.icon || base64Df;
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
                     a.setAttribute('data-pswp-width', "200");
                     a.setAttribute('data-pswp-height', "200");
                     a.setAttribute('target', "_blank");
-                    a.setAttribute('href', base64Df);
+                    a.setAttribute('href', url);
                     a.setAttribute('title', node.title);
 
                     let img = new Image();
                     // img;
-                    img.src = window._appData?.icon || base64Df;
+                    img.src = url;
                     a.appendChild(img)
                     output_card.appendChild(a);
                     isShowImageFn = true;
@@ -2272,7 +2272,7 @@
             // leftDiv.appendChild(des);
             leftDiv.appendChild(statusDiv);
             leftDiv.appendChild(input1);
-            
+
             if (typeof (data.data) == 'object') mainDiv.appendChild(submitButton);
 
             rightDiv.appendChild(output);
