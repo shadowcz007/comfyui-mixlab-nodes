@@ -67,7 +67,7 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='right_bottom':
         
-        scale = int(bwidth*0.5) / width
+        scale = int(bwidth*0.35) / width
         new_height = int(height * scale)
 
         layer = {
@@ -100,7 +100,7 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='right_top':
         
-        scale = int(bwidth*0.5) / width
+        scale = int(bwidth*0.35) / width
         new_height = int(height * scale)
 
         layer = {
@@ -115,7 +115,7 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
         }
     elif position=='left_top':
         
-        scale = int(bwidth*0.5) / width
+        scale = int(bwidth*0.35) / width
         new_height = int(height * scale)
 
         layer = {
@@ -128,7 +128,21 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
                 "image":foreground,
                 "mask":mask
         }
+    elif position=='left_bottom':
+        
+        scale = int(bwidth*0.35) / width
+        new_height = int(height * scale)
 
+        layer = {
+                "x":24,
+                "y":bheight-new_height-24,
+                "width":int(bwidth*0.35),
+                "height":int(bheight*0.25),
+                "z_index":88,
+                "scale_option":'width',
+                "image":foreground,
+                "mask":mask
+        }
                 
     # width, height = bg_image.size
 
@@ -1842,7 +1856,7 @@ class CompositeImages:
              "optional":{
                            
                   "is_multiply_blend":  ("BOOLEAN", {"default": False}),
-                  "position":  (['overall',"center_bottom","center_top","right_bottom","right_top","left_top"],),    
+                  "position":  (['overall',"center_bottom","center_top","right_bottom","left_bottom","right_top","left_top"],),    
                     }
                 }
     
