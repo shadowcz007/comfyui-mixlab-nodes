@@ -29,23 +29,93 @@ def opencv_to_pil(image):
     return pil_image
 
 
-def composite_images(foreground, background, mask,is_multiply_blend=False):
+def composite_images(foreground, background, mask,is_multiply_blend=False,position="overall"):
     width,height=foreground.size
  
     bg_image=background
+
+    bwidth,bheight=bg_image.size
+
     # 按z-index排序
-    layer = {
-            "x":0,
-            "y":0,
-            "width":width,
-            "height":height,
-            "z_index":88,
-            "scale_option":'overall',
-            "image":foreground,
-            "mask":mask
-    }
+    if position=="overall":
+        layer = {
+                "x":0,
+                "y":0,
+                "width":bwidth,
+                "height":bheight,
+                "z_index":88,
+                "scale_option":'overall',
+                "image":foreground,
+                "mask":mask
+        }
+
+    elif position=='center_bottom':
+        
+        scale = int(bwidth*0.5) / width
+        new_height = int(height * scale)
+
+        layer = {
+                "x":int(bwidth*0.25),
+                "y":bheight-new_height-24,
+                "width":int(bwidth*0.5),
+                "height":int(bheight*0.25),
+                "z_index":88,
+                "scale_option":'width',
+                "image":foreground,
+                "mask":mask
+        }
+
+    elif position=='right_bottom':
+        
+        scale = int(bwidth*0.5) / width
+        new_height = int(height * scale)
+
+        layer = {
+                "x":bwidth-int(bwidth*0.35)-24,
+                "y":bheight-new_height-24,
+                "width":int(bwidth*0.35),
+                "height":int(bheight*0.25),
+                "z_index":88,
+                "scale_option":'width',
+                "image":foreground,
+                "mask":mask
+        }
+
+
+    elif position=='center_top':
+        
+        scale = int(bwidth*0.5) / width
+        new_height = int(height * scale)
+
+        layer = {
+                "x":int(bwidth*0.25),
+                "y":24,
+                "width":int(bwidth*0.5),
+                "height":int(bheight*0.25),
+                "z_index":88,
+                "scale_option":'width',
+                "image":foreground,
+                "mask":mask
+        }
+
+    elif position=='right_top':
+        
+        scale = int(bwidth*0.5) / width
+        new_height = int(height * scale)
+
+        layer = {
+                "x":bwidth-int(bwidth*0.35)-24,
+                "y":24,
+                "width":int(bwidth*0.35),
+                "height":int(bheight*0.25),
+                "z_index":88,
+                "scale_option":'width',
+                "image":foreground,
+                "mask":mask
+        }
+
                 
-    width, height = bg_image.size
+    # width, height = bg_image.size
 
     layer_image=layer['image']
     layer_mask=layer['mask']
@@ -729,6 +799,27 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,
         # 整体缩放
         layer_image = layer_image.resize((width, height))
 
+    elif scale_option == "longest":
+        original_width, original_height = layer_image.size
+        if original_width > original_height:
+            new_width=width
+            scale = width / original_width
+            new_height = int(original_height * scale)
+            x=0
+            y=int((height-new_height)*0.5)
+        else:
+            new_height=height
+            scale = height / original_height
+            new_width = int(original_height * scale)
+            x=int((width-new_width)*0.5)
+            y=0
+    # elif side == "shortest":
+    #         if width < height:
+    #              
+    #         else:
+    #              
+    
+
     # 调整mask的大小
     nw, nh = layer_image.size
     mask = mask.resize((nw, nh))
@@ -803,6 +894,31 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
         resized_image = resized_image.convert("RGB")
         resized_image=resize_2(resized_image)
         return resized_image
+    elif scale_option == "longest":
+    #暂时不用，  
+        if original_width > original_height:
+            new_width=width
+            scale = width / original_width
+            new_height = int(original_height * scale)
+            x=0
+            y=int((new_height-height)*0.5)
+            resized_image = Image.new("RGB", (new_width, new_height), color=color)
+            resized_image.paste(layer_image.resize((new_width, new_height)), (x,y))
+            resized_image = resized_image.convert("RGB")
+            resized_image=resize_2(resized_image)
+            return resized_image
+        else:
+            new_height=height
+            scale = height / original_height
+            new_width = int(original_height * scale)
+            x=int((new_width-width)*0.5)
+            y=0
+            resized_image = Image.new("RGB", (new_width, new_height), color=color)
+            resized_image.paste(layer_image.resize((new_width, new_height)), (x,y))
+            resized_image = resized_image.convert("RGB")
+            resized_image=resize_2(resized_image)
+            return resized_image
+
     
     layer_image=resize_2(layer_image)
     return layer_image
@@ -1711,7 +1827,7 @@ class CompositeImages:
              "optional":{
                            
                   "is_multiply_blend":  ("BOOLEAN", {"default": False}),
-                            
+                  "position":  (['overall',"center_bottom","center_top","right_bottom","right_top"],),    
                     }
                 }
     
@@ -1724,11 +1840,11 @@ class CompositeImages:
 
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self, foreground,mask,background,is_multiply_blend):
+    def run(self, foreground,mask,background,is_multiply_blend,position):
         foreground= tensor2pil(foreground)
         mask= tensor2pil(mask)
         background= tensor2pil(background)
-        res=composite_images(foreground,background,mask,is_multiply_blend)
+        res=composite_images(foreground,background,mask,is_multiply_blend,position)
         
         return (pil2tensor(res),)
 
