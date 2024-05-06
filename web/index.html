@@ -952,6 +952,10 @@
 
 
         function createOutputs(outputData, link) {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const innerApp = params.get("innerApp");
+
             const container = document.createElement('div');
             container.className = "output";
 
@@ -960,11 +964,11 @@
 
             const copyHTML = document.createElement('button');
             copyHTML.innerText = 'copy as html'
-            action.appendChild(copyHTML)
+            if (!innerApp) action.appendChild(copyHTML)
 
             const copyImage = document.createElement('button');
             copyImage.innerText = 'copy image'
-            action.appendChild(copyImage)
+            if (!innerApp) action.appendChild(copyImage)
             copyImage.style.marginLeft = '18px';
 
             let isURL = false;
@@ -2630,7 +2634,7 @@
             ui.title.update(appData.name || 'Mixlab APP');
 
             // 更新应用图标
-            ui.icon.update(appData.icon || base64Df);
+            ui.icon.update(appData.icon || appData.output[0]?.options?.defaultImage || base64Df);
 
             ui.des.update(appData.description || '-');
 
