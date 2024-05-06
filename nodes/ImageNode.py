@@ -1849,7 +1849,7 @@ class CompositeImages:
     def INPUT_TYPES(s):
         return {
             "required": { 
-                    "foreground": ("IMAGE",),
+                    "foreground": (any_type,),
                     "mask":("MASK",),
                     "background": ("IMAGE",),
                     },
