@@ -10,6 +10,12 @@ if exist "%python_exec%" (
     for /f "delims=" %%i in (%requirements_txt%) do (
         %python_exec% -s -m pip install "%%i" -i https://pypi.tuna.tsinghua.edu.cn/simple
     )
+
+    %python_exec% -s -m pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+
+    %python_exec% -s -m pip install llama-cpp-python[server]
+    
+
 ) else (
     echo Installing with system Python
     for /f "delims=" %%i in (%requirements_txt%) do (
