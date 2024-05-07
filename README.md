@@ -108,6 +108,14 @@ Model download,move to :```models/llamafile/```
 备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
 
 
+> 如果碰到安装失败，可以尝试手动安装
+```
+../../../python_embeded/python.exe -s -m pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+
+../../../python_embeded/python.exe -s -m pip install llama-cpp-python[server]
+
+```
+
 
 ## Prompt
 > PromptSlide
