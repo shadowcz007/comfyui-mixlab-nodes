@@ -1251,97 +1251,6 @@ app.registerExtension({
       }
     }
 
-    const getNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions // store the existing method
-    LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
-      // replace it
-      const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
-      node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
-      console.log('#getNodeMenuOptions', node.type)
-
-      let opts = [
-        {
-          content: 'Help ♾️Mixlab', // with a name
-          callback: () => {
-            LGraphCanvas.prototype.helpAboutNode(node)
-          } // and the callback
-        },
-        {
-          content: 'Fix node v2', // with a name
-          callback: () => {
-            LGraphCanvas.prototype.fixTheNode(node)
-          }
-        }
-      ]
-
-      if (node.widgets) {
-        let text_widget = node.widgets.filter(
-          w => w.name === 'text' && typeof w.value == 'string'
-        )
-
-        let text_input = node.inputs.filter(
-          inp => inp.name == 'text' && inp.type == 'STRING'
-        )
-
-        if (
-          text_input.length == 0 &&
-          text_widget &&
-          text_widget.length == 1 &&
-          window._mixlab_llamacpp &&
-          node.type != 'ShowTextForGPT'
-        ) {
-          opts.push({
-            content: 'Text-to-Text ♾️Mixlab', // with a name
-            callback: () => {
-              LGraphCanvas.prototype.text2text(node)
-            } // and the callback
-          })
-        }
-      }
-
-      // if (node.imgs && node.imgs.length > 0) {
-      //   opts.push({
-      //     content: 'Image-to-Text ♾️Mixlab', // with a name
-      //     callback: () => {
-      //       LGraphCanvas.prototype.text2text(node)
-      //     } // and the callback
-      //   })
-      // }
-
-      opts = addSmartMenu(opts, node)
-
-      // if (node.type == 'CLIPTextEncode') {
-      //   // 则出现 randomPrompt
-      //   // CLIPTextEncode 的widget ，name== 'text'
-      //   let node_widget_name = 'text'
-      //   const widget = node.widgets.filter(w => w.name === node_widget_name)[0]
-
-      //  let mixlab_nodes_smart_connect= [{node_type:'CLIPTextEncode',
-      //   node_widget_name:'text',
-      //   inputNodeName:'RandomPrompt',
-      //   inputNode_output_type:'STRING'}]
-
-      //   if (widget) {
-      //     opts = [
-      //       {
-      //         content: 'RandomPrompt',
-      //         callback: () => {
-      //           LGraphCanvas.prototype._createNodeForInput(
-      //             node, //当前node
-      //             widget,//当前node里需要自动连线的widget
-      //             'RandomPrompt',//作为input的node type
-      //             'STRING'// 作为input的node的outputs的type. the input slot type of the target node
-      //           )
-      //         }
-      //       },
-      //       null,
-      //       ...opts
-      //     ]
-      //   }
-      // }
-
-      return [...opts, null, ...options] // and return the options
-    }
-
     const getGroupMenuOptions = LGraphCanvas.prototype.getGroupMenuOptions // store the existing method
     LGraphCanvas.prototype.getGroupMenuOptions = function (node) {
       // replace it
@@ -1488,51 +1397,51 @@ app.registerExtension({
       this.setDirty(true, true)
     }
 
+    const getNodeMenuOptions=LGraphCanvas.prototype.getNodeMenuOptions;
     LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
       // replace it
       const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
       node.setDirtyCanvas(true, true) // force a redraw of (foreground, background)
 
-      let opts = []
+      let opts = [
+        {
+          content: 'Help ♾️Mixlab', // with a name
+          callback: () => {
+            LGraphCanvas.prototype.helpAboutNode(node)
+          } // and the callback
+        },
+        {
+          content: 'Fix node v2', // with a name
+          callback: () => {
+            LGraphCanvas.prototype.fixTheNode(node)
+          }
+        }
+      ]
 
       if (node.widgets) {
         let text_widget = node.widgets.filter(
           w => w.name === 'text' && typeof w.value == 'string'
         )
 
-        if (text_widget && text_widget.length == 1) {
-          opts = [
-            {
-              content: 'Text-to-Text ♾️Mixlab', // with a name
-              callback: () => {
-                LGraphCanvas.prototype.text2text(node)
-              } // and the callback
-            }
-            // {
-            //   content: 'Fix node v2', // with a name
-            //   callback: () => {
-            //     LGraphCanvas.prototype.fixTheNode(node)
-            //   }
-            // }
-          ]
-        }
-      }
+        let text_input = node.inputs?.filter(
+          inp => inp.name == 'text' && inp.type == 'STRING'
+        )
 
-      if (node.imgs && node.imgs.length > 0) {
-        opts = [
-          {
-            content: 'Image-to-Text ♾️Mixlab', // with a name
+        if (
+          text_input&&
+          text_input.length == 0 &&
+          text_widget &&
+          text_widget.length == 1 &&
+          window._mixlab_llamacpp &&
+          node.type != 'ShowTextForGPT'
+        ) {
+          opts.push({
+            content: 'Text-to-Text ♾️Mixlab', // with a name
             callback: () => {
               LGraphCanvas.prototype.text2text(node)
             } // and the callback
-          }
-          // {
-          //   content: 'Fix node v2', // with a name
-          //   callback: () => {
-          //     LGraphCanvas.prototype.fixTheNode(node)
-          //   }
-          // }
-        ]
+          })
+        }
       }
 
       return [...opts, null, ...options] // and return the options
