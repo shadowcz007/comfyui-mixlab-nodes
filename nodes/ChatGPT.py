@@ -91,10 +91,16 @@ def ZhipuAI_client(key):
 def phi_sort(lst):
     return sorted(lst, key=lambda x: x.lower().count('phi'), reverse=True)
 
+def get_llama_path():
+    try:
+        return folder_paths.get_folder_paths('llamafile')[0]
+    except:
+        return os.path.join(folder_paths.models_dir, "llamafile")
+
 def get_llama_models():
     res=[]
 
-    model_path=os.path.join(folder_paths.models_dir, "llamafile")
+    model_path=get_llama_path()
     if os.path.exists(model_path):
         files = os.listdir(model_path)
         for file in files:
@@ -106,7 +112,7 @@ def get_llama_models():
 llama_modes_list=get_llama_models()
 
 def get_llama_model_path(file_name):
-    model_path=os.path.join(folder_paths.models_dir, "llamafile")
+    model_path=get_llama_path()
     mp=os.path.join(model_path,file_name)
     return mp
 
@@ -129,6 +135,12 @@ def llama_cpp_client(file_name):
             if result.returncode == 0:
                 print("#install success")
                 from llama_cpp import Llama
+
+                subprocess.run([sys.executable, '-s', '-m', 'pip', 
+                                     'install', 
+                                     'llama-cpp-python[server]'
+                                     ], capture_output=True, text=True)
+
             else:
                 print("#install error")
             
@@ -137,14 +149,15 @@ def llama_cpp_client(file_name):
     except:
         print("#install llama-cpp-python error")
 
-    mp=get_llama_model_path(file_name)
-    # file_name=get_llama_models()[0]
-    # model_path=os.path.join(folder_paths.models_dir, "llamafile")
-    # mp=os.path.join(model_path,file_name)
+    if file_name:
+        mp=get_llama_model_path(file_name)
+        # file_name=get_llama_models()[0]
+        # model_path=os.path.join(folder_paths.models_dir, "llamafile")
+        # mp=os.path.join(model_path,file_name)
 
-    llm = Llama(model_path=mp, chat_format="chatml")
+        llm = Llama(model_path=mp, chat_format="chatml",n_gpu_layers=-1,n_ctx=512)
 
-    return llm
+        return llm
 
     
 

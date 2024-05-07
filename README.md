@@ -22,7 +22,9 @@ Model download,move to :```models/llamafile/```
 备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
 
 
-
+> 右键菜单支持 text-to-text，方便对prompt词补全
+![](./assets/prompt_ai_setup.png)
+![](./assets/prompt-ai.png)
 
 
 ## 🚀🚗🚚🏃 Workflow-to-APP 

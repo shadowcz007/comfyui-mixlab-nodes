@@ -1202,37 +1202,52 @@ app.registerExtension({
         let userInput = widget.value
         widget.value = widget.value.trim()
         widget.value += '\n'
-        await completion_(
-          window._mixlab_llamacpp.url + '/v1/chat/completions',
-          [
-            {
-              role: 'system',
-              content: localStorage.getItem('_mixlab_system_prompt')
-            },
-            { role: 'user', content: userInput }
-          ],
-          controller,
-          t => {
-            // console.log(t)
-            widget.value += t
+        try {
+          await completion_(
+            window._mixlab_llamacpp.url + '/v1/chat/completions',
+            [
+              {
+                role: 'system',
+                content: localStorage.getItem('_mixlab_system_prompt')
+              },
+              { role: 'user', content: userInput }
+            ],
+            controller,
+            t => {
+              // console.log(t)
+              widget.value += t
+            }
+          )
+        } catch (error) {
+          //是否要自动加载模型
+          if (localStorage.getItem('_mixlab_auto_llama_open')) {
+            let model = localStorage.getItem('_mixlab_llama_select')
+            start_llama(model).then(async res => {
+              window._mixlab_llamacpp = res
+              document.body
+                .querySelector('#mixlab_chatbot_by_llamacpp')
+                .setAttribute('title', res.url)
+
+              await completion_(
+                window._mixlab_llamacpp.url + '/v1/chat/completions',
+                [
+                  {
+                    role: 'system',
+                    content: localStorage.getItem('_mixlab_system_prompt')
+                  },
+                  { role: 'user', content: userInput }
+                ],
+                controller,
+                t => {
+                  // console.log(t)
+                  widget.value += t
+                }
+              )
+            })
           }
-        )
+        }
+
         widget.value = widget.value.trim()
-        // await chat(
-        //   userInput,
-        //   await getSelectImageNode(),
-        //   t => {
-        //     widget.value += t
-        //     //有回车则终止
-        //     t = t.replace(/\n/g, '<br>')
-        //     ends.push(t.trim())
-        //     if (hasRepeatingPhrases(ends.join(' '))) t = '<br>'
-        //     if (t.trim() == '<br>') {
-        //       controller.abort()
-        //     }
-        //   },
-        //   controller
-        // )
       }
     }
 
