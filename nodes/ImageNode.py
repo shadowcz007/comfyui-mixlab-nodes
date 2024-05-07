@@ -51,13 +51,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='center_bottom':
         
-        scale = int(bwidth*0.5) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
-                "x":int(bwidth*0.25),
+                "x":int(bwidth*0.75*0.5),
                 "y":bheight-new_height-24,
-                "width":int(bwidth*0.5),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -67,13 +67,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='right_bottom':
         
-        scale = int(bwidth*0.35) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
-                "x":bwidth-int(bwidth*0.35)-24,
+                "x":bwidth-int(bwidth*0.25)-24,
                 "y":bheight-new_height-24,
-                "width":int(bwidth*0.35),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -84,13 +84,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='center_top':
         
-        scale = int(bwidth*0.5) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
-                "x":int(bwidth*0.25),
+                "x":int( bwidth*0.75*0.5),
                 "y":24,
-                "width":int(bwidth*0.5),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -100,13 +100,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
 
     elif position=='right_top':
         
-        scale = int(bwidth*0.35) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
-                "x":bwidth-int(bwidth*0.35)-24,
+                "x":bwidth-int(bwidth*0.25)-24,
                 "y":24,
-                "width":int(bwidth*0.35),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -115,13 +115,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
         }
     elif position=='left_top':
         
-        scale = int(bwidth*0.35) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
                 "x":24,
                 "y":24,
-                "width":int(bwidth*0.35),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -130,13 +130,13 @@ def composite_images(foreground, background, mask,is_multiply_blend=False,positi
         }
     elif position=='left_bottom':
         
-        scale = int(bwidth*0.35) / width
+        scale = int(bwidth*0.25) / width
         new_height = int(height * scale)
 
         layer = {
                 "x":24,
                 "y":bheight-new_height-24,
-                "width":int(bwidth*0.35),
+                "width":int(bwidth*0.25),
                 "height":int(bheight*0.25),
                 "z_index":88,
                 "scale_option":'width',
@@ -872,8 +872,9 @@ def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,
         bg_image=multiply_blend(bg_image_white,bg_image)
         bg_image=bg_image.convert("RGBA")
     else:
-        transparent_img = Image.new("RGBA",layer_image.size, (0, 0, 0, 0))
+        transparent_img = Image.new("RGBA",layer_image.size, (255, 255, 255, 0))
         transparent_img.paste(layer_image,(0, 0), mask)
+        # transparent_img.save('test.png')
         bg_image.paste(transparent_img, (x, y), transparent_img)
 
 
