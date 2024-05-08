@@ -14,7 +14,11 @@ python = sys.executable
 llama_port=None
 llama_model=""
 
-from .nodes.ChatGPT import get_llama_models,get_llama_model_path
+try:
+    from .nodes.ChatGPT import get_llama_models,get_llama_model_path
+except:
+    print("##nodes.ChatGPT ImportError")
+
 
 from server import PromptServer
 
@@ -705,7 +709,13 @@ async def start_local_llm(data):
 async def my_hander_method(request):
     data =await request.json()
     # print(data)
-    result=await start_local_llm(data)
+    try:
+        result=await start_local_llm(data)
+    except:
+        result={
+            {"port":None,"model":"","llama_cpp_error":True}
+        }
+        print('start_local_llm error')
 
     return web.json_response(result)
 
