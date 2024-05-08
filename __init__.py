@@ -683,8 +683,13 @@ async def start_local_llm(data):
 
     app = create_app(
                 server_settings=server_settings,
-                model_settings=[ModelSettings(model=model,n_gpu_layers=9999,n_ctx=4098)],
-            )
+                model_settings=[
+                    ModelSettings(
+                    model=model,
+                    n_gpu_layers=9999,
+                    n_ctx=4098,
+                    chat_format="chatml"
+                    )])
 
     def run_uvicorn():
         uvicorn.run(
