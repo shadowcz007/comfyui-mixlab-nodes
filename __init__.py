@@ -15,7 +15,9 @@ llama_port=None
 llama_model=""
 
 try:
-    from .nodes.ChatGPT import get_llama_models,get_llama_model_path
+    from .nodes.ChatGPT import get_llama_models,get_llama_model_path,llama_cpp_client
+    llama_cpp_client("")
+
 except:
     print("##nodes.ChatGPT ImportError")
 
