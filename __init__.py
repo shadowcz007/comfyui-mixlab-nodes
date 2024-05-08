@@ -686,7 +686,7 @@ async def start_local_llm(data):
                 model_settings=[
                     ModelSettings(
                     model=model,
-                    n_gpu_layers=9999,
+                    n_gpu_layers=-1,
                     n_ctx=4098,
                     chat_format="chatml"
                     )])
