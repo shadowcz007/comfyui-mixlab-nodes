@@ -116,6 +116,13 @@ Model download,move to :```models/llamafile/```
 
 ```
 
+> [Mac](https://llama-cpp-python.readthedocs.io/en/latest/install/macos/) 
+```
+pip uninstall llama-cpp-python -y
+CMAKE_ARGS="-DLLAMA_METAL=on" pip install -U llama-cpp-python --no-cache-dir
+pip install 'llama-cpp-python[server]'
+```
+
 
 ## Prompt
 > PromptSlide
