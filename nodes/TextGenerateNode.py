@@ -18,17 +18,23 @@ from lark import Lark, Transformer, v_args
 global _available
 _available=True
 
+def get_text_generator_path():
+    try:
+        return folder_paths.get_folder_paths('prompt_generator')[0]
+    except:
+        return os.path.join(folder_paths.models_dir, "prompt_generator")
 
-text_generator_model_path=os.path.join(folder_paths.models_dir, "prompt_generator/text2image-prompt-generator")
+prompt_generator=get_text_generator_path()
+
+text_generator_model_path=os.path.join(prompt_generator, "text2image-prompt-generator")
 if not os.path.exists(text_generator_model_path):
     print(f"## text_generator_model not found: {text_generator_model_path}, pls download from https://huggingface.co/succinctly/text2image-prompt-generator/tree/main")
     text_generator_model_path='succinctly/text2image-prompt-generator'
 
-zh_en_model_path=os.path.join(folder_paths.models_dir, "prompt_generator/opus-mt-zh-en")
+zh_en_model_path=os.path.join(prompt_generator, "opus-mt-zh-en")
 if not os.path.exists(zh_en_model_path):
     print(f"## zh_en_model not found: {zh_en_model_path}, pls download from https://huggingface.co/Helsinki-NLP/opus-mt-zh-en/tree/main")
     zh_en_model_path='Helsinki-NLP/opus-mt-zh-en'
-
 
 
 def is_installed(package):
