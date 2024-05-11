@@ -8,18 +8,6 @@ import codecs,sys
 import importlib.util
 
 
-#修复 sys.stdout.isatty()  object has no attribute 'isatty'
-
-class CustomStdout(sys.stdout.__class__):
-    def isatty(self):
-        print('# sys.stdout.isatty')
-        return False
-try:
-    sys.stdout.isatty()
-except:
-    sys.stdout = CustomStdout()
-
-
 def is_installed(package):
     try:
         spec = importlib.util.find_spec(package)
