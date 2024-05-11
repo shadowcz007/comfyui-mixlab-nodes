@@ -12,16 +12,11 @@ from comfy.cli_args import args
 python = sys.executable
 
 #修复 sys.stdout.isatty()  object has no attribute 'isatty'
-from io import TextIOWrapper
-class CustomStdout(TextIOWrapper):
-    def isatty(self):
-        return False
 try:
     sys.stdout.isatty()
 except:
     print('#fix sys.stdout.isatty')
-    sys.stdout = CustomStdout(sys.stdout.buffer, sys.stdout.encoding)
-
+    sys.stdout.isatty = lambda: False
 
 llama_port=None
 llama_model=""
