@@ -40,6 +40,13 @@ async function get_llamafile_models () {
 }
 // 运行llama
 async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
+  let n_gpu_layers=-1;
+  try {
+    n_gpu_layers=parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
+  } catch (error) {
+    
+  }
+
   try {
     const response = await fetch('/mixlab/start_llama', {
       method: 'POST',
@@ -47,17 +54,20 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model
+        model,
+        n_gpu_layers
       })
     })
 
-    const data = await response.json();
-    if(data.llama_cpp_error){
-      return 
+    const data = await response.json()
+    if (data.llama_cpp_error) {
+      return
     }
-    
-    return { url:`http://${window.location.hostname}:${data.port}`, model: data.model }
-    
+
+    return {
+      url: `http://${window.location.hostname}:${data.port}`,
+      model: data.model
+    }
   } catch (error) {
     console.error(error)
   }
@@ -618,9 +628,9 @@ app.showMissingNodesError = async function (
   href="https://discord.gg/cXs9vZSqeK"  target="_blank">Welcome to Mixlab nodes discord, seeking help.</a>
   
   When loading the graph, the following node types were not found: <ul>${missingNodeGithub(
-      missingNodeTypes,
-      nodesMap
-    ).join('')}</ul>${
+    missingNodeTypes,
+    nodesMap
+  ).join('')}</ul>${
       hasAddedNodes
         ? 'Nodes that have failed to load will show as red on the graph.'
         : ''
@@ -775,15 +785,64 @@ function createModelsModal (models) {
       user-select: none;
     `
 
-  headTitleElement.textContent = 'Models'
   // headTitleElement.href = 'https://github.com/shadowcz007/comfyui-mixlab-nodes'
   // headTitleElement.target = '_blank'
   const linkIcon = document.createElement('small')
   linkIcon.textContent = '自动开启'
   linkIcon.style.padding = '4px'
 
-  headTitleElement.appendChild(linkIcon)
-  headerElement.appendChild(headTitleElement)
+  const n_gpu = document.createElement('input')
+  n_gpu.type = 'number'
+  n_gpu.setAttribute('min',-1);
+  n_gpu.setAttribute('max',9999);
+
+  n_gpu.style=`color: var(--input-text);
+  background-color: var(--comfy-input-bg);
+  border-radius: 8px;
+  border-color: var(--border-color);
+  height: 26px;
+  padding: 4px 10px;
+  width: 48px;
+  margin-left: 12px;`
+  if (localStorage.getItem('_mixlab_llama_n_gpu')) {
+    n_gpu.value = parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
+  }else{
+    n_gpu.value=-1;
+    localStorage.setItem('_mixlab_llama_n_gpu', -1)
+  }
+
+  const n_gpu_p = document.createElement('p')
+  n_gpu_p.innerText='n_gpu_layers';
+
+  const n_gpu_div= document.createElement('div')
+  n_gpu_div.style=`display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;`
+  n_gpu_div.appendChild(n_gpu_p)
+  n_gpu_div.appendChild(n_gpu)
+
+  
+
+
+  const title = document.createElement('p')
+  title.innerText='Models';
+  title.style=`font-size: 18px;
+  margin-right: 8px;`
+
+  const left_d= document.createElement('div')
+  left_d.style=`display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;`
+  left_d.appendChild(title)
+
+  left_d.appendChild(linkIcon)
+
+  headTitleElement.appendChild(left_d) 
+
+  headTitleElement.appendChild(n_gpu_div) 
+  
   if (localStorage.getItem('_mixlab_auto_llama_open')) {
     linkIcon.style.backgroundColor = '#66ff6c'
     linkIcon.style.color = 'black'
@@ -799,6 +858,11 @@ function createModelsModal (models) {
       linkIcon.style.backgroundColor = '#66ff6c'
       linkIcon.style.color = 'black'
     }
+  })
+
+  n_gpu.addEventListener('click', e => {
+    e.stopPropagation()
+    localStorage.setItem('_mixlab_llama_n_gpu', n_gpu.value)
   })
 
   modal.appendChild(headTitleElement)
@@ -1409,7 +1473,7 @@ app.registerExtension({
       this.setDirty(true, true)
     }
 
-    const getNodeMenuOptions=LGraphCanvas.prototype.getNodeMenuOptions;
+    const getNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions
     LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
       // replace it
       const options = getNodeMenuOptions.apply(this, arguments) // start by calling the stored one
@@ -1440,7 +1504,7 @@ app.registerExtension({
         )
 
         if (
-          text_input&&
+          text_input &&
           text_input.length == 0 &&
           text_widget &&
           text_widget.length == 1 &&

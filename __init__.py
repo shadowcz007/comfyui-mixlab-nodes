@@ -672,6 +672,10 @@ async def start_local_llm(data):
     elif "model" in data:
         model=get_llama_model_path(data['model'])
     
+    n_gpu_layers=-1
+
+    if "n_gpu_layers" in data:
+        n_gpu_layers=data['n_gpu_layers']
 
     address="127.0.0.1"
     port=9090
@@ -693,7 +697,7 @@ async def start_local_llm(data):
                 model_settings=[
                     ModelSettings(
                     model=model,
-                    n_gpu_layers=-1,
+                    n_gpu_layers=n_gpu_layers,
                     n_ctx=4098,
                     chat_format="chatml"
                     )])
