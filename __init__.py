@@ -737,13 +737,14 @@ async def my_hander_method(request):
 
     return web.json_response(result)
 
-# parser.add_argument("--llm-model", type=str, help="Path to Model file (gguf). Run the Local LLM by MixlabNodes")
-# if args.llm_model and os.path.exists(args.llm_model):
-#     start_local_llm({
-#         "model_path":args.llm_model
-#     })
-#     print("Local LLM Start")
-
+# 重启服务
+@routes.post('/mixlab/re_start')
+def re_start(request):
+    try:
+        sys.stdout.close_log()
+    except Exception as e:
+        pass
+    return os.execv(sys.executable, [sys.executable] + sys.argv)
 
 
 

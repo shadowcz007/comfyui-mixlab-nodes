@@ -824,7 +824,6 @@ function createModelsModal (models) {
 
   
 
-
   const title = document.createElement('p')
   title.innerText='Models';
   title.style=`font-size: 18px;
@@ -841,7 +840,15 @@ function createModelsModal (models) {
 
   headTitleElement.appendChild(left_d) 
 
-  headTitleElement.appendChild(n_gpu_div) 
+  headTitleElement.appendChild(n_gpu_div)
+
+  //重启
+  const reStart = document.createElement('small')
+  reStart.textContent = '重启'
+  reStart.style.padding = '4px'
+
+  headTitleElement.appendChild(reStart)
+
   
   if (localStorage.getItem('_mixlab_auto_llama_open')) {
     linkIcon.style.backgroundColor = '#66ff6c'
@@ -859,6 +866,12 @@ function createModelsModal (models) {
       linkIcon.style.color = 'black'
     }
   })
+
+  reStart.addEventListener('click', e => {
+    e.stopPropagation()
+    fetch('mixlab/re_start')
+  })
+
 
   n_gpu.addEventListener('click', e => {
     e.stopPropagation()
