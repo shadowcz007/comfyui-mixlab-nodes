@@ -868,8 +868,12 @@ function createModelsModal (models) {
   })
 
   reStart.addEventListener('click', e => {
-    e.stopPropagation()
-    fetch('mixlab/re_start')
+    e.stopPropagation();
+    div.remove()
+    fetch('mixlab/re_start',{
+      method: 'POST'
+    })
+    
   })
 
 
