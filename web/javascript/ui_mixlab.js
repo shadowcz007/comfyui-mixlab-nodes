@@ -56,7 +56,7 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
       return 
     }
     
-    return { url: `http://127.0.0.1:${data.port}`, model: data.model }
+    return { url:`http://${window.location.hostname}:${data.port}`, model: data.model }
     
   } catch (error) {
     console.error(error)
