@@ -610,7 +610,14 @@ app.showMissingNodesError = async function (
   // console.log('#nodesMap', nodesMap)
   // console.log('###MIXLAB', missingNodeTypes, hasAddedNodes)
   this.ui.dialog.show(
-    `When loading the graph, the following node types were not found: <ul>${missingNodeGithub(
+    `<a style="color: white;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }"
+  href="https://discord.gg/cXs9vZSqeK"  target="_blank">Welcome to Mixlab nodes discord, seeking help.</a>
+  
+  When loading the graph, the following node types were not found: <ul>${missingNodeGithub(
       missingNodeTypes,
       nodesMap
     ).join('')}</ul>${
