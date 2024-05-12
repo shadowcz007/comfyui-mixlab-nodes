@@ -36,7 +36,6 @@ async function* completion (url, messages, controller) {
         break
       }
 
-     
       // Add any leftover data to the current chunk of data
       const text = leftover + decoder.decode(result.value)
 
@@ -64,14 +63,14 @@ async function* completion (url, messages, controller) {
           if (result.data) {
             result.data = JSON.parse(result.data)
             // console.log('#result.data',result.data)
-            
-            content += result.data.choices[0].delta?.content||''
+
+            content += result.data.choices[0].delta?.content || ''
 
             // yield
             yield result
 
             // if we got a stop token from server, we will break here
-            if (result.data.choices[0].finish_reason=="stop") {
+            if (result.data.choices[0].finish_reason == 'stop') {
               if (result.data.generation_settings) {
                 // generation_settings = result.data.generation_settings;
               }
@@ -96,11 +95,10 @@ async function* completion (url, messages, controller) {
 export async function completion_ (url, messages, controller, callback) {
   let request = await completion(url, messages, controller)
   for await (const chunk of request) {
-    
-    let content=chunk.data.choices[0].delta.content||""
-    if(chunk.data.choices[0].role=="assistant"){
+    let content = chunk.data.choices[0].delta.content || ''
+    if (chunk.data.choices[0].role == 'assistant') {
       //开始
-      content=""
+      content = ''
     }
 
     if (callback) callback(content)

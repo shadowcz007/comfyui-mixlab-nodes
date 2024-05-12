@@ -20,6 +20,7 @@ except:
 
 llama_port=None
 llama_model=""
+llama_chat_format=""
 
 try:
     from .nodes.ChatGPT import get_llama_models,get_llama_model_path,llama_cpp_client
@@ -651,9 +652,9 @@ async def post_prompt_result(request):
 
 
 async def start_local_llm(data):
-    global llama_port,llama_model
-    if llama_port and llama_model:
-        return {"port":llama_port,"model":llama_model}
+    global llama_port,llama_model,llama_chat_format
+    if llama_port and llama_model and llama_chat_format:
+        return {"port":llama_port,"model":llama_model,"chat_format":llama_chat_format}
 
     import threading
     import uvicorn
@@ -671,11 +672,29 @@ async def start_local_llm(data):
 
     elif "model" in data:
         model=get_llama_model_path(data['model'])
-    
+
     n_gpu_layers=-1
 
     if "n_gpu_layers" in data:
         n_gpu_layers=data['n_gpu_layers']
+
+
+    chat_format="chatml"
+
+    model_alias=os.path.basename(model)
+
+    # 多模态
+    clip_model_path=None
+    
+    prefix = "llava-phi-3-mini"
+    file_name = prefix+"-mmproj-"
+    if model_alias.startswith(prefix):
+        for file in os.listdir(os.path.dirname(model)):
+            if file.startswith(file_name):
+                clip_model_path=os.path.join(os.path.dirname(model),file)
+                chat_format='llava-1-5'
+    print('#clip_model_path',chat_format,clip_model_path)
+
 
     address="127.0.0.1"
     port=9090
@@ -697,9 +716,12 @@ async def start_local_llm(data):
                 model_settings=[
                     ModelSettings(
                     model=model,
+                    model_alias=os.path.basename(model),
                     n_gpu_layers=n_gpu_layers,
                     n_ctx=4098,
-                    chat_format="chatml"
+                    chat_format=chat_format,
+                    embedding=False,
+                    clip_model_path=clip_model_path
                     )])
 
     def run_uvicorn():
@@ -719,8 +741,9 @@ async def start_local_llm(data):
 
     llama_port=port
     llama_model=data['model']
+    llama_chat_format=chat_format
 
-    return  {"port":llama_port,"model":llama_model}
+    return  {"port":llama_port,"model":llama_model,"chat_format":llama_chat_format}
 
 # llam服务的开启
 @routes.post('/mixlab/start_llama')

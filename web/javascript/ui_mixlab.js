@@ -40,12 +40,10 @@ async function get_llamafile_models () {
 }
 // 运行llama
 async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
-  let n_gpu_layers=-1;
+  let n_gpu_layers = -1
   try {
-    n_gpu_layers=parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
-  } catch (error) {
-    
-  }
+    n_gpu_layers = parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
+  } catch (error) {}
 
   try {
     const response = await fetch('/mixlab/start_llama', {
@@ -66,7 +64,8 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
 
     return {
       url: `http://${window.location.hostname}:${data.port}`,
-      model: data.model
+      model: data.model,
+      chat_format: data.chat_format
     }
   } catch (error) {
     console.error(error)
@@ -793,10 +792,10 @@ function createModelsModal (models) {
 
   const n_gpu = document.createElement('input')
   n_gpu.type = 'number'
-  n_gpu.setAttribute('min',-1);
-  n_gpu.setAttribute('max',9999);
+  n_gpu.setAttribute('min', -1)
+  n_gpu.setAttribute('max', 9999)
 
-  n_gpu.style=`color: var(--input-text);
+  n_gpu.style = `color: var(--input-text);
   background-color: var(--comfy-input-bg);
   border-radius: 8px;
   border-color: var(--border-color);
@@ -806,31 +805,29 @@ function createModelsModal (models) {
   margin-left: 12px;`
   if (localStorage.getItem('_mixlab_llama_n_gpu')) {
     n_gpu.value = parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
-  }else{
-    n_gpu.value=-1;
+  } else {
+    n_gpu.value = -1
     localStorage.setItem('_mixlab_llama_n_gpu', -1)
   }
 
   const n_gpu_p = document.createElement('p')
-  n_gpu_p.innerText='n_gpu_layers';
+  n_gpu_p.innerText = 'n_gpu_layers'
 
-  const n_gpu_div= document.createElement('div')
-  n_gpu_div.style=`display: flex;
+  const n_gpu_div = document.createElement('div')
+  n_gpu_div.style = `display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;`
   n_gpu_div.appendChild(n_gpu_p)
   n_gpu_div.appendChild(n_gpu)
 
-  
-
   const title = document.createElement('p')
-  title.innerText='Models';
-  title.style=`font-size: 18px;
+  title.innerText = 'Models'
+  title.style = `font-size: 18px;
   margin-right: 8px;`
 
-  const left_d= document.createElement('div')
-  left_d.style=`display: flex;
+  const left_d = document.createElement('div')
+  left_d.style = `display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;`
@@ -838,7 +835,7 @@ function createModelsModal (models) {
 
   left_d.appendChild(linkIcon)
 
-  headTitleElement.appendChild(left_d) 
+  headTitleElement.appendChild(left_d)
 
   headTitleElement.appendChild(n_gpu_div)
 
@@ -849,7 +846,6 @@ function createModelsModal (models) {
 
   headTitleElement.appendChild(reStart)
 
-  
   if (localStorage.getItem('_mixlab_auto_llama_open')) {
     linkIcon.style.backgroundColor = '#66ff6c'
     linkIcon.style.color = 'black'
@@ -868,14 +864,12 @@ function createModelsModal (models) {
   })
 
   reStart.addEventListener('click', e => {
-    e.stopPropagation();
+    e.stopPropagation()
     div.remove()
-    fetch('mixlab/re_start',{
+    fetch('mixlab/re_start', {
       method: 'POST'
     })
-    
   })
-
 
   n_gpu.addEventListener('click', e => {
     e.stopPropagation()
@@ -1246,6 +1240,32 @@ function drawBadge (node, orig, restArgs) {
   return r
 }
 
+function convertImageUrlToBase64 (imageUrl) {
+  return fetch(imageUrl)
+    .then(response => response.blob())
+    .then(blob => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+      })
+    })
+}
+
+async function getSelectImageNode () {
+  var nodes = app.canvas.selected_nodes
+  let imageNode = null
+  if (Object.keys(app.canvas.selected_nodes).length == 0) return
+  for (var id in nodes) {
+    if (nodes[id].imgs) {
+      let base64 = await convertImageUrlToBase64(nodes[id].imgs[0].currentSrc)
+      imageNode = base64
+    }
+  }
+  return imageNode
+}
+
 app.registerExtension({
   name: 'Comfy.Mixlab.ui',
   init () {
@@ -1290,6 +1310,8 @@ app.registerExtension({
         w => w.name === 'text' && typeof w.value == 'string'
       )[0]
       if (widget) {
+        app.canvas.centerOnNode(node)
+
         let controller = new AbortController()
         let ends = []
         let userInput = widget.value
@@ -1334,6 +1356,109 @@ app.registerExtension({
                 t => {
                   // console.log(t)
                   widget.value += t
+                }
+              )
+            })
+          }
+        }
+
+        widget.value = widget.value.trim()
+      }
+    }
+
+    LGraphCanvas.prototype.image2text = async function (node) {
+      let imageBase64 = await getSelectImageNode()
+
+      if (imageBase64) {
+        // console.log('image2text')
+        // 添加note 节点
+        const NoteNode = LiteGraph.createNode('Note')
+        NoteNode.title = `Image-to-Text ${node.id}`
+        NoteNode.size = [NoteNode.size[0] + 100, NoteNode.size[1]]
+        let widget = NoteNode.widgets[0]
+        widget.value = ''
+
+        NoteNode.pos = [node.pos[0] + node.size[0] + 24, node.pos[1] - 48]
+
+        app.canvas.graph.add(NoteNode, false)
+        app.canvas.centerOnNode(NoteNode)
+
+        let controller = new AbortController()
+        let ends = []
+        let userInput = widget.value
+        widget.value = widget.value.trim()
+        widget.value += '\n'
+
+        try {
+          await completion_(
+            window._mixlab_llamacpp.url + '/v1/chat/completions',
+            [
+              {
+                role: 'system',
+                content: localStorage.getItem('_mixlab_system_prompt')
+              },
+              // { role: 'user', content: userInput }
+
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: imageBase64
+                    }
+                  },
+                  { type: 'text', text: 'What’s in this image?' }
+                ]
+              }
+            ],
+            controller,
+            t => {
+              // console.log(t)
+              widget.value += t
+
+              NoteNode.size[1] = widget.element.scrollHeight + 20
+              widget.computedHeight = NoteNode.size[1]
+              app.canvas.centerOnNode(NoteNode)
+            }
+          )
+        } catch (error) {
+          //是否要自动加载模型
+          if (localStorage.getItem('_mixlab_auto_llama_open')) {
+            let model = localStorage.getItem('_mixlab_llama_select')
+            start_llama(model).then(async res => {
+              window._mixlab_llamacpp = res
+              document.body
+                .querySelector('#mixlab_chatbot_by_llamacpp')
+                .setAttribute('title', res.url)
+
+              await completion_(
+                window._mixlab_llamacpp.url + '/v1/chat/completions',
+                [
+                  {
+                    role: 'system',
+                    content: localStorage.getItem('_mixlab_system_prompt')
+                  },
+                  {
+                    role: 'user',
+                    content: [
+                      {
+                        type: 'image_url',
+                        image_url: {
+                          url: imageBase64
+                        }
+                      },
+                      { type: 'text', text: 'What’s in this image?' }
+                    ]
+                  }
+                ],
+                controller,
+                t => {
+                  // console.log(t)
+                  widget.value += t
+                  NoteNode.size[1] = widget.element.scrollHeight + 20
+                  widget.computedHeight = NoteNode.size[1]
+                  app.canvas.centerOnNode(NoteNode)
                 }
               )
             })
@@ -1532,6 +1657,20 @@ app.registerExtension({
             content: 'Text-to-Text ♾️Mixlab', // with a name
             callback: () => {
               LGraphCanvas.prototype.text2text(node)
+            } // and the callback
+          })
+        }
+
+        if (
+          node.imgs &&
+          node.imgs.length > 0 &&
+          window._mixlab_llamacpp &&
+          window._mixlab_llamacpp.chat_format === 'llava-1-5'
+        ) {
+          opts.push({
+            content: 'Image-to-Text ♾️Mixlab', // with a name
+            callback: () => {
+              LGraphCanvas.prototype.image2text(node)
             } // and the callback
           })
         }
