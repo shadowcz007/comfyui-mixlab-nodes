@@ -72,6 +72,39 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
   }
 }
 
+
+function resizeImage (base64Image) {
+  var img = new Image()
+  var canvas = document.createElement('canvas')
+  var ctx = canvas.getContext('2d')
+  return new Promise((res, rej) => {
+    img.onload = function () {
+      // 等比例缩放图片
+      var width = img.width
+      var height = img.height
+      var max_width = 768
+      if (width > max_width) {
+        height *= max_width / width
+        width = max_width
+      }
+
+      // 设置canvas尺寸
+      canvas.width = width
+      canvas.height = height
+
+      // 在canvas上绘制图片
+      ctx.drawImage(img, 0, 0, width, height)
+
+      // 将canvas转换为base64图片数据
+      var canvasData = canvas.toDataURL()
+      res(canvasData) //  canvas转换后的base64图片数据
+    }
+
+    img.src = base64Image
+  })
+}
+
+
 // 菜单入口
 async function createMenu () {
   const menu = document.querySelector('.comfy-menu')
@@ -1260,7 +1293,7 @@ async function getSelectImageNode () {
   for (var id in nodes) {
     if (nodes[id].imgs) {
       let base64 = await convertImageUrlToBase64(nodes[id].imgs[0].currentSrc)
-      imageNode = base64
+      imageNode = await resizeImage(base64)
     }
   }
   return imageNode
