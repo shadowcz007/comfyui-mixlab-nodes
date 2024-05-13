@@ -11,6 +11,17 @@ import { smart_init, addSmartMenu } from './smart_connect.js'
 
 import { completion_ } from './chat.js'
 
+function showTextByLanguage (key, json) {
+  // 获取浏览器语言
+  var language = navigator.language
+  // 判断是否为中文
+  if (language.indexOf('zh') !== -1 || language.indexOf('cn') !== -1) {
+    return json[key]
+  } else {
+    return key
+  }
+}
+
 //系统prompt
 const systemPrompt = `You are a prompt creator, your task is to create prompts for the user input request, the prompts are image descriptions that include keywords for (an adjective, type of image, framing/composition, subject, subject appearance/action, environment, lighting situation, details of the shoot/illustration, visuals aesthetics and artists), brake keywords by comas, provide high quality, non-verboose, coherent, brief, concise, and not superfluous prompts, the subject from the input request must be included verbatim on the prompt,the prompt is english`
 
@@ -72,7 +83,6 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
   }
 }
 
-
 function resizeImage (base64Image) {
   var img = new Image()
   var canvas = document.createElement('canvas')
@@ -103,7 +113,6 @@ function resizeImage (base64Image) {
     img.src = base64Image
   })
 }
-
 
 // 菜单入口
 async function createMenu () {
@@ -656,15 +665,28 @@ app.showMissingNodesError = async function (
     font-size: 18px;
     font-weight: 800;
     letter-spacing: 2px;
+    font-family: sans-serif;
   }"
-  href="https://discord.gg/cXs9vZSqeK"  target="_blank">Welcome to Mixlab nodes discord, seeking help.</a>
+  href="https://discord.gg/cXs9vZSqeK"  target="_blank">${showTextByLanguage(
+    'Welcome to Mixlab nodes discord, seeking help.',
+    {
+      'Welcome to Mixlab nodes discord, seeking help.':
+        '寻求帮助，加入Mixlab nodes交流频道'
+    }
+  )}</a><br><br>${showTextByLanguage(
+    'When loading the graph, the following node types were not found:',
+    {
+      'When loading the graph, the following node types were not found:':
+        '缺少以下节点：'
+    }
+  )}
   
-  When loading the graph, the following node types were not found: <ul>${missingNodeGithub(
+   <ul>${missingNodeGithub(
     missingNodeTypes,
     nodesMap
   ).join('')}</ul>${
       hasAddedNodes
-        ? 'Nodes that have failed to load will show as red on the graph.'
+        ? ''
         : ''
     }`
   )
