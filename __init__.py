@@ -773,7 +773,7 @@ def re_start(request):
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import ComparingTwoFrames,LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -834,6 +834,7 @@ NODE_CLASS_MAPPINGS = {
     # "VAELoaderConsistencyDecoder":VAELoader,
     "SaveImageToLocal":SaveImageToLocal,
     "SaveImageAndMetadata_":SaveImageAndMetadata,
+    "ComparingTwoFrames_":ComparingTwoFrames,
     # "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
@@ -888,6 +889,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IntNumber":"Int Input ♾️MixlabApp",
     "ImagesPrompt_":"Images Input ♾️MixlabApp",
     "SaveImageAndMetadata_":"Save Image Output ♾️MixlabApp",
+    "ComparingTwoFrames_":"Comparing Two Frames ♾️MixlabApp",
     "ResizeImageMixlab":"Resize Image ♾️Mixlab",
     "RandomPrompt": "Random Prompt ♾️Mixlab",
     "PromptImage":"Output Prompt and Image ♾️Mixlab",

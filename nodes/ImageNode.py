@@ -2983,6 +2983,65 @@ class SaveImageAndMetadata:
 
         return { "ui": { "images": results } }
 
+class ComparingTwoFrames:
+    def __init__(self):
+        self.output_dir = folder_paths.get_output_directory()
+        self.type = "output"
+        self.prefix_append = "ComparingTwoFrames"
+        self.compress_level = 4
+
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": 
+                    {"before_image": ("IMAGE", ),
+                    "after_image": ("IMAGE", )
+                     }, 
+                }
+
+    RETURN_TYPES = ()
+    FUNCTION = "comparingImages"
+
+    OUTPUT_NODE = True
+
+    CATEGORY = "♾️Mixlab/Output"
+
+    def comparingImages(self, before_image,after_image):
+        filename_prefix = self.prefix_append
+        full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
+            filename_prefix, self.output_dir, after_image[0].shape[1], after_image[0].shape[0])
+        
+        bresults = list()
+        
+        for bimage in before_image:
+            i = 255. * bimage.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+         
+            file = f"{filename}_{counter:05}_.png"
+            img.save(os.path.join(full_output_folder, file), pnginfo=None, compress_level=self.compress_level)
+            bresults.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            counter += 1
+
+
+        results = list()
+        for aimage in after_image:
+            i = 255. * aimage.cpu().numpy()
+            img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+         
+            file = f"{filename}_{counter:05}_.png"
+            img.save(os.path.join(full_output_folder, file), pnginfo=None, compress_level=self.compress_level)
+            results.append({
+                "filename": file,
+                "subfolder": subfolder,
+                "type": self.type
+            })
+            counter += 1
+
+        return { "ui": { "after_images": results,"before_images":bresults } }
+
 class ImageColorTransfer:
     @classmethod
     def INPUT_TYPES(s):

@@ -1385,7 +1385,7 @@ app.registerExtension({
         app.canvas.centerOnNode(node)
 
         let controller = new AbortController()
-        let ends = []
+        let ends = [] //TODO 判断终止 <|im_start|>
         let userInput = widget.value
         widget.value = widget.value.trim()
         widget.value += '\n'

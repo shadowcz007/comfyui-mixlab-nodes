@@ -705,7 +705,9 @@ app.registerExtension({
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'LoadImagesToBatch') {
+
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
+
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
@@ -838,6 +840,143 @@ app.registerExtension({
         let im = createInputImageForBatch(d, imagesWidget)
         pre.appendChild(im)
       }
+    }
+  }
+})
+
+// 如何引入css
+app.registerExtension({
+  name: 'Mixlab.output.ComparingTwoFrames_',
+  init () {
+    $el('link', {
+      rel: 'stylesheet',
+      href: '/extensions/comfyui-mixlab-nodes/lib/juxtapose.css',
+      parent: document.head
+    })
+
+    $el('style', {
+      textContent: `
+      .juxtapose-name{
+        display: none!important; 
+      }
+			`,
+      parent: document.body
+    })
+  },
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'ComparingTwoFrames_') {
+      const onNodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        const r = onNodeCreated
+        ? onNodeCreated.apply(this, arguments)
+        : undefined
+
+        this.size = [400, this.size[1]]
+        console.log('##onNodeCreated', this)
+        const widget = {
+          type: 'div',
+          name: 'preview',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, 400, 44, node.size[1])
+            )
+          },
+          serialize: false
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+        this.addCustomWidget(widget)
+        this.serialize_widgets = true //需要保存参数
+
+       return r
+
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('##onExecuted', this, message)
+
+        this.widgets[0].div.id = 'mix_comparingtowframes_' + this.id
+
+        let after_image = message.after_images[0]
+        let before_image = message.before_images[0]
+
+        after_image = `${window.location.protocol}//${
+          window.location.hostname
+        }:${window.location.port}/view?filename=${encodeURIComponent(
+          after_image.filename
+        )}&type=${after_image.type}&subfolder=${encodeURIComponent(
+          after_image.subfolder
+        )}&t=${+new Date()}`
+
+        before_image = `${window.location.protocol}//${
+          window.location.hostname
+        }:${window.location.port}/view?filename=${encodeURIComponent(
+          before_image.filename
+        )}&type=${before_image.type}&subfolder=${encodeURIComponent(
+          before_image.subfolder
+        )}&t=${+new Date()}`
+
+        this.widgets[0].div.innerHTML = ''
+
+        let slider = new juxtapose.JXSlider(
+          '#mix_comparingtowframes_' + this.id,
+          [
+            {
+              src: before_image,
+              label: 'Before'
+            },
+            {
+              src: after_image,
+              label: 'After'
+            }
+          ],
+          {
+            animate: true,
+            showLabels: true,
+            showCredits: false,
+            startingPosition: '50%',
+            makeResponsive: false
+          }
+        )
+
+        this.widgets_values = [
+          {
+            src: before_image,
+            label: 'Before'
+          },
+          {
+            src: after_image,
+            label: 'After'
+          }
+        ]
+        this.size=[this.size[0],300]
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    // console.log('##loadedGraphNode', node)
+    if (node.type === 'ComparingTwoFrames_') {
+      // node.widgets[0].div.id = 'mix_comparingtowframes_' + node.id
+      // if (node.widgets_values && node.widgets_values[0]) {
+      //   node.widgets[0].div.innerHTML = ''
+
+      //   let slider = new juxtapose.JXSlider(
+      //     '#mix_comparingtowframes_' + node.id,
+      //     node.widgets_values,
+      //     {
+      //       animate: true,
+      //       showLabels: true,
+      //       showCredits: false,
+      //       startingPosition: '50%',
+      //       makeResponsive: false
+      //     }
+      //   )
+      // }
     }
   }
 })
