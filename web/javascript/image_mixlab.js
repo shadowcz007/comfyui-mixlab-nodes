@@ -891,9 +891,19 @@ app.registerExtension({
         this.addCustomWidget(widget)
         this.serialize_widgets = true //需要保存参数
 
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+
        return r
 
       }
+
+     
 
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
