@@ -15,7 +15,10 @@ function showTextByLanguage (key, json) {
   // 获取浏览器语言
   var language = navigator.language
   // 判断是否为中文
-  if (language.indexOf('zh') !== -1 || language.indexOf('cn') !== -1) {
+  if (
+    language.indexOf('zh') !== -1 ||
+    (language.indexOf('cn') !== -1 && json[key])
+  ) {
     return json[key]
   } else {
     return key
@@ -674,20 +677,15 @@ app.showMissingNodesError = async function (
         '寻求帮助，加入Mixlab nodes交流频道'
     }
   )}</a><br><br>${showTextByLanguage(
-    'When loading the graph, the following node types were not found:',
-    {
-      'When loading the graph, the following node types were not found:':
-        '缺少以下节点：'
-    }
-  )}
+      'When loading the graph, the following node types were not found:',
+      {
+        'When loading the graph, the following node types were not found:':
+          '缺少以下节点：'
+      }
+    )}
   
-   <ul>${missingNodeGithub(
-    missingNodeTypes,
-    nodesMap
-  ).join('')}</ul>${
-      hasAddedNodes
-        ? ''
-        : ''
+   <ul>${missingNodeGithub(missingNodeTypes, nodesMap).join('')}</ul>${
+      hasAddedNodes ? '' : ''
     }`
   )
   this.logging.addEntry('Comfy.App', 'warn', {
@@ -842,7 +840,9 @@ function createModelsModal (models) {
   // headTitleElement.href = 'https://github.com/shadowcz007/comfyui-mixlab-nodes'
   // headTitleElement.target = '_blank'
   const linkIcon = document.createElement('small')
-  linkIcon.textContent = '自动开启'
+  linkIcon.textContent = showTextByLanguage('Auto Open', {
+    'Auto Open': '自动开启'
+  })
   linkIcon.style.padding = '4px'
 
   const n_gpu = document.createElement('input')
@@ -896,7 +896,10 @@ function createModelsModal (models) {
 
   //重启
   const reStart = document.createElement('small')
-  reStart.textContent = '重启'
+  reStart.textContent = showTextByLanguage('restart', {
+    restart: '重启'
+  })
+
   reStart.style.padding = '4px'
 
   headTitleElement.appendChild(reStart)
@@ -981,6 +984,20 @@ function createModelsModal (models) {
     modalContent.appendChild(d)
   }
   modal.appendChild(modalContent)
+
+  const helpInfo = document.createElement('a')
+  helpInfo.textContent = showTextByLanguage('Help', {
+    Help: '寻求帮助'
+  })
+  helpInfo.style = `text-align: center;
+  display: block;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: white;`
+  helpInfo.href="https://discord.gg/cXs9vZSqeK"
+  helpInfo.target="_blank"
+  modal.appendChild(helpInfo)
 
   document.body.appendChild(div)
 }
