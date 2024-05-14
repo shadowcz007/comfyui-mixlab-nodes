@@ -6,9 +6,7 @@
 
 ##### `最新`：
 
-ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
-
-Model 下载后，放置到 `models/llamafile/`
+ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。模型下载后，放置到 `models/llamafile/`
 
 - 右键菜单支持 text-to-text，方便对 prompt 词补全
 
