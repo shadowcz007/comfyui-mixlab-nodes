@@ -3,6 +3,23 @@
 > 适配了最新版 comfyui 的 py3.11 ，torch 2.1.2+cu121
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
+
+##### `最新`：
+
+ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
+
+Model 下载后，放置到 `models/llamafile/`
+
+- 右键菜单支持 text-to-text，方便对 prompt 词补全
+
+强烈推荐：[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)，备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
+
+- 右键菜单支持 image-to-text，使用多模态模型，多模态使用 [llava-phi-3-mini-gguf](https://huggingface.co/xtuner/llava-phi-3-mini-gguf/tree/main)，注意需要把llava-phi-3-mini-mmproj-f16.gguf也下载
+
+![](./assets/prompt_ai_setup.png)
+![](./assets/prompt-ai.png)
+
+
 #### `相关插件推荐`
 
 <!-- [comfyui-sd-prompt-mixlab](https://github.com/shadowcz007/comfyui-sd-prompt-mixlab) -->
@@ -14,26 +31,6 @@
 [comfyui-moondream](https://github.com/shadowcz007/comfyui-moondream)
 
 <!-- [comfyui-CLIPSeg](https://github.com/shadowcz007/comfyui-CLIPSeg) -->
-
-##### `最新`：
-
-ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
-
-Model download,move to :`models/llamafile/`
-
-强烈推荐：
-[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)
-
-多模态使用 [llava-phi-3-mini-gguf](https://huggingface.co/xtuner/llava-phi-3-mini-gguf/tree/main)，注意需要把llava-phi-3-mini-mmproj-f16.gguf也下载
-
-
-备选：
-[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
-
-
-> 右键菜单支持 text-to-text，方便对 prompt 词补全
-> ![](./assets/prompt_ai_setup.png)
-> ![](./assets/prompt-ai.png)
 
 ## 🚀🚗🚚🏃 Workflow-to-APP
 
