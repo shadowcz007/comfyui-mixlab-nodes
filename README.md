@@ -21,7 +21,10 @@ Model download,move to :`models/llamafile/`
 
 强烈推荐：
 [Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)
+
 [llava-phi-3-mini-gguf](https://huggingface.co/xtuner/llava-phi-3-mini-gguf/tree/main)
+注意需要把llava-phi-3-mini-mmproj-f16.gguf也下载
+
 
 备选：
 [llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
