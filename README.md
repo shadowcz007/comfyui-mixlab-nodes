@@ -1,3 +1,6 @@
+![](https://img.shields.io/github/release/shadowcz007/comfyui-mixlab-nodes)
+
+自动获取最新 Release 的版本号。)
 > 适配了最新版 comfyui 的 py3.11 ，torch 2.1.2+cu121
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
