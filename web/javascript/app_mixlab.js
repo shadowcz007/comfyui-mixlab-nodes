@@ -70,7 +70,8 @@ function get_position_style (ctx, widget_width, y, node_height) {
     display: 'flex',
     flexDirection: 'column',
     // alignItems: 'center',
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    zIndex: 9999999
   }
 }
 
@@ -192,7 +193,7 @@ async function extractInputAndOutputData (
             options.hasMask = true
           }
           // loadImage的默认图，转为base64
-          let imgurl = app.graph.getNodeById(id).imgs[0].src
+          let imgurl = app.graph.getNodeById(id).imgs[0].src + '&channel=rgb'
 
           options.defaultImage = await drawImageToCanvas(imgurl, 512)
           console.log('#loadImage的默认图', options)
