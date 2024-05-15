@@ -1,0 +1,51 @@
+{
+  "name": "miniPaint",
+  "version": "4.14.2",
+  "author": "Vilius L.",
+  "description": "Online graphics editing tool lets create, edit images using HTML5 technologies.",
+  "keywords": [
+    "canvas",
+    "drawing",
+    "paint",
+    "layers",
+    "effects"
+  ],
+  "scripts": {
+    "server": "webpack serve --mode development --env development --open",
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/viliusle/miniPaint"
+  },
+  "homepage": "https://github.com/viliusle/miniPaint",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/plugin-transform-runtime": "^7.14.5",
+    "@babel/preset-env": "^7.14.5",
+    "babel-loader": "^8.2.2",
+    "css-loader": "^5.2.6",
+    "source-map-loader": "^3.0.0",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.76.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^4.3.1"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.14.5",
+    "alertifyjs": "^1.13.1",
+    "blueimp-canvas-to-blob": "^3.28.0",
+    "exif-js": "^2.3.0",
+    "file-saver": "^2.0.5",
+    "fuzzysort": "^1.1.4",
+    "gif.js.optimized": "^1.0.1",
+    "hermite-resize": "git+https://github.com/viliusle/Hermite-resize.git",
+    "jquery": "^3.5.1",
+    "pica": "^7.0.0",
+    "semver-compare": "^1.0.0",
+    "uuid": "^8.3.2",
+    "webfontloader": "^1.6.28"
+  }
+}
