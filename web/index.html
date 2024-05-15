@@ -434,7 +434,7 @@
             /* 角落颜色 */
         }
 
-/* 
+        /* 
         .dynamic_prompt::after {
             content: attr(title);
             position: absolute;
@@ -459,7 +459,10 @@
 
 <body>
 
-    <div id="editor_container"></div>
+    <div id="editor_container">
+        <iframe style="width:100%; height:100vh;" id="miniPaint"
+            src="/extensions/comfyui-mixlab-nodes/lib/miniPaint-4.14.2/index.html" allow="camera"></iframe>
+    </div>
     <div class="header">
         <div id="logo" style="margin: 0 24px;
             margin-bottom: 24px;
@@ -557,6 +560,42 @@
 
         };
 
+        async function uploadMask(arrayBuffer, imgurl) {
+            const body = new FormData()
+            const filename = 'clipspace-mask-' + performance.now() + '.png'
+
+            let original_url = new URL(imgurl)
+
+            const original_ref = { filename: original_url.searchParams.get('filename') }
+
+            let original_subfolder = original_url.searchParams.get('subfolder')
+            if (original_subfolder) original_ref.subfolder = original_subfolder
+
+            let original_type = original_url.searchParams.get('type')
+            if (original_type) original_ref.type = original_type
+
+            body.append('image', arrayBuffer, filename)
+            body.append('original_ref', JSON.stringify(original_ref))
+            body.append('type', 'input')
+            body.append('subfolder', 'clipspace')
+
+            const url = get_url()
+
+            const resp = await fetch(`${url}/upload/mask`, {
+                method: 'POST',
+                body
+            })
+
+            // console.log(resp)
+            let data = await resp.json()
+            let { name, subfolder, type } = data
+            let src = `${url}/view?filename=${encodeURIComponent(
+                name
+            )}&type=${type}&subfolder=${subfolder}&rand=${Math.random()}`
+
+            return { url: src, name: 'clipspace/' + name }
+        }
+
 
         const parseImageToBase64 = url => {
             return new Promise((res, rej) => {
@@ -641,125 +680,176 @@
         }
 
 
-        function editImage(img, data) {
-
-
-            const update = async () => {
-                const { imageData } = filerobotImageEditor.getCurrentImgData()
-                let base64 = imageData.imageBase64;
-
-                let fileBlob = base64ToBlob(base64)
-                // // 获取读取的文件内容，即 Blob 对象
-                let hashId = await calculateImageHash(fileBlob)
-
-                if (hashId == window._appData.data[data.id].hashId) return
-
-                let { url, name } = await uploadImage(fileBlob);
-                // 在这里可以对 Blob 对象进行进一步处理
-                // imageElement.src = url;
-                window._appData.data[data.id].inputs.image = name;
-                window._appData.data[data.id].hashId = hashId;
-
-                console.log("上传的文件：", url, data.id, name);
-
-                img.src = base64;
-            }
-
-            const { TABS, TOOLS } = FilerobotImageEditor;
-            const config = {
-                source: img.src,
-                // loadableDesignState:{ //默认值
-                //     annotations:{
-                //         watermark:{
-                //             image:'https://127.0.0.1:8189/view?filename=1703554480406.png&type=input&subfolder=&rand=0.044164708320141965',
-                //             width:100,
-                //             height:200,
-                //             x:10,
-                //             y:50,
-                //             name: "Image",
-                //             id:'watermark'
-                //         }
-                //     }
-                // },
-                // annotationsCommon: {
-                //     fill: '#ff0000',
-                // },
-                // Text: { text: 'Filerobot...' },
-                Rotate: { angle: 90, componentType: 'slider' },
-
-                Crop: {
-                    presetsItems: [
-                        {
-                            titleKey: 'classicTv',
-                            descriptionKey: '4:3',
-                            ratio: 4 / 3,
-                            // icon: CropClassicTv,  
-                        },
-                        {
-                            titleKey: 'cinemascope',
-                            descriptionKey: '21:9',
-                            ratio: 21 / 9,
-                            // icon: CropCinemaScope, 
-                        },
-                    ],
-                    presetsFolders: [
-                        {
-                            titleKey: 'socialMedia', // will be translated into Social Media as backend contains this translation key
-                            // icon: Social, // optional,  
-                            groups: [
-                                {
-                                    titleKey: 'facebook',
-                                    items: [
-                                        {
-                                            titleKey: 'profile',
-                                            width: 180,
-                                            height: 180,
-                                            descriptionKey: 'fbProfileSize',
-                                        },
-                                        {
-                                            titleKey: 'coverPhoto',
-                                            width: 820,
-                                            height: 312,
-                                            descriptionKey: 'fbCoverPhotoSize',
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                    ],
-                },
-                tabsIds: [...Object.values(TABS)], // or ['Adjust', 'Annotate', 'Watermark']
-                defaultTabId: TABS.WATERMARK, // or 'Annotate'
-                defaultToolId: TOOLS.WATERMARK, // or 'Text'
-                closeAfterSave: true
-            };
+        // 图像编辑
+        async function editImage(image, data) {
+            //判断mask是否有输出
+            let isMask = data.options.hasMask;
+            console.log(data)
+            //app
+            document.body.querySelector('.app').style.display = 'none'
+            document.body.querySelector('#author').style.display = 'none'
 
             let editor = document.querySelector('#editor_container')
-            // Assuming we have a div with id="editor_container"
             editor.style.display = 'block';
-            // console.log(img,editor,data)
-            document.body.style.overflow = 'hidden'
+            const iframe = editor.querySelector('iframe');
 
-            const filerobotImageEditor = new FilerobotImageEditor(
-                editor,
-                config,
-            );
+            //默认的画笔size设置大
+            // let inputSize = (iframe.contentDocument.getElementById('size')).querySelector('input');
+            // inputSize.value=50;
+            // (iframe.contentDocument.getElementById('size')).querySelector('.increase_number').click()
 
-            filerobotImageEditor.render({
-                onSave: (editedImageObject, designState) => {
-                    console.log('saved', designState)
-                    //adjustments
-                    update()
-                },
-                onClose: (closingReason) => {
-                    console.log('Closing reason', closingReason);
 
-                    filerobotImageEditor.terminate();
-                    editor.style.display = 'none'
-                    document.body.style.overflow = 'auto'
+            let cancelImageBtn = iframe.contentDocument.getElementById('cancel_image_mixlab');
+            cancelImageBtn.addEventListener('click', e => {
+                editor.style.display = 'none';
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
+            })
+            // 获取 id 为 "mix" 的 button 元素
+            let saveImageBtn = iframe.contentDocument.getElementById('save_image_mixlab');
+            saveImageBtn.addEventListener('click', async e => {
+                //保存，并更新图片
+                e.preventDefault();
 
-                },
-            });
+                //image的合成，排除mask和brush
+                if (isMask) {
+
+                    let Layers = iframe.contentWindow.Layers;
+                    let tempCanvas = document.createElement("canvas");
+                    let tempCtx = tempCanvas.getContext("2d");
+                    let dim = Layers.get_dimensions();
+                    tempCanvas.width = dim.width;
+                    tempCanvas.height = dim.height;
+
+
+                    for (const layer of Layers.get_layers()) {
+                        if (layer.name !== 'Image_' + data.id) {
+                            layer.visible = true;
+                        } else {
+                            layer.visible = false;
+                        }
+                    }
+                    Layers.refresh_gui()
+
+                    Layers.convert_layers_to_canvas(tempCtx);
+
+                    // 复原
+                    for (const layer of Layers.get_layers()) {
+                        layer.visible = true;
+                    }
+                    Layers.refresh_gui()
+
+
+
+
+                    // 获取图像数据
+                    const imageData = tempCtx.getImageData(0, 0, dim.width, dim.height);
+                    const imageDataData = imageData.data;
+
+                    // 反相图像数据
+                    for (let i = 0; i < imageDataData.length; i += 4) {
+                        // imageDataData[i] = 255 - imageDataData[i];
+                        // imageDataData[i + 1] = 255 - imageDataData[i + 1];
+                        // imageDataData[i + 2] = 255 - imageDataData[i + 2];
+                        imageDataData[i + 3] = 255 - imageDataData[i + 3]; // 反相透明度
+                    }
+
+                    // 更新画布
+                    tempCtx.putImageData(imageData, 0, 0);
+
+
+                    let base64 = tempCanvas.toDataURL();
+                    // console.log(base64);
+                    editor.style.display = 'none';
+
+                    let fileBlob = base64ToBlob(base64)
+                    // // 获取读取的文件内容，即 Blob 对象
+                    let hashId = await calculateImageHash(fileBlob)
+
+                    if (hashId == window._appData.data[data.id].hashId) return;
+
+                    const { url: imgurl } = await uploadImage(base64ToBlob(data.options.defaultImage))
+
+                    let { url, name } = await uploadMask(fileBlob, imgurl);
+                    // 在这里可以对 Blob 对象进行进一步处理
+                    // imageElement.src = url;
+                    window._appData.data[data.id].inputs.image = name;
+                    window._appData.data[data.id].hashId = hashId;
+
+                    // console.log("上传的文件：", url, data.id, name);
+
+
+                    //更新图片
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = dim.width;
+                    canvas.height = dim.height;
+
+                    const ctx = canvas.getContext('2d');
+
+                    const defaultImage = new Image();
+                    defaultImage.src = data.options.defaultImage;
+                    defaultImage.onload = function () {
+                        ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
+
+                        // 绘制base64图片
+                        const base64Image = base64
+                        const base64ImageObj = new Image();
+                        base64ImageObj.onload = function () {
+                            ctx.globalCompositeOperation = 'destination-in';
+                            ctx.drawImage(base64ImageObj, 0, 0, dim.width, dim.height);
+                            image.src = canvas.toDataURL();
+                        };
+                        base64ImageObj.src = base64;
+                    };
+
+                }
+
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
+            })
+
+
+            var Layers = iframe.contentWindow.Layers;
+            // console.log(Layers)
+
+            //判断是否已经存在
+            let layers1 = Layers.get_layers()
+
+            if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
+                var new_layer = {
+                    id: (Layers.get_layers()).length,
+                    name: 'Image_' + data.id,
+                    type: 'image',
+                    data: image,
+                    width: image.naturalWidth || image.width,
+                    height: image.naturalHeight || image.height,
+                    width_original: image.naturalWidth || image.width,
+                    height_original: image.naturalHeight || image.height,
+                };
+
+                Layers.insert(new_layer);
+            }
+
+
+
+            if (isMask) {
+                if (!layers1.filter(l => l.name == 'Mask_' + data.id)[0]) {
+                    var new_mask_layer = {
+                        id: (Layers.get_layers()).length,
+                        name: 'Mask_' + data.id,
+                        type: 'brush',
+                        data: [],
+                        render_function: ['brush', 'render'],
+                        width: image.naturalWidth || image.width,
+                        height: image.naturalHeight || image.height,
+
+                    };
+
+                    Layers.insert(new_mask_layer);
+                }
+
+            }
 
         }
 
@@ -1486,7 +1576,8 @@
 
                     if (!isVideoUpload) btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
 
-                    if (!isVideoUpload && !isBase64Upload) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
+                    // 只有mask有输出，才有编辑功能
+                    if (!isVideoUpload && !isBase64Upload && data.options.hasMask) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
 
 
                     uploadImageInput.addEventListener('click', (event) => {
