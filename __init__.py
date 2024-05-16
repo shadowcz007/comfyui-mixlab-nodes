@@ -8,6 +8,8 @@ import hashlib
 import datetime
 import folder_paths
 import logging
+import base64,io,re
+from PIL import Image
 from comfy.cli_args import args
 python = sys.executable
 
@@ -29,6 +31,8 @@ try:
 except:
     print("##nodes.ChatGPT ImportError")
 
+
+from .nodes.RembgNode import get_rembg_models,U2NET_HOME,run_briarmbg,run_rembg
 
 from server import PromptServer
 
@@ -98,6 +102,26 @@ install_openai()
 current_path = os.path.abspath(os.path.dirname(__file__))
 
 
+def remove_base64_prefix(base64_str):
+  """
+  去除 base64 字符串中的 data:image/*;base64, 前缀
+
+  Args:
+    base64_str: base64 编码的字符串
+
+  Returns:
+    去除前缀后的 base64 字符串
+  """
+
+  # 使用正则表达式匹配常见的前缀
+  pattern = r'^data:image\/(.*);base64,(.+)$'
+  match = re.match(pattern, base64_str)
+  if match:
+    # 如果匹配到常见的前缀，则去除前缀并返回
+    return match.group(2)
+  else:
+    # 如果不匹配到常见的前缀，则直接返回
+    return base64_str
 
 def calculate_md5(string):
     encoded_string = string.encode()
@@ -629,8 +653,51 @@ async def get_checkpoints(request):
             names=get_llama_models()
     except:
         print("llamafile none")
+
+    try:
+        if data['type']=='rembg':
+            names=get_rembg_models(U2NET_HOME)
+    except:
+        print("rembg none")
     
     return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
+
+
+@routes.post('/mixlab/rembg')
+async def rembg_hander(request):
+    data = await request.json()
+    model=data['model']
+    result={}
+
+    data_base64=remove_base64_prefix(data['base64'])
+    image_data = base64.b64decode(data_base64)
+    
+    # 创建一个BytesIO对象
+    image_stream = io.BytesIO(image_data)
+
+    # 使用PIL Image模块读取图像
+    image = Image.open(image_stream)
+
+    if model=='briarmbg':
+        _,rgba_images,_=run_briarmbg([image])
+    else:
+        _,rgba_images,_=run_rembg(model,[image])
+
+    with io.BytesIO() as buf:
+        rgba_images[0].save(buf, format='PNG')
+        img_bytes = buf.getvalue()
+    img_base64 = base64.b64encode(img_bytes).decode('utf-8')
+    
+    try: 
+        result={
+            'data':img_base64,
+            'model':model,
+            'status':'success',
+            }
+    except Exception as e:
+            print(e)
+
+    return web.json_response(result)
 
 
 @routes.post("/mixlab/prompt_result")

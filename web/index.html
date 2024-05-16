@@ -247,7 +247,7 @@
 
         .card textarea {
             width: 100%;
-            height:'fit-content';
+            height: 'fit-content';
             /* min-width: 300px; */
             margin-top: 12px;
             resize: none;
@@ -474,15 +474,15 @@
             <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
         </div>
 
-        <a target="_blank" id="login_btn" href="https://www.mixcomfy.com/blog/" style="text-decoration: none;
+        <a id="login_btn" target="_blank" href="https://discord.gg/xbP2GZF6gn" 
+        style="text-decoration: none;
         color: black;font-size:12px">
             <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
                 class="octicon octicon-mark-github v-align-middle color-fg-default">
                 <path
                     d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z">
                 </path>
-            </svg> Community</a>
-
+            </svg> HELP/帮助</a>
 
     </div>
     <a id="author"></a>
@@ -680,11 +680,90 @@
         }
 
 
+        // 获取 rembg 模型
+        async function get_rembg_models() {
+            try {
+                const response = await fetch(`${get_url()}/mixlab/folder_paths`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        type: 'rembg'
+                    })
+                })
+
+                const data = await response.json()
+                // console.log(data)
+                return data.names
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        //自动抠图
+        async function run_rembg(model, base64) {
+            try {
+                const response = await fetch(`${get_url()}/mixlab/rembg`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model,
+                        base64
+                    })
+                })
+
+                const data = await response.json()
+                // console.log(data)
+                return data.data
+            } catch (error) {
+                console.error(error)
+            }
+        }
+
+        function convertImageToBlackBasedOnAlpha(image) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Draw the image onto the canvas
+            canvas.width = image.width;
+            canvas.height = image.height;
+            ctx.drawImage(image, 0, 0);
+
+            // Get the image data from the canvas
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+
+            // Modify the RGB values based on the alpha channel
+            for (let i = 0; i < pixels.length; i += 4) {
+                const alpha = pixels[i + 3];
+                if (alpha !== 0) {
+                    // Set non-transparent pixels to black
+                    pixels[i] = 0; // Red
+                    pixels[i + 1] = 0; // Green
+                    pixels[i + 2] = 0; // Blue
+                }
+            }
+
+            // Put the modified image data back onto the canvas
+            ctx.putImageData(imageData, 0, 0);
+
+            // Convert the modified canvas to base64 data URL
+            const base64ImageData = canvas.toDataURL('image/png'); // Replace 'png' with your desired image format
+
+            return base64ImageData;
+        }
+
+
+
         // 图像编辑
         async function editImage(image, data) {
             //判断mask是否有输出
             let isMask = data.options.hasMask;
             console.log(data)
+
             //app
             document.body.querySelector('.app').style.display = 'none'
             document.body.querySelector('#author').style.display = 'none'
@@ -693,10 +772,102 @@
             editor.style.display = 'block';
             const iframe = editor.querySelector('iframe');
 
+            // 复原
+            const resetLayer = () => {
+                let Layers = iframe.contentWindow.Layers;
+                for (const layer of Layers.get_layers()) {
+                    layer.visible = true;
+                }
+                Layers.refresh_gui()
+            }
+            //取image
+            const getImageBase64FromLayer = () => {
+                let Layers = iframe.contentWindow.Layers;
+                let tempCanvas = document.createElement("canvas");
+                let tempCtx = tempCanvas.getContext("2d");
+                let dim = Layers.get_dimensions();
+                tempCanvas.width = dim.width;
+                tempCanvas.height = dim.height;
+                for (const layer of Layers.get_layers()) {
+                    if (layer.name === 'Image_' + data.id) {
+                        layer.visible = true;
+                    } else {
+                        layer.visible = false;
+                    }
+                }
+                Layers.refresh_gui()
+
+                Layers.convert_layers_to_canvas(tempCtx);
+                return tempCanvas.toDataURL()
+            }
+
+            //add mask
+            const addMask = (id, name, image) => {
+                let Layers = iframe.contentWindow.Layers;
+                var new_mask_layer = {
+                    id,
+                    name,
+                    type: 'brush',
+                    data: [],
+                    render_function: ['brush', 'render'],
+                    width: image.naturalWidth || image.width,
+                    height: image.naturalHeight || image.height,
+
+                };
+                Layers.insert(new_mask_layer);
+            }
+
+            //add image
+            const addImage = (id, name, image) => {
+                let Layers = iframe.contentWindow.Layers;
+                var new_mask_layer = {
+                    id,
+                    name,
+                    type: 'image',
+                    data: image,
+                    width: image.naturalWidth || image.width,
+                    height: image.naturalHeight || image.height,
+                    width_original: image.naturalWidth || image.width,
+                    height_original: image.naturalHeight || image.height,
+                };
+                Layers.insert(new_mask_layer);
+            }
+
             //默认的画笔size设置大
             // let inputSize = (iframe.contentDocument.getElementById('size')).querySelector('input');
             // inputSize.value=50;
             // (iframe.contentDocument.getElementById('size')).querySelector('.increase_number').click()
+
+            //自动抠图
+            let autoMaskSelect = iframe.contentDocument.getElementById('automask_image_mixlab');
+            const select = iframe.contentDocument.getElementById('automask_models_mixlab');
+            let rembgModels = await get_rembg_models()
+            // 遍历模型列表并创建选项
+            for (const model of rembgModels) {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                select.appendChild(option);
+            }
+
+            let autoMaskBtn = iframe.contentDocument.getElementById('automask_image_mixlab');
+            autoMaskBtn.addEventListener('click', async e => {
+                //api请求
+                let base64 = getImageBase64FromLayer()
+                resetLayer()
+
+                let res = await run_rembg(select.value, base64)
+                const match = res.match(/^data:image\/(\w+);base64,/);
+                if (!match) {
+                    res = 'data:image/png;base64,' + res
+                }
+
+                let image = await createImage(res)
+
+                let mb = convertImageToBlackBasedOnAlpha(image)
+                let mask = await createImage(mb)
+                addImage((Layers.get_layers()).length, 'Mask_' + data.id, mask)
+            })
 
 
             let cancelImageBtn = iframe.contentDocument.getElementById('cancel_image_mixlab');
@@ -707,6 +878,11 @@
             })
             // 获取 id 为 "mix" 的 button 元素
             let saveImageBtn = iframe.contentDocument.getElementById('save_image_mixlab');
+            saveImageBtn.style = `width: 98px;
+            height: 36px;
+            margin: 0 12px;
+            background-color: var(--background-color-active);
+            color: var(--text-color-active);`
             saveImageBtn.addEventListener('click', async e => {
                 //保存，并更新图片
                 e.preventDefault();
@@ -734,13 +910,7 @@
                     Layers.convert_layers_to_canvas(tempCtx);
 
                     // 复原
-                    for (const layer of Layers.get_layers()) {
-                        layer.visible = true;
-                    }
-                    Layers.refresh_gui()
-
-
-
+                    resetLayer()
 
                     // 获取图像数据
                     const imageData = tempCtx.getImageData(0, 0, dim.width, dim.height);
@@ -780,28 +950,22 @@
 
 
                     //更新图片
-
                     const canvas = document.createElement("canvas");
                     canvas.width = dim.width;
                     canvas.height = dim.height;
 
                     const ctx = canvas.getContext('2d');
 
-                    const defaultImage = new Image();
-                    defaultImage.src = data.options.defaultImage;
-                    defaultImage.onload = function () {
-                        ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
 
-                        // 绘制base64图片
-                        const base64Image = base64
-                        const base64ImageObj = new Image();
-                        base64ImageObj.onload = function () {
-                            ctx.globalCompositeOperation = 'destination-in';
-                            ctx.drawImage(base64ImageObj, 0, 0, dim.width, dim.height);
-                            image.src = canvas.toDataURL();
-                        };
-                        base64ImageObj.src = base64;
-                    };
+                    const defaultImage = await createImage(data.options.defaultImage)
+                    ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
+
+                    // 绘制base64图片
+                    // const base64Image = base64
+                    const base64ImageObj = await createImage(base64)
+                    ctx.globalCompositeOperation = 'destination-in';
+                    ctx.drawImage(base64ImageObj, 0, 0, dim.width, dim.height);
+                    image.src = canvas.toDataURL();
 
                 }
 
@@ -817,36 +981,12 @@
             let layers1 = Layers.get_layers()
 
             if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
-                var new_layer = {
-                    id: (Layers.get_layers()).length,
-                    name: 'Image_' + data.id,
-                    type: 'image',
-                    data: image,
-                    width: image.naturalWidth || image.width,
-                    height: image.naturalHeight || image.height,
-                    width_original: image.naturalWidth || image.width,
-                    height_original: image.naturalHeight || image.height,
-                };
-
-                Layers.insert(new_layer);
+                addImage((Layers.get_layers()).length, 'Image_' + data.id, image)
             }
-
-
 
             if (isMask) {
                 if (!layers1.filter(l => l.name == 'Mask_' + data.id)[0]) {
-                    var new_mask_layer = {
-                        id: (Layers.get_layers()).length,
-                        name: 'Mask_' + data.id,
-                        type: 'brush',
-                        data: [],
-                        render_function: ['brush', 'render'],
-                        width: image.naturalWidth || image.width,
-                        height: image.naturalHeight || image.height,
-
-                    };
-
-                    Layers.insert(new_mask_layer);
+                    addMask((Layers.get_layers()).length, 'Mask_' + data.id, image)
                 }
 
             }

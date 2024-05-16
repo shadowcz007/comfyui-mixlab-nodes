@@ -46,7 +46,7 @@ async function get_llamafile_models () {
     })
 
     const data = await response.json()
-    console.log(data)
+    // console.log(data)
     return data.names
   } catch (error) {
     console.error(error)

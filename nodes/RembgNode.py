@@ -476,6 +476,24 @@ os.environ["U2NET_HOME"] = U2NET_HOME
 global _available
 _available=False
 
+
+def get_rembg_models(path):
+    """从目录中获取文件并提取文件名
+    Args:
+        path: 目录路径
+    Returns:
+        文件名列表
+    """
+    filenames = []
+    for root, _, files in os.walk(path):
+        for filename in files:
+        # 过滤隐藏文件
+            if not filename.startswith('.'):
+                name, ext = os.path.splitext(os.path.basename(filename))
+                filenames.append(name)
+    return filenames
+
+
 def is_installed(package):
     try:
         spec = importlib.util.find_spec(package)
@@ -509,7 +527,7 @@ except:
     _available=False
 
 
-def briarmbg_run(images=[]):
+def run_briarmbg(images=[]):
     mroot=os.path.join(folder_paths.models_dir, "rembg")
     m=os.path.join(mroot,'briarmbg.pth')
     if os.path.exists(m)==False:
@@ -573,7 +591,7 @@ def briarmbg_run(images=[]):
     return (masks,rgba_images,rgb_images)   
 
 
-def run_bg(model_name= "unet",images=[]):
+def run_rembg(model_name= "unet",images=[]):
     # model_name = "unet" # "isnet-general-use"
     rembg_session = new_session(model_name)
     masks=[]
@@ -643,17 +661,7 @@ class RembgNode_:
     def INPUT_TYPES(s):
         return {"required": {
             "image": ("IMAGE",),
-            "model_name": ([
-                            "briarmbg",
-                            "u2net",
-                            "u2netp",
-                            "u2net_human_seg",
-                            "u2net_cloth_seg",
-                            "silueta",
-                            "isnet-general-use",
-                            "isnet-anime",
-                            
-                            ],),
+            "model_name": (get_rembg_models(U2NET_HOME),),
             
                              },
                 }
@@ -681,9 +689,9 @@ class RembgNode_:
                 images.append(im)
 
         if model_name=='briarmbg':
-            masks,rgba_images,rgb_images=briarmbg_run(images)
+            masks,rgba_images,rgb_images=run_briarmbg(images)
         else:
-            masks,rgba_images,rgb_images=run_bg(model_name,images)
+            masks,rgba_images,rgb_images=run_rembg(model_name,images)
 
         masks=[pil2tensor(m) for m in masks]
 
