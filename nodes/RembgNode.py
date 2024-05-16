@@ -591,14 +591,15 @@ def run_briarmbg(images=[]):
     return (masks,rgba_images,rgb_images)   
 
 
-def run_rembg(model_name= "unet",images=[]):
+def run_rembg(model_name= "unet",images=[],callback=None):
     # model_name = "unet" # "isnet-general-use"
+    # print('#run_rembg',model_name)
     rembg_session = new_session(model_name)
     masks=[]
     rgba_images=[]
     rgb_images=[]
     # 进度条
-    pbar = comfy.utils.ProgressBar(len(images) )
+    pbar=callback 
     for img in images:
         # use the post_process_mask argument to post process the mask to get better results.
         mask = remove(img, session=rembg_session,only_mask=True,post_process_mask=True)
@@ -638,8 +639,9 @@ def run_rembg(model_name= "unet",images=[]):
             rgb_image = Image.new("RGB", image_rgba.size, (0, 0, 0))
             rgb_image.paste(image_rgba, mask=image_rgba.split()[3])
             rgb_images.append(rgb_image)
-            
-        pbar.update(1)
+
+        if pbar:
+            pbar.update(1)
     return (masks,rgba_images,rgb_images)
 
 
@@ -691,7 +693,7 @@ class RembgNode_:
         if model_name=='briarmbg':
             masks,rgba_images,rgb_images=run_briarmbg(images)
         else:
-            masks,rgba_images,rgb_images=run_rembg(model_name,images)
+            masks,rgba_images,rgb_images=run_rembg(model_name,images, comfy.utils.ProgressBar(len(images) ))
 
         masks=[pil2tensor(m) for m in masks]
 

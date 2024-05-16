@@ -778,12 +778,14 @@ async def start_local_llm(data):
     
     server_settings=ServerSettings(host=address,port=port)
 
+    name, ext = os.path.splitext(os.path.basename(model))
+    print('#model',name)
     app = create_app(
                 server_settings=server_settings,
                 model_settings=[
                     ModelSettings(
                     model=model,
-                    model_alias=os.path.basename(model),
+                    model_alias=name,
                     n_gpu_layers=n_gpu_layers,
                     n_ctx=4098,
                     chat_format=chat_format,

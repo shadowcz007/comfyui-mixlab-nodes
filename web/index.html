@@ -474,8 +474,7 @@
             <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
         </div>
 
-        <a id="login_btn" target="_blank" href="https://discord.gg/xbP2GZF6gn" 
-        style="text-decoration: none;
+        <a id="login_btn" target="_blank" href="https://discord.gg/xbP2GZF6gn" style="text-decoration: none;
         color: black;font-size:12px">
             <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
                 class="octicon octicon-mark-github v-align-middle color-fg-default">
@@ -762,8 +761,7 @@
         async function editImage(image, data) {
             //判断mask是否有输出
             let isMask = data.options.hasMask;
-            console.log(data)
-
+           
             //app
             document.body.querySelector('.app').style.display = 'none'
             document.body.querySelector('#author').style.display = 'none'
@@ -841,17 +839,19 @@
             //自动抠图
             let autoMaskSelect = iframe.contentDocument.getElementById('automask_image_mixlab');
             const select = iframe.contentDocument.getElementById('automask_models_mixlab');
-            let rembgModels = await get_rembg_models()
-            // 遍历模型列表并创建选项
-            for (const model of rembgModels) {
-                const option = document.createElement('option');
-                option.value = model;
-                option.textContent = model;
-                select.appendChild(option);
+            if (select.children.length === 0) {
+                let rembgModels = await get_rembg_models()
+                // 遍历模型列表并创建选项
+                for (const model of rembgModels) {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    select.appendChild(option);
+                }
             }
 
             let autoMaskBtn = iframe.contentDocument.getElementById('automask_image_mixlab');
-            autoMaskBtn.addEventListener('click', async e => {
+           if(!autoMaskBtn.getAttribute('init')) autoMaskBtn.addEventListener('click', async e => {
                 //api请求
                 let base64 = getImageBase64FromLayer()
                 resetLayer()
@@ -869,13 +869,15 @@
                 addImage((Layers.get_layers()).length, 'Mask_' + data.id, mask)
             })
 
-
+            autoMaskBtn.setAttribute('init',1)
             let cancelImageBtn = iframe.contentDocument.getElementById('cancel_image_mixlab');
-            cancelImageBtn.addEventListener('click', e => {
+            if(!cancelImageBtn.getAttribute('init'))  cancelImageBtn.addEventListener('click', e => {
                 editor.style.display = 'none';
                 document.body.querySelector('.app').style.display = 'flex'
                 document.body.querySelector('#author').style.display = 'block'
             })
+            
+            cancelImageBtn.setAttribute('init',1)
             // 获取 id 为 "mix" 的 button 元素
             let saveImageBtn = iframe.contentDocument.getElementById('save_image_mixlab');
             saveImageBtn.style = `width: 98px;
@@ -883,7 +885,7 @@
             margin: 0 12px;
             background-color: var(--background-color-active);
             color: var(--text-color-active);`
-            saveImageBtn.addEventListener('click', async e => {
+            if(!saveImageBtn.getAttribute('init'))  saveImageBtn.addEventListener('click', async e => {
                 //保存，并更新图片
                 e.preventDefault();
 
@@ -973,7 +975,8 @@
                 document.body.querySelector('#author').style.display = 'block'
             })
 
-
+            saveImageBtn.setAttribute('init',1)
+            
             var Layers = iframe.contentWindow.Layers;
             // console.log(Layers)
 
