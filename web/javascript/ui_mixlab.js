@@ -539,10 +539,6 @@ injectCSS(`::-webkit-scrollbar {
   border-left: 2px solid var(--input-text); 
 }
  
-.litegraph{
-  background: var(--bg-color)!important;
-}
-
 `)
 
 async function getCustomnodeMappings (mode = 'url') {
