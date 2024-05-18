@@ -761,7 +761,7 @@
         async function editImage(image, data) {
             //判断mask是否有输出
             let isMask = data.options.hasMask;
-           
+
             //app
             document.body.querySelector('.app').style.display = 'none'
             document.body.querySelector('#author').style.display = 'none'
@@ -769,6 +769,22 @@
             let editor = document.querySelector('#editor_container')
             editor.style.display = 'block';
             const iframe = editor.querySelector('iframe');
+
+            const sleep = (t = 1000) => {
+                return new Promise((res, rej) => {
+                    setTimeout(() => {
+                        res(true)
+                    }, t)
+                })
+            }
+
+            //清空 图层
+            const removeAllLayer = () => {
+                let Layers = iframe.contentWindow.Layers;
+                //清空
+                Layers.reset_layers()
+                Layers.refresh_gui()
+            }
 
             // 复原
             const resetLayer = () => {
@@ -851,7 +867,7 @@
             }
 
             let autoMaskBtn = iframe.contentDocument.getElementById('automask_image_mixlab');
-           if(!autoMaskBtn.getAttribute('init')) autoMaskBtn.addEventListener('click', async e => {
+            if (!autoMaskBtn.getAttribute('init')) autoMaskBtn.addEventListener('click', async e => {
                 //api请求
                 let base64 = getImageBase64FromLayer()
                 resetLayer()
@@ -866,18 +882,19 @@
 
                 let mb = convertImageToBlackBasedOnAlpha(image)
                 let mask = await createImage(mb)
-                addImage((Layers.get_layers()).length, 'Mask_' + data.id, mask)
+                let id = Layers.auto_increment;
+                addImage(id, 'Mask_' + data.id + id, mask)
             })
 
-            autoMaskBtn.setAttribute('init',1)
+            autoMaskBtn.setAttribute('init', 1)
             let cancelImageBtn = iframe.contentDocument.getElementById('cancel_image_mixlab');
-            if(!cancelImageBtn.getAttribute('init'))  cancelImageBtn.addEventListener('click', e => {
+            if (!cancelImageBtn.getAttribute('init')) cancelImageBtn.addEventListener('click', e => {
                 editor.style.display = 'none';
                 document.body.querySelector('.app').style.display = 'flex'
                 document.body.querySelector('#author').style.display = 'block'
             })
-            
-            cancelImageBtn.setAttribute('init',1)
+
+            cancelImageBtn.setAttribute('init', 1)
             // 获取 id 为 "mix" 的 button 元素
             let saveImageBtn = iframe.contentDocument.getElementById('save_image_mixlab');
             saveImageBtn.style = `width: 98px;
@@ -885,7 +902,7 @@
             margin: 0 12px;
             background-color: var(--background-color-active);
             color: var(--text-color-active);`
-            if(!saveImageBtn.getAttribute('init'))  saveImageBtn.addEventListener('click', async e => {
+            if (!saveImageBtn.getAttribute('init')) saveImageBtn.addEventListener('click', async e => {
                 //保存，并更新图片
                 e.preventDefault();
 
@@ -975,23 +992,32 @@
                 document.body.querySelector('#author').style.display = 'block'
             })
 
-            saveImageBtn.setAttribute('init',1)
-            
+            saveImageBtn.setAttribute('init', 1)
+
             var Layers = iframe.contentWindow.Layers;
             // console.log(Layers)
 
             //判断是否已经存在
-            let layers1 = Layers.get_layers()
+            let layers1 = Layers.get_layers();
 
+            //通过layer.link.src 判断是否图片更新
+            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc !== image.src)
+            if (layers1.filter(l => l.name == 'Image_' + data.id)[0]
+                && layers1.filter(l => l.name == 'Image_' + data.id)[0].link.src !== image.src) {
+                //清空图层
+                removeAllLayer();
+                layers1 = [];
+                await sleep()
+            }
+            console.log(layers1, layers1.length)
             if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
-                addImage((Layers.get_layers()).length, 'Image_' + data.id, image)
+                addImage(0, 'Image_' + data.id, image)
             }
 
             if (isMask) {
                 if (!layers1.filter(l => l.name == 'Mask_' + data.id)[0]) {
-                    addMask((Layers.get_layers()).length, 'Mask_' + data.id, image)
+                    addMask(1, 'Mask_' + data.id, image)
                 }
-
             }
 
         }
@@ -1440,8 +1466,9 @@
 
                             if (hashId == window._appData.data[data.id].hashId) return
 
+                            let base64 = await blobToBase64(fileBlob)
+
                             if (data.class_type === 'LoadImagesToBatch') {
-                                let base64 = await blobToBase64(fileBlob)
                                 createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
                             } else {
                                 let { url, name } = await uploadImage(fileBlob);
@@ -1450,6 +1477,14 @@
                                 window._appData.data[data.id].inputs.image = name;
                                 window._appData.data[data.id].hashId = hashId;
                                 console.log("上传的文件：", url, data.id, name);
+
+                                //更换option里的default image
+                                window._appData.input = Array.from(window._appData.input, inp => {
+                                    if (inp.id === data.id) {
+                                        inp.options.defaultImage = base64;
+                                    }
+                                    return inp
+                                })
                             }
                         }
                     }
@@ -1751,9 +1786,9 @@
                                 //上传，返回url
                                 let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
 
+                                let base64 = await parseImageToBase64(url);
+
                                 if (data.class_type === 'ImagesPrompt_') {
-                                    // 
-                                    let base64 = await parseImageToBase64(url);
                                     uploadContainer.querySelector('.images_prompt_main').src = base64
                                     window._appData.data[data.id].inputs.image_base64 = base64;
                                 } else {
@@ -1763,10 +1798,17 @@
                                     // 在这里可以对 Blob 对象进行进一步处理
                                     imageElement.src = url;
 
-
                                     if (isVideoUpload) {
                                         window._appData.data[data.id].inputs.video = name;
                                     } else {
+                                        //更换option里的default image
+                                        window._appData.input = Array.from(window._appData.input, inp => {
+                                            if (inp.id === data.id) {
+                                                inp.options.defaultImage = base64;
+                                            }
+                                            return inp
+                                        })
+
                                         window._appData.data[data.id].inputs.image = name;
                                     }
 
