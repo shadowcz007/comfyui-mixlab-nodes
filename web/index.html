@@ -955,10 +955,15 @@
                     // // 获取读取的文件内容，即 Blob 对象
                     let hashId = await calculateImageHash(fileBlob)
 
-                    if (hashId == window._appData.data[data.id].hashId) return;
+                    if (hashId == window._appData.data[data.id].hashId) {
+                        document.body.querySelector('.app').style.display = 'flex'
+                        document.body.querySelector('#author').style.display = 'block'
+                        return;
+                    }
 
+                    //底图
                     const { url: imgurl } = await uploadImage(base64ToBlob(data.options.defaultImage))
-
+                    //mask
                     let { url, name } = await uploadMask(fileBlob, imgurl);
                     // 在这里可以对 Blob 对象进行进一步处理
                     // imageElement.src = url;
@@ -966,15 +971,12 @@
                     window._appData.data[data.id].hashId = hashId;
 
                     // console.log("上传的文件：", url, data.id, name);
-
-
                     //更新图片
                     const canvas = document.createElement("canvas");
                     canvas.width = dim.width;
                     canvas.height = dim.height;
 
                     const ctx = canvas.getContext('2d');
-
 
                     const defaultImage = await createImage(data.options.defaultImage)
                     ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
@@ -1009,14 +1011,16 @@
                 layers1 = [];
                 await sleep()
             }
-            console.log(layers1, layers1.length)
+
+            let im = await createImage(data.options.defaultImage)
+            // console.log(layers1, layers1.length)
             if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
-                addImage(0, 'Image_' + data.id, image)
+                addImage(0, 'Image_' + data.id, im)
             }
 
             if (isMask) {
                 if (!layers1.filter(l => l.name == 'Mask_' + data.id)[0]) {
-                    addMask(1, 'Mask_' + data.id, image)
+                    addMask(1, 'Mask_' + data.id, im)
                 }
             }
 
