@@ -1003,9 +1003,9 @@
             let layers1 = Layers.get_layers();
 
             //通过layer.link.src 判断是否图片更新
-            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc !== image.src)
+            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc!==data.options.defaultImage)
             if (layers1.filter(l => l.name == 'Image_' + data.id)[0]
-                && layers1.filter(l => l.name == 'Image_' + data.id)[0].link.src !== image.src) {
+                && layers1.filter(l => l.name == 'Image_' + data.id)[0].link.src !== data.options.defaultImage) {
                 //清空图层
                 removeAllLayer();
                 layers1 = [];
