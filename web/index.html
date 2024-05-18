@@ -916,6 +916,7 @@
                     tempCanvas.width = dim.width;
                     tempCanvas.height = dim.height;
 
+                    //todo 获取Image更新后的数据(暂不支持image的修改)
 
                     for (const layer of Layers.get_layers()) {
                         if (layer.name !== 'Image_' + data.id) {
@@ -1003,7 +1004,7 @@
             let layers1 = Layers.get_layers();
 
             //通过layer.link.src 判断是否图片更新
-            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc!==data.options.defaultImage)
+            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc !== data.options.defaultImage)
             if (layers1.filter(l => l.name == 'Image_' + data.id)[0]
                 && layers1.filter(l => l.name == 'Image_' + data.id)[0].link.src !== data.options.defaultImage) {
                 //清空图层
