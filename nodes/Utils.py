@@ -284,7 +284,7 @@ class FloatSlider:
                 }
     
     RETURN_TYPES = ("FLOAT",) 
-    RETURN_NAMES = ('weight(0-1)',)
+    RETURN_NAMES = ('FLOAT',)
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Input"
@@ -297,8 +297,7 @@ class FloatSlider:
             number = min_value
         elif number > max_value:
             number = max_value
-        scaled_number = (number - min_value) / (max_value - min_value)
-        return (scaled_number,)
+        return number
     
   
 class IntNumber:
