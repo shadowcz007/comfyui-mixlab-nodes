@@ -87,7 +87,7 @@ def split_video(video_path, video_segment_frames, transition_frames, output_dir)
 
 folder_paths.folder_names_and_paths["video_formats"] = (
     [
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "video_formats"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), ".", "video_formats"),
     ],
     [".json"]
 )
@@ -429,11 +429,11 @@ class VideoCombine_Adv:
     @classmethod
     def INPUT_TYPES(s):
         #Hide ffmpeg formats if ffmpeg isn't available
-        # if ffmpeg_path is not None:
-        #     ffmpeg_formats = ["video/"+x[:-5] for x in folder_paths.get_filename_list("video_formats")]
-        # else:
-        #     ffmpeg_formats = []
-        ffmpeg_formats =["video/"+x for x in  ['webm', 'mp4', 'mkv']]
+        if ffmpeg_path is not None:
+            ffmpeg_formats = ["video/"+x[:-5] for x in folder_paths.get_filename_list("video_formats")]
+        else:
+            ffmpeg_formats = []
+        # ffmpeg_formats =["video/"+x for x in  ['webm', 'mp4', 'mkv']]
         return {
             "required": {
                 "image_batch": ("IMAGE",),
