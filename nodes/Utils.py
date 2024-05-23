@@ -297,8 +297,7 @@ class FloatSlider:
             number = min_value
         elif number > max_value:
             number = max_value
-        return number
-    
+        return (number,)    
   
 class IntNumber:
     @classmethod
