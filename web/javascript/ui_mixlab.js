@@ -1357,7 +1357,7 @@ app.registerExtension({
           ? nodesMap
           : await getCustomnodeMappings('url')
 
-      console.log('node & node map', node, nodesMap, nodesMap[node.type])
+      console.log("%c### node & node map", "background: yellow; color: black", node, nodesMap, nodesMap[node.type])
       let repo = nodesMap[node.type]
       if (repo) {
         let markdown = await fetchReadmeContent(repo.url)
