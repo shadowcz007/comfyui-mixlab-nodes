@@ -10,6 +10,6 @@ Repository = "https://github.com/shadowcz007/comfyui-mixlab-nodes"
 #  Used by Comfy Registry https://comfyregistry.org
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "shadow"
 DisplayName = "comfyui-mixlab-nodes"
 Icon = ""
