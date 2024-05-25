@@ -5,13 +5,20 @@ from PIL import Image
 import numpy as np
 import torch
 
-from folder_paths import get_filename_list, get_full_path, get_save_image_path, get_output_directory,models_dir
+from folder_paths import get_folder_paths, get_full_path, get_save_image_path, get_output_directory,models_dir
 from comfy.model_management import get_torch_device
 from .tsr.system import TSR
 
 import comfy.utils
 
-triposr_model_path=path.join(models_dir,'triposr/model.ckpt')
+
+def get_triposr_model_path():
+    try:
+        return path.join(get_folder_paths('triposr')[0],'model.ckpt')
+    except:
+        return path.join(path.join(models_dir, "triposr"),'model.ckpt')
+    
+triposr_model_path=get_triposr_model_path()
 
 
 # Tensor to PIL

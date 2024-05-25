@@ -467,10 +467,14 @@ class BriaRMBG(nn.Module):
 
 
 
+def get_U2NET_model_path():
+    try:
+        return folder_paths.get_folder_paths('rembg')[0]
+    except:
+        return os.path.join(folder_paths.models_dir, "rembg")
+    
 
-
-
-U2NET_HOME=os.path.join(folder_paths.models_dir, "rembg")
+U2NET_HOME=get_U2NET_model_path()
 os.environ["U2NET_HOME"] = U2NET_HOME
 
 global _available
@@ -528,7 +532,7 @@ except:
 
 
 def run_briarmbg(images=[]):
-    mroot=os.path.join(folder_paths.models_dir, "rembg")
+    mroot=U2NET_HOME
     m=os.path.join(mroot,'briarmbg.pth')
     if os.path.exists(m)==False:
         # 下载
