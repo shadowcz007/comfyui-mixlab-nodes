@@ -267,13 +267,13 @@
         .run_btn {
             background: black;
             color: white;
-            width: 50%;
-            min-width: 400px;
-            max-width: 560px;
+            width: calc(50% - 100px);
+            min-width: 300px;
+            max-width: 460px;
             height: 48px;
             position: fixed;
             bottom: 28px;
-            left: 44px;
+            left: 144px;
             border-radius: 12px;
             cursor: pointer;
             border: 3px solid;
@@ -487,7 +487,7 @@
             </svg> HELP/帮助</a>
 
     </div>
-    <a id="author"></a>
+    <a id="author"></a> 
     <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
     <script type="module">
         import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
@@ -1218,7 +1218,7 @@
         }
 
 
-        function createOutputs(outputData, link) {
+        async function createOutputs(outputData, link) {
             const url = new URL(window.location.href);
             const params = new URLSearchParams(url.search);
             const innerApp = params.get("innerApp");
@@ -1341,18 +1341,19 @@
                     const url = node.options?.defaultImage || window._appData?.icon || base64Df;
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
-                    a.setAttribute('data-pswp-width', "200");
-                    a.setAttribute('data-pswp-height', "200");
+
+                    let img = await createImage(url)
+
+                    a.appendChild(img)
+                    a.setAttribute('data-pswp-width', img.naturalWidth);
+                    a.setAttribute('data-pswp-height', img.naturalHeight);
                     a.setAttribute('target', "_blank");
                     a.setAttribute('href', url);
                     a.setAttribute('title', node.title);
 
-                    let img = new Image();
-                    // img;
-                    img.src = url;
-                    a.appendChild(img)
                     output_card.appendChild(a);
                     isShowImageFn = true;
+
                 }
 
                 //3d 
@@ -2400,7 +2401,7 @@
             })
         }
 
-        function createUI(data, share = true) {
+        async function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
             if (!data) return
             const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
@@ -2547,7 +2548,7 @@
             // 创建输入框
             var input1 = createInputs(inputData)
 
-            var output = createOutputs(outputData, link)
+            var output = await createOutputs(outputData, link)
 
             // 创建提交按钮
             var submitButton = document.createElement('button');
@@ -2912,7 +2913,7 @@
         async function createApp(appData, share = true) {
             // console.log(appData)
             // 使用示例：
-            var ui = createUI(appData, share);
+            var ui =await createUI(appData, share);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
@@ -3052,7 +3053,8 @@
             const lightbox = new PhotoSwipeLightbox({
                 gallery: '.output_card',
                 children: 'a',
-                pswpModule: () => import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
+                pswpModule: () => import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js'),
+                // appendToEl: document.querySelector('#result')
             });
             lightbox.on('uiRegister', function () {
                 lightbox.pswp.ui.registerElement({
@@ -3097,8 +3099,8 @@
             if (appData.author) {
                 let div = document.body.querySelector('#author');
                 if (appData.author.link) div.href = appData.author.link
-                div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 12px;right: 24px;cursor: pointer;text-decoration: none;color: black;`
-                div.innerHTML = `<p style="font-size:12px">Author:</p>
+                div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 24px;left: 24px;cursor: pointer;text-decoration: none;color: black;`
+                div.innerHTML = `<p style="font-size:12px;margin: 8px 0;">Author:</p>
                 <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
                 <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
