@@ -66,9 +66,9 @@
             box-shadow: 0px 0px 10px 10px #fbe9f0
         }
 
-        .card:hover {
+        /* .card:hover {
             box-shadow: 0px 0px 10px 10px #e9fbfa
-        }
+        } */
 
         .card h5 {
             font-size: 14px;
@@ -146,15 +146,6 @@
             margin-top: 4px;
         }
 
-        .status {
-            background: black;
-            color: white;
-            display: flex;
-            width: fit-content;
-            padding: 4px;
-            font-size: 12px;
-
-        }
 
         .description {
             display: flex;
@@ -264,20 +255,44 @@
             margin-top: 12px;
         }
 
+        .run_div {
+            position: fixed;
+            bottom: 28px;
+            display: flex;
+            left: 144px;
+            z-index: 100;
+            /* align-items: center; */
+            /* justify-content: space-around; */
+            /* width: calc(50% - 100px); */
+            flex-direction: column;
+            background-color: #f7f7f7;
+            box-shadow: 3px 3px 8px #cacaca;
+            border-radius: 8px;
+        }
+
+        .status {
+            /* background: #e7e7e7; */
+            color: black;
+            display: flex;
+            width: 120px;
+            padding-left: 11px;
+            font-size: 12px;
+            border-radius: 8px;
+            justify-content: flex-start;
+            align-items: center;
+            height: 48px;
+        }
+
         .run_btn {
             background: black;
             color: white;
-            width: calc(50% - 100px);
-            min-width: 300px;
+            /* width: calc(50% - 100px); */
+            min-width: 200px;
             max-width: 460px;
             height: 48px;
-            position: fixed;
-            bottom: 28px;
-            left: 144px;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
             border: 3px solid;
-            z-index: 100;
         }
 
         button:hover {
@@ -487,7 +502,7 @@
             </svg> HELP/帮助</a>
 
     </div>
-    <a id="author"></a> 
+    <a id="author"></a>
     <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
     <script type="module">
         import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
@@ -1339,17 +1354,17 @@
                     "TransparentImage"].includes(node.class_type)) {
 
                     const url = node.options?.defaultImage || window._appData?.icon || base64Df;
-                    let a = document.createElement('a');
+                    let a = document.createElement('div');
                     a.id = `output_${node.id}`
 
                     let img = await createImage(url)
 
                     a.appendChild(img)
-                    a.setAttribute('data-pswp-width', img.naturalWidth);
-                    a.setAttribute('data-pswp-height', img.naturalHeight);
-                    a.setAttribute('target', "_blank");
-                    a.setAttribute('href', url);
-                    a.setAttribute('title', node.title);
+                    // a.setAttribute('data-pswp-width', img.naturalWidth);
+                    // a.setAttribute('data-pswp-height', img.naturalHeight);
+                    // a.setAttribute('target', "_blank");
+                    // a.setAttribute('href', url);
+                    // a.setAttribute('title', node.title);
 
                     output_card.appendChild(a);
                     isShowImageFn = true;
@@ -2542,7 +2557,7 @@
             }
 
 
-            statusDiv.appendChild(status);
+            // statusDiv.appendChild(status);
             statusDiv.appendChild(seeds);
 
             // 创建输入框
@@ -2551,20 +2566,34 @@
             var output = await createOutputs(outputData, link)
 
             // 创建提交按钮
+            let submitDiv = document.createElement('div');
+            submitDiv.appendChild(statusDiv);
+
+            let submitDivBtn = document.createElement('div');
+            submitDivBtn.style.display = 'flex'
+            submitDiv.appendChild(submitDivBtn);
+
+            submitDivBtn.appendChild(status);
+
+            submitDiv.className = 'run_div';
             var submitButton = document.createElement('button');
             submitButton.textContent = 'Create';
             submitButton.className = 'run_btn'
 
             // 将所有UI元素添加到页面中
-            leftDiv.appendChild(titleDiv);
-            leftDiv.appendChild(iconDes);
+            // leftDiv.appendChild(titleDiv);
+            // leftDiv.appendChild(iconDes);
             // leftDiv.appendChild(des);
-            leftDiv.appendChild(statusDiv);
+            // leftDiv.appendChild(statusDiv);
             leftDiv.appendChild(input1);
 
-            if (typeof (data.data) == 'object') mainDiv.appendChild(submitButton);
+            submitDivBtn.appendChild(submitButton);
+            if (typeof (data.data) == 'object') mainDiv.appendChild(submitDiv);
 
             rightDiv.appendChild(output);
+
+            // mainDiv.appendChild(titleDiv);
+            // mainDiv.appendChild(iconDes);
 
             mainDiv.appendChild(leftDetails);
             mainDiv.appendChild(rightDiv);
@@ -2913,7 +2942,7 @@
         async function createApp(appData, share = true) {
             // console.log(appData)
             // 使用示例：
-            var ui =await createUI(appData, share);
+            var ui = await createUI(appData, share);
 
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
