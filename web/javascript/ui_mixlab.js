@@ -26,7 +26,35 @@ function showTextByLanguage (key, json) {
 }
 
 //系统prompt
-const systemPrompt = `You are a prompt creator, your task is to create prompts for the user input request, the prompts are image descriptions that include keywords for (an adjective, type of image, framing/composition, subject, subject appearance/action, environment, lighting situation, details of the shoot/illustration, visuals aesthetics and artists), brake keywords by comas, provide high quality, non-verboose, coherent, brief, concise, and not superfluous prompts, the subject from the input request must be included verbatim on the prompt,the prompt is english`
+// const systemPrompt = `You are a prompt creator, your task is to create prompts for the user input request, the prompts are image descriptions that include keywords for (an adjective, type of image, framing/composition, subject, subject appearance/action, environment, lighting situation, details of the shoot/illustration, visuals aesthetics and artists), brake keywords by comas, provide high quality, non-verboose, coherent, brief, concise, and not superfluous prompts, the subject from the input request must be included verbatim on the prompt,the prompt is english`
+
+let tool ={
+  "name": "create_prompt",
+  "description": "Create a prompt with a given subject, content, and style based on user input for image descriptions.",
+  "parameter": {
+    "type": "object",
+    "properties": {
+      "subject": {
+        "type": "string",
+        "description": "The subject of the prompt, included verbatim from the input request.",
+        "required": true
+      },
+      "content": {
+        "type": "string",
+        "description": "The content of the prompt, primarily focusing on the scene and objects, including keywords for adjective, type of image, framing/composition, subject appearance/action, and environment.",
+        "required": true
+      },
+      "style": {
+        "type": "string",
+        "description": "The style of the prompt, including lighting situation, details of the shoot/illustration, visual aesthetics, and artists. Ensure it is high quality, non-verbose, coherent, brief, concise, and not superfluous.",
+        "required": true
+      }
+    }
+  }
+}
+
+const systemPrompt=`You are a helpful assistant with access to the following functions. Use them if required - ${JSON.stringify(tool,null,2)}`
+
 
 if (!localStorage.getItem('_mixlab_system_prompt')) {
   localStorage.setItem('_mixlab_system_prompt', systemPrompt)
@@ -770,6 +798,22 @@ async function fetchReadmeContent (url) {
   }
 }
 
+async function startLLM (model) {
+  let res = await start_llama(model)
+  window._mixlab_llamacpp = res
+
+  localStorage.setItem('_mixlab_llama_select', res.model)
+
+  if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')&&window._mixlab_llamacpp.url) {
+    document.body
+      .querySelector('#mixlab_chatbot_by_llamacpp')
+      .setAttribute('title', window._mixlab_llamacpp.url)
+  }
+  if (document.body.querySelector('#llm_status_btn')&&window._mixlab_llamacpp) {
+    document.body.querySelector('#llm_status_btn').innerText = window._mixlab_llamacpp.model
+  }
+}
+
 function createModelsModal (models) {
   var div =
     document.querySelector('#model-modal') || document.createElement('div')
@@ -825,7 +869,7 @@ function createModelsModal (models) {
       color: var(--descrip-text);
       font-size: 18px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       flex: 1;
       overflow: hidden;
       text-decoration: none;
@@ -843,6 +887,27 @@ function createModelsModal (models) {
     'Auto Open': '自动开启'
   })
   linkIcon.style.padding = '4px'
+
+  const statusIcon = document.createElement('small')
+  statusIcon.textContent = showTextByLanguage('Status', {
+    Status: 'OFF'
+  })
+  statusIcon.id = 'llm_status_btn'
+  statusIcon.style=`padding: 4px;
+  background-color: rgb(102, 255, 108);
+  color: black;
+  font-size: 12px;
+  margin-left: 12px;`
+  if (window._mixlab_llamacpp?.url) {
+    statusIcon.textContent = window._mixlab_llamacpp.model
+    statusIcon.style.backgroundColor = '#66ff6c'
+    statusIcon.style.color = 'black'
+  } else {
+  }
+  statusIcon.addEventListener('click', e => {
+    e.stopPropagation()
+    // startLLM()
+  })
 
   const n_gpu = document.createElement('input')
   n_gpu.type = 'number'
@@ -878,20 +943,22 @@ function createModelsModal (models) {
   const title = document.createElement('p')
   title.innerText = 'Models'
   title.style = `font-size: 18px;
-  margin-right: 8px;`
+  margin-right: 8px;
+  margin-top: 0;`
 
   const left_d = document.createElement('div')
   left_d.style = `display: flex;
   justify-content: center;
-  align-items: center;
-  font-size: 12px;`
+  align-items: flex-start;
+  font-size: 12px;
+  flex-direction: column; `
   left_d.appendChild(title)
-
+  title.appendChild(statusIcon)
   left_d.appendChild(linkIcon)
-
+  left_d.appendChild(n_gpu_div)
   headTitleElement.appendChild(left_d)
 
-  headTitleElement.appendChild(n_gpu_div)
+  // headTitleElement.appendChild(n_gpu_div)
 
   //重启
   const reStart = document.createElement('small')
@@ -899,7 +966,11 @@ function createModelsModal (models) {
     restart: '重启'
   })
 
-  reStart.style.padding = '4px'
+  reStart.style=`padding: 8px;
+  font-size: 16px;
+  outline: 1px solid;
+  padding-top: 4px;
+  padding-bottom: 4px;`
 
   headTitleElement.appendChild(reStart)
 
@@ -958,29 +1029,22 @@ function createModelsModal (models) {
 
   modalContent.appendChild(input)
 
-  for (const m of models) {
-    let d = document.createElement('div')
-    d.innerText = m
-    d.className = `mix_tag`
+  if (!window._mixlab_llamacpp) {
+    for (const m of models) {
+      let d = document.createElement('div')
+      d.innerText = `${showTextByLanguage('Run', {
+        Run: '运行'
+      })} ${m}`
+      d.className = `mix_tag`
 
-    if (!window._mixlab_llamacpp) {
       d.addEventListener('click', async e => {
         e.stopPropagation()
         div.remove()
-        let res = await start_llama(m)
-        window._mixlab_llamacpp = res
-
-        localStorage.setItem('_mixlab_llama_select', res.model)
-
-        if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')) {
-          document.body
-            .querySelector('#mixlab_chatbot_by_llamacpp')
-            .setAttribute('title', window._mixlab_llamacpp.url)
-        }
+        startLLM(m)
       })
-    }
 
-    modalContent.appendChild(d)
+      modalContent.appendChild(d)
+    }
   }
   modal.appendChild(modalContent)
 
@@ -994,8 +1058,8 @@ function createModelsModal (models) {
   cursor: pointer;
   font-size: 12px;
   color: white;`
-  helpInfo.href="https://discord.gg/cXs9vZSqeK"
-  helpInfo.target="_blank"
+  helpInfo.href = 'https://discord.gg/cXs9vZSqeK'
+  helpInfo.target = '_blank'
   modal.appendChild(helpInfo)
 
   document.body.appendChild(div)
@@ -1349,6 +1413,8 @@ app.registerExtension({
           .querySelector('#mixlab_chatbot_by_llamacpp')
           .setAttribute('title', res.url)
       })
+    }else{
+      startLLM('')
     }
 
     LGraphCanvas.prototype.helpAboutNode = async function (node) {
@@ -1357,7 +1423,13 @@ app.registerExtension({
           ? nodesMap
           : await getCustomnodeMappings('url')
 
-      console.log("%c### node & node map", "background: yellow; color: black", node, nodesMap, nodesMap[node.type])
+      console.log(
+        '%c### node & node map',
+        'background: yellow; color: black',
+        node,
+        nodesMap,
+        nodesMap[node.type]
+      )
       let repo = nodesMap[node.type]
       if (repo) {
         let markdown = await fetchReadmeContent(repo.url)
@@ -1388,6 +1460,7 @@ app.registerExtension({
         let userInput = widget.value
         widget.value = widget.value.trim()
         widget.value += '\n'
+        let jsonStr="";
         try {
           await completion_(
             window._mixlab_llamacpp.url + '/v1/chat/completions',
@@ -1402,6 +1475,7 @@ app.registerExtension({
             t => {
               // console.log(t)
               widget.value += t
+              jsonStr+=t
             }
           )
         } catch (error) {
@@ -1427,13 +1501,27 @@ app.registerExtension({
                 t => {
                   // console.log(t)
                   widget.value += t
+                  jsonStr+=t
                 }
               )
             })
           }
         }
 
-        widget.value = widget.value.trim()
+        let json=null;
+
+        try {
+          json=JSON.parse(jsonStr.trim())
+        } catch (error) {
+          json=JSON.parse(jsonStr.trim()+"}")
+        }
+
+        if(json){
+          widget.value = [json.subject,json.content,json.style].join('\n')
+        }else{
+          widget.value = widget.value.trim()
+        }
+        
       }
     }
 

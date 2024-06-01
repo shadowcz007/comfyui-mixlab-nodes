@@ -819,12 +819,12 @@ async def start_local_llm(data):
 async def my_hander_method(request):
     data =await request.json()
     # print(data)
+    if llama_port and llama_model and llama_chat_format:
+        return web.json_response({"port":llama_port,"model":llama_model,"chat_format":llama_chat_format} )
     try:
         result=await start_local_llm(data)
     except:
-        result={
-            {"port":None,"model":"","llama_cpp_error":True}
-        }
+        result= {"port":None,"model":"","llama_cpp_error":True}
         print('start_local_llm error')
 
     return web.json_response(result)

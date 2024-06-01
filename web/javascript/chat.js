@@ -2,7 +2,7 @@ async function* completion (url, messages, controller) {
   let data = {
     model: 'gpt-3.5-turbo-16k',
     messages,
-    temperature: 0.6,
+    temperature: 0.05,
     stream: true
   }
   // if (imageNode) {

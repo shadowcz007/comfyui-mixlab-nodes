@@ -10,7 +10,10 @@ ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一
 
 - 右键菜单支持 text-to-text，方便对 prompt 词补全
 
-强烈推荐：[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)，备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
+强烈推荐：
+[Phi-3-mini-4k-instruct-function-calling-GGUF](https://huggingface.co/nold/Phi-3-mini-4k-instruct-function-calling-GGUF)
+
+[Phi-3-mini-4k-instruct-GGUF](https://huggingface.co/lmstudio-community/Phi-3-mini-4k-instruct-GGUF/tree/main)，备选：[llama3_if_ai_sdpromptmkr_q2k](https://hf-mirror.com/impactframes/llama3_if_ai_sdpromptmkr_q2k/tree/main)
 
 - 右键菜单支持 image-to-text，使用多模态模型，多模态使用 [llava-phi-3-mini-gguf](https://huggingface.co/xtuner/llava-phi-3-mini-gguf/tree/main)，注意需要把llava-phi-3-mini-mmproj-f16.gguf也下载
 
