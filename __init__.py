@@ -1,4 +1,3 @@
-#
 import os
 import subprocess
 import importlib.util
@@ -17,7 +16,7 @@ python = sys.executable
 try:
     sys.stdout.isatty()
 except:
-    print('#fix sys.stdout.isatty')
+    # print('#fix sys.stdout.isatty')
     sys.stdout.isatty = lambda: False
 
 llama_port=None
@@ -580,6 +579,17 @@ async def mixlab_app_handler(request):
 async def mixlab_live_handler(request):
     html_file = os.path.join(current_path, "web/live.html")
     if os.path.exists(html_file):
+        live_server_path=os.path.join(current_path, "nodes/vad-websockets-perclient.py")
+        import threading
+        import subprocess
+
+        def run_vad_script():
+            subprocess.run([python, live_server_path])
+
+        thread = threading.Thread(target=run_vad_script)
+        thread.start()
+
+
         with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
             html_data = f.read()
             return web.Response(text=html_data, content_type='text/html')

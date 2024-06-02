@@ -1,46 +1,209 @@
+<!-- https://stackoverflow.com/questions/67118642/audiocontext-getusermedia-and-websockets-audio-streaming -->
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live</title>
-    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
-</head>
+<html>
 
 <body>
-
-    <script>
-        const {
-            Participant,
-            RemoteParticipant,
-            RemoteTrack,
-            RemoteTrackPublication,
-            Room,
-            RoomEvent,
-            VideoPresets
-        } = LivekitClient
-
-        // creates a new room with options
-        const room = new Room({
-            // automatically manage subscribed video quality
-            adaptiveStream: true,
-
-            // optimize publishing bandwidth and CPU for published tracks
-            dynacast: true,
-
-            // default capture settings
-            videoCaptureDefaults: {
-                resolution: VideoPresets.h720.resolution,
-            },
-        });
-
-        // pre-warm connection, this can be called as early as your page is loaded
-        room.prepareConnection(url, token);
-
-
-    </script>
-
+    <div class='message'>Welcome!</div>
+    <button onclick='startRecording()'>Start recording</button>
+    <button onclick='stopRecording()'>Stop recording</button>
+    <br />
+    <div>WebSocket: <span id="webSocketStatus">Not Connected</span></div>
 </body>
 
 </html>
+<script>
+    //================= CONFIG =================
+    // Global Variables
+    // let websocket_uri = 'wss://edca-36-68-8-204.ap.ngrok.io';
+    let websocket_uri = 'ws://127.0.0.1:5000';
+    let bufferSize = 512,
+        AudioContext,
+        context,
+        processor,
+        input,
+        globalStream,
+        websocket;
+
+    // Initialize WebSocket
+    initWebSocket();
+
+    function downsampleBuffer(buffer, sampleRate, outSampleRate) {
+        if (outSampleRate == sampleRate) {
+            return buffer;
+        }
+        if (outSampleRate > sampleRate) {
+            throw 'downsampling rate show be smaller than original sample rate';
+        }
+        var sampleRateRatio = sampleRate / outSampleRate;
+        var newLength = Math.round(buffer.length / sampleRateRatio);
+        var result = new Int16Array(newLength);
+        var offsetResult = 0;
+        var offsetBuffer = 0;
+        while (offsetResult < result.length) {
+            var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+            var accum = 0,
+                count = 0;
+            for (var i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                accum += buffer[i];
+                count++;
+            }
+
+            result[offsetResult] = Math.min(1, accum / count) * 0x7fff;
+            offsetResult++;
+            offsetBuffer = nextOffsetBuffer;
+        }
+        return result.buffer;
+    } // closes function downsampleBuffer()
+
+    //================= RECORDING =================
+    // Define the AudioWorkletProcessor in a Blob and add it to the AudioWorklet.
+    const processorCode = `
+            class MyProcessor extends AudioWorkletProcessor {
+                process(inputs, outputs, parameters) {
+                    const input = inputs[0];
+                    const output = outputs[0];
+                    if (input && input[0]) {
+                        const left = input[0];
+                        const left16 = this.downsampleBuffer(left, sampleRate, 16000);
+                        this.port.postMessage(left16);
+                    }
+                    return true;
+                }
+
+                downsampleBuffer(buffer, sampleRate, outSampleRate) {
+                    if (outSampleRate === sampleRate) {
+                        return buffer;
+                    }
+                    const sampleRateRatio = sampleRate / outSampleRate;
+                    const newLength = Math.round(buffer.length / sampleRateRatio);
+                    const result = new Int16Array(newLength);
+                    let offsetResult = 0;
+                    let offsetBuffer = 0;
+                    while (offsetResult < result.length) {
+                        const nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+                        let accum = 0, count = 0;
+                        for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                            accum += buffer[i];
+                            count++;
+                        }
+                        result[offsetResult] = Math.min(1, accum / count) * 0x7FFF;
+                        offsetResult++;
+                        offsetBuffer = nextOffsetBuffer;
+                    }
+                    return result;
+                }
+            }
+
+            registerProcessor('my-processor', MyProcessor);
+        `;
+
+    const blob = new Blob([processorCode], { type: 'application/javascript' });
+    const url = URL.createObjectURL(blob);
+
+
+    async function startRecording() {
+        streamStreaming = true;
+        AudioContext = window.AudioContext || window.webkitAudioContext;
+        context = new AudioContext({ latencyHint: 'interactive' });
+        await context.audioWorklet.addModule(url);
+        const processor = new AudioWorkletNode(context, 'my-processor');
+        processor.connect(context.destination);
+        context.resume();
+
+        processor.port.onmessage = (event) => {
+            websocket.send(event.data);
+        };
+
+        const handleSuccess = function (stream) {
+            globalStream = stream;
+            const input = context.createMediaStreamSource(stream);
+            input.connect(processor);
+        };
+
+        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(handleSuccess);
+    }
+
+    function stopRecording() {
+        streamStreaming = false;
+
+        if (globalStream) {
+            let track = globalStream.getTracks()[0];
+            track.stop();
+        }
+
+        if (input) {
+            input.disconnect();
+        }
+
+        if (processor) {
+            processor.disconnect();
+        }
+
+        if (context) {
+            context.close().then(function () {
+                input = null;
+                processor = null;
+                context = null;
+                AudioContext = null;
+            });
+        }
+    }
+
+
+
+    let lastActivityTime = Date.now();
+    const idleCut = 5000; // Replace with the appropriate idle time in milliseconds
+    let isSpeaking = false;
+    function handleVoiceActivity(result) {
+        if (result === "1" && isSpeaking == false) {
+            lastActivityTime = Date.now();
+            console.log("Speaking");
+            isSpeaking = true;
+        } else if (result === "X") {
+            // console.log("Stopped speaking for too long, sending signal");
+            // send();
+        } else if (result === "_") {
+            let currentTime = Date.now();
+            if (currentTime - lastActivityTime > idleCut && isSpeaking) {
+                console.log("Stopped speaking for too long, sending signal");
+                isSpeaking = false;
+                send();
+            }
+        }
+    }
+
+    function send() {
+        // Implement the send logic here, e.g., making an HTTP request
+        console.log("Signal sent");
+    }
+
+
+    function initWebSocket() {
+        // Create WebSocket
+        websocket = new WebSocket(websocket_uri);
+        //console.log("Websocket created...");
+
+        // WebSocket Definitions: executed when triggered webSocketStatus
+        websocket.onopen = function () {
+            console.log("connected to server");
+            //websocket.send("CONNECTED TO YOU");
+            document.getElementById("webSocketStatus").innerHTML = 'Connected';
+        }
+
+        websocket.onclose = function (e) {
+            console.log("connection closed (" + e.code + ")");
+            document.getElementById("webSocketStatus").innerHTML = 'Not Connected';
+        }
+
+
+        websocket.onmessage = function (e) {
+            // console.log("message received: " + e.data);
+            // console.log(e.data);
+            let result = e.data;
+
+            document.querySelector('.message').innerHTML = result;
+            handleVoiceActivity(result)
+
+        }
+    } // closes function initWebSocket()
+</script>
