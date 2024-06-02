@@ -575,6 +575,16 @@ async def mixlab_app_handler(request):
             return web.Response(text=html_data, content_type='text/html')
     else:
         return web.Response(text="HTML file not found", status=404)
+
+@routes.get('/mixlab/live')
+async def mixlab_live_handler(request):
+    html_file = os.path.join(current_path, "web/live.html")
+    if os.path.exists(html_file):
+        with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
+            html_data = f.read()
+            return web.Response(text=html_data, content_type='text/html')
+    else:
+        return web.Response(text="HTML file not found", status=404)
     
 
 @routes.post('/mixlab/workflow')

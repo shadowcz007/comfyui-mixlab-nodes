@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live</title>
+    <script src="https://cdn.jsdelivr.net/npm/livekit-client/dist/livekit-client.umd.min.js"></script>
+</head>
+
+<body>
+
+    <script>
+        const {
+            Participant,
+            RemoteParticipant,
+            RemoteTrack,
+            RemoteTrackPublication,
+            Room,
+            RoomEvent,
+            VideoPresets
+        } = LivekitClient
+
+        // creates a new room with options
+        const room = new Room({
+            // automatically manage subscribed video quality
+            adaptiveStream: true,
+
+            // optimize publishing bandwidth and CPU for published tracks
+            dynacast: true,
+
+            // default capture settings
+            videoCaptureDefaults: {
+                resolution: VideoPresets.h720.resolution,
+            },
+        });
+
+        // pre-warm connection, this can be called as early as your page is loaded
+        room.prepareConnection(url, token);
+
+
+    </script>
+
+</body>
+
+</html>
