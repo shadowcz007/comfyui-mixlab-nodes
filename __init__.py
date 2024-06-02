@@ -579,7 +579,11 @@ async def mixlab_app_handler(request):
 async def mixlab_live_handler(request):
     html_file = os.path.join(current_path, "web/live.html")
     if os.path.exists(html_file):
-        live_server_path=os.path.join(current_path, "nodes/vad-websockets-perclient.py")
+        os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com' #hf_hub_download 里的下载地址修改
+        os.environ['PYANNOTE_AUTH_TOKEN'] = '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'
+        
+        live_server_path=os.path.join(current_path, "nodes/VoiceStreamAI/main.py")
+
         import threading
         import subprocess
 

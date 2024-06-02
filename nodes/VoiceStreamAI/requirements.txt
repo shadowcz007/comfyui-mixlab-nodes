@@ -1,0 +1,7 @@
+websockets
+speechbrain
+pyannote-audio
+asyncio
+sentence-transformers
+transformers
+faster-whisper

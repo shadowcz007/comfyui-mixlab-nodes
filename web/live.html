@@ -1,209 +1,367 @@
-<!-- https://stackoverflow.com/questions/67118642/audiocontext-getusermedia-and-websockets-audio-streaming -->
 <!DOCTYPE html>
-<html>
+<!-- 
+  VoiceStreamAI Client Interface
+  Real-time audio transcription using self-hosted Whisper and WebSocket
+
+  Contributor:
+  - Alessandro Saccoia - alessandro.saccoia@gmail.com
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Stream to WebSocket Server</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .controls {
+            margin: 20px auto;
+            padding: 10px;
+            width: 80%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls input,
+        .controls button,
+        .controls select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        #transcription {
+            margin: 20px auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            width: 80%;
+            height: 150px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .label {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .buffering-strategy-panel {
+            margin-top: 10px;
+        }
+
+        /* ... existing styles ... */
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script>
+        /**
+ * VoiceStreamAI Client - WebSocket-based real-time transcription
+ *
+ * Contributor:
+ * - Alessandro Saccoia - alessandro.saccoia@gmail.com
+ */
+
+        let websocket;
+        let context;
+        let processor;
+        let globalStream;
+
+        const websocket_uri = 'ws://localhost:8765';
+        const bufferSize = 4096;
+        let isRecording = false;
+
+        function initWebSocket() {
+            const websocketAddress = document.getElementById('websocketAddress').value;
+            chunk_length_seconds = document.getElementById('chunk_length_seconds').value;
+            chunk_offset_seconds = document.getElementById('chunk_offset_seconds').value;
+            const selectedLanguage = document.getElementById('languageSelect').value;
+            language = selectedLanguage !== 'multilingual' ? selectedLanguage : null;
+
+            if (!websocketAddress) {
+                console.log("WebSocket address is required.");
+                return;
+            }
+
+            websocket = new WebSocket(websocketAddress);
+            websocket.onopen = () => {
+                console.log("WebSocket connection established");
+                document.getElementById("webSocketStatus").textContent = 'Connected';
+                document.getElementById('startButton').disabled = false;
+            };
+            websocket.onclose = event => {
+                console.log("WebSocket connection closed", event);
+                document.getElementById("webSocketStatus").textContent = 'Not Connected';
+                document.getElementById('startButton').disabled = true;
+                document.getElementById('stopButton').disabled = true;
+            };
+            websocket.onmessage = event => {
+                console.log("Message from server:", event.data);
+                const transcript_data = JSON.parse(event.data);
+                updateTranscription(transcript_data);
+            };
+        }
+
+        function updateTranscription(transcript_data) {
+            const transcriptionDiv = document.getElementById('transcription');
+            const languageDiv = document.getElementById('detected_language');
+
+            if (transcript_data['words'] && transcript_data['words'].length > 0) {
+                // Append words with color based on their probability
+                transcript_data['words'].forEach(wordData => {
+                    const span = document.createElement('span');
+                    const probability = wordData['probability'];
+                    span.textContent = wordData['word'] + ' ';
+
+                    // Set the color based on the probability
+                    if (probability > 0.9) {
+                        span.style.color = 'green';
+                    } else if (probability > 0.6) {
+                        span.style.color = 'orange';
+                    } else {
+                        span.style.color = 'red';
+                    }
+
+                    transcriptionDiv.appendChild(span);
+                });
+
+                // Add a new line at the end
+                transcriptionDiv.appendChild(document.createElement('br'));
+            } else {
+                // Fallback to plain text
+                transcriptionDiv.textContent += transcript_data['text'] + '\n';
+            }
+
+            // Update the language information
+            if (transcript_data['language'] && transcript_data['language_probability']) {
+                languageDiv.textContent = transcript_data['language'] + ' (' + transcript_data['language_probability'].toFixed(2) + ')';
+            }
+
+            // Update the processing time, if available
+            const processingTimeDiv = document.getElementById('processing_time');
+            if (transcript_data['processing_time']) {
+                processingTimeDiv.textContent = 'Processing time: ' + transcript_data['processing_time'].toFixed(2) + ' seconds';
+            }
+        }
+
+
+        function startRecording() {
+            if (isRecording) return;
+            isRecording = true;
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            context = new AudioContext();
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                globalStream = stream;
+                const input = context.createMediaStreamSource(stream);
+                processor = context.createScriptProcessor(bufferSize, 1, 1);
+                processor.onaudioprocess = e => processAudio(e);
+                input.connect(processor);
+                processor.connect(context.destination);
+
+                sendAudioConfig();
+            }).catch(error => console.error('Error accessing microphone', error));
+
+            // Disable start button and enable stop button
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('stopButton').disabled = false;
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+            isRecording = false;
+
+            if (globalStream) {
+                globalStream.getTracks().forEach(track => track.stop());
+            }
+            if (processor) {
+                processor.disconnect();
+                processor = null;
+            }
+            if (context) {
+                context.close().then(() => context = null);
+            }
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('stopButton').disabled = true;
+        }
+
+        function sendAudioConfig() {
+            let selectedStrategy = document.getElementById('bufferingStrategySelect').value;
+            let processingArgs = {};
+
+            if (selectedStrategy === 'silence_at_end_of_chunk') {
+                processingArgs = {
+                    chunk_length_seconds: parseFloat(document.getElementById('chunk_length_seconds').value),
+                    chunk_offset_seconds: parseFloat(document.getElementById('chunk_offset_seconds').value)
+                };
+            }
+
+            const audioConfig = {
+                type: 'config',
+                data: {
+                    sampleRate: context.sampleRate,
+                    bufferSize: bufferSize,
+                    channels: 1, // Assuming mono channel
+                    language: language,
+                    processing_strategy: selectedStrategy,
+                    processing_args: processingArgs
+                }
+            };
+
+            websocket.send(JSON.stringify(audioConfig));
+        }
+
+        function downsampleBuffer(buffer, inputSampleRate, outputSampleRate) {
+            if (inputSampleRate === outputSampleRate) {
+                return buffer;
+            }
+            var sampleRateRatio = inputSampleRate / outputSampleRate;
+            var newLength = Math.round(buffer.length / sampleRateRatio);
+            var result = new Float32Array(newLength);
+            var offsetResult = 0;
+            var offsetBuffer = 0;
+            while (offsetResult < result.length) {
+                var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
+                var accum = 0, count = 0;
+                for (var i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
+                    accum += buffer[i];
+                    count++;
+                }
+                result[offsetResult] = accum / count;
+                offsetResult++;
+                offsetBuffer = nextOffsetBuffer;
+            }
+            return result;
+        }
+
+        function processAudio(e) {
+            const inputSampleRate = context.sampleRate;
+            const outputSampleRate = 16000; // Target sample rate
+
+            const left = e.inputBuffer.getChannelData(0);
+            const downsampledBuffer = downsampleBuffer(left, inputSampleRate, outputSampleRate);
+            const audioData = convertFloat32ToInt16(downsampledBuffer);
+
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.send(audioData);
+            }
+        }
+
+        function convertFloat32ToInt16(buffer) {
+            let l = buffer.length;
+            const buf = new Int16Array(l);
+            while (l--) {
+                buf[l] = Math.min(1, buffer[l]) * 0x7FFF;
+            }
+            return buf.buffer;
+        }
+
+        // Initialize WebSocket on page load
+        //  window.onload = initWebSocket;
+
+        function toggleBufferingStrategyPanel() {
+            var selectedStrategy = document.getElementById('bufferingStrategySelect').value;
+            if (selectedStrategy === 'silence_at_end_of_chunk') {
+                var panel = document.getElementById('silence_at_end_of_chunk_options_panel');
+                panel.classList.remove('hidden');
+            } else {
+                var panel = document.getElementById('silence_at_end_of_chunk_options_panel');
+                panel.classList.add('hidden');
+            }
+        }
+
+
+
+    </script>
+</head>
 
 <body>
-    <div class='message'>Welcome!</div>
-    <button onclick='startRecording()'>Start recording</button>
-    <button onclick='stopRecording()'>Stop recording</button>
+    <h1>Transcribe a Web Audio Stream with Huggingface VAD + Whisper</h1>
+    <div class="controls">
+        <div class="control-group">
+            <label class="label" for="websocketAddress">WebSocket Address:</label>
+            <input type="text" id="websocketAddress" value="ws://localhost:8765">
+        </div>
+        <div class="control-group">
+            <label class="label" for="bufferingStrategySelect" onchange="toggleBufferingStrategyPanel()">Buffering
+                Strategy:</label>
+            <select id="bufferingStrategySelect">
+                <option value="silence_at_end_of_chunk" selected>Silence at End of Chunk</option>
+            </select>
+        </div>
+        <div class="silence_at_end_of_chunk_options_panel">
+            <div class="control-group">
+                <label class="label" for="chunk_length_seconds">Chunk Length (s):</label>
+                <input type="number" id="chunk_length_seconds" value="3" min="1">
+            </div>
+            <div class="control-group">
+                <label class="label" for="chunk_offset_seconds">Silence at the End of Chunk (s):</label>
+                <input type="number" id="chunk_offset_seconds" value="0.1" min="0">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="label" for="languageSelect">Language:</label>
+            <select id="languageSelect">
+                <option value="multilingual">Multilingual</option>
+                <option value="english">English</option>
+                <option value="italian">Italian</option>
+                <option value="spanish">Spanish</option>
+                <option value="french">French</option>
+                <option value="german">German</option>
+                <option value="chinese">Chinese</option>
+                <option value="arabic">Arabic</option>
+                <option value="portuguese">Portuguese</option>
+                <option value="russian">Russian</option>
+                <option value="japanese">Japanese</option>
+                <option value="dutch">Dutch</option>
+                <option value="korean">Korean</option>
+                <option value="hindi">Hindi</option>
+                <option value="turkish">Turkish</option>
+                <option value="swedish">Swedish</option>
+                <option value="norwegian">Norwegian</option>
+                <option value="danish">Danish</option>
+                <option value="polish">Polish</option>
+                <option value="finnish">Finnish</option>
+                <option value="thai">Thai</option>
+                <option value="czech">Czech</option>
+                <option value="hungarian">Hungarian</option>
+                <option value="greek">Greek</option>
+            </select>
+        </div>
+        <button onclick="initWebSocket()">Connect</button>
+    </div>
+    <button id="startButton" onclick='startRecording()' disabled>Start Streaming</button>
+    <button id="stopButton" onclick='stopRecording()' disabled>Stop Streaming</button>
+    <div id="transcription"></div>
     <br />
     <div>WebSocket: <span id="webSocketStatus">Not Connected</span></div>
+    <div>Detected Language: <span id="detected_language">Undefined</span></div>
+    <div>Last Processing Time: <span id="processing_time">Undefined</span></div>
 </body>
 
 </html>
-<script>
-    //================= CONFIG =================
-    // Global Variables
-    // let websocket_uri = 'wss://edca-36-68-8-204.ap.ngrok.io';
-    let websocket_uri = 'ws://127.0.0.1:5000';
-    let bufferSize = 512,
-        AudioContext,
-        context,
-        processor,
-        input,
-        globalStream,
-        websocket;
-
-    // Initialize WebSocket
-    initWebSocket();
-
-    function downsampleBuffer(buffer, sampleRate, outSampleRate) {
-        if (outSampleRate == sampleRate) {
-            return buffer;
-        }
-        if (outSampleRate > sampleRate) {
-            throw 'downsampling rate show be smaller than original sample rate';
-        }
-        var sampleRateRatio = sampleRate / outSampleRate;
-        var newLength = Math.round(buffer.length / sampleRateRatio);
-        var result = new Int16Array(newLength);
-        var offsetResult = 0;
-        var offsetBuffer = 0;
-        while (offsetResult < result.length) {
-            var nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
-            var accum = 0,
-                count = 0;
-            for (var i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
-                accum += buffer[i];
-                count++;
-            }
-
-            result[offsetResult] = Math.min(1, accum / count) * 0x7fff;
-            offsetResult++;
-            offsetBuffer = nextOffsetBuffer;
-        }
-        return result.buffer;
-    } // closes function downsampleBuffer()
-
-    //================= RECORDING =================
-    // Define the AudioWorkletProcessor in a Blob and add it to the AudioWorklet.
-    const processorCode = `
-            class MyProcessor extends AudioWorkletProcessor {
-                process(inputs, outputs, parameters) {
-                    const input = inputs[0];
-                    const output = outputs[0];
-                    if (input && input[0]) {
-                        const left = input[0];
-                        const left16 = this.downsampleBuffer(left, sampleRate, 16000);
-                        this.port.postMessage(left16);
-                    }
-                    return true;
-                }
-
-                downsampleBuffer(buffer, sampleRate, outSampleRate) {
-                    if (outSampleRate === sampleRate) {
-                        return buffer;
-                    }
-                    const sampleRateRatio = sampleRate / outSampleRate;
-                    const newLength = Math.round(buffer.length / sampleRateRatio);
-                    const result = new Int16Array(newLength);
-                    let offsetResult = 0;
-                    let offsetBuffer = 0;
-                    while (offsetResult < result.length) {
-                        const nextOffsetBuffer = Math.round((offsetResult + 1) * sampleRateRatio);
-                        let accum = 0, count = 0;
-                        for (let i = offsetBuffer; i < nextOffsetBuffer && i < buffer.length; i++) {
-                            accum += buffer[i];
-                            count++;
-                        }
-                        result[offsetResult] = Math.min(1, accum / count) * 0x7FFF;
-                        offsetResult++;
-                        offsetBuffer = nextOffsetBuffer;
-                    }
-                    return result;
-                }
-            }
-
-            registerProcessor('my-processor', MyProcessor);
-        `;
-
-    const blob = new Blob([processorCode], { type: 'application/javascript' });
-    const url = URL.createObjectURL(blob);
-
-
-    async function startRecording() {
-        streamStreaming = true;
-        AudioContext = window.AudioContext || window.webkitAudioContext;
-        context = new AudioContext({ latencyHint: 'interactive' });
-        await context.audioWorklet.addModule(url);
-        const processor = new AudioWorkletNode(context, 'my-processor');
-        processor.connect(context.destination);
-        context.resume();
-
-        processor.port.onmessage = (event) => {
-            websocket.send(event.data);
-        };
-
-        const handleSuccess = function (stream) {
-            globalStream = stream;
-            const input = context.createMediaStreamSource(stream);
-            input.connect(processor);
-        };
-
-        navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(handleSuccess);
-    }
-
-    function stopRecording() {
-        streamStreaming = false;
-
-        if (globalStream) {
-            let track = globalStream.getTracks()[0];
-            track.stop();
-        }
-
-        if (input) {
-            input.disconnect();
-        }
-
-        if (processor) {
-            processor.disconnect();
-        }
-
-        if (context) {
-            context.close().then(function () {
-                input = null;
-                processor = null;
-                context = null;
-                AudioContext = null;
-            });
-        }
-    }
-
-
-
-    let lastActivityTime = Date.now();
-    const idleCut = 5000; // Replace with the appropriate idle time in milliseconds
-    let isSpeaking = false;
-    function handleVoiceActivity(result) {
-        if (result === "1" && isSpeaking == false) {
-            lastActivityTime = Date.now();
-            console.log("Speaking");
-            isSpeaking = true;
-        } else if (result === "X") {
-            // console.log("Stopped speaking for too long, sending signal");
-            // send();
-        } else if (result === "_") {
-            let currentTime = Date.now();
-            if (currentTime - lastActivityTime > idleCut && isSpeaking) {
-                console.log("Stopped speaking for too long, sending signal");
-                isSpeaking = false;
-                send();
-            }
-        }
-    }
-
-    function send() {
-        // Implement the send logic here, e.g., making an HTTP request
-        console.log("Signal sent");
-    }
-
-
-    function initWebSocket() {
-        // Create WebSocket
-        websocket = new WebSocket(websocket_uri);
-        //console.log("Websocket created...");
-
-        // WebSocket Definitions: executed when triggered webSocketStatus
-        websocket.onopen = function () {
-            console.log("connected to server");
-            //websocket.send("CONNECTED TO YOU");
-            document.getElementById("webSocketStatus").innerHTML = 'Connected';
-        }
-
-        websocket.onclose = function (e) {
-            console.log("connection closed (" + e.code + ")");
-            document.getElementById("webSocketStatus").innerHTML = 'Not Connected';
-        }
-
-
-        websocket.onmessage = function (e) {
-            // console.log("message received: " + e.data);
-            // console.log(e.data);
-            let result = e.data;
-
-            document.querySelector('.message').innerHTML = result;
-            handleVoiceActivity(result)
-
-        }
-    } // closes function initWebSocket()
-</script>
