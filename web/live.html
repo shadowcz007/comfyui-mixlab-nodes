@@ -78,14 +78,112 @@
             display: none;
         }
     </style>
-    <script>
-        /**
- * VoiceStreamAI Client - WebSocket-based real-time transcription
- *
- * Contributor:
- * - Alessandro Saccoia - alessandro.saccoia@gmail.com
- */
 
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            /* background-color: #333;
+            color:white */
+        }
+
+        #mic_container {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mic {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 1rem;
+            height: 300px;
+            width: 300px
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="mic_container">
+        <div id="mic"></div>
+
+    </div>
+
+    <h1>VAD + Whisper + </h1>
+    <div class="controls">
+        <div class="control-group">
+            <label class="label" for="websocketAddress">WebSocket Address:</label>
+            <input type="text" id="websocketAddress" value="ws://localhost:8765">
+        </div>
+        <div class="control-group">
+            <label class="label" for="bufferingStrategySelect" onchange="toggleBufferingStrategyPanel()">Buffering
+                Strategy:</label>
+            <select id="bufferingStrategySelect">
+                <option value="silence_at_end_of_chunk" selected>Silence at End of Chunk</option>
+            </select>
+        </div>
+        <div class="silence_at_end_of_chunk_options_panel">
+            <div class="control-group">
+                <label class="label" for="chunk_length_seconds">Chunk Length (s):</label>
+                <input type="number" id="chunk_length_seconds" value="3" min="1">
+            </div>
+            <div class="control-group">
+                <label class="label" for="chunk_offset_seconds">Silence at the End of Chunk (s):</label>
+                <input type="number" id="chunk_offset_seconds" value="0.1" min="0">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="label" for="languageSelect">Language:</label>
+            <select id="languageSelect">
+                <option value="multilingual">Multilingual</option>
+                <option value="english">English</option>
+                <option value="italian">Italian</option>
+                <option value="spanish">Spanish</option>
+                <option value="french">French</option>
+                <option value="german">German</option>
+                <option value="chinese">Chinese</option>
+                <option value="arabic">Arabic</option>
+                <option value="portuguese">Portuguese</option>
+                <option value="russian">Russian</option>
+                <option value="japanese">Japanese</option>
+                <option value="dutch">Dutch</option>
+                <option value="korean">Korean</option>
+                <option value="hindi">Hindi</option>
+                <option value="turkish">Turkish</option>
+                <option value="swedish">Swedish</option>
+                <option value="norwegian">Norwegian</option>
+                <option value="danish">Danish</option>
+                <option value="polish">Polish</option>
+                <option value="finnish">Finnish</option>
+                <option value="thai">Thai</option>
+                <option value="czech">Czech</option>
+                <option value="hungarian">Hungarian</option>
+                <option value="greek">Greek</option>
+            </select>
+        </div>
+        <button id="connectButton">Connect</button>
+    </div>
+    <button id="startButton" disabled>Start Streaming</button>
+    <button id="stopButton" disabled>Stop Streaming</button>
+    <div id="transcription"></div>
+    <br />
+    <div>WebSocket: <span id="webSocketStatus">Not Connected</span></div>
+    <div>Detected Language: <span id="detected_language">Undefined</span></div>
+    <div>Last Processing Time: <span id="processing_time">Undefined</span></div>
+
+    <script type="module">
+
+        // Record plugin
+
+        import WaveSurfer from 'https://cdn.jsdelivr.net/npm/wavesurfer.js@7/dist/wavesurfer.esm.js'
+        import RecordPlugin from 'https://cdn.jsdelivr.net/npm/wavesurfer.js/dist/plugins/record.esm.js'
+
+        // 可视化
+        let wavesurfer, record;
+
+        // ws服务
         let websocket;
         let context;
         let processor;
@@ -94,6 +192,129 @@
         const websocket_uri = 'ws://localhost:8765';
         const bufferSize = 4096;
         let isRecording = false;
+        let chunk_length_seconds, chunk_offset_seconds, language;
+
+        // Record button
+        const startButton = document.getElementById('startButton'),
+            stopButton = document.getElementById('stopButton'),
+            connectButton = document.getElementById('connectButton');
+
+        const createWaveSurfer = () => {
+            // Create an instance of WaveSurfer
+            if (wavesurfer) {
+                wavesurfer.destroy()
+            }
+            wavesurfer = WaveSurfer.create({
+                container: '#mic',
+                waveColor: 'rgb(200, 0, 200)',
+                progressColor: 'rgb(100, 0, 100)',
+                renderFunction: (channels, ctx) => {
+                    const { width, height } = ctx.canvas
+                    console.log(width, height)
+                    const scale = channels[0].length / width
+                    const step = 20
+
+                    ctx.translate(0, height / 2)
+                    ctx.strokeStyle = ctx.fillStyle
+                    ctx.beginPath()
+
+                    for (let i = 0; i < width; i += step * 2) {
+                        const index = Math.floor(i * scale)
+                        const value = Math.abs(channels[0][index])
+                        let x = i
+                        let y = value * height * 1.2
+
+                        ctx.moveTo(x, 0)
+                        ctx.lineTo(x, y)
+                        ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, true)
+                        ctx.lineTo(x + step, 0)
+
+                        x = x + step
+                        y = -y
+                        ctx.moveTo(x, 0)
+                        ctx.lineTo(x, y)
+                        ctx.arc(x + step / 2, y, step / 2, Math.PI, 0, false)
+                        ctx.lineTo(x + step, 0)
+                    }
+
+                    ctx.stroke()
+                    ctx.closePath()
+                },
+                // // Set a bar width
+                // barWidth: 20,
+                // // Optionally, specify the spacing between bars
+                // barGap: 4,
+                // // And the bar radius
+                // barRadius: 2,
+            })
+
+            // Initialize the Record plugin
+            record = wavesurfer.registerPlugin(RecordPlugin.create({ scrollingWaveform: false, renderRecordedAudio: false }))
+            // Render recorded audio
+            // recButton.textContent = 'Record'
+
+        }
+
+        startButton.addEventListener('click', e => {
+            record.startRecording()
+
+            if (isRecording) return;
+            isRecording = true;
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            context = new AudioContext();
+
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                globalStream = stream;
+                const input = context.createMediaStreamSource(stream);
+                processor = context.createScriptProcessor(bufferSize, 1, 1);
+                processor.onaudioprocess = e => processAudio(e);
+                input.connect(processor);
+                processor.connect(context.destination);
+
+                sendAudioConfig();
+            }).catch(error => console.error('Error accessing microphone', error));
+
+            // Disable start button and enable stop button
+            startButton.disabled = true;
+            stopButton.disabled = false;
+
+
+        });
+
+        stopButton.addEventListener('click', e => {
+            if (!isRecording) return;
+            isRecording = false;
+
+            if (globalStream) {
+                globalStream.getTracks().forEach(track => track.stop());
+            }
+            if (processor) {
+                processor.disconnect();
+                processor = null;
+            }
+            if (context) {
+                context.close().then(() => context = null);
+            }
+            startButton.disabled = false;
+            stopButton.disabled = true;
+
+            // 可视化部分
+            if (record.isRecording() || record.isPaused()) {
+                record.stopRecording()
+                return
+            }
+        })
+
+        connectButton.addEventListener('click', e => {
+            initWebSocket()
+        })
+
+        // Initialize on page load
+        window.onload = () => {
+            initWebSocket()
+            createWaveSurfer();
+        };
 
         function initWebSocket() {
             const websocketAddress = document.getElementById('websocketAddress').value;
@@ -107,17 +328,19 @@
                 return;
             }
 
+            if (websocket) websocket.close()
+
             websocket = new WebSocket(websocketAddress);
             websocket.onopen = () => {
                 console.log("WebSocket connection established");
                 document.getElementById("webSocketStatus").textContent = 'Connected';
-                document.getElementById('startButton').disabled = false;
+                startButton.disabled = false;
             };
             websocket.onclose = event => {
                 console.log("WebSocket connection closed", event);
                 document.getElementById("webSocketStatus").textContent = 'Not Connected';
-                document.getElementById('startButton').disabled = true;
-                document.getElementById('stopButton').disabled = true;
+                startButton.disabled = true;
+                stopButton.disabled = true;
             };
             websocket.onmessage = event => {
                 console.log("Message from server:", event.data);
@@ -169,46 +392,7 @@
         }
 
 
-        function startRecording() {
-            if (isRecording) return;
-            isRecording = true;
 
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            context = new AudioContext();
-
-            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-                globalStream = stream;
-                const input = context.createMediaStreamSource(stream);
-                processor = context.createScriptProcessor(bufferSize, 1, 1);
-                processor.onaudioprocess = e => processAudio(e);
-                input.connect(processor);
-                processor.connect(context.destination);
-
-                sendAudioConfig();
-            }).catch(error => console.error('Error accessing microphone', error));
-
-            // Disable start button and enable stop button
-            document.getElementById('startButton').disabled = true;
-            document.getElementById('stopButton').disabled = false;
-        }
-
-        function stopRecording() {
-            if (!isRecording) return;
-            isRecording = false;
-
-            if (globalStream) {
-                globalStream.getTracks().forEach(track => track.stop());
-            }
-            if (processor) {
-                processor.disconnect();
-                processor = null;
-            }
-            if (context) {
-                context.close().then(() => context = null);
-            }
-            document.getElementById('startButton').disabled = false;
-            document.getElementById('stopButton').disabled = true;
-        }
 
         function sendAudioConfig() {
             let selectedStrategy = document.getElementById('bufferingStrategySelect').value;
@@ -281,8 +465,6 @@
             return buf.buffer;
         }
 
-        // Initialize WebSocket on page load
-        //  window.onload = initWebSocket;
 
         function toggleBufferingStrategyPanel() {
             var selectedStrategy = document.getElementById('bufferingStrategySelect').value;
@@ -296,72 +478,7 @@
         }
 
 
-
     </script>
-</head>
-
-<body>
-    <h1>Transcribe a Web Audio Stream with Huggingface VAD + Whisper</h1>
-    <div class="controls">
-        <div class="control-group">
-            <label class="label" for="websocketAddress">WebSocket Address:</label>
-            <input type="text" id="websocketAddress" value="ws://localhost:8765">
-        </div>
-        <div class="control-group">
-            <label class="label" for="bufferingStrategySelect" onchange="toggleBufferingStrategyPanel()">Buffering
-                Strategy:</label>
-            <select id="bufferingStrategySelect">
-                <option value="silence_at_end_of_chunk" selected>Silence at End of Chunk</option>
-            </select>
-        </div>
-        <div class="silence_at_end_of_chunk_options_panel">
-            <div class="control-group">
-                <label class="label" for="chunk_length_seconds">Chunk Length (s):</label>
-                <input type="number" id="chunk_length_seconds" value="3" min="1">
-            </div>
-            <div class="control-group">
-                <label class="label" for="chunk_offset_seconds">Silence at the End of Chunk (s):</label>
-                <input type="number" id="chunk_offset_seconds" value="0.1" min="0">
-            </div>
-        </div>
-        <div class="control-group">
-            <label class="label" for="languageSelect">Language:</label>
-            <select id="languageSelect">
-                <option value="multilingual">Multilingual</option>
-                <option value="english">English</option>
-                <option value="italian">Italian</option>
-                <option value="spanish">Spanish</option>
-                <option value="french">French</option>
-                <option value="german">German</option>
-                <option value="chinese">Chinese</option>
-                <option value="arabic">Arabic</option>
-                <option value="portuguese">Portuguese</option>
-                <option value="russian">Russian</option>
-                <option value="japanese">Japanese</option>
-                <option value="dutch">Dutch</option>
-                <option value="korean">Korean</option>
-                <option value="hindi">Hindi</option>
-                <option value="turkish">Turkish</option>
-                <option value="swedish">Swedish</option>
-                <option value="norwegian">Norwegian</option>
-                <option value="danish">Danish</option>
-                <option value="polish">Polish</option>
-                <option value="finnish">Finnish</option>
-                <option value="thai">Thai</option>
-                <option value="czech">Czech</option>
-                <option value="hungarian">Hungarian</option>
-                <option value="greek">Greek</option>
-            </select>
-        </div>
-        <button onclick="initWebSocket()">Connect</button>
-    </div>
-    <button id="startButton" onclick='startRecording()' disabled>Start Streaming</button>
-    <button id="stopButton" onclick='stopRecording()' disabled>Stop Streaming</button>
-    <div id="transcription"></div>
-    <br />
-    <div>WebSocket: <span id="webSocketStatus">Not Connected</span></div>
-    <div>Detected Language: <span id="detected_language">Undefined</span></div>
-    <div>Last Processing Time: <span id="processing_time">Undefined</span></div>
 </body>
 
 </html>
