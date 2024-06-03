@@ -13,7 +13,7 @@ current_file_path = os.path.abspath(__file__)
 # 获取当前文件的目录
 current_directory = os.path.dirname(current_file_path)
 sys.path.append(str(Path(current_directory).parent))
-print("Current directory:", current_directory)
+# print("Current directory:", current_directory)
 
 
 from VoiceStreamAI.server import Server
@@ -25,7 +25,7 @@ def parse_args():
     parser.add_argument("--vad-type", type=str, default="pyannote", help="Type of VAD pipeline to use (e.g., 'pyannote')")
     parser.add_argument("--vad-args", type=str, default='{"auth_token": "huggingface_token"}', help="JSON string of additional arguments for VAD pipeline")
     parser.add_argument("--asr-type", type=str, default="faster_whisper", help="Type of ASR pipeline to use (e.g., 'whisper')")
-    parser.add_argument("--asr-args", type=str, default='{"model_size": "tiny"}', help="JSON string of additional arguments for ASR pipeline")
+    parser.add_argument("--asr-args", type=str, default='{"model_size": "distil-whisper/distil-large-v3"}', help="JSON string of additional arguments for ASR pipeline")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Host for the WebSocket server")
     parser.add_argument("--port", type=int, default=8765, help="Port for the WebSocket server")
     parser.add_argument("--certfile", type=str, default=None, help="The path to the SSL certificate (cert file) if using secure websockets")
