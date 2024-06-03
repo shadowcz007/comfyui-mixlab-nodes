@@ -586,7 +586,7 @@ async def mixlab_live_handler(request):
 
         import threading
         import subprocess
-
+ 
         def run_vad_script():
             subprocess.run([python, live_server_path])
 

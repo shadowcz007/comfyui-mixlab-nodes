@@ -113,7 +113,7 @@ language_codes = {
 class FasterWhisperASR(ASRInterface):
     def __init__(self, **kwargs):
         model_size = kwargs.get('model_size', "large-v3")
-        model_root = os.path.join(folder_paths.models_dir, "whisper")
+        model_root = os.path.join(folder_paths.models_dir, "whisper") 
         # Run on GPU with FP16
         self.asr_pipeline = WhisperModel(model_size, device="cuda", compute_type="float16",download_root=model_root)
 
