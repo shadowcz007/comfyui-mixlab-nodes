@@ -4,6 +4,7 @@ import json
 import time
 
 from VoiceStreamAI.buffering_strategy.buffering_strategy_interface import BufferingStrategyInterface
+from openai import OpenAI
 
 class SilenceAtEndOfChunk(BufferingStrategyInterface):
     """
@@ -43,6 +44,8 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
             self.error_if_not_realtime = kwargs.get('error_if_not_realtime', False)
         
         self.processing_flag = False
+
+        self.messages=[]
 
     def process_audio(self, websocket, vad_pipeline, asr_pipeline):
         """
@@ -95,6 +98,33 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
                 end = time.time()
                 transcription['processing_time'] = end - start
                 json_transcription = json.dumps(transcription) 
+
+                # Point to the local server
+                client = OpenAI(base_url="http://localhost:9090/v1", api_key="lm-studio")
+
+                print('#messages',self.messages)
+                
+                completion = client.chat.completions.create(
+                model="model-identifier",
+                messages=[
+                    {"role": "system", "content": "Always answer in rhymes."}, 
+                ]+self.messages[-10:0]+[{"role": "user", "content":transcription['text']}],
+                temperature=0.7,
+                )
+
+                transcription['asistant'] = completion.choices[0].message.content
+                json_transcription = json.dumps(transcription) 
+
+                self.messages.append({
+                    "role": "user", 
+                    "content":transcription['text']})
+                
+                self.messages.append({
+                    "role": "asistant", 
+                    "content": transcription['asistant']
+                                      })
+                print('#messages',completion.choices[0].message.content)
+
                 await websocket.send(json_transcription)
             self.client.scratch_buffer.clear()
             self.client.increment_file_counter()

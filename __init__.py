@@ -12,6 +12,8 @@ from PIL import Image
 from comfy.cli_args import args
 python = sys.executable
 
+# print("sys.path", sys.path)
+
 #修复 sys.stdout.isatty()  object has no attribute 'isatty'
 try:
     sys.stdout.isatty()

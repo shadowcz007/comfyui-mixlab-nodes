@@ -98,7 +98,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-top: 1rem;
-            height: 300px;
+            
             width: 300px
         }
     </style>
@@ -210,7 +210,7 @@
                 progressColor: 'rgb(100, 0, 100)',
                 renderFunction: (channels, ctx) => {
                     const { width, height } = ctx.canvas
-                    console.log(width, height)
+                    // console.log(width, height)
                     const scale = channels[0].length / width
                     const step = 20
 
@@ -341,12 +341,16 @@
                 document.getElementById("webSocketStatus").textContent = 'Not Connected';
                 startButton.disabled = true;
                 stopButton.disabled = true;
+                // setTimeout(()=>initWebSocket(),1000)
             };
             websocket.onmessage = event => {
                 console.log("Message from server:", event.data);
                 const transcript_data = JSON.parse(event.data);
                 updateTranscription(transcript_data);
             };
+            websocket.onerror=()=>{
+                // setTimeout(()=>initWebSocket(),1000)
+            }
         }
 
         function updateTranscription(transcript_data) {

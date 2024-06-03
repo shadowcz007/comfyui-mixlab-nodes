@@ -13,7 +13,7 @@ current_file_path = os.path.abspath(__file__)
 # 获取当前文件的目录
 current_directory = os.path.dirname(current_file_path)
 sys.path.append(str(Path(current_directory).parent))
-# print("Current directory:", current_directory)
+# print("sys.path", sys.path)
 
 
 from VoiceStreamAI.server import Server
