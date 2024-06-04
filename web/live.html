@@ -98,7 +98,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             margin-top: 1rem;
-            
+
             width: 300px
         }
     </style>
@@ -108,14 +108,17 @@
 
     <div id="mic_container">
         <div id="mic"></div>
-
+        <div id="asistant"></div>
     </div>
 
     <h1>VAD + Whisper + </h1>
+
+    <button id="init_server">Server</button>
+
     <div class="controls">
         <div class="control-group">
             <label class="label" for="websocketAddress">WebSocket Address:</label>
-            <input type="text" id="websocketAddress" value="ws://localhost:8765">
+            <input type="text" id="websocketAddress" value="ws://localhost:8725">
         </div>
         <div class="control-group">
             <label class="label" for="bufferingStrategySelect" onchange="toggleBufferingStrategyPanel()">Buffering
@@ -197,7 +200,8 @@
         // Record button
         const startButton = document.getElementById('startButton'),
             stopButton = document.getElementById('stopButton'),
-            connectButton = document.getElementById('connectButton');
+            connectButton = document.getElementById('connectButton'),
+            initServerButton = document.getElementById('init_server')
 
         const createWaveSurfer = () => {
             // Create an instance of WaveSurfer
@@ -279,7 +283,6 @@
             startButton.disabled = true;
             stopButton.disabled = false;
 
-
         });
 
         stopButton.addEventListener('click', e => {
@@ -308,6 +311,21 @@
 
         connectButton.addEventListener('click', e => {
             initWebSocket()
+        })
+
+        initServerButton.addEventListener('click', async e => {
+            const response = await fetch('/mixlab/start_live', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    port: 8323,
+                    model: ''
+                })
+            })
+            console.log(await response.json())
+
         })
 
         // Initialize on page load
@@ -339,16 +357,27 @@
             websocket.onclose = event => {
                 console.log("WebSocket connection closed", event);
                 document.getElementById("webSocketStatus").textContent = 'Not Connected';
+                stopButton.click()
                 startButton.disabled = true;
                 stopButton.disabled = true;
+
                 // setTimeout(()=>initWebSocket(),1000)
             };
             websocket.onmessage = event => {
                 console.log("Message from server:", event.data);
                 const transcript_data = JSON.parse(event.data);
-                updateTranscription(transcript_data);
+
+                if (transcript_data.status === 'chat_start') {
+                    updateTranscription(transcript_data);
+                    stopButton.click();
+                } else if (transcript_data.status === 'chat_end') {
+                    let asistant = decodeURIComponent(transcript_data.asistant)
+                    document.getElementById('asistant').innerText = asistant;
+                    startButton.click();
+                }
+
             };
-            websocket.onerror=()=>{
+            websocket.onerror = () => {
                 // setTimeout(()=>initWebSocket(),1000)
             }
         }

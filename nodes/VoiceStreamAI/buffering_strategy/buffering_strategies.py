@@ -47,7 +47,7 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
 
         self.messages=[]
 
-    def process_audio(self, websocket, vad_pipeline, asr_pipeline):
+    def process_audio(self, websocket, vad_pipeline, asr_pipeline,llm_port):
         """
         Process audio chunks by checking their length and scheduling asynchronous processing.
 
@@ -68,9 +68,9 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
             self.client.buffer.clear()
             self.processing_flag = True
             # Schedule the processing in a separate task
-            asyncio.create_task(self.process_audio_async(websocket, vad_pipeline, asr_pipeline))
+            asyncio.create_task(self.process_audio_async(websocket, vad_pipeline, asr_pipeline,llm_port))
     
-    async def process_audio_async(self, websocket, vad_pipeline, asr_pipeline):
+    async def process_audio_async(self, websocket, vad_pipeline, asr_pipeline,llm_port):
         """
         Asynchronously process audio for activity detection and transcription.
 
@@ -97,22 +97,32 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
             if transcription['text'] != '':
                 end = time.time()
                 transcription['processing_time'] = end - start
-                json_transcription = json.dumps(transcription) 
+
+                transcription['status']="chat_start"
+
+                json_transcription = json.dumps(transcription)
+
+                await websocket.send(json_transcription)
 
                 # Point to the local server
-                client = OpenAI(base_url="http://localhost:9090/v1", api_key="lm-studio")
+                client = OpenAI(base_url=f"http://localhost:{llm_port}/v1", api_key="lm-studio")
 
-                print('#messages',self.messages)
-                
-                completion = client.chat.completions.create(
-                model="model-identifier",
+               
                 messages=[
                     {"role": "system", "content": "Always answer in rhymes."}, 
-                ]+self.messages[-10:0]+[{"role": "user", "content":transcription['text']}],
-                temperature=0.7,
-                )
+                ]+self.messages[-10:0]+[{"role": "user", "content":transcription['text']}]
+                # print('#messages',messages)
+                
+                completion = client.chat.completions.create(
+                    model="model-identifier",
+                    messages=messages,
+                    temperature=0.7,
+                    )
 
                 transcription['asistant'] = completion.choices[0].message.content
+
+                transcription['status']="chat_end"
+
                 json_transcription = json.dumps(transcription) 
 
                 self.messages.append({
@@ -123,7 +133,7 @@ class SilenceAtEndOfChunk(BufferingStrategyInterface):
                     "role": "asistant", 
                     "content": transcription['asistant']
                                       })
-                print('#messages',completion.choices[0].message.content)
+                # print('#messages',completion.choices[0].message.content)
 
                 await websocket.send(json_transcription)
             self.client.scratch_buffer.clear()

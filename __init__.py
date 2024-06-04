@@ -577,31 +577,6 @@ async def mixlab_app_handler(request):
     else:
         return web.Response(text="HTML file not found", status=404)
 
-@routes.get('/mixlab/live')
-async def mixlab_live_handler(request):
-    html_file = os.path.join(current_path, "web/live.html")
-    if os.path.exists(html_file):
-        os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com' #hf_hub_download 里的下载地址修改
-        os.environ['PYANNOTE_AUTH_TOKEN'] = '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'
-        
-        live_server_path=os.path.join(current_path, "nodes/VoiceStreamAI/main.py")
-
-        import threading
-        import subprocess
- 
-        def run_vad_script():
-            subprocess.run([python, live_server_path])
-
-        thread = threading.Thread(target=run_vad_script)
-        thread.start()
-
-
-        with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
-            html_data = f.read()
-            return web.Response(text=html_data, content_type='text/html')
-    else:
-        return web.Response(text="HTML file not found", status=404)
-    
 
 @routes.post('/mixlab/workflow')
 async def mixlab_workflow_hander(request):
@@ -744,6 +719,44 @@ async def post_prompt_result(request):
     return web.json_response({"result":res})
 
 
+
+def start_local_live_thread(data):
+    import asyncio
+    from VoiceStreamAI.server import Server
+    from VoiceStreamAI.asr.asr_factory import ASRFactory
+    from VoiceStreamAI.vad.vad_factory import VADFactory
+
+    model="large-v3"
+    if "model" in data:
+        model=data['model']
+
+    vad_pipeline = VADFactory.create_vad_pipeline("pyannote")
+    #device 
+    asr_pipeline = ASRFactory.create_asr_pipeline("faster_whisper", **{"model_size":model})
+
+    port=8765
+    if 'port' in data:
+        port=data['port']
+
+    llm_port=9000
+    if 'llm_port' in data:
+        llm_port=data['llm_port']
+
+    server = Server(vad_pipeline, 
+                    asr_pipeline, 
+                    host="127.0.0.1", 
+                    port=port, 
+                    sampling_rate=16000, 
+                    samples_width=2,
+                    llm_port=llm_port
+                    )
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(server.start())
+    loop.run_forever()
+
+
 async def start_local_llm(data):
     global llama_port,llama_model,llama_chat_format
     if llama_port and llama_model and llama_chat_format:
@@ -773,6 +786,8 @@ async def start_local_llm(data):
 
 
     chat_format="chatml"
+    if "model" in data and "function-calling" in data['model']:
+        chat_format="functionary-v2"
 
     model_alias=os.path.basename(model)
 
@@ -854,6 +869,42 @@ async def my_hander_method(request):
         print('start_local_llm error')
 
     return web.json_response(result)
+
+
+@routes.post('/mixlab/start_live')
+async def mixlab_live_start_handler(request):
+    import threading
+    llm=await start_local_llm({
+        "model":"Phi-3-mini-4k-instruct-Q5_K_S.gguf",
+        "n_gpu_layers":2
+    })
+
+    # {"port":llama_port,"model":llama_model,"chat_format":llama_chat_format}
+
+    os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com' #hf_hub_download 里的下载地址修改
+    os.environ['PYANNOTE_AUTH_TOKEN'] = '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'
+
+    # Create and start the thread
+    data = {
+        "llm_port":llm['port'],
+        "port":8725,
+        "model":"large-v3"
+    }  # Replace with your actual data if needed
+    thread = threading.Thread(target=start_local_live_thread, args=(data,))
+    thread.start()
+
+    return web.json_response(data)
+
+
+@routes.get('/mixlab/live')
+async def mixlab_live_handler(request):
+    html_file = os.path.join(current_path, "web/live.html")
+    if os.path.exists(html_file):
+        with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
+            html_data = f.read()
+            return web.Response(text=html_data, content_type='text/html')
+    else:
+        return web.Response(text="HTML file not found", status=404)
 
 # 重启服务
 @routes.post('/mixlab/re_start')
