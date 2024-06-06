@@ -163,7 +163,7 @@ async function createMenu () {
 
     // appsButton.onclick = () =>
     appsButton.onclick = async () => {
-      if (window._mixlab_llamacpp) {
+      if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
         //显示运行的模型
         createModelsModal([
           window._mixlab_llamacpp.url,
@@ -1029,7 +1029,7 @@ function createModelsModal (models) {
 
   modalContent.appendChild(input)
 
-  if (!window._mixlab_llamacpp) {
+  if (!window._mixlab_llamacpp||(window._mixlab_llamacpp?.model?.length==0)) {
     for (const m of models) {
       let d = document.createElement('div')
       d.innerText = `${showTextByLanguage('Run', {
