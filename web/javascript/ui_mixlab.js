@@ -800,11 +800,11 @@ async function fetchReadmeContent (url) {
 
 async function startLLM (model) {
   let res = await start_llama(model)
-  window._mixlab_llamacpp = res
+  window._mixlab_llamacpp = res||{ model:[] }
 
-  localStorage.setItem('_mixlab_llama_select', res.model)
+  localStorage.setItem('_mixlab_llama_select', res?.model||'')
 
-  if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')&&window._mixlab_llamacpp.url) {
+  if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')&&window._mixlab_llamacpp?.url) {
     document.body
       .querySelector('#mixlab_chatbot_by_llamacpp')
       .setAttribute('title', window._mixlab_llamacpp.url)
