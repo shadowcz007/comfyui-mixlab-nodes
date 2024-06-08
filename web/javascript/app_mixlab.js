@@ -2,6 +2,8 @@ import { app } from '../../../scripts/app.js'
 import { $el } from '../../../scripts/ui.js'
 import { api } from '../../../scripts/api.js'
 
+import { td_bg } from './td_background.js'
+console.log('td_bg', td_bg)
 //本机安装的插件节点全集
 window._nodesAll = null
 
@@ -503,6 +505,22 @@ app.registerExtension({
           }
         })
 
+        //td bg
+        const tdBG = document.createElement('button')
+        tdBG.innerText = 'TDBG'
+        tdBG.style = style
+        tdBG.style.marginLeft = '12px'
+
+        tdBG.addEventListener('click', () => {
+          td_bg.toggle();
+          if(td_bg.running){
+            tdBG.style.background = 'yellow'
+          }else{
+            tdBG.style.background = 'transparent'
+          }
+
+        })
+
         // author
         let author = document.createElement('div')
         // author.style=`display: flex`
@@ -659,6 +677,7 @@ app.registerExtension({
 
         btns.appendChild(btn)
         btns.appendChild(download)
+        btns.appendChild(tdBG)
 
         document.body.appendChild(widget.div)
         this.addCustomWidget(widget)
@@ -687,9 +706,8 @@ app.registerExtension({
           }
 
           const div = this.widgets.filter(w => w.div)[0].div
-          Array.from(
-            div.querySelectorAll('button'),
-            b => (b.style.background = 'yellow')
+          Array.from(div.querySelectorAll('button'), b =>
+            b.innerText != 'TDBG' ? (b.style.background = 'yellow') : ''
           )
         } catch (error) {}
       }
