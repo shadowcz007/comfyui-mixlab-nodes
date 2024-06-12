@@ -6,8 +6,6 @@ import { $el } from '../../../scripts/ui.js'
 
 // The code is based on ComfyUI-VideoHelperSuite modification.
 
-
-
 function injectCSS (css) {
   // 检查页面中是否已经存在具有相同内容的style标签
   const existingStyle = document.querySelector('style')
@@ -240,15 +238,7 @@ app.registerExtension({
   }
 })
 
-
-function offsetDOMWidget(
-  widget,
-  ctx,
-  node,
-  widgetWidth,
-  widgetY,
-  height
-) {
+function offsetDOMWidget (widget, ctx, node, widgetWidth, widgetY, height) {
   const margin = 10
   const elRect = ctx.canvas.getBoundingClientRect()
   const transform = new DOMMatrix()
@@ -270,18 +260,18 @@ function offsetDOMWidget(
     position: 'absolute',
     background: !node.color ? '' : node.color,
     color: !node.color ? '' : 'white',
-    zIndex: 5, //app.graph._nodes.indexOf(node),
+    zIndex: 5 //app.graph._nodes.indexOf(node),
   })
 }
 
-export const hasWidgets = (node) => {
+export const hasWidgets = node => {
   if (!node.widgets || !node.widgets?.[Symbol.iterator]) {
     return false
   }
   return true
 }
 
-export const cleanupNode = (node) => {
+export const cleanupNode = node => {
   if (!hasWidgets(node)) {
     return
   }
@@ -298,43 +288,43 @@ export const cleanupNode = (node) => {
   }
 }
 
-const CreatePreviewElement = (name, val, format) => {
-  const [type] = format.split('/')  
+const createPreviewElement = (name, val, format) => {
+  const [type] = format.split('/')
   const w = {
-      name,
-      type,
-      value: val,
-      draw: function (ctx, node, widgetWidth, widgetY, height) {
-        const [cw, ch] = this.computeSize(widgetWidth)
-        offsetDOMWidget(this, ctx, node, widgetWidth, widgetY, ch)
-      },
-      computeSize: function (_) {
-        const ratio = this.inputRatio || 1
-        const width = Math.max(220, this.parent.size[0])
-        return [width, (width / ratio + 10)]
-      },
-      onRemoved: function () {
-        if (this.inputEl) {
-          this.inputEl.remove()
-        }
-      },
+    name,
+    type,
+    value: val,
+    draw: function (ctx, node, widgetWidth, widgetY, height) {
+      const [cw, ch] = this.computeSize(widgetWidth)
+      offsetDOMWidget(this, ctx, node, widgetWidth, widgetY, ch)
+    },
+    computeSize: function (_) {
+      const ratio = this.inputRatio || 1
+      const width = Math.max(220, this.parent.size[0])
+      return [width, width / ratio + 10]
+    },
+    onRemoved: function () {
+      if (this.inputEl) {
+        this.inputEl.remove()
+      }
     }
-
-    w.inputEl = document.createElement(type === 'video' ? 'video' : 'img')
-    w.inputEl.src = w.value
-    if (type === 'video') {
-      w.inputEl.setAttribute('type', 'video/webm');
-      w.inputEl.autoplay = true
-      w.inputEl.loop = true
-      w.inputEl.controls = false;
-    }
-    w.inputEl.onload = function () {
-      w.inputRatio = w.inputEl.naturalWidth / w.inputEl.naturalHeight
-    }
-    document.body.appendChild(w.inputEl)
-    return w
   }
 
+  w.inputEl = document.createElement(type === 'video' ? 'video' : 'img')
+  w.inputEl.src = w.value
+
+  if (type === 'video' || format.match('.mp4')) {
+    w.inputEl.setAttribute('type', 'video/webm')
+    w.inputEl.autoplay = true
+    w.inputEl.loop = true
+    w.inputEl.controls = true
+  }
+  w.inputEl.onload = function () {
+    w.inputRatio = w.inputEl.naturalWidth / w.inputEl.naturalHeight
+  }
+  document.body.appendChild(w.inputEl)
+  return w
+}
 
 app.registerExtension({
   name: 'Mixlab.Video.ImageListReplace',
@@ -469,7 +459,10 @@ app.registerExtension({
       }
     }
 
-    if (nodeData?.name == 'VideoCombine_Adv') {
+    if (
+      nodeData?.name == 'VideoCombine_Adv' ||
+      nodeData?.name == 'CombineAudioVideo'
+    ) {
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
         const prefix = 'vhs_gif_preview_'
@@ -489,7 +482,7 @@ app.registerExtension({
                 '/view?' + new URLSearchParams(params).toString()
               )
               const w = this.addCustomWidget(
-                CreatePreviewElement(
+                createPreviewElement(
                   `${prefix}_${i}`,
                   previewUrl,
                   params.format || 'image/gif'

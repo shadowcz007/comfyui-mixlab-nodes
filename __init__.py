@@ -842,7 +842,7 @@ def re_start(request):
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import ComparingTwoFrames,LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import ImageListToBatch_,ComparingTwoFrames,LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -853,7 +853,7 @@ from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,F
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
-from .nodes.Video import VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames
+from .nodes.Video import GenerateFramesByCount,scenesNode_,CombineAudioVideo,VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames,LoadAndCombinedAudio_
 
 from .nodes.TripoSR import LoadTripoSRModel,TripoSRSampler,SaveTripoSRMesh
 
@@ -886,6 +886,7 @@ NODE_CLASS_MAPPINGS = {
     "ImageColorTransfer":ImageColorTransfer,
     "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
+    "ImageListToBatch_":ImageListToBatch_,
     "CompositeImages_":CompositeImages,
     "SplitImage":SplitImage,
     "CenterImage":CenterImage,
@@ -945,7 +946,11 @@ NODE_CLASS_MAPPINGS = {
     "PreviewMask_":PreviewMask_,
      "LoadTripoSRModel_": LoadTripoSRModel,
     "TripoSRSampler_": TripoSRSampler,
-    "SaveTripoSRMesh": SaveTripoSRMesh
+    "SaveTripoSRMesh": SaveTripoSRMesh,
+    "LoadAndCombinedAudio_":LoadAndCombinedAudio_,
+    "CombineAudioVideo":CombineAudioVideo,
+    "ScenesNode_":scenesNode_,
+    "GenerateFramesByCount":GenerateFramesByCount
     # "GamePal":GamePal
 }
 
@@ -973,6 +978,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
+    "ImageListToBatch_":"Image List To Batch",
     "CompositeImages_":"Composite Images ♾️Mixlab",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
@@ -1004,7 +1010,11 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "PreviewMask_":"Preview Mask",
     "LoadTripoSRModel_": "Load TripoSR Model",
     "TripoSRSampler_": "TripoSR Sampler",
-    "SaveTripoSRMesh": "Save TripoSR Mesh"
+    "SaveTripoSRMesh": "Save TripoSR Mesh",
+    "LoadAndCombinedAudio_":"Load And Combined Audio",
+    "CombineAudioVideo":"Combine Audio Video",
+    "ScenesNode_":"Scenes",
+    "GenerateFramesByCount":"Generate Frames By Count"
 }
 
 # web ui的节点功能

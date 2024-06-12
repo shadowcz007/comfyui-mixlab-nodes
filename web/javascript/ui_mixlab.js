@@ -1784,6 +1784,7 @@ app.registerExtension({
         {
           content: 'Help ♾️Mixlab', // with a name
           callback: () => {
+            // console.log('#data',node)
             LGraphCanvas.prototype.helpAboutNode(node)
           } // and the callback
         },

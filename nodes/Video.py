@@ -17,8 +17,127 @@ import folder_paths
 from comfy.k_diffusion.utils import FolderOfImages
 from comfy.utils import common_upscale
 
+import torchaudio
+import base64
+
+import mimetypes
 
 
+
+def get_frames(frame_count, frames, revert=False):
+    if not revert:
+        if frame_count <= len(frames):
+            return frames[:frame_count]
+        else:
+            return [frames[i % len(frames)] for i in range(frame_count)]
+    else:
+        extended_frames = frames + frames[-2:0:-1]  # 正向加反向中间部分
+        if frame_count <= len(extended_frames):
+            return extended_frames[:frame_count]
+        else:
+            return [extended_frames[i % len(extended_frames)] for i in range(frame_count)]
+
+# # 示例用法
+# frames = ["frame1", "frame2", "frame3"]
+# frame_count = 2
+
+# result = get_frames(frame_count, frames, revert=False)
+# print(result)  # 输出: ['frame1', 'frame2', 'frame3', 'frame1', 'frame2', 'frame3', 'frame1']
+
+# result = get_frames(frame_count, frames, revert=True)
+# print(result)  # 输出: ['frame1', 'frame2', 'frame3', 'frame2', 'frame1', 'frame2', 'frame3']
+
+
+
+
+def get_mime_type(file_path):
+    # 获取文件的 MIME 类型
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    # 如果无法猜测类型，返回默认类型
+    if mime_type is None:
+        return 'application/octet-stream'
+    
+    return mime_type
+# import subprocess
+# from imageio_ffmpeg import get_ffmpeg_exe
+
+
+def save_audio_base64s_to_file(base64_audios, output_folder, file_name):
+    # Ensure the output folder exists
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    decoded_audios=[]
+    for a in base64_audios:
+    
+        # If the base64 string contains a header, remove it
+        if ',' in a:
+            a = a.split(',')[1]
+        
+        # 解码 base64 数据
+        a=base64.b64decode(a)
+        decoded_audios.append(a)
+
+    # 拼接音频数据
+    combined_audio = b''.join(decoded_audios)
+    
+    # Create the full file path
+    file_path = os.path.join(output_folder, file_name)
+    
+    # Write the decoded audio to the file
+    with open(file_path, 'wb') as audio_file:
+        audio_file.write(combined_audio)
+    
+    return file_path
+
+# Example usage
+# base64_audio = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA="
+# output_folder = "audio_files"
+# file_name = "output.wav"
+
+# file_path = save_audio_base64_to_file(base64_audio, output_folder, file_name)
+# print(f"Audio saved to: {file_path}")
+
+# 写一个python文件，用来 判断文件夹内命名为 所有chat_tts开头的文件数量（chat_tts_00001），并输出新的编号
+def get_new_counter(full_output_folder, filename_prefix):
+    # 获取目录中的所有文件
+    files = os.listdir(full_output_folder)
+    
+    # 过滤出以 filename_prefix 开头并且后续部分为数字的文件
+    filtered_files = []
+    for f in files:
+        if f.startswith(filename_prefix):
+            # 去掉文件名中的前缀和后缀，只保留中间的数字部分
+            base_name = f[len(filename_prefix)+1:]
+            number_part = base_name.split('.')[0]  # 假设文件名中只有一个点，即扩展名
+            if number_part.isdigit():
+                filtered_files.append(int(number_part))
+
+    if not filtered_files:
+        return 1
+
+    # 获取最大的编号
+    max_number = max(filtered_files)
+    
+    # 新的编号
+    return max_number + 1
+
+def crop_audio(input_file, start_time, duration):
+    # Load the audio file
+    audio_tensor, sample_rate = torchaudio.load(input_file)
+    
+    # Convert start_time and duration from seconds to sample indices
+    start_sample = int(start_time * sample_rate)
+    end_sample = start_sample + int(duration * sample_rate)
+    
+    # Perform the slicing
+    cropped_audio_tensor = audio_tensor[:, start_sample:end_sample]
+    
+    # Save the cropped audio to a new file
+    torchaudio.save(input_file, cropped_audio_tensor, sample_rate)
+    
+    return input_file
 
 def generate_folder_name(directory,video_path):
     # Get the directory and filename from the video path
@@ -100,6 +219,25 @@ if ffmpeg_path is None:
         ffmpeg_path = get_ffmpeg_exe()
     except:
         print("ffmpeg could not be found. Outputs that require it have been disabled")
+
+
+def combine_audio_video(audio_path, video_path, output_path):
+   
+    command = [
+        ffmpeg_path,
+        '-i', video_path,
+        '-i', audio_path,
+        '-c:v', 'copy',
+        '-c:a', 'aac',
+        '-shortest',
+        output_path
+    ]
+    
+    subprocess.run(command, check=True)
+    return output_path
+
+
+
 
 # Tensor to PIL
 def tensor2pil(image):
@@ -262,7 +400,7 @@ class LoadVideoAndSegment:
                     files.append(f)
         return {"required": {
                     "video": (sorted(files), {"video_upload": True}),
-                     "video_segment_frames": ("INT", {"default": 10, "min": 1, "step": 1}),
+                     "video_segment_frames": ("INT", {"default": 10, "min": -1, "step": 1}),
                      "transition_frames": ("INT", {"default": 0, "min": 0, "step": 1}), 
                      },}
 
@@ -332,63 +470,6 @@ class LoadVideoAndSegment:
         
         video_path = folder_paths.get_annotated_filepath(video)
         
-        # check if video is a gif - will need to use cv fallback to read frames
-        # use cv fallback if ffmpeg not installed or gif
-        # if ffmpeg_path is None:
-        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
-        # otherwise, continue with ffmpeg
-        
-        # args_dummy = [ffmpeg_path, "-i", video_path, "-f", "null", "-"]
-        # try:
-        #     with subprocess.Popen(args_dummy, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE) as proc:
-        #         for line in proc.stderr.readlines():
-        #             match = re.search(", ([1-9]|\\d{2,})x(\\d+)",line.decode('utf-8'))
-        #             if match is not None:
-        #                 size = [int(match.group(1)), int(match.group(2))]
-        #                 break
-        # except Exception as e:
-        #     print(f"Retrying with opencv due to ffmpeg error: {e}")
-        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
-        # args_all_frames = [ffmpeg_path, "-i", video_path, "-v", "error",
-        #                      "-pix_fmt", "rgb24"]
-
-        # vfilters = []
-       
-        # if skip_first_frames > 0:
-        #     vfilters.append(f"select=gt(n\\,{skip_first_frames-1})")
-        # if frame_load_cap > 0:
-        #     vfilters.append(f"select=gt({frame_load_cap}\\,n)")
-        # #manually calculate aspect ratio to ensure reads remain aligned
-        
-        # if len(vfilters) > 0:
-        #     args_all_frames += ["-vf", ",".join(vfilters)]
-
-        # args_all_frames += ["-f", "rawvideo", "-"]
-        # images = []
-        # try:
-        #     with subprocess.Popen(args_all_frames, stdout=subprocess.PIPE) as proc:
-        #         #Manually buffer enough bytes for an image
-        #         bpi = size[0]*size[1]*3
-        #         current_bytes = bytearray(bpi)
-        #         current_offset=0
-        #         while True:
-        #             bytes_read = proc.stdout.read(bpi - current_offset)
-        #             if bytes_read is None:#sleep to wait for more data
-        #                 time.sleep(.2)
-        #                 continue
-        #             if len(bytes_read) == 0:#EOF
-        #                 break
-        #             current_bytes[current_offset:len(bytes_read)] = bytes_read
-        #             current_offset+=len(bytes_read)
-        #             if current_offset == bpi:
-        #                 images.append(np.array(current_bytes, dtype=np.float32).reshape(size[1], size[0], 3) / 255.0)
-        #                 current_offset = 0
-        # except Exception as e:
-        #     print(f"Retrying with opencv due to ffmpeg error: {e}")
-        #     return self.load_video_cv_fallback(video, frame_load_cap, skip_first_frames)
-
-        # imgs=split_list(images,video_segment_frames,transition_frames)
-
         # temp path 
         tp=folder_paths.get_temp_directory()
         basename = os.path.basename(video_path)  # 获取文件名
@@ -396,15 +477,22 @@ class LoadVideoAndSegment:
 
         folder_path = create_folder(tp,name_without_extension)
         
- 
-        # 导出的数据
-        scenes_video,total_frames,fps=split_video(video_path,video_segment_frames,
-                                 transition_frames,folder_path)
+        if video_segment_frames==-1:
+            # 不切割视频
+            scenes_video=[video_path]
+            # 读取视频文件
+            video_capture = cv2.VideoCapture(video_path)
+            
+            # 获取视频的总帧数和帧率
+            total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+            fps = video_capture.get(cv2.CAP_PROP_FPS)
+
+        else:
+            # 导出的数据
+            scenes_video,total_frames,fps=split_video(video_path,video_segment_frames,
+                                    transition_frames,folder_path)
       
 
-        # imgs=[torch.from_numpy(np.stack(im)) for im in imgs]
-
-        # images = torch.from_numpy(np.stack(images))
 
         return (scenes_video,len(scenes_video), total_frames,fps,)
 
@@ -422,7 +510,79 @@ class LoadVideoAndSegment:
             return "Invalid image file: {}".format(video)
 
         return True
-    
+
+
+
+class LoadAndCombinedAudio_:
+    @classmethod
+    def INPUT_TYPES(s):
+       
+        return {"required": {
+                    "audios": ("AUDIOBASE64",),
+                    "start_time": ("FLOAT" , {"default": 0, "min": 0, "max": 10000000, "step": 0.01}),
+                    "duration": ("FLOAT" , {"default": 10, "min": 0, "max": 10000000, "step": 0.01}),
+                     },
+                }
+
+    CATEGORY = "♾️Mixlab/Audio"
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("audio_file_path",)
+    FUNCTION = "run"
+
+    def run(self,audios, start_time, duration):
+        output_dir = folder_paths.get_output_directory()
+        counter=get_new_counter(output_dir,'audio_')
+
+        audio_file = f"audio_{counter:05}.wav"
+
+        audio_file=save_audio_base64s_to_file(audios['base64'],output_dir,audio_file)
+
+        crop_audio(audio_file, start_time, duration)
+
+        return (audio_file,)
+
+class CombineAudioVideo:
+    @classmethod
+    def INPUT_TYPES(s):
+       
+        return {"required": {
+                     "video_file_path": ("STRING",  {"forceInput": True}),
+                     "audio_file_path": ("STRING",  {"forceInput": True}), 
+                     },
+                }
+
+    CATEGORY = "♾️Mixlab/Video"
+
+    OUTPUT_NODE = True
+    FUNCTION = "run" 
+    RETURN_TYPES = ()
+    RETURN_NAMES = ()
+
+    def run(self,video_file_path, audio_file_path):
+
+        output_dir = folder_paths.get_output_directory()
+
+        counter=get_new_counter(output_dir,'video_final_')
+        
+        # 获取文件名和扩展名
+        base, ext = os.path.splitext(video_file_path)
+
+        v_file = f"video_final_{counter:05}{ext}"
+        
+        v_file_path=os.path.join(output_dir, v_file)
+
+        combine_audio_video(audio_file_path,video_file_path,v_file_path)
+
+        previews = [
+            {
+                "filename": v_file,
+                "subfolder": "",
+                "type": "output",
+                "format": get_mime_type(v_file),
+            }
+        ]
+        return {"ui": {"gifs": previews}}
 
 # The code is based on ComfyUI-VideoHelperSuite modification.
 class VideoCombine_Adv:
@@ -454,7 +614,8 @@ class VideoCombine_Adv:
             },
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("video_file_path",)
     OUTPUT_NODE = True
     CATEGORY = "♾️Mixlab/Video"
     FUNCTION = "run"
@@ -623,7 +784,7 @@ class VideoCombine_Adv:
                 "format": format,
             }
         ]
-        return {"ui": {"gifs": previews}}
+        return {"ui": {"gifs": previews},"result":(file_path,)}
 
 
 class VAEEncodeForInpaint_Frames:
@@ -691,3 +852,112 @@ class VAEEncodeForInpaint_Frames:
 
 
         return (result, )
+    
+
+
+class GenerateFramesByCount:
+    @classmethod
+    def INPUT_TYPES(cls):
+        
+        return {"required": {
+                    "frames": ('IMAGE',),
+                    "frame_count": ("INT", {"default": 72, "min": 1, "step": 1}), 
+                    "revert" :("BOOLEAN", {"default": True},),
+                     },}
+
+    RETURN_TYPES = ('IMAGE',)
+    RETURN_NAMES = ("frames",)
+
+    FUNCTION = "r"
+    CATEGORY = "♾️Mixlab/Video"
+    # INPUT_IS_LIST = True
+
+    def r(self, frames, frame_count, revert):
+        
+        image_list = [frames[i:i + 1, ...] for i in range(frames.shape[0])]
+
+        image_list=get_frames(frame_count,image_list,revert)
+
+        images = torch.cat(image_list, dim=0)
+
+        return (images,)
+
+
+class scenesNode_:
+    @classmethod
+    def INPUT_TYPES(cls):
+        
+        return {"required": {
+                    "scenes_video": ('SCENE_VIDEO',),
+                     "index": ("INT", {"default": 0, "min": 0, "step": 1}),
+                     
+                     },}
+
+    RETURN_TYPES = ('IMAGE','INT',)
+    RETURN_NAMES = ("frames","count",)
+    # OUTPUT_IS_LIST = (False,)
+
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Video"
+    INPUT_IS_LIST = True
+
+    def load_video_cv_fallback(self, video, frame_load_cap, skip_first_frames):
+        print('#video',video)
+        try:
+            video_cap = cv2.VideoCapture(video)
+            if not video_cap.isOpened():
+                raise ValueError(f"{video} could not be loaded with cv fallback.")
+            # set video_cap to look at start_index frame
+            images = []
+            total_frame_count = 0
+            frames_added = 0
+            base_frame_time = 1/video_cap.get(cv2.CAP_PROP_FPS)
+            
+            target_frame_time = base_frame_time
+
+            time_offset=0.0
+            while video_cap.isOpened():
+                if time_offset < target_frame_time:
+                    is_returned, frame = video_cap.read()
+                    # if didn't return frame, video has ended
+                    if not is_returned:
+                        break
+                    time_offset += base_frame_time
+                if time_offset < target_frame_time:
+                    continue
+                time_offset -= target_frame_time
+                # if not at start_index, skip doing anything with frame
+                total_frame_count += 1
+                if total_frame_count <= skip_first_frames:
+                    continue
+                # TODO: do whatever operations need to happen, like force_size, etc
+
+                # opencv loads images in BGR format (yuck), so need to convert to RGB for ComfyUI use
+                # follow up: can videos ever have an alpha channel?
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # convert frame to comfyui's expected format (taken from comfy's load image code)
+                image = Image.fromarray(frame)
+                image = ImageOps.exif_transpose(image)
+                image = np.array(image, dtype=np.float32) / 255.0
+                image = torch.from_numpy(image)[None,]
+                images.append(image)
+                frames_added += 1
+                # if cap exists and we've reached it, stop processing frames
+                if frame_load_cap > 0 and frames_added >= frame_load_cap:
+                    break
+        finally:
+            video_cap.release()
+        
+        images = torch.cat(images, dim=0)
+       
+        return (images, frames_added,)
+
+    def run(self, scenes_video,index):
+        print('#scenes_video',index,scenes_video)
+        index=index[0]
+        if len(scenes_video) > index:
+            vp=scenes_video[index]
+
+            return self.load_video_cv_fallback(vp,0,0)
+        
+        return ([], 0,)

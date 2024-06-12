@@ -396,3 +396,207 @@ app.registerExtension({
     }
   }
 })
+
+// 上传音频转为base64
+async function uploadAndConvertAudio (file) {
+  if (!file) {
+    alert('Please select a WAV file.')
+    return
+  }
+
+  if (file.type !== 'audio/wav') {
+    alert('Only WAV files are supported.')
+    return
+  }
+
+  try {
+    const base64Audio = await readFileAsDataURL(file)
+    return base64Audio
+  } catch (error) {
+    console.error('Error reading file:', error)
+    alert('Error reading file.')
+  }
+}
+
+function readFileAsDataURL (file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = function (event) {
+      resolve(event.target.result)
+    }
+
+    reader.onerror = function (error) {
+      reject(error)
+    }
+
+    reader.readAsDataURL(file)
+  })
+}
+
+const createInputAudioForBatch = (base64, widget) => {
+  // Create an audio element
+  let audio = document.createElement('audio')
+  audio.src = base64
+  audio.controls = true
+  audio.style = 'width: 120px; display: block'
+
+  // Create a delete button
+  let deleteButton = document.createElement('button')
+  deleteButton.textContent = 'Delete'
+  deleteButton.style = 'margin-left: 10px;'
+
+  // Create a container for the audio and delete button
+  let container = document.createElement('div')
+  container.appendChild(audio)
+  container.appendChild(deleteButton)
+  container.style= `display: flex`
+
+  // Add event listener for the delete button
+  deleteButton.addEventListener('click', e => {
+    let newValue = []
+    let items = widget.value?.base64 || []
+    for (const v of items) {
+      if (v != base64) newValue.push(v)
+    }
+    widget.value.base64 = newValue
+    container.remove()
+  })
+
+  return container
+}
+
+app.registerExtension({
+  name: 'Mixlab.Comfy.LoadAndCombinedAudio_',
+  async getCustomWidgets (app) {
+    return {
+      AUDIOBASE64 (node, inputName, inputData, app) {
+        // console.log('##node', node)
+        const widget = {
+          value: {
+            base64: []
+          }, // 不能[x,x,x]
+          type: inputData[0], // the type
+          name: inputName, // the name, slice
+          size: [128, 32], // a default size
+          draw (ctx, node, width, y) {},
+          computeSize (...args) {
+            return [128, 122] // a method to compute the current size of the widget
+          }
+          // serializeValue (nodeId, widgetIndex) {
+          //   return widget.value
+          // },
+        }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      }
+    }
+  },
+
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'LoadAndCombinedAudio_') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        let audiosWidget = this.widgets.filter(w => w.name == 'audios')[0]
+
+        const widget = {
+          type: 'div',
+          name: 'audio_base64',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, 44, node.size[1])
+            )
+          },
+          serialize: false
+        }
+
+        widget.div = $el('div', {})
+
+        document.body.appendChild(widget.div)
+
+        let audioPreview = document.createElement('div')
+        let audiosDiv = document.createElement('div') //显示图片
+        audiosDiv.className = 'audios_preview'
+        audiosDiv.style = `width: calc(100% - 14px);
+        display: flex;
+        flex-wrap: wrap;
+        padding: 7px;    justify-content: space-between;
+        align-items: center;`
+
+        const btn = document.createElement('button')
+        btn.innerText = 'Upload Audio'
+
+        btn.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 122px;
+       `
+
+        btn.addEventListener('click', e => {
+          e.preventDefault()
+          let inputAudio = document.createElement('input')
+          inputAudio.type = 'file'
+          inputAudio.style.display = 'none'
+          inputAudio.addEventListener('change', async e => {
+            e.preventDefault()
+            const file = e.target.files[0]
+            let base64 = await uploadAndConvertAudio(file)
+            if (!audiosWidget.value) audiosWidget.value = { base64: [] }
+            audiosWidget.value.base64.push(base64)
+
+            let a = createInputAudioForBatch(base64, audiosWidget)
+            audiosDiv.appendChild(a)
+          })
+
+          inputAudio.click()
+          inputAudio.remove()
+        })
+
+        widget.div.appendChild(audioPreview)
+        audioPreview.appendChild(audiosDiv)
+        audioPreview.appendChild(btn)
+        // audioPreview.appendChild(inputAudio)
+
+        this.addCustomWidget(widget)
+
+        // document.addEventListener('wheel', handleMouseWheel)
+
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => { 
+          widget.div.remove()
+          try {
+            // document.removeEventListener('wheel', handleMouseWheel)
+          } catch (error) {
+            console.log(error)
+          }
+
+          return onRemoved?.()
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'LoadAndCombinedAudio_') {
+      // await sleep(0)
+      let audiosWidget = node.widgets.filter(w => w.name === 'audios')[0]
+      let audioPreview = node.widgets.filter(w => w.name == 'audio_base64')[0]
+
+      let pre = audioPreview.div.querySelector('.audios_preview')
+      for (const d of audiosWidget.value?.base64 || []) {
+        let im = createInputAudioForBatch(d, audiosWidget)
+        pre.appendChild(im)
+      }
+    }
+  }
+})

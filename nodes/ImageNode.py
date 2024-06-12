@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import torch
+import torchvision.transforms.v2 as T
 # from PIL import Image, ImageDraw
 from PIL import Image, ImageOps,ImageFilter,ImageEnhance,ImageDraw,ImageSequence, ImageFont
 from PIL.PngImagePlugin import PngInfo
@@ -3207,3 +3208,52 @@ class SaveImageToLocal:
             counter += 1
 
         return ()
+
+
+class ImageBatchToList_:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": {"image_batch": ("IMAGE",), }}
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image_list",)
+    OUTPUT_IS_LIST = (True,)
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Image"
+
+    def run(self, image_batch):
+        images = [image_batch[i:i + 1, ...] for i in range(image_batch.shape[0])]
+        return (images, )
+
+class ImageListToBatch_:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    FUNCTION = "run"
+    INPUT_IS_LIST = True
+    CATEGORY = "♾️Mixlab/Image"
+
+    def run(self, images):
+        shape = images[0].shape[1:3]
+        out = []
+
+        for i in range(len(images)):
+            img = images[i].permute([0,3,1,2])
+            if images[i].shape[1:3] != shape:
+                transforms = T.Compose([
+                    T.CenterCrop(min(img.shape[2], img.shape[3])),
+                    T.Resize((shape[0], shape[1]), interpolation=T.InterpolationMode.BICUBIC),
+                ])
+                img = transforms(img)
+            out.append(img.permute([0,2,3,1]))
+
+        out = torch.cat(out, dim=0)
+
+        return (out,)
