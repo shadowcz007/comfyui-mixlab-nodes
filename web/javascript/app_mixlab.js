@@ -187,6 +187,25 @@ async function extractInputAndOutputData (
         if (node.type == 'Color') {
         }
 
+        // 语音输入的支持
+        if (node.type == 'LoadAndCombinedAudio_') {
+          // if (
+          //   data[id].widgets_values &&
+          //   data[id].widgets_values[0] &&
+          //   data[id].widgets_values[0].base64 &&
+          //   data[id].widgets_values[0].base64.length > 0
+          // ) {
+          //   options.defaultBase64 = data[id].widgets_values[0].base64
+          // }
+
+          input[inputIds.indexOf(id)] = {
+            ...data[id],
+            title: node.title,
+            id,
+            options
+          }
+        }
+
         if (node.type === 'LoadImage') {
           // loadImage的mask支持
           let output = node.outputs.filter(ot => ot.type == 'MASK')[0]
@@ -399,11 +418,11 @@ async function save (json, download = false, showInfo = true) {
 
 function getInputsAndOutputs () {
   const inputs =
-      `LoadImage LoadImagesToBatch ImagesPrompt_ VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
+      `LoadImage LoadImagesToBatch ImagesPrompt_ LoadAndCombinedAudio_ VHS_LoadVideo CLIPTextEncode PromptSlide TextInput_ Color FloatSlider IntNumber CheckpointLoaderSimple LoraLoader`.split(
         ' '
       ),
     outputs =
-      `SaveTripoSRMesh,PreviewImage,SaveImage,TransparentImage,ShowTextForGPT,VHS_VideoCombine,VideoCombine_Adv,Image Save,SaveImageAndMetadata_,ClipInterrogator`.split(
+      `SaveTripoSRMesh,PreviewImage,SaveImage,TransparentImage,ShowTextForGPT,CombineAudioVideo,VHS_VideoCombine,VideoCombine_Adv,Image Save,SaveImageAndMetadata_,ClipInterrogator`.split(
         ','
       )
 
@@ -512,13 +531,12 @@ app.registerExtension({
         tdBG.style.marginLeft = '12px'
 
         tdBG.addEventListener('click', () => {
-          td_bg.toggle();
-          if(td_bg.running){
+          td_bg.toggle()
+          if (td_bg.running) {
             tdBG.style.background = 'yellow'
-          }else{
+          } else {
             tdBG.style.background = 'transparent'
           }
-
         })
 
         // author

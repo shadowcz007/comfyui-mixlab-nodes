@@ -55,46 +55,27 @@ class SpeechSynthesis:
         return {"ui": {"text": text}, "result": (text,)}
     
 
-#
-class GamePal:
+
+class AudioPlayNode:
+
     @classmethod
     def INPUT_TYPES(s):
-        return {
-            "required": {
-                "input_text": ("STRING",{"multiline": True,"default": ""}),
-            },
-            "optional": {
-                 
-                "input_num": ("INT",{
-                                "default":100, 
-                                "min": -1, #Minimum value
-                                "max": 0xffffffffffffffff, #Maximum value
-                                "step": 1, #Slider's step
-                                "display": "slider" # Cosmetic only: display as "number" or "slider"
-                                }), 
-                "python_code": ("STRING",{"multiline": True,"default": "result= 1 if 'Mixlab' in input_text else 0"}),
-            }
-        }
-
-    INPUT_IS_LIST = False
-    RETURN_TYPES = ("INT",)
+        return {"required": {
+            "audio": ("AUDIO",),
+              }, 
+                }
+    
+    RETURN_TYPES = ()
+  
     FUNCTION = "run"
-    OUTPUT_NODE = True
-    OUTPUT_IS_LIST = (False,)
 
     CATEGORY = "♾️Mixlab/Audio"
 
-    def run(self, input_text,input_num,python_code):
-        exec(python_code)
-        res=None
-        try:
-            # 可能会引发异常的代码
-            res=result
-        except:
-            # 处理异常的代码
-            print('')
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = ()
 
-        print(res)
-
-        # print(session_history)
-        return {"ui": {"text": [input_text],"num":[input_num]}, "result": (res,)}
+    OUTPUT_NODE = True
+  
+    def run(self,audio):
+        # print(audio)
+        return {"ui": {"audio":[audio]}}

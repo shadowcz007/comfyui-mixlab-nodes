@@ -1388,7 +1388,7 @@
                 }
 
                 // video ,gif
-                if (["VHS_VideoCombine", "VideoCombine_Adv"].includes(node.class_type)) {
+                if (["VHS_VideoCombine", "VideoCombine_Adv", "CombineAudioVideo"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
@@ -1645,6 +1645,42 @@
         // copyImagesToClipboard(htmlString);
 
 
+        // 上传音频转为base64
+        async function uploadAndConvertAudio(file) {
+            if (!file) {
+                alert('Please select a WAV file.')
+                return
+            }
+
+            if (file.type !== 'audio/wav') {
+                alert('Only WAV files are supported.')
+                return
+            }
+
+            try {
+                const base64Audio = await readFileAsDataURL(file)
+                return base64Audio
+            } catch (error) {
+                console.error('Error reading file:', error)
+                alert('Error reading file.')
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+
+                reader.onload = function (event) {
+                    resolve(event.target.result)
+                }
+
+                reader.onerror = function (error) {
+                    reject(error)
+                }
+
+                reader.readAsDataURL(file)
+            })
+        }
 
         function createInputs(inputData) {
             // Assuming you have an HTML element with the id "container" to hold the UI
@@ -2091,7 +2127,53 @@
                     container.appendChild(d);
                 }
 
+                // 加载音频 base64
+                if (['LoadAndCombinedAudio_'].includes(data.class_type)) {
+                    let inpAudio = document.createElement('div');
 
+                    let inputAudio = document.createElement('button');
+
+                    inputAudio.innerText = data.title || 'Upload Audio'
+                    inputAudio.style = `cursor: pointer;
+                        font-weight: 300;
+                        margin: 2px; 
+                        color: var(--descrip-text);
+                        background-color: var(--comfy-input-bg);
+                        border-radius: 8px;
+                        border-color: var(--border-color);
+                        border-style: solid;height: 30px;min-width: 122px;
+                    `;
+
+                    let audioE = document.createElement('audio');
+                    audioE.setAttribute('controls', 'on')
+                    //暂时只支持一个
+                    audioE.src = data.inputs.audios.base64[0];
+
+                    inputAudio.addEventListener('click', e => {
+                        e.preventDefault()
+                        let inp = document.createElement('input')
+                        inp.type = 'file'
+                        inp.style.display = 'none'
+                        inp.addEventListener('change', async e => {
+                            e.preventDefault()
+                            const file = e.target.files[0]
+                            let base64 = await uploadAndConvertAudio(file)
+
+                            audioE.src = base64;
+
+                            window._appData.data[data.id].inputs.audios.base64 = [base64];
+                        })
+
+                        inp.click()
+                        inp.remove()
+                    })
+
+                    inpAudio.appendChild(inputAudio)
+                    inpAudio.appendChild(audioE)
+
+                    container.appendChild(inpAudio);
+
+                }
             });
             return container
         }

@@ -847,13 +847,12 @@ from .nodes.ImageNode import ImageListToBatch_,ComparingTwoFrames,LoadImages_,Co
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
-from .nodes.Audio import GamePal,SpeechRecognition,SpeechSynthesis
+from .nodes.Audio import AudioPlayNode,SpeechRecognition,SpeechSynthesis
 from .nodes.Utils import IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
-from .nodes.TripoSR import LoadTripoSRModel,TripoSRSampler,SaveTripoSRMesh
 
 
 
@@ -940,9 +939,7 @@ NODE_CLASS_MAPPINGS = {
     "MaskListReplace_":MaskListReplace, 
     "IncrementingListNode_":IncrementingListNode,
     "PreviewMask_":PreviewMask_,
-     "LoadTripoSRModel_": LoadTripoSRModel,
-    "TripoSRSampler_": TripoSRSampler,
-    "SaveTripoSRMesh": SaveTripoSRMesh, 
+    "AudioPlay":AudioPlayNode
 }
 
 # 一个包含节点友好/可读的标题的字典
@@ -998,9 +995,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
     "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
     "PreviewMask_":"Preview Mask",
-    "LoadTripoSRModel_": "Load TripoSR Model",
-    "TripoSRSampler_": "TripoSR Sampler",
-    "SaveTripoSRMesh": "Save TripoSR Mesh"
+    "AudioPlay":"Audio Play ♾️Mixlab"
 }
 
 # web ui的节点功能
@@ -1079,6 +1074,28 @@ try:
 
 except:
     logging.info('Video.available False')
+
+
+try:
+    from .nodes.TripoSR import LoadTripoSRModel,TripoSRSampler,SaveTripoSRMesh
+    logging.info('TripoSR.available')
+
+    NODE_CLASS_MAPPINGS['LoadTripoSRModel_']=LoadTripoSRModel
+    NODE_DISPLAY_NAME_MAPPINGS["LoadTripoSRModel_"]= "Load TripoSR Model"
+    
+    NODE_CLASS_MAPPINGS['TripoSRSampler_']=TripoSRSampler
+    NODE_DISPLAY_NAME_MAPPINGS["TripoSRSampler_"]= "TripoSR Sampler"
+
+    NODE_CLASS_MAPPINGS['SaveTripoSRMesh']=SaveTripoSRMesh
+    NODE_DISPLAY_NAME_MAPPINGS["SaveTripoSRMesh"]= "Save TripoSR Mesh"
+    
+
+except Exception as e:
+    logging.info('TripoSR.available False' )
+
+
+
+
 
 
 logging.info('\033[93m -------------- \033[0m')
