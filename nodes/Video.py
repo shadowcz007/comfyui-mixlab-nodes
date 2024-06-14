@@ -520,7 +520,7 @@ class LoadAndCombinedAudio_:
         return {"required": {
                     "audios": ("AUDIOBASE64",),
                     "start_time": ("FLOAT" , {"default": 0, "min": 0, "max": 10000000, "step": 0.01}),
-                    "duration": ("FLOAT" , {"default": 10, "min": 0, "max": 10000000, "step": 0.01}),
+                    "duration": ("FLOAT" , {"default": 10, "min": -1, "max": 10000000, "step": 0.01}),
                      },
                 }
 
@@ -537,8 +537,9 @@ class LoadAndCombinedAudio_:
         audio_file = f"audio_{counter:05}.wav"
 
         audio_file=save_audio_base64s_to_file(audios['base64'],output_dir,audio_file)
-
-        crop_audio(audio_file, start_time, duration)
+        # duration == -1 则不裁切
+        if duration > -1:
+            crop_audio(audio_file, start_time, duration)
 
         return (audio_file,)
 
