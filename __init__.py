@@ -941,7 +941,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AppInfo":"App Info ♾️MixlabApp",
     "ScreenShare":"Screen Share ♾️Mixlab",
     "FloatingVideo":"Floating Video ♾️Mixlab",
-
+    "TextImage":"Text Image ♾️Mixlab",
     
     "Color":"Color Input ♾️MixlabApp",
     "TextInput_":"Text Input ♾️MixlabApp",

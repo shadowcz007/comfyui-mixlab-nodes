@@ -15,7 +15,7 @@ import cv2
 import string
 import math,glob
 from .Watcher import FolderWatcher
-import hashlib
+
 
 
 
@@ -29,6 +29,17 @@ def opencv_to_pil(image):
     pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
     return pil_image
 
+# 列出目录下面的所有文件
+def get_files_with_extension(directory, extension):
+    file_list = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(extension):
+                file = os.path.splitext(file)[0]
+                file_path = os.path.join(root, file)
+                file_name = os.path.relpath(file_path, directory)
+                file_list.append(file_name)
+    return file_list
 
 def composite_images(foreground, background, mask,is_multiply_blend=False,position="overall"):
     width,height=foreground.size
@@ -201,7 +212,8 @@ class AnyType(str):
 any_type = AnyType("*")
 
 
-FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/王汉宗颜楷体繁.ttf'))
+FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/fonts'))
+
 
 MAX_RESOLUTION=8192
 
@@ -955,52 +967,12 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
     return layer_image
 
 
-
-
-
-
-# def generate_text_image(text_list, font_path, font_size, text_color, vertical=True, spacing=0):
-#     # Load Chinese font
-#     font = ImageFont.truetype(font_path, font_size)
-
-#     # Calculate image size based on the number of characters and orientation
-#     if vertical:
-#         width = font_size + 100
-#         height = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
-#     else:
-#         width = font_size * len(text_list) + (len(text_list) - 1) * spacing + 100
-#         height = font_size + 100
-
-#     # Create a blank image
-#     image = Image.new('RGBA', (width, height), (255, 255, 255,0))
-#     draw = ImageDraw.Draw(image)
-
-#     # Draw text
-#     if vertical:
-#         for i, char in enumerate(text_list):
-#             char_position = (50, 50 + i * font_size)
-#             draw.text(char_position, char, font=font, fill=text_color)
-#     else:
-#         for i, char in enumerate(text_list):
-#             char_position = (50 + i * (font_size + spacing), 50)
-#             draw.text(char_position, char, font=font, fill=text_color)
-
-#     # Save the image
-#     # image.save(output_image_path)
-
-#     # 分离alpha通道
-#     alpha_channel = image.split()[3]
-
-#     # 创建一个只有alpha通道的新图像
-#     alpha_image = Image.new('L', image.size)
-#     alpha_image.putdata(alpha_channel.getdata())
-
-#     image=image.convert('RGB')
-
-#     return (image,alpha_image)
-def generate_text_image(text, font_path, font_size, text_color, vertical=True, stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0):
+def generate_text_image(text, font_path, font_size, text_color, vertical=True, stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0, padding=4):
     # Split text into lines based on line breaks
     lines = text.split("\n")
+
+    # Load font
+    font = ImageFont.truetype(font_path, font_size)
 
     # 1. Determine layout direction
     if vertical:
@@ -1010,44 +982,41 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
 
     # 2. Calculate absolute coordinates for each character
     char_coordinates = []
-    if layout == "vertical":
-        x = 0
-        y = 0
-        for i in range(len(lines)):
-            line = lines[i]
-            for char in line:
-                char_coordinates.append((x, y))
-                y += font_size + spacing
-            x += font_size + spacing
-            y = 0
-    else:
-        x = 0
-        y = 0
-        for line in lines:
-            for char in line:
-                char_coordinates.append((x, y))
-                x += font_size + spacing
-            y += font_size + spacing
-            x = 0
+    x, y = padding, padding
+    max_width, max_height = 0, 0
 
-    # 3. Calculate image width and height
     if layout == "vertical":
-        width = (len(lines) * (font_size + spacing)) - spacing
-        height = ((len(max(lines, key=len)) + 1) * (font_size + spacing)) + spacing
+        for line in lines:
+            max_char_width = max(font.getsize(char)[0] for char in line)
+            for char in line:
+                char_width, char_height = font.getsize(char)
+                char_coordinates.append((x, y))
+                y += char_height + spacing
+                max_height = max(max_height, y + padding)
+            x += max_char_width + spacing
+            y = padding
+        max_width = x
     else:
-        width = (len(max(lines, key=len)) * (font_size + spacing)) - spacing
-        height = ((len(lines) - 1) * (font_size + spacing)) + font_size
+        for line in lines:
+            line_width, line_height = font.getsize(line)
+            for char in line:
+                char_width, char_height = font.getsize(char)
+                char_coordinates.append((x, y))
+                x += char_width + spacing
+                max_width = max(max_width, x + padding)
+            y += line_height + spacing
+            x = padding
+        max_height = y
+
+    # 3. Create image with calculated width and height
+    image = Image.new('RGBA', (max_width, max_height), (255, 255, 255, 0))
+    draw = ImageDraw.Draw(image)
 
     # 4. Draw each character on the image
-    image = Image.new('RGBA', (width, height), (255, 255, 255, 0))
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(font_path, font_size)
-
     index = 0
-    for i, line in enumerate(lines):
-        for j, char in enumerate(line):
+    for line in lines:
+        for char in line:
             x, y = char_coordinates[index]
-            
             if stroke:
                 draw.text((x-stroke_width, y), char, font=font, fill=stroke_color)
                 draw.text((x+stroke_width, y), char, font=font, fill=stroke_color)
@@ -1579,7 +1548,7 @@ class ImageCropByAlpha:
 
 
 
-
+# get_files_with_extension(FONT_PATH,'.ttf')
 
 class TextImage:
     @classmethod
@@ -1587,7 +1556,7 @@ class TextImage:
         return {"required": { 
             
                     "text": ("STRING",{"multiline": True,"default": "龍馬精神迎新歲","dynamicPrompts": False}),
-                    "font_path": ("STRING",{"multiline": False,"default": FONT_PATH,"dynamicPrompts": False}),
+                    "font": (get_files_with_extension(FONT_PATH,'.ttf'),),#后缀为 ttf
                     "font_size": ("INT",{
                                 "default":100, 
                                 "min": 100, #Minimum value
@@ -1602,6 +1571,13 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
+                    "padding": ("INT",{
+                                "default":8, 
+                                "min": 0, #Minimum value
+                                "max": 200, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }), 
                     "text_color":("STRING",{"multiline": False,"default": "#000000","dynamicPrompts": False}),
                     "vertical":("BOOLEAN", {"default": True},),
                     "stroke":("BOOLEAN", {"default": False},),
@@ -1609,7 +1585,7 @@ class TextImage:
                 }
     
     RETURN_TYPES = ("IMAGE","MASK",)
-    # RETURN_NAMES = ("WIDTH","HEIGHT","X","Y",)
+    RETURN_NAMES = ("image","mask",)
 
     FUNCTION = "run"
 
@@ -1618,11 +1594,13 @@ class TextImage:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
 
-    def run(self,text,font_path,font_size,spacing,text_color,vertical,stroke):
+    def run(self,text,font,font_size,spacing,padding,text_color,vertical,stroke):
         
+        font_path=os.path.join(FONT_PATH,font+'.ttf')
+
         # text_list=list(text)
         # stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0
-        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing)
+        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,padding)
         
         img=pil2tensor(img)
         mask=pil2tensor(mask)
