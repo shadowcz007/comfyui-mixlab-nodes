@@ -526,7 +526,7 @@ app.registerExtension({
 
         //td bg
         const tdBG = document.createElement('button')
-        tdBG.innerText = 'TDBG'
+        tdBG.innerText = 'Canvas Mode'
         tdBG.style = style
         tdBG.style.marginLeft = '12px'
 
@@ -709,6 +709,7 @@ app.registerExtension({
         this.serialize_widgets = true //需要保存参数
 
         window._mixlab_app_json = null
+ 
       }
 
       const onExecuted = nodeType.prototype.onExecuted
@@ -725,7 +726,7 @@ app.registerExtension({
 
           const div = this.widgets.filter(w => w.div)[0].div
           Array.from(div.querySelectorAll('button'), b =>
-            b.innerText != 'TDBG' ? (b.style.background = 'yellow') : ''
+            b.innerText != 'Canvas Mode' ? (b.style.background = 'yellow') : ''
           )
         } catch (error) {}
       }
