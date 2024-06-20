@@ -167,6 +167,9 @@ pip install llama-cpp-python \
 
 > A new layer class node has been added, allowing you to separate the image into layers. After merging the images, you can input the controlnet for further processing.
 
+> The composite images node overlays a foreground image onto a background image at specified positions and scales, with optional blending modes and masking capabilities. position : 'overall',"center_center","left_bottom","center_bottom","right_bottom","left_top","center_top","right_top"
+
+
 ![layers](./assets/layers-workflow.svg)
 
 ![poster](./assets/poster-workflow.svg)
@@ -197,6 +200,12 @@ pip install llama-cpp-python \
 #### LoadImagesFromURL
 
 > Conveniently load images from a fixed address on the internet to ensure that default images in the workflow can be executed.
+
+#### TextImage
+
+> [下载字体](https://drxie.github.io/OSFCC/)放到 ```custom_nodes/comfyui-mixlab-nodes/assets/fonts```
+
+
 
 ### Style
 

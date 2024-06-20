@@ -41,139 +41,85 @@ def get_files_with_extension(directory, extension):
                 file_list.append(file_name)
     return file_list
 
-def composite_images(foreground, background, mask,is_multiply_blend=False,position="overall"):
-    width,height=foreground.size
- 
-    bg_image=background
+def composite_images(foreground, background, mask, is_multiply_blend=False, position="overall", scale=0.25):
+    width, height = foreground.size
+    bg_image = background
+    bwidth, bheight = bg_image.size
 
-    bwidth,bheight=bg_image.size
+    def determine_scale_option(width, height):
+        return 'height' if height > width else 'width'
 
-    # 按z-index排序
-    if position=="overall":
+    if position == "overall":
         layer = {
-                "x":0,
-                "y":0,
-                "width":bwidth,
-                "height":bheight,
-                "z_index":88,
-                "scale_option":'overall',
-                "image":foreground,
-                "mask":mask
+            "x": 0,
+            "y": 0,
+            "width": bwidth,
+            "height": bheight,
+            "z_index": 88,
+            "scale_option": 'overall',
+            "image": foreground,
+            "mask": mask
         }
+    else:
+        scale_option = determine_scale_option(width, height)
+        if scale_option == 'height':
+            scale = int(bheight * scale) / height
+        else:
+            scale = int(bwidth * scale) / width
 
-    elif position=='center_bottom':
-        
-        scale = int(bwidth*0.25) / width
+        new_width = int(width * scale)
         new_height = int(height * scale)
 
-        layer = {
-                "x":int(bwidth*0.75*0.5),
-                "y":bheight-new_height-24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
-        }
-
-    elif position=='right_bottom':
-        
-        scale = int(bwidth*0.25) / width
-        new_height = int(height * scale)
-
-        layer = {
-                "x":bwidth-int(bwidth*0.25)-24,
-                "y":bheight-new_height-24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
-        }
-
-
-    elif position=='center_top':
-        
-        scale = int(bwidth*0.25) / width
-        new_height = int(height * scale)
+        if position == 'center_bottom':
+            x_position = int((bwidth - new_width) * 0.5)
+            y_position = bheight - new_height - 24
+        elif position == 'right_bottom':
+            x_position = bwidth - new_width - 24
+            y_position = bheight - new_height - 24
+        elif position == 'center_top':
+            x_position = int((bwidth - new_width) * 0.5)
+            y_position = 24
+        elif position == 'right_top':
+            x_position = bwidth - new_width - 24
+            y_position = 24
+        elif position == 'left_top':
+            x_position = 24
+            y_position = 24
+        elif position == 'left_bottom':
+            x_position = 24
+            y_position = bheight - new_height - 24
+        elif position == 'center_center':
+            x_position = int((bwidth - new_width) * 0.5)
+            y_position = int((bheight - new_height) * 0.5)
 
         layer = {
-                "x":int( bwidth*0.75*0.5),
-                "y":24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
+            "x": x_position,
+            "y": y_position,
+            "width": new_width,
+            "height": new_height,
+            "z_index": 88,
+            "scale_option": scale_option,
+            "image": foreground,
+            "mask": mask
         }
 
-    elif position=='right_top':
-        
-        scale = int(bwidth*0.25) / width
-        new_height = int(height * scale)
+    layer_image = layer['image']
+    layer_mask = layer['mask']
 
-        layer = {
-                "x":bwidth-int(bwidth*0.25)-24,
-                "y":24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
-        }
-    elif position=='left_top':
-        
-        scale = int(bwidth*0.25) / width
-        new_height = int(height * scale)
+    bg_image = merge_images(bg_image,
+                            layer_image,
+                            layer_mask,
+                            layer['x'],
+                            layer['y'],
+                            layer['width'],
+                            layer['height'],
+                            layer['scale_option'],
+                            is_multiply_blend)
 
-        layer = {
-                "x":24,
-                "y":24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
-        }
-    elif position=='left_bottom':
-        
-        scale = int(bwidth*0.25) / width
-        new_height = int(height * scale)
+    bg_image = bg_image.convert('RGB')
 
-        layer = {
-                "x":24,
-                "y":bheight-new_height-24,
-                "width":int(bwidth*0.25),
-                "height":int(bheight*0.25),
-                "z_index":88,
-                "scale_option":'width',
-                "image":foreground,
-                "mask":mask
-        }
-                
-    # width, height = bg_image.size
-
-    layer_image=layer['image']
-    layer_mask=layer['mask']
-    
-    bg_image=merge_images(bg_image,
-                        layer_image,
-                        layer_mask,
-                        layer['x'],
-                        layer['y'],
-                        layer['width'],
-                        layer['height'],
-                        layer['scale_option'],
-                        is_multiply_blend )
-                   
-    bg_image=bg_image.convert('RGB')
-    
     return bg_image
+
 
 
 def count_files_in_directory(directory):
@@ -815,85 +761,78 @@ def multiply_blend(image1, image2):
 
 # cv2.imwrite('result.jpg', result)
 
+# 使用gpt4o优化代码
+# 为了消除图像合并时出现的灰色描边，可以使用以下方法：
+# 调整透明度：确保透明像素不会引入不需要的颜色。
+# 预处理图像：在缩放图像之前，可以先将图像的边缘进行预处理，例如扩展边缘颜色，减少抗锯齿带来的过渡效果。
 
-def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option,is_multiply_blend=False):
+def merge_images(bg_image, layer_image, mask, x, y, width, height, scale_option, is_multiply_blend=False):
     # 打开底图
     bg_image = bg_image.convert("RGBA")
 
     # 打开图层
     layer_image = layer_image.convert("RGBA")
-    # layer_image = layer_image.resize((width, height))
-
+   
     # 根据缩放选项调整图像大小
     if scale_option == "height":
         # 按照高度比例缩放
         original_width, original_height = layer_image.size
         scale = height / original_height
         new_width = int(original_width * scale)
-        layer_image = layer_image.resize((new_width, height))
+        layer_image = layer_image.resize((new_width, height), Image.NEAREST)
     elif scale_option == "width":
         # 按照宽度比例缩放
         original_width, original_height = layer_image.size
         scale = width / original_width
         new_height = int(original_height * scale)
-        layer_image = layer_image.resize((width, new_height))
+        layer_image = layer_image.resize((width, new_height), Image.NEAREST)
     elif scale_option == "overall":
         # 整体缩放
-        layer_image = layer_image.resize((width, height))
-
+        layer_image = layer_image.resize((width, height), Image.NEAREST)
     elif scale_option == "longest":
         original_width, original_height = layer_image.size
         if original_width > original_height:
-            new_width=width
+            new_width = width
             scale = width / original_width
             new_height = int(original_height * scale)
-            x=0
-            y=int((height-new_height)*0.5)
+            x = 0
+            y = int((height - new_height) * 0.5)
         else:
-            new_height=height
+            new_height = height
             scale = height / original_height
             new_width = int(original_height * scale)
-            x=int((width-new_width)*0.5)
-            y=0
-    # elif side == "shortest":
-    #         if width < height:
-    #              
-    #         else:
-    #              
-    
+            x = int((width - new_width) * 0.5)
+            y = 0
 
     # 调整mask的大小
     nw, nh = layer_image.size
-    mask = mask.resize((nw, nh))
+    mask = mask.resize((nw, nh), Image.NEAREST)
 
-    # # 分离出a通道
-    # r, g, b, alpha = layer_image.split()
-    # alpha = ImageOps.invert(alpha)
-    # # 创建一个新的RGB图像
-    # new_rgb_image = Image.new("RGB", layer_image.size)
-    # # 将透明通道粘贴到新的RGB图像上
-    # new_rgb_image.paste(layer_image, (0, 0), mask=alpha)
-   
-    # new_rgb_image.paste(layer_image, (x, y), mask=mask)
-    # mask=new_rgb_image.convert('L')
-    # mask = ImageOps.invert(mask)
+    # 预处理图像边缘以减少灰色描边
+    layer_image = layer_image.filter(ImageFilter.SMOOTH)
 
     if is_multiply_blend:
-        bg_image_white=Image.new("RGB", bg_image.size,(255, 255, 255))
+        bg_image_white = Image.new("RGB", bg_image.size, (255, 255, 255))
 
         bg_image_white.paste(layer_image, (x, y), mask=mask)
-        bg_image=multiply_blend(bg_image_white,bg_image)
-        bg_image=bg_image.convert("RGBA")
+        bg_image = multiply_blend(bg_image_white, bg_image)
+        bg_image = bg_image.convert("RGBA")
     else:
-        transparent_img = Image.new("RGBA",layer_image.size, (255, 255, 255, 0))
-        transparent_img.paste(layer_image,(0, 0), mask)
-        # transparent_img.save('test.png')
-        bg_image.paste(transparent_img, (x, y), transparent_img)
+        transparent_img = Image.new("RGBA", layer_image.size, (255, 255, 255, 0))
+        # 调整透明度处理
+        for i in range(transparent_img.size[0]):
+            for j in range(transparent_img.size[1]):
+                r, g, b, a = transparent_img.getpixel((i, j))
+                if a > 0:
+                    transparent_img.putpixel((i, j), (r, g, b, 255))
 
+        transparent_img.paste(layer_image, (0, 0), mask)
+        bg_image.paste(transparent_img, (x, y), transparent_img)
 
     # 输出合成后的图片
     return bg_image
 
+#MixCopilot
 
 def resize_2(img):
     # 检查图像的高度是否是2的倍数，如果不是，则调整高度
@@ -1834,10 +1773,16 @@ class CompositeImages:
                     "mask":("MASK",),
                     "background": ("IMAGE",),
                     },
-             "optional":{
-                           
+             "optional":{ 
                   "is_multiply_blend":  ("BOOLEAN", {"default": False}),
-                  "position":  (['overall',"center_bottom","center_top","right_bottom","left_bottom","right_top","left_top"],),    
+                  "position":  (['overall',"center_center","left_bottom","center_bottom","right_bottom","left_top","center_top","right_top"],),
+                   "scale": ("FLOAT",{
+                                "default":0, 
+                                "min": 0.01, #Minimum value
+                                "max": 1, #Maximum value
+                                "step": 0.01, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                            }), 
                     }
                 }
     
@@ -1850,11 +1795,11 @@ class CompositeImages:
 
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self, foreground,mask,background,is_multiply_blend,position):
+    def run(self, foreground,mask,background,is_multiply_blend,position,scale):
         foreground= tensor2pil(foreground)
         mask= tensor2pil(mask)
         background= tensor2pil(background)
-        res=composite_images(foreground,background,mask,is_multiply_blend,position)
+        res=composite_images(foreground,background,mask,is_multiply_blend,position,scale)
         
         return (pil2tensor(res),)
 
