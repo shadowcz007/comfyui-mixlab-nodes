@@ -1598,7 +1598,8 @@ class TextImage:
         
         font_path=os.path.join(FONT_PATH,font+'.ttf')
 
-        # text_list=list(text)
+        if text=="":
+            text=" "
         # stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0
         img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,padding)
         
