@@ -1267,7 +1267,7 @@ app.registerExtension({
         })
 
         widget.PictureInPicture = $el('button', {
-          innerText: 'PictureInPicture',
+          innerText: 'Picture In Picture',
           style: {
             display: 'pictureInPictureEnabled' in document ? 'block' : 'none',
             cursor: 'pointer',

@@ -90,7 +90,7 @@ class ScreenShareNode:
                 } }
     
     RETURN_TYPES = ('IMAGE','STRING','FLOAT',"INT")
-    RETURN_NAMES = ("IMAGE","PROMPT","FLOAT","INT")
+    RETURN_NAMES = ("current frame (image)","prompt","denoise (float)","seed (int)")
     FUNCTION = "run"
 
     CATEGORY = "♾️Mixlab/Screen"
@@ -109,7 +109,7 @@ class FloatingVideo:
     @classmethod
     def INPUT_TYPES(s):
         return { "required":{
-            "images": ("IMAGE",)
+            "image": ("IMAGE",)
         }, }
     
     # RETURN_TYPES = ('IMAGE','MASK')
@@ -124,16 +124,16 @@ class FloatingVideo:
     # OUTPUT_IS_LIST = (False,False,)
   
     # 运行的函数
-    def run(self,images):
+    def run(self,image):
        
         results = list()
     
-        for image in images:
-            image=tensor2pil(image)
+        for im in image:
+            im=tensor2pil(im)
             # image_base64 = base64.b64encode(image.tobytes())
 
             buffered = BytesIO()
-            image.save(buffered, format="JPEG")
+            im.save(buffered, format="JPEG")
             image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
             results.append(image_base64)

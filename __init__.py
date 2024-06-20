@@ -939,6 +939,10 @@ NODE_CLASS_MAPPINGS = {
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
     "AppInfo":"App Info ♾️MixlabApp",
+    "ScreenShare":"Screen Share ♾️Mixlab",
+    "FloatingVideo":"Floating Video ♾️Mixlab",
+
+    
     "Color":"Color Input ♾️MixlabApp",
     "TextInput_":"Text Input ♾️MixlabApp",
     "FloatSlider":"Float Slider Input ♾️MixlabApp",
@@ -952,8 +956,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
     "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
-    "ScreenShare":"Screen Share ♾️Mixlab",
-    "FloatingVideo":"FloatingVideo ♾️Mixlab",
+    
     
     "MergeLayers":"Merge Layers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",

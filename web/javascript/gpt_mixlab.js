@@ -209,13 +209,16 @@ app.registerExtension({
         text = text.filter(t => t && t?.trim())
 
         if (this.widgets) {
+          // console.log('#ShowTextForGPT',this.widgets)
           // const pos = this.widgets.findIndex(w => w.name === 'text')
           for (let i = 0; i < this.widgets.length; i++) {
-            if (this.widgets[i].name == 'show_text') this.widgets[i].onRemove?.()
+            if (this.widgets[i].name == 'show_text')
+              this.widgets[i].onRemove?.()
+            console.log('#ShowTextForGPT', this.widgets[i])
           }
-          this.widgets.length = 1
+          this.widgets.length = 2
         }
-        // console.log('ShowTextForGPT',text)
+
         for (let list of text) {
           if (list) {
             // console.log('#####', list)
@@ -227,6 +230,8 @@ app.registerExtension({
             ).widget
             w.inputEl.readOnly = true
             w.inputEl.style.opacity = 0.6
+
+            // w.inputEl.style.display='none'
 
             try {
               if (typeof list != 'string') {
@@ -279,6 +284,25 @@ app.registerExtension({
       }
 
       this.serialize_widgets = true //需要保存参数
+    }
+  },
+  async loadedGraphNode (node, app) {
+    if (node.type === 'ShowTextForGPT') {
+      let widget = node.widgets.filter(w => w.name == 'show_text')[0]
+
+      // if (widget.value) {
+      //   let [url, prompt] = widget.value
+
+      //   this[`wavesurfer_${node.id}`] = updateWaveWidgetValue(
+      //     node.widgets,
+      //     node.id,
+      //     url,
+      //     prompt,
+      //     this[`wavesurfer_${node.id}`]
+      //   )
+      // }
+
+      console.log('#loadedGraphNode', node)
     }
   }
 })
