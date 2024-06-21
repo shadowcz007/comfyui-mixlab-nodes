@@ -16,7 +16,7 @@ import string
 import math,glob
 from .Watcher import FolderWatcher
 
-
+from itertools import product
 
 
 # 将PIL图片转换为OpenCV格式
@@ -45,6 +45,9 @@ def composite_images(foreground, background, mask, is_multiply_blend=False, posi
     width, height = foreground.size
     bg_image = background
     bwidth, bheight = bg_image.size
+
+    scale=max(scale,1/bwidth)
+    scale=max(scale,1/bheight)
 
     def determine_scale_option(width, height):
         return 'height' if height > width else 'width'
@@ -1777,7 +1780,7 @@ class CompositeImages:
                   "is_multiply_blend":  ("BOOLEAN", {"default": False}),
                   "position":  (['overall',"center_center","left_bottom","center_bottom","right_bottom","left_top","center_top","right_top"],),
                    "scale": ("FLOAT",{
-                                "default":0, 
+                                "default":0.35, 
                                 "min": 0.01, #Minimum value
                                 "max": 1, #Maximum value
                                 "step": 0.01, #Slider's step
@@ -1795,15 +1798,33 @@ class CompositeImages:
 
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self, foreground,mask,background,is_multiply_blend,position,scale):
-        foreground= tensor2pil(foreground)
-        mask= tensor2pil(mask)
-        background= tensor2pil(background)
-        res=composite_images(foreground,background,mask,is_multiply_blend,position,scale)
+    # def run(self, foreground,mask,background,is_multiply_blend,position,scale):
+    #     foreground= tensor2pil(foreground)
+    #     mask= tensor2pil(mask)
+    #     background= tensor2pil(background)
+    #     res=composite_images(foreground,background,mask,is_multiply_blend,position,scale)
         
-        return (pil2tensor(res),)
+    #     return (pil2tensor(res),)
 
+    def run(self, foreground,mask,background, is_multiply_blend, position, scale):
+        results = []
+        
+        f1=[]
+        for fg, mask in zip(foreground, mask ):
+            f1.append([fg,mask])
 
+        
+        for f, bg in product(f1, background):
+            [fg,mask]=f
+            fg_pil = tensor2pil(fg)
+            mask_pil = tensor2pil(mask)
+            bg_pil = tensor2pil(bg)
+            res = composite_images(fg_pil, bg_pil, mask_pil, is_multiply_blend, position, scale)
+            results.append(pil2tensor(res))
+        
+        output_image = torch.cat(results, dim=0)
+
+        return (output_image,)
 
 
 class EmptyLayer:
