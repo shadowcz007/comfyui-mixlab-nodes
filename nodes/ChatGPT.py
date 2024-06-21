@@ -215,15 +215,28 @@ class ChatGPTNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        model_list=llama_modes_list+[
+        model_list=llama_modes_list+[ 
                     "gpt-3.5-turbo",
-                    "gpt-3.5-turbo-0125",
-                    "gpt-35-turbo",
-                    "gpt-3.5-turbo-16k", 
-                    "gpt-3.5-turbo-16k-0613", 
-                    "gpt-4-0613",
-                    "gpt-4-1106-preview",
-                    "glm-4"
+            "gpt-3.5-turbo-16k",
+            "gpt-4o",
+            "gpt-4o-2024-05-13",
+            "gpt-4",
+            "gpt-4-0314",
+            "gpt-4-0613",
+            "gpt-3.5-turbo-0301",
+            "gpt-3.5-turbo-0613",
+            "gpt-3.5-turbo-16k-0613",
+            "qwen-turbo",
+            "qwen-plus",
+            "qwen-long",
+            "qwen-max",
+            "qwen-max-longcontext",
+            "glm-4",
+            "glm-3-turbo",
+            "moonshot-v1-8k",
+            "moonshot-v1-32k",
+            "moonshot-v1-128k",
+            "deepseek-chat" 
                     ]
         return {
             "required": {
