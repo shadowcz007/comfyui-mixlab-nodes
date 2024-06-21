@@ -960,10 +960,10 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
         for char in line:
             x, y = char_coordinates[index]
             if stroke:
-                draw.text((x-stroke_width, y), char, font=font, fill=stroke_color)
-                draw.text((x+stroke_width, y), char, font=font, fill=stroke_color)
-                draw.text((x, y-stroke_width), char, font=font, fill=stroke_color)
-                draw.text((x, y+stroke_width), char, font=font, fill=stroke_color)
+                draw.text((x-stroke_width, y), char, font=font, fill=text_color)
+                draw.text((x+stroke_width, y), char, font=font, fill=text_color)
+                draw.text((x, y-stroke_width), char, font=font, fill=text_color)
+                draw.text((x, y+stroke_width), char, font=font, fill=text_color)
             
             draw.text((x, y), char, font=font, fill=text_color)
             index += 1
