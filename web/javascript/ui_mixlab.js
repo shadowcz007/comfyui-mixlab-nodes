@@ -1439,10 +1439,14 @@ app.registerExtension({
 
     LGraphCanvas.prototype.fixTheNode = function (node) {
       let new_node = LiteGraph.createNode(node.comfyClass)
-      new_node.pos = [node.pos[0], node.pos[1]]
-      app.canvas.graph.add(new_node, false)
-      copyNodeValues(node, new_node)
-      app.canvas.graph.remove(node)
+      console.log(node)
+      if(new_node){
+        new_node.pos = [node.pos[0], node.pos[1]]
+        app.canvas.graph.add(new_node, false)
+        copyNodeValues(node, new_node)
+        app.canvas.graph.remove(node)
+      }
+     
     }
 
     smart_init()
