@@ -17,4 +17,4 @@ trimesh>=4.0.5
 huggingface-hub
 scikit-image
 torchaudio
-soundfile
+soundfile>=0.12.1

@@ -444,13 +444,23 @@ const createInputAudioForBatch = (base64, widget) => {
   // Create a delete button
   let deleteButton = document.createElement('button')
   deleteButton.textContent = 'Delete'
-  deleteButton.style = 'margin-left: 10px;'
+
+  deleteButton.style = `cursor: pointer;
+        font-weight: 300;
+        margin: 2px; 
+        margin-left: 10px;
+        color: var(--descrip-text);
+        background-color: var(--comfy-input-bg);
+        border-radius: 8px;
+        border-color: var(--border-color);
+        border-style: solid;height: 30px;min-width: 122px;
+       `
 
   // Create a container for the audio and delete button
   let container = document.createElement('div')
   container.appendChild(audio)
   container.appendChild(deleteButton)
-  container.style= `display: flex`
+  container.style = `display: flex;margin-top: 12px;`
 
   // Add event listener for the delete button
   deleteButton.addEventListener('click', e => {
@@ -571,7 +581,7 @@ app.registerExtension({
         // document.addEventListener('wheel', handleMouseWheel)
 
         const onRemoved = this.onRemoved
-        this.onRemoved = () => { 
+        this.onRemoved = () => {
           widget.div.remove()
           try {
             // document.removeEventListener('wheel', handleMouseWheel)

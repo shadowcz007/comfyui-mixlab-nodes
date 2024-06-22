@@ -526,22 +526,27 @@ class LoadAndCombinedAudio_:
 
     CATEGORY = "♾️Mixlab/Audio"
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("audio_file_path",)
+    RETURN_TYPES = ("STRING","AUDIO",)
+    RETURN_NAMES = ("audio_file_path","audio",)
     FUNCTION = "run"
 
     def run(self,audios, start_time, duration):
         output_dir = folder_paths.get_output_directory()
         counter=get_new_counter(output_dir,'audio_')
 
-        audio_file = f"audio_{counter:05}.wav"
+        audio_file_name = f"audio_{counter:05}.wav"
 
-        audio_file=save_audio_base64s_to_file(audios['base64'],output_dir,audio_file)
+        audio_file=save_audio_base64s_to_file(audios['base64'],output_dir,audio_file_name)
         # duration == -1 则不裁切
         if duration > -1:
             crop_audio(audio_file, start_time, duration)
 
-        return (audio_file,)
+        return (audio_file, {
+                "filename": audio_file_name,
+                "subfolder": "",
+                "type": "output",
+                "audio_path":audio_file
+                } ,)
 
 class CombineAudioVideo:
     @classmethod
