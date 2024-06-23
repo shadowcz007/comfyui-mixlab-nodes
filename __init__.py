@@ -991,7 +991,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
     "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
     "PreviewMask_":"Preview Mask",
-    "AudioPlay":"Audio Play ♾️Mixlab"
+    "AudioPlay":"Audio Play ♾️Mixlab",
+
+     "MultiplicationNode":"Math Operation ♾️Mixlab",
 }
 
 # web ui的节点功能

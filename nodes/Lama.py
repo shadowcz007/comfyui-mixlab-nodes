@@ -85,8 +85,6 @@ class LaMaInpainting:
             "image": ("IMAGE",),
             "mask": ("MASK",),
                              },
-
-            
                 }
     
     RETURN_TYPES = ("IMAGE",)
