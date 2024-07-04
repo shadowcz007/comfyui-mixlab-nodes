@@ -179,6 +179,9 @@ def split_video(video_path, video_segment_frames, transition_frames, output_dir)
         
         # 打印当前片段的起始帧和结束帧
         print(f"Segment {i+1}: Start Frame {start_frame}, End Frame {end_frame}")
+
+        if end_frame<start_frame:
+            break
         
         # 保存当前片段为一个视频文件
         segment_video_path = f"{output_dir}/segment_{i+1}.avi"
@@ -187,6 +190,7 @@ def split_video(video_path, video_segment_frames, transition_frames, output_dir)
         segment_video = cv2.VideoWriter(segment_video_path, fourcc, fps, (int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
                                                               int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
         
+
         for frame_num in range(start_frame, end_frame):
             ret, frame = video_capture.read()
             if ret:
