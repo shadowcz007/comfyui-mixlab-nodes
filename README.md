@@ -26,6 +26,8 @@
 
 #### `相关插件推荐`
 
+[comfyui-liveportrait](https://github.com/shadowcz007/comfyui-liveportrait)
+
 [Comfyui-ChatTTS](https://github.com/shadowcz007/Comfyui-ChatTTS)
 
 [comfyui-sound-lab](https://github.com/shadowcz007/comfyui-sound-lab)
