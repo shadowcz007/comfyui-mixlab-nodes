@@ -79,7 +79,7 @@ def get_clip_interrogator_path():
 
 cache_path=get_clip_interrogator_path()
 
-caption_model_path=os.path.join(cache_path, "Salesforce/blip-image-captioning-base")
+caption_model_path=os.path.join(cache_path, "Salesforce","blip-image-captioning-base")
 if not os.path.exists(caption_model_path):
     print(f"## clip_interrogator_model not found: {caption_model_path}, pls download from https://huggingface.co/Salesforce/blip-image-captioning-base")
     caption_model_path='Salesforce/blip-image-captioning-base'

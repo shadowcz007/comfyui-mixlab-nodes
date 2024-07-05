@@ -133,7 +133,7 @@ def get_font_files(directory):
 
     return font_files
 
-r_directory = os.path.join(os.path.dirname(__file__), '../assets/')
+r_directory = os.path.join(os.path.dirname(__file__), '..','assets','/')
 
 font_files = get_font_files(r_directory)
 # print(font_files)

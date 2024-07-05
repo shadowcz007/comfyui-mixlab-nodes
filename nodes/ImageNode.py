@@ -161,7 +161,7 @@ class AnyType(str):
 any_type = AnyType("*")
 
 
-FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),'../assets/fonts'))
+FONT_PATH= os.path.abspath(os.path.join(os.path.dirname(__file__),"..","assets","fonts"))
 
 
 MAX_RESOLUTION=8192
