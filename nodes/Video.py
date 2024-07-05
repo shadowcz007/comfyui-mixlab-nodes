@@ -624,8 +624,8 @@ class VideoCombine_Adv:
             },
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("video_file_path",)
+    RETURN_TYPES = ("SCENE_VIDEO",)
+    RETURN_NAMES = ("scenes_video",)
     OUTPUT_NODE = True
     CATEGORY = "♾️Mixlab/Video"
     FUNCTION = "run"
@@ -899,7 +899,7 @@ class scenesNode_:
         
         return {"required": {
                     "scenes_video": ('SCENE_VIDEO',),
-                     "index": ("INT", {"default": 0, "min": 0, "step": 1}),
+                    "index": ("INT", {"default": 0, "min": 0, "step": 1}),
                      
                      },}
 
@@ -912,7 +912,7 @@ class scenesNode_:
     INPUT_IS_LIST = True
 
     def load_video_cv_fallback(self, video, frame_load_cap, skip_first_frames):
-        print('#video',video)
+        # print('#video',video)
         try:
             video_cap = cv2.VideoCapture(video)
             if not video_cap.isOpened():
