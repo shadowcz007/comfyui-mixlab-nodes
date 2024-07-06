@@ -967,7 +967,7 @@ class scenesNode_:
         index=index[0]
         if len(scenes_video) > index:
             vp=scenes_video[index]
-
-            return self.load_video_cv_fallback(vp,0,0)
+        else:
+            vp=scenes_video[-1]
         
-        return ([], 0,)
+        return self.load_video_cv_fallback(vp,0,0)
