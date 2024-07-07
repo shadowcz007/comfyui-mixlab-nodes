@@ -1097,7 +1097,7 @@ try:
         "VideoCombine_Adv":"Video Combine",
         "LoadAndCombinedAudio_":"Load And Combined Audio",
         "CombineAudioVideo":"Combine Audio Video",
-        "ScenesNode_":"Scenes Node", 
+        "ScenesNode_":"Select Scene", 
         "GenerateFramesByCount":"Generate Frames By Count"
     }
 

@@ -904,7 +904,7 @@ class scenesNode_:
                      },}
 
     RETURN_TYPES = ('IMAGE','INT',)
-    RETURN_NAMES = ("frames","count",)
+    RETURN_NAMES = ("video frames (batch)","count",)
     # OUTPUT_IS_LIST = (False,)
 
     FUNCTION = "run"
