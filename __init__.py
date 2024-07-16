@@ -991,7 +991,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
     "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
     "PreviewMask_":"Preview Mask",
-    "AudioPlay":"Audio Play ♾️Mixlab",
+    "AudioPlay":"Preview Audio ♾️Mixlab",
 
      "MultiplicationNode":"Math Operation ♾️Mixlab",
 }
