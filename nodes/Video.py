@@ -545,12 +545,16 @@ class LoadAndCombinedAudio_:
         if duration > -1:
             crop_audio(audio_file, start_time, duration)
 
-        return (audio_file, {
-                "filename": audio_file_name,
-                "subfolder": "",
-                "type": "output",
-                "audio_path":audio_file
-                } ,)
+        waveform, sample_rate = torchaudio.load(audio_file)
+        audio = {
+            "filename": audio_file_name,
+            "subfolder": "",
+            "type": "output",
+            "audio_path":audio_file,
+            "waveform": waveform.unsqueeze(0), 
+            "sample_rate": sample_rate}
+
+        return (audio_file,audio ,)
 
 class CombineAudioVideo:
     @classmethod

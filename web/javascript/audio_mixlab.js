@@ -555,6 +555,7 @@ app.registerExtension({
           e.preventDefault()
           let inputAudio = document.createElement('input')
           inputAudio.type = 'file'
+          inputAudio.accept = "audio/*"
           inputAudio.style.display = 'none'
           inputAudio.addEventListener('change', async e => {
             e.preventDefault()
