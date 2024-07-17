@@ -30,17 +30,20 @@ def opencv_to_pil(image):
     return pil_image
 
 # 列出目录下面的所有文件
-def get_files_with_extension(directory, extension):
+def get_files_with_extension(directory, extensions):
     file_list = []
+    # 确保extensions参数是一个list，即使只有一个元素
+    if not isinstance(extensions, (tuple, list)):
+        extensions = [extensions]
     for root, dirs, files in os.walk(directory):
+        # print(f"Files at {root}: {files}")  # 确认files是一个字符串列表
         for file in files:
-            if file.endswith(extension):
-                file = os.path.splitext(file)[0]
-                file_path = os.path.join(root, file)
-                file_name = os.path.relpath(file_path, directory)
-                file_list.append(file_name)
+            # 检查文件是否以任何一个提供的扩展名结尾
+            if any(file.endswith(ext) for ext in extensions):
+                # 直接将文件名添加到列表中
+                file_list.append(file)
     return file_list
-
+	
 def composite_images(foreground, background, mask, is_multiply_blend=False, position="overall", scale=0.25):
     width, height = foreground.size
     bg_image = background
@@ -1498,7 +1501,7 @@ class TextImage:
         return {"required": { 
             
                     "text": ("STRING",{"multiline": True,"default": "龍馬精神迎新歲","dynamicPrompts": False}),
-                    "font": (get_files_with_extension(FONT_PATH,'.ttf'),),#后缀为 ttf
+                    "font": (get_files_with_extension(FONT_PATH,['.ttf','.otf']),),#后缀为 ttf
                     "font_size": ("INT",{
                                 "default":100, 
                                 "min": 100, #Minimum value
@@ -1538,7 +1541,7 @@ class TextImage:
 
     def run(self,text,font,font_size,spacing,padding,text_color,vertical,stroke):
         
-        font_path=os.path.join(FONT_PATH,font+'.ttf')
+        font_path=os.path.join(FONT_PATH,font)
 
         if text=="":
             text=" "
