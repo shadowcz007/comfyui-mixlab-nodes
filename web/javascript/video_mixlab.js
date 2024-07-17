@@ -468,6 +468,8 @@ app.registerExtension({
         const prefix = 'vhs_gif_preview_'
         const r = onExecuted ? onExecuted.apply(this, message) : undefined
 
+        if(!this.widgets) this.widgets=[]
+
         if (this.widgets) {
           const pos = this.widgets.findIndex(w => w.name === `${prefix}_0`)
           if (pos !== -1) {
@@ -488,6 +490,7 @@ app.registerExtension({
                   params.format || 'image/gif'
                 )
               )
+              console.log(w)
               w.parent = this
             })
           }
