@@ -100,7 +100,7 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
     })
 
     const data = await response.json()
-    if (data.llama_cpp_error) {
+    if (data.llama_cpp_error||!data.port) {
       return
     }
 
