@@ -521,9 +521,18 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             logging.info("\n")
             logging.info("\n\nStarting server")
 
+            import socket
+
+            hostname = socket.gethostname()
+            ip_address = socket.gethostbyname(hostname)
+
+            # print(f"本机的IP地址是: {ip_address}")
+
+
             # print("\033[93mStarting server\n")
-            logging.info("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
-            logging.info("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
+            logging.info("\033[93mTo see the GUI go to: http://{}:{}".format(ip_address, http_port))
+            logging.info("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(ip_address, https_port))
+ 
  
             # print("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
             # print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
