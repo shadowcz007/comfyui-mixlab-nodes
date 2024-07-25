@@ -951,7 +951,12 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
                 max_width = max(max_width, x + padding)
             y += line_height + spacing
             x = padding
-        max_height = y
+        # max_height = y
+        total_line_heights = sum(font.getsize(line)[1] for line in lines)
+        total_spacing = spacing * (len(lines) - 1)
+        # 确保顶部和底部的padding都被计入max_height
+        max_height = total_line_heights + total_spacing + padding * 2
+
 
     # 3. Create image with calculated width and height
     image = Image.new('RGBA', (max_width, max_height), (255, 255, 255, 0))
