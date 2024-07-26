@@ -90,7 +90,7 @@ class AudioPlayNode:
             # {'waveform': tensor([], size=(1, 1, 0)), 'sample_rate': 44100}
             is_tensor=True
 
-        if is_tensor:
+        if is_tensor and (not 'audio_path' in audio):
             filename_prefix=""
             # 保存
             filename_prefix += self.prefix_append
@@ -108,7 +108,12 @@ class AudioPlayNode:
                 })
             
         else:
-            results=[audio]
+            results=[{
+                    "filename": audio['filename'],
+                    "subfolder":audio['subfolder'],
+                    "type": audio['type'],
+                    "audio_path":audio['audio_path']
+                }]
                 
 
         # print(audio)
