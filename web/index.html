@@ -641,8 +641,13 @@
             imageElement.appendChild(im);
 
             let base64s = imageElement.querySelectorAll('.base64')
-            //更新输入
-            window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+            //更新输入 //兼容 ，如果data没有则不更新data
+            if (window._appData.data) window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+            //更新输入参数
+            updateInputData(nodeId, (inputs) => {
+                inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                return inputs
+            })
 
             // 删除
             im.addEventListener('click', e => {
@@ -650,7 +655,11 @@
                 im.remove();
                 let base64s = imageElement.querySelectorAll('.base64')
                 //更新输入
-                window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                if (window._appData.data) window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                updateInputData(nodeId, (inputs) => {
+                    inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                    return inputs
+                })
             })
         }
 
@@ -974,7 +983,7 @@
                     // // 获取读取的文件内容，即 Blob 对象
                     let hashId = await calculateImageHash(fileBlob)
 
-                    if (hashId == window._appData.data[data.id].hashId) {
+                    if (window._appData.data && hashId == window._appData.data[data.id].hashId) {
                         document.body.querySelector('.app').style.display = 'flex'
                         document.body.querySelector('#author').style.display = 'block'
                         return;
@@ -986,8 +995,15 @@
                     let { url, name } = await uploadMask(fileBlob, imgurl);
                     // 在这里可以对 Blob 对象进行进一步处理
                     // imageElement.src = url;
-                    window._appData.data[data.id].inputs.image = name;
-                    window._appData.data[data.id].hashId = hashId;
+                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
+
+                    //更新输入参数
+                    updateInputData(data.id, (inputs) => {
+                        inputs.image = name
+                        return inputs
+                    })
+
 
                     // console.log("上传的文件：", url, data.id, name);
                     //更新图片
@@ -1116,10 +1132,31 @@
 
         function updateSeed(id, val) {
             // console.log(val)
-            if (window._appData.data[id].inputs.seed && !Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
-            if (window._appData.data[id].inputs.noise_seed && !Array.isArray(window._appData.data[id].inputs.noise_seed)) window._appData.data[id].inputs.noise_seed = Math.round(val);
+            if (window._appData.data
+                && window._appData.data[id].inputs.seed
+                && !Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
+            if (window._appData.data
+                && window._appData.data[id].inputs.noise_seed
+                && !Array.isArray(window._appData.data[id].inputs.noise_seed)) window._appData.data[id].inputs.noise_seed = Math.round(val);
+
+            //更新输入参数
+            updateInputData(id, (inputs) => {
+                inputs.seed = Math.round(val);
+                inputs.noise_seed = Math.round(val);
+                return inputs
+            })
+
         }
 
+        //更新输入参数
+        function updateInputData(nodeId, callback) {
+            for (let index = 0; index < window._appData.input.length; index++) {
+                const inp = window._appData.input[index];
+                if (inp.id === nodeId) {
+                    window._appData.input[index].inputs = callback(window._appData.input[index].inputs);
+                }
+            }
+        }
 
         function queuePrompt(appInfo, promptWorkflow, seed, client_id) {
             // appinfo升级后 兼容，补丁
@@ -1130,21 +1167,6 @@
             }
             // 随机seed
             promptWorkflow = randomSeed(seed, promptWorkflow);
-
-            // //动态提示,改为输入的时候，手动触发
-            // for (const id in promptWorkflow) {
-            //     let node = promptWorkflow[id]
-            //     if (["TextInput_", "CLIPTextEncode", "PromptSimplification", "ChinesePrompt_Mix"].includes(
-            //         node.class_type
-            //     )) {
-            //         if (node.class_type == "PromptSimplification") {
-            //             promptWorkflow[id].inputs.prompt = dynamicPrompts(node.inputs.prompt);
-            //         } else {
-            //             promptWorkflow[id].inputs.text = dynamicPrompts(node.inputs.text);
-            //         }
-            //         console.log('#动态提示', promptWorkflow[id].inputs)
-            //     }
-            // }
 
             let url = get_url()
             const data = JSON.stringify({ prompt: promptWorkflow, client_id });
@@ -1169,6 +1191,24 @@
                 });
         }
 
+
+        // 新的运行工作流的接口
+        function queuePromptNew(filename, category, seed, input, client_id) {
+            let url = get_url()
+            // var filename = "Text-to-Image_1.json", category = "";
+
+            // 随机seed
+            //  promptWorkflow = randomSeed(seed, promptWorkflow);
+
+            const data = JSON.stringify({ filename, category, seed, input, client_id });
+            fetch(`${url}/mixlab/prompt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: data,
+            })
+        }
 
         function success(isSuccess, btn, text) {
             isSuccess ? btn.innerText = 'success' : text;
@@ -1488,7 +1528,7 @@
                             // // 获取读取的文件内容，即 Blob 对象
                             let hashId = await calculateImageHash(fileBlob)
 
-                            if (hashId == window._appData.data[data.id].hashId) return
+                            if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
 
                             let base64 = await blobToBase64(fileBlob)
 
@@ -1498,9 +1538,15 @@
                                 let { url, name } = await uploadImage(fileBlob);
                                 // 在这里可以对 Blob 对象进行进一步处理
                                 imageElement.src = url;
-                                window._appData.data[data.id].inputs.image = name;
-                                window._appData.data[data.id].hashId = hashId;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
                                 console.log("上传的文件：", url, data.id, name);
+
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.image = name;
+                                    return inputs
+                                })
 
                                 //更换option里的default image
                                 window._appData.input = Array.from(window._appData.input, inp => {
@@ -1792,11 +1838,26 @@
                             data.options.images,
                             data.inputs.imageIndex,
                             (base64, text) => {
-                                window._appData.data[data.id].inputs.image_base64 = base64;
-                                window._appData.data[data.id].inputs.text = text;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = base64;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.text = text;
+
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.image_base64 = base64;
+                                    inputs.text = text;
+                                    return inputs
+                                })
+
                             })
                         uploadContainer.appendChild(imgDiv);
-                        window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+
+                        //更新输入参数
+                        updateInputData(data.id, (inputs) => {
+                            inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+                            return inputs
+                        })
+
                     } else if (data.class_type === 'LoadImagesToBatch') {
                         // 多张base64 图片
                         let base64 = data.inputs.images.base64
@@ -1836,7 +1897,7 @@
                             // console.log( file.type.split('/')[1])
                             let hashId = await calculateImageHash(fileBlob)
 
-                            if (hashId == window._appData.data[data.id].hashId) return
+                            if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
 
                             if (data.class_type === 'LoadImagesToBatch') {
                                 // 上传 ，转为base64
@@ -1849,8 +1910,16 @@
                                 let base64 = await parseImageToBase64(url);
 
                                 if (data.class_type === 'ImagesPrompt_') {
-                                    uploadContainer.querySelector('.images_prompt_main').src = base64
-                                    window._appData.data[data.id].inputs.image_base64 = base64;
+                                    uploadContainer.querySelector('.images_prompt_main').src = base64;
+
+                                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = base64;
+
+                                    //更新输入参数
+                                    updateInputData(data.id, (inputs) => {
+                                        inputs.image_base64 = base64;
+                                        return inputs
+                                    })
+
                                 } else {
                                     if (isVideoUpload) {
                                         imageElement.srcObject = null;
@@ -1859,7 +1928,14 @@
                                     imageElement.src = url;
 
                                     if (isVideoUpload) {
-                                        window._appData.data[data.id].inputs.video = name;
+                                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.video = name;
+
+                                        //更新输入参数
+                                        updateInputData(data.id, (inputs) => {
+                                            inputs.video = name;
+                                            return inputs
+                                        })
+
                                     } else {
                                         //更换option里的default image
                                         window._appData.input = Array.from(window._appData.input, inp => {
@@ -1869,13 +1945,19 @@
                                             return inp
                                         })
 
-                                        window._appData.data[data.id].inputs.image = name;
+                                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                                        //更新输入参数
+                                        updateInputData(data.id, (inputs) => {
+                                            inputs.image = name;
+                                            return inputs
+                                        })
+
                                     }
 
                                 }
 
 
-                                window._appData.data[data.id].hashId = hashId;
+                                if (window._appData.data) window._appData.data[data.id].hashId = hashId;
 
                                 console.log("上传的文件：", url, data.id, name);
                             }
@@ -1915,7 +1997,12 @@
                     let silde = createNumSlide(label,
                         data.inputs.weight,
                         (v) => {
-                            window._appData.data[data.id].inputs.weight = parseFloat(v);
+                            if (window._appData.data) window._appData.data[data.id].inputs.weight = parseFloat(v);
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.weight = parseFloat(v);
+                                return inputs
+                            })
                         },
                         options.min,
                         options.max,
@@ -1939,7 +2026,14 @@
                         data.inputs.number,
                         (v) => {
                             // console.log(data.id,window._appData.data[data.id])
-                            window._appData.data[data.id].inputs.number = data.class_type === 'IntNumber' ? parseInt(v) : parseFloat(v);
+                            if (window._appData.data) window._appData.data[data.id].inputs.number = data.class_type === 'IntNumber' ? parseInt(v) : parseFloat(v);
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.number = data.class_type === 'IntNumber' ? parseInt(v) : parseFloat(v);
+                                return inputs
+                            })
+
                         },
                         options.min,
                         options.max,
@@ -1979,9 +2073,21 @@
                         textInput.style.height = height;
 
                         if (data.class_type == "PromptSimplification") {
-                            window._appData.data[data.id].inputs.prompt = textInput.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.prompt = textInput.value;
+                                return inputs
+                            })
                         } else {
-                            window._appData.data[data.id].inputs.text = textInput.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.text = textInput.value;
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.text = textInput.value;
+                                return inputs
+                            })
+
                         }
 
                     } catch (error) {
@@ -2005,9 +2111,19 @@
                         textInput.setAttribute('title', prompt)
                         dynamicPromptsBtn.setAttribute('title', prompt)
                         if (data.class_type == "PromptSimplification") {
-                            window._appData.data[data.id].inputs.prompt = prompt;
+                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = prompt;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.prompt = prompt;
+                                return inputs
+                            })
                         } else {
-                            window._appData.data[data.id].inputs.text = prompt;
+                            if (window._appData.data) window._appData.data[data.id].inputs.text = prompt;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.text = prompt;
+                                return inputs
+                            })
                         }
                     })
 
@@ -2022,9 +2138,19 @@
                         autoResize(textInput);
 
                         if (data.class_type == "PromptSimplification") {
-                            window._appData.data[data.id].inputs.prompt = textInput.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.prompt = textInput.value;
+                                return inputs
+                            })
                         } else {
-                            window._appData.data[data.id].inputs.text = textInput.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.text = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.text = textInput.value;
+                                return inputs
+                            })
                         }
                         localStorage.setItem(`t_${data.id}`, JSON.stringify({
                             value: textInput.value,
@@ -2071,10 +2197,24 @@
                         if (v) {
                             value = v;
                             if (data.class_type === 'CheckpointLoaderSimple') {
-                                window._appData.data[data.id].inputs.ckpt_name = value;
+
+                                if (window._appData.data) window._appData.data[data.id].inputs.ckpt_name = value;
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.ckpt_name = value;
+                                    return inputs
+                                })
+
                             }
                             if (data.class_type === 'LoraLoader') {
-                                window._appData.data[data.id].inputs.lora_name = value;
+
+                                if (window._appData.data) window._appData.data[data.id].inputs.lora_name = value;
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.lora_name = value;
+                                    return inputs
+                                })
+
                             }
                         }
                     } catch (error) {
@@ -2094,10 +2234,20 @@
                         e.preventDefault();
                         // console.log(selectDom.value)
                         if (data.class_type === 'CheckpointLoaderSimple') {
-                            window._appData.data[data.id].inputs.ckpt_name = selectDom.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.ckpt_name = selectDom.value;
+                            //更新输入参数
+                            updateInputData(nodeId, (inputs) => {
+                                inputs.ckpt_name = selectDom.value;
+                                return inputs
+                            })
                         }
                         if (data.class_type === 'LoraLoader') {
-                            window._appData.data[data.id].inputs.lora_name = selectDom.value;
+                            if (window._appData.data) window._appData.data[data.id].inputs.lora_name = selectDom.value;
+                            //更新输入参数
+                            updateInputData(nodeId, (inputs) => {
+                                inputs.lora_name = selectDom.value;
+                                return inputs
+                            })
                         }
 
                         localStorage.setItem(`_model_${data.id}_${data.class_type}`, selectDom.value)
@@ -2161,7 +2311,15 @@
 
                             audioE.src = base64;
 
-                            window._appData.data[data.id].inputs.audios.base64 = [base64];
+                            if (window._appData.data) window._appData.data[data.id].inputs.audios.base64 = [base64];
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.audios.base64 = [base64];
+                                return inputs
+                            })
+
+
                         })
 
                         inp.click()
@@ -2225,11 +2383,26 @@
                         // console.log(color)
                         // window._appData.data[data.id].inputs.color.hex = color.toHEXA().toString();
                         let [r, g, b, a] = color.toRGBA();
-                        window._appData.data[nodeId].inputs.color = {
-                            ...window._appData.data[nodeId].inputs.color,
+                        r = parseInt(r);
+                        g = parseInt(g);
+                        b = parseInt(b);
+
+                        if (window._appData.data) window._appData.data[nodeId].inputs.color = {
+                            // ...window._appData.data[nodeId].inputs.color,
                             r, g, b, a,
                             hex: color.toHEXA().toString()
-                        }
+                        };
+
+                        //更新输入参数 //todo color里的参数
+                        updateInputData(nodeId, (inputs) => {
+                            inputs.color = {
+                                // ...window._appData.data[nodeId].inputs.color,
+                                r, g, b, a,
+                                hex: color.toHEXA().toString()
+                            };
+                            return inputs
+                        })
+
                     } catch (error) { }
                 })
                 .on('cancel', instance => {
@@ -2308,7 +2481,14 @@
 
                 let defaultValue = (targetId ? localStorage.getItem(`_slide_${targetId}`) : '') || keywords[0];
 
-                window._appData.data[targetId].inputs.prompt_keyword = defaultValue;
+                if (window._appData.data) window._appData.data[targetId].inputs.prompt_keyword = defaultValue;
+
+                //更新输入参数 //todo color里的参数
+                updateInputData(targetId, (inputs) => {
+                    inputs.prompt_keyword = defaultValue;
+                    return inputs
+                })
+
 
                 let selectTag = createSelect(Array.from(keywords, (k, i) => {
                     return {
@@ -2325,7 +2505,13 @@
                 // selectTag.setAttribute('data-content',labelText);
                 selectTag.addEventListener('change', e => {
                     e.preventDefault();
-                    window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
+                    if (window._appData.data) window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
+
+                    //更新输入参数 //todo color里的参数
+                    updateInputData(targetId, (inputs) => {
+                        inputs.prompt_keyword = selectTag.value;
+                        return inputs
+                    })
 
                     targetId ? localStorage.setItem(`_slide_${targetId}`, selectTag.value) : ''
                 })
@@ -2501,6 +2687,7 @@
         async function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
             if (!data) return
+            // console.log('#createUI', data)
             const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
 
             let mainDiv = document.createElement('div');
@@ -2584,6 +2771,7 @@
             // seeds.textContent = 'Status';
             seeds.className = 'seeds';
 
+            console.log('#createUI', seed, data.data)
             try {
                 if (Object.keys(seed).length > 0) {
                     seeds.innerHTML = `<summary>SEED</summary>
@@ -2591,7 +2779,8 @@
                     const content = seeds.querySelector('.content')
                     for (const id in seed) {
                         const s = seed[id];
-                        if (!Array.isArray(workflow[id].inputs.seed)) {
+                        console.log('#createUI', !!(workflow && !Array.isArray(workflow[id].inputs.seed) || !workflow))
+                        if (!!(workflow && !Array.isArray(workflow[id].inputs.seed) || !workflow)) {
 
                             let seedInput = document.createElement('div');
                             content.appendChild(seedInput)
@@ -2670,7 +2859,7 @@
             leftDiv.appendChild(input1);
 
             submitDivBtn.appendChild(submitButton);
-            if (typeof (data.data) == 'object') mainDiv.appendChild(submitDiv);
+            mainDiv.appendChild(submitDiv);
 
             rightDiv.appendChild(output);
 
@@ -3041,13 +3230,22 @@
             ui.submitButton.update(
                 () => {
                     // 在提交按钮点击时执行的逻辑
-                    queuePrompt({
-                        name: window._appData.name,
-                        id: window._appData.id,
-                        icon: window._appData.icon,
-                        category: window._appData.category,
-                        filename: window._appData.filename
-                    }, window._appData.data, window._appData.seed, api.clientId);
+                    // queuePrompt({
+                    //     name: window._appData.name,
+                    //     id: window._appData.id,
+                    //     icon: window._appData.icon,
+                    //     category: window._appData.category,
+                    //     filename: window._appData.filename
+                    // }, window._appData.data, window._appData.seed, api.clientId);
+
+                    queuePromptNew(
+                        window._appData.filename,
+                        window._appData.category,
+                        window._appData.seed,
+                        window._appData.input.filter(inp => inp),
+                        api.clientId
+                    )
+
                 }, () => {
                     // 取消
                     if (api.runningCancel) {

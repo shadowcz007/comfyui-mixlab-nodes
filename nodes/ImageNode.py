@@ -1291,6 +1291,9 @@ class LoadImages_:
             image=pil2tensor(image)
             ims.append(image)
 
+        if len(ims)==0:
+            image1 = Image.new('RGB', (512, 512), color='black')
+            return (pil2tensor(image1),)
         image1 = ims[0]
         for image2 in ims[1:]:
             if image1.shape[1:] != image2.shape[1:]:
