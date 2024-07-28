@@ -823,7 +823,7 @@ async def mixlab_post_prompt(request):
             '''
         json_data["prompt"]=random_seed(seed,prompt)
 
-    print("#json_data",prompt)
+    # print("#json_data",prompt)
     # 需要把apps处理成 prompt
     # 注意seed的处理
     
