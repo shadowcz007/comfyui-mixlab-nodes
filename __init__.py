@@ -619,29 +619,33 @@ async def mixlab_workflow_hander(request):
                 if 'admin' in data:
                     admin=data['admin']
 
-                ds=get_my_workflow_for_app(filename,category,admin)                
+                ds=get_my_workflow_for_app(filename,category,admin)
+                data=[]           
                 for json_data in ds:
                     # 不传给前端
-                    if 'output' in json_data:
-                        del json_data['output']
-                    if 'workflow' in json_data:
-                        del json_data['workflow']
+                    if 'output' in json_data['data']:
+                        del json_data['data']['output']
+                    if 'workflow' in json_data['data']:
+                        del json_data['data']['workflow']
+                    data.append(json_data)
 
                 result={
-                    'data':ds,
+                    'data':data,
                     'status':'success',
                 }
             elif data['task']=='list':
                 ds=get_workflows()
+                data=[]
                 for json_data in ds:
                     # 不传给前端
-                    if 'output' in json_data:
-                        del json_data['output']
-                    if 'workflow' in json_data:
-                        del json_data['workflow']
+                    if 'output' in json_data['data']:
+                        del json_data['data']['output']
+                    if 'workflow' in json_data['data']:
+                        del json_data['data']['workflow']
+                    data.append(json_data)
 
                 result={
-                    'data':ds,
+                    'data':data,
                     'status':'success',
                 }
     except Exception as e:
