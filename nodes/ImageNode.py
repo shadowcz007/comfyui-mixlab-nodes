@@ -912,7 +912,7 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
     return layer_image
 
 
-def generate_text_image(text, font_path, font_size, text_color, vertical=True, stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0, padding=4):
+def generate_text_image(text, font_path, font_size, text_color, vertical=True, stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0, line_spacing=0,padding=4):
     # Split text into lines based on line breaks
     lines = text.split("\n")
 
@@ -938,9 +938,13 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
                 char_coordinates.append((x, y))
                 y += char_height + spacing
                 max_height = max(max_height, y + padding)
-            x += max_char_width + spacing
+            x += max_char_width + line_spacing
             y = padding
         max_width = x
+        total_line_width = sum(font.getsize(line)[1] for line in lines)
+        total_spacing = line_spacing * (len(lines) - 1)
+        # 确保左边和右边的padding都被计入max_width
+        max_width = total_line_width + total_spacing + padding * 2
     else:
         for line in lines:
             line_width, line_height = font.getsize(line)
@@ -949,9 +953,13 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
                 char_coordinates.append((x, y))
                 x += char_width + spacing
                 max_width = max(max_width, x + padding)
-            y += line_height + spacing
+            y += line_height + line_spacing
             x = padding
-        max_height = y
+        # max_height = y
+        total_line_heights = sum(font.getsize(line)[1] for line in lines)
+        total_spacing = line_spacing * (len(lines) - 1)
+        # 确保顶部和底部的padding都被计入max_height
+        max_height = total_line_heights + total_spacing + padding * 2
 
     # 3. Create image with calculated width and height
     image = Image.new('RGBA', (max_width, max_height), (255, 255, 255, 0))
@@ -1519,6 +1527,13 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
+                    "line_spacing": ("INT",{
+                                "default":12, 
+                                "min": -200, #Minimum value
+                                "max": 200, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }), 
                     "padding": ("INT",{
                                 "default":8, 
                                 "min": 0, #Minimum value
@@ -1542,14 +1557,14 @@ class TextImage:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
 
-    def run(self,text,font,font_size,spacing,padding,text_color,vertical,stroke):
+    def run(self,text,font,font_size,spacing,line_spacing,padding,text_color,vertical,stroke):
         
         font_path=os.path.join(FONT_PATH,font)
 
         if text=="":
             text=" "
         # stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0
-        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,padding)
+        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,line_spacing,padding)
         
         img=pil2tensor(img)
         mask=pil2tensor(mask)
