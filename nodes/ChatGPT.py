@@ -236,7 +236,11 @@ class ChatGPTNode:
             "moonshot-v1-8k",
             "moonshot-v1-32k",
             "moonshot-v1-128k",
-            "deepseek-chat" 
+            "deepseek-chat",
+            "Qwen/Qwen2-7B-Instruct",
+            "THUDM/glm-4-9b-chat",
+            "01-ai/Yi-1.5-9B-Chat-16K",
+            "meta-llama/Meta-Llama-3.1-8B-Instruct"
                     ]
         return {
             "required": {
