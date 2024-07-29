@@ -466,7 +466,6 @@ app.registerExtension({
         const { input, output } = getInputsAndOutputs()
         input_ids.value = input.join('\n')
         output_ids.value = output.join('\n')
-
         const widget = {
           type: 'div',
           name: 'AppInfoRun',

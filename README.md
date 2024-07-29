@@ -6,13 +6,14 @@
 
 ##### `最新`：
 
+- 增加 SiliconflowLLM，可以使用由Siliconflow提供的免费LLM
+
 - 增加 Edit Mask，方便在生成的时候手动绘制 mask [workflow](./workflow/edit-mask-workflow.json)
 
+<!-- - ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。模型下载后，放置到 `models/llamafile/` -->
 
-- ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。模型下载后，放置到 `models/llamafile/`
-
-- 右键菜单支持 text-to-text，方便对 prompt 词补全
-
+<!-- - 右键菜单支持 text-to-text，方便对 prompt 词补全 -->
+<!-- 
 强烈推荐：
 [Phi-3-mini-4k-instruct-function-calling-GGUF](https://huggingface.co/nold/Phi-3-mini-4k-instruct-function-calling-GGUF)
 
@@ -21,7 +22,7 @@
 - 右键菜单支持 image-to-text，使用多模态模型，多模态使用 [llava-phi-3-mini-gguf](https://huggingface.co/xtuner/llava-phi-3-mini-gguf/tree/main)，注意需要把llava-phi-3-mini-mmproj-f16.gguf也下载
 
 ![](./assets/prompt_ai_setup.png)
-![](./assets/prompt-ai.png)
+![](./assets/prompt-ai.png) -->
 
 
 #### `相关插件推荐`

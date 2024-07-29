@@ -1147,11 +1147,12 @@ logging.info('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 # print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 
 try:
-    from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter
+    from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
     NODE_CLASS_MAPPINGS_V = {
        "ChatGPTOpenAI":ChatGPTNode,
+       "SiliconflowLLM":SiliconflowFreeNode,
         "ShowTextForGPT":ShowTextForGPT,
         "CharacterInText":CharacterInText,
         "TextSplitByDelimiter":TextSplitByDelimiter,
@@ -1160,6 +1161,7 @@ try:
     # 一个包含节点友好/可读的标题的字典
     NODE_DISPLAY_NAME_MAPPINGS_V = {
         "ChatGPTOpenAI":"ChatGPT & Local LLM ♾️Mixlab",
+        "SiliconflowLLM":"LLM Siliconflow ♾️Mixlab",
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
         "CharacterInText":"Character In Text",
         "TextSplitByDelimiter":"Text Split By Delimiter",

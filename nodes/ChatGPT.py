@@ -53,8 +53,8 @@ def azure_client(key,url):
 
 def openai_client(key,url):
     client = openai.OpenAI(
-    api_key=key,
-    base_url=url
+        api_key=key,
+        base_url=url
     )
     return client
 
@@ -163,7 +163,7 @@ def llama_cpp_client(file_name):
 
 
 def chat(client, model_name,messages ):
-
+        print('#chat',model_name,messages)
         try_count = 0
         while True:
             try_count += 1
@@ -304,7 +304,7 @@ class ChatGPTNode:
                 client=llama_cpp_client(model)
             else :
                 client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
-                print('using ChatGPT interface')
+                # print('using ChatGPT interface',api_key,api_url)
 
         # 把用户的提示添加到会话历史中
         # 调用API时传递整个会话历史
@@ -320,6 +320,7 @@ class ChatGPTNode:
         session_history=crop_list_tail(self.session_history,context_size)
 
         messages=[{"role": "system", "content": self.system_content}]+session_history+[{"role": "user", "content": prompt}]
+
         response_content = chat(client,model,messages)
         
         self.session_history=self.session_history+[{"role": "user", "content": prompt}]+[{'role':'assistant',"content":response_content}]
@@ -338,6 +339,91 @@ class ChatGPTNode:
         #                            context_size]
         
         return (response_content,json.dumps(messages, indent=4),json.dumps(self.session_history, indent=4),)
+
+
+class SiliconflowFreeNode:
+    def __init__(self):
+        # self.__client = OpenAI()
+        self.session_history = []  # 用于存储会话历史的列表
+        # self.seed=0
+        self.system_content="You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        model_list= [ 
+            "Qwen/Qwen2-7B-Instruct",
+            "THUDM/glm-4-9b-chat",
+            "01-ai/Yi-1.5-9B-Chat-16K",
+            "meta-llama/Meta-Llama-3.1-8B-Instruct"
+            ]
+        return {
+            "required": {
+                "api_key":("KEY", {"default": "", "multiline": True,"dynamicPrompts": False}),
+                "prompt": ("STRING", {"multiline": True,"dynamicPrompts": False}),
+                "system_content": ("STRING", 
+                                   {
+                                       "default": "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.", 
+                                       "multiline": True,"dynamicPrompts": False
+                                       }),
+                "model": ( model_list, 
+                    {"default": model_list[0]}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
+                "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
+            },
+             "hidden": {
+                "unique_id": "UNIQUE_ID",
+                "extra_pnginfo": "EXTRA_PNGINFO",
+            },
+        }
+
+    RETURN_TYPES = ("STRING","STRING","STRING",)
+    RETURN_NAMES = ("text","messages","session_history",)
+    FUNCTION = "generate_contextual_text"
+    CATEGORY = "♾️Mixlab/GPT"
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,False,False,)
+
+    
+    def generate_contextual_text(self,
+                                 api_key,
+                                 prompt, 
+                                 system_content,
+                                model, 
+                                seed,context_size,unique_id = None, extra_pnginfo=None):
+    
+        api_url="https://api.siliconflow.cn/v1"
+        
+        # 把系统信息和初始信息添加到会话历史中
+        if system_content:
+            self.system_content=system_content
+            # self.session_history=[]
+            # self.session_history.append({"role": "system", "content": system_content})
+        
+        # 
+        client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
+        # print('using ChatGPT interface',api_key,api_url)
+
+        # 把用户的提示添加到会话历史中
+        # 调用API时传递整个会话历史
+
+        def crop_list_tail(lst, size):
+            if size >= len(lst):
+                return lst
+            elif size==0:
+                return []
+            else:
+                return lst[-size:]
+            
+        session_history=crop_list_tail(self.session_history,context_size)
+
+        messages=[{"role": "system", "content": self.system_content}]+session_history+[{"role": "user", "content": prompt}]
+
+        response_content = chat(client,model,messages)
+        
+        self.session_history=self.session_history+[{"role": "user", "content": prompt}]+[{'role':'assistant',"content":response_content}]
+
+        return (response_content,json.dumps(messages, indent=4),json.dumps(self.session_history, indent=4),)
+
 
 
 
