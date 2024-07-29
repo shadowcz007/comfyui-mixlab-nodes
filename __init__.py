@@ -753,6 +753,7 @@ def random_seed(seed, data):
     max_seed = 4294967295
 
     for id, value in data.items():
+        # print(seed,id)
         if 'seed' in value['inputs'] and not isinstance(value['inputs']['seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
             value['inputs']['seed'] = round(random.random() * max_seed)
         

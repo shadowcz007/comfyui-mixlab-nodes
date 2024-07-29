@@ -256,7 +256,9 @@ async function extractInputAndOutputData (
         node.type === 'KSampler' ||
         node.type == 'SamplerCustom' ||
         node.type === 'ChinesePrompt_Mix' ||
-        node.type === 'Seed_'
+        node.type === 'Seed_'||
+        node.type==='SiliconflowLLM'||
+        node.type==='ChatGPTOpenAI'
       ) {
         // seed 的类型收集
         try {
