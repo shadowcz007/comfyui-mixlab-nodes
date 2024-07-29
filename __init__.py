@@ -532,8 +532,8 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
 
             # print("\033[93mStarting server\n")
-            logging.info("\033[93mTo see the GUI go to: http://{}:{}".format(ip_address, http_port))
-            logging.info("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(ip_address, https_port))
+            logging.info("\033[93mTo see the GUI go to: http://{}:{} or http://{}:{}".format(ip_address, http_port,address,http_port))
+            logging.info("\033[93mTo see the GUI go to: https://{}:{} or https://{}:{}\033[0m".format(ip_address, https_port,address,https_port))
  
             # print("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
             # print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
