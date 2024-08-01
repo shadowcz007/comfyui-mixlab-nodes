@@ -97,67 +97,68 @@ def get_llama_path():
     except:
         return os.path.join(folder_paths.models_dir, "llamafile")
 
-def get_llama_models():
-    res=[]
+# def get_llama_models():
+#     res=[]
 
-    model_path=get_llama_path()
-    if os.path.exists(model_path):
-        files = os.listdir(model_path)
-        for file in files:
-            if os.path.isfile(os.path.join(model_path, file)):
-                res.append(file)
-        res=phi_sort(res)
-    return res
+#     model_path=get_llama_path()
+#     if os.path.exists(model_path):
+#         files = os.listdir(model_path)
+#         for file in files:
+#             if os.path.isfile(os.path.join(model_path, file)):
+#                 res.append(file)
+#         res=phi_sort(res)
+#     return res
 
-llama_modes_list=get_llama_models()
+# llama_modes_list=get_llama_models()
+# llama_modes_list=[]
 
-def get_llama_model_path(file_name):
-    model_path=get_llama_path()
-    mp=os.path.join(model_path,file_name)
-    return mp
+# def get_llama_model_path(file_name):
+#     model_path=get_llama_path()
+#     mp=os.path.join(model_path,file_name)
+#     return mp
 
-def llama_cpp_client(file_name):
-    try:
-        if is_installed('llama_cpp')==False:
-            import subprocess
+# def llama_cpp_client(file_name):
+#     try:
+#         if is_installed('llama_cpp')==False:
+#             import subprocess
 
-            # 安装
-            print('#pip install llama-cpp-python')
+#             # 安装
+#             print('#pip install llama-cpp-python')
  
-            result = subprocess.run([sys.executable, '-s', '-m', 'pip', 
-                                     'install', 
-                                     'llama-cpp-python',
-                                     '--extra-index-url',
-                                     'https://abetlen.github.io/llama-cpp-python/whl/cu121'
-                                     ], capture_output=True, text=True)
+#             result = subprocess.run([sys.executable, '-s', '-m', 'pip', 
+#                                      'install', 
+#                                      'llama-cpp-python',
+#                                      '--extra-index-url',
+#                                      'https://abetlen.github.io/llama-cpp-python/whl/cu121'
+#                                      ], capture_output=True, text=True)
 
-            #检查命令执行结果
-            if result.returncode == 0:
-                print("#install success")
-                from llama_cpp import Llama
+#             #检查命令执行结果
+#             if result.returncode == 0:
+#                 print("#install success")
+#                 from llama_cpp import Llama
 
-                subprocess.run([sys.executable, '-s', '-m', 'pip', 
-                                     'install', 
-                                     'llama-cpp-python[server]'
-                                     ], capture_output=True, text=True)
+#                 subprocess.run([sys.executable, '-s', '-m', 'pip', 
+#                                      'install', 
+#                                      'llama-cpp-python[server]'
+#                                      ], capture_output=True, text=True)
 
-            else:
-                print("#install error")
+#             else:
+#                 print("#install error")
             
-        else:
-            from llama_cpp import Llama
-    except:
-        print("#install llama-cpp-python error")
+#         else:
+#             from llama_cpp import Llama
+#     except:
+#         print("#install llama-cpp-python error")
 
-    if file_name:
-        mp=get_llama_model_path(file_name)
-        # file_name=get_llama_models()[0]
-        # model_path=os.path.join(folder_paths.models_dir, "llamafile")
-        # mp=os.path.join(model_path,file_name)
+#     if file_name:
+#         mp=get_llama_model_path(file_name)
+#         # file_name=get_llama_models()[0]
+#         # model_path=os.path.join(folder_paths.models_dir, "llamafile")
+#         # mp=os.path.join(model_path,file_name)
 
-        llm = Llama(model_path=mp, chat_format="chatml",n_gpu_layers=-1,n_ctx=512)
+#         llm = Llama(model_path=mp, chat_format="chatml",n_gpu_layers=-1,n_ctx=512)
 
-        return llm
+#         return llm
 
     
 
@@ -215,7 +216,7 @@ class ChatGPTNode:
 
     @classmethod
     def INPUT_TYPES(cls):
-        model_list=llama_modes_list+[ 
+        model_list=[ 
                     "gpt-3.5-turbo",
             "gpt-3.5-turbo-16k",
             "gpt-4o",
@@ -299,9 +300,9 @@ class ChatGPTNode:
             if model == "glm-4" :
                 client = ZhipuAI_client(api_key)  # 使用 Zhipuai 的接口
                 print('using Zhipuai interface')
-            elif model in llama_modes_list:
-                #
-                client=llama_cpp_client(model)
+            # elif model in llama_modes_list:
+            #     #
+            #     client=llama_cpp_client(model)
             else :
                 client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
                 # print('using ChatGPT interface',api_key,api_url)

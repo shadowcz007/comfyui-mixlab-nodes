@@ -163,17 +163,20 @@ async function createMenu () {
 
     // appsButton.onclick = () =>
     appsButton.onclick = async () => {
-      if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
-        //显示运行的模型
-        createModelsModal([
-          window._mixlab_llamacpp.url,
-          window._mixlab_llamacpp.model
-        ])
-      } else {
-        let ms = await get_llamafile_models()
-        ms = ms.filter(m => !m.match('-mmproj-'))
-        if (ms.length > 0) createModelsModal(ms)
-      }
+      // if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
+      //   //显示运行的模型
+      //   createModelsModal([
+      //     window._mixlab_llamacpp.url,
+      //     window._mixlab_llamacpp.model
+      //   ])
+      // } else {
+      //   // let ms = await get_llamafile_models()
+      //   // ms = ms.filter(m => !m.match('-mmproj-'))
+      //   // if (ms.length > 0) createModelsModal(ms)
+      // }
+      createModelsModal([
+      
+      ])
     }
     menu.append(appsButton)
   }
@@ -932,16 +935,16 @@ function createModelsModal (models) {
   const n_gpu_p = document.createElement('p')
   n_gpu_p.innerText = 'n_gpu_layers'
 
-  const n_gpu_div = document.createElement('div')
-  n_gpu_div.style = `display: flex;
+  const batchPageBtn = document.createElement('div')
+  batchPageBtn.style = `display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;`
-  n_gpu_div.appendChild(n_gpu_p)
-  n_gpu_div.appendChild(n_gpu)
+  batchPageBtn.innerHTML=`<a href="${get_url()}/mixlab/app" target="_blank" style="color: var(--input-text);
+  background-color: var(--comfy-input-bg);">App</a>`
 
   const title = document.createElement('p')
-  title.innerText = 'Models'
+  title.innerText = 'Mixlab Nodes'
   title.style = `font-size: 18px;
   margin-right: 8px;
   margin-top: 0;`
@@ -953,9 +956,9 @@ function createModelsModal (models) {
   font-size: 12px;
   flex-direction: column; `
   left_d.appendChild(title)
-  title.appendChild(statusIcon)
-  left_d.appendChild(linkIcon)
-  left_d.appendChild(n_gpu_div)
+  // title.appendChild(statusIcon)
+  // left_d.appendChild(linkIcon)
+  left_d.appendChild(batchPageBtn)
   headTitleElement.appendChild(left_d)
 
   // headTitleElement.appendChild(n_gpu_div)
@@ -1010,24 +1013,24 @@ function createModelsModal (models) {
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
 
-  var input = document.createElement('textarea')
-  input.className = 'comfy-multiline-input'
-  input.style = `    height: 260px;
+  var inputForSystemPrompt = document.createElement('textarea')
+  inputForSystemPrompt.className = 'comfy-multiline-input'
+  inputForSystemPrompt.style = `    height: 260px;
   width: 480px;
   font-size: 16px;
   padding: 18px;`
-  input.value = localStorage.getItem('_mixlab_system_prompt')
+  inputForSystemPrompt.value = localStorage.getItem('_mixlab_system_prompt')
 
-  input.addEventListener('change', e => {
+  inputForSystemPrompt.addEventListener('change', e => {
     e.stopPropagation()
-    localStorage.setItem('_mixlab_system_prompt', input.value)
+    localStorage.setItem('_mixlab_system_prompt', inputForSystemPrompt.value)
   })
 
-  input.addEventListener('click', e => {
+  inputForSystemPrompt.addEventListener('click', e => {
     e.stopPropagation()
   })
 
-  modalContent.appendChild(input)
+  // modalContent.appendChild(inputForSystemPrompt)
 
   if (!window._mixlab_llamacpp||(window._mixlab_llamacpp?.model?.length==0)) {
     for (const m of models) {
@@ -1040,10 +1043,10 @@ function createModelsModal (models) {
       d.addEventListener('click', async e => {
         e.stopPropagation()
         div.remove()
-        startLLM(m)
+        // startLLM(m)
       })
 
-      modalContent.appendChild(d)
+      // modalContent.appendChild(d)
     }
   }
   modal.appendChild(modalContent)
@@ -1414,7 +1417,7 @@ app.registerExtension({
           .setAttribute('title', res.url)
       })
     }else{
-      startLLM('')
+      // startLLM('')
     }
 
     LGraphCanvas.prototype.helpAboutNode = async function (node) {

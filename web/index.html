@@ -146,6 +146,11 @@
             margin-top: 4px;
         }
 
+        .prompt_lab {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
 
         .description {
             display: flex;
@@ -295,6 +300,17 @@
             border: 3px solid;
         }
 
+        .run_btn:hover {
+            border-color: yellow !important;
+            cursor: pointer;
+        }
+
+        .mix_on {
+            color: #ffffff !important;
+            /* font-weight: 400; */
+            background: #232222;
+        }
+
         button:hover {
             /* border-color: yellow !important; */
             color: #ffffff !important;
@@ -302,6 +318,7 @@
             background: #232222;
             cursor: pointer;
         }
+
 
         .disabled {
             background-color: #eee !important;
@@ -508,36 +525,7 @@
         import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
         // console.log(Lightbox)
         import { api } from "../../../scripts/api.js";
-
-
-        // ComfyUI\web\extensions\core\dynamicPrompts.js
-        // 官方实现修改
-        // Allows for simple dynamic prompt replacement
-        // Inputs in the format {a|b} will have a random value of a or b chosen when the prompt is queued.
-
-        /*
-         * Strips C-style line and block comments from a string
-         */
-        function stripComments(str) {
-            return str.replace(/\/\*[\s\S]*?\*\/|\/\/.*/g, '');
-        }
-
-        function dynamicPrompts(prompt) {
-            prompt = stripComments(prompt);
-            while (prompt.replace("\\{", "").includes("{") && prompt.replace("\\}", "").includes("}")) {
-                const startIndex = prompt.replace("\\{", "00").indexOf("{");
-                const endIndex = prompt.replace("\\}", "00").indexOf("}");
-
-                const optionsString = prompt.substring(startIndex + 1, endIndex);
-                const options = optionsString.split("|");
-
-                const randomIndex = Math.floor(Math.random() * options.length);
-                const randomOption = options[randomIndex];
-
-                prompt = prompt.substring(0, startIndex) + randomOption + prompt.substring(endIndex + 1);
-            }
-            return prompt
-        }
+        import Command from '/extensions/comfyui-mixlab-nodes/javascript/command.js'
 
 
         // console.log('api', api)
@@ -545,93 +533,6 @@
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
 
-        function get_url() {
-            let api_host = `${window.location.hostname}:${window.location.port}`
-            let api_base = ''
-            let url = `${window.location.protocol}//${api_host}${api_base}`
-            return url
-        }
-
-        async function uploadImage(blob, fileType = '.png', filename) {
-            const body = new FormData()
-            body.append(
-                'image',
-                new File([blob], (filename || new Date().getTime()) + fileType)
-            )
-
-            const url = get_url()
-
-            const resp = await fetch(`${url}/upload/image`, {
-                method: 'POST',
-                body
-            })
-
-            let data = await resp.json()
-            // console.log(data)
-            let { name, subfolder } = data
-            let src = `${url}/view?filename=${encodeURIComponent(
-                name
-            )}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
-
-            return { url: src, name }
-
-        };
-
-        async function uploadMask(arrayBuffer, imgurl) {
-            const body = new FormData()
-            const filename = 'clipspace-mask-' + performance.now() + '.png'
-
-            let original_url = new URL(imgurl)
-
-            const original_ref = { filename: original_url.searchParams.get('filename') }
-
-            let original_subfolder = original_url.searchParams.get('subfolder')
-            if (original_subfolder) original_ref.subfolder = original_subfolder
-
-            let original_type = original_url.searchParams.get('type')
-            if (original_type) original_ref.type = original_type
-
-            body.append('image', arrayBuffer, filename)
-            body.append('original_ref', JSON.stringify(original_ref))
-            body.append('type', 'input')
-            body.append('subfolder', 'clipspace')
-
-            const url = get_url()
-
-            const resp = await fetch(`${url}/upload/mask`, {
-                method: 'POST',
-                body
-            })
-
-            // console.log(resp)
-            let data = await resp.json()
-            let { name, subfolder, type } = data
-            let src = `${url}/view?filename=${encodeURIComponent(
-                name
-            )}&type=${type}&subfolder=${subfolder}&rand=${Math.random()}`
-
-            return { url: src, name: 'clipspace/' + name }
-        }
-
-
-        const parseImageToBase64 = url => {
-            return new Promise((res, rej) => {
-                fetch(url)
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const reader = new FileReader()
-                        reader.onloadend = () => {
-                            const base64data = reader.result
-                            res(base64data)
-                            // 在这里可以将base64数据用于进一步处理或显示图片
-                        }
-                        reader.readAsDataURL(blob)
-                    })
-                    .catch(error => {
-                        console.log('发生错误:', error)
-                    })
-            })
-        }
 
         //给load image to batch节点使用的输入
         function createBase64ImageForLoadImageToBatch(imageElement, nodeId, bs) {
@@ -661,125 +562,6 @@
                     return inputs
                 })
             })
-        }
-
-        const blobToBase64 = blob => {
-            return new Promise((res, rej) => {
-                const reader = new FileReader()
-                reader.onloadend = () => {
-                    const base64data = reader.result
-                    res(base64data)
-                    // 在这里可以将base64数据用于进一步处理或显示图片
-                }
-                reader.readAsDataURL(blob)
-            })
-        }
-
-
-        function base64ToBlob(base64) {
-            // 去除base64编码中的前缀
-            const base64WithoutPrefix = base64.replace(/^data:image\/\w+;base64,/, '');
-
-            // 将base64编码转换为字节数组
-            const byteCharacters = atob(base64WithoutPrefix);
-
-            // 创建一个存储字节数组的数组
-            const byteArrays = [];
-
-            // 将字节数组放入数组中
-            for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-                const slice = byteCharacters.slice(offset, offset + 1024);
-
-                const byteNumbers = new Array(slice.length);
-                for (let i = 0; i < slice.length; i++) {
-                    byteNumbers[i] = slice.charCodeAt(i);
-                }
-
-                const byteArray = new Uint8Array(byteNumbers);
-                byteArrays.push(byteArray);
-            }
-
-            // 创建blob对象
-            const blob = new Blob(byteArrays, { type: 'image/png' }); // 根据实际情况设置MIME类型
-
-            return blob;
-        }
-
-
-        // 获取 rembg 模型
-        async function get_rembg_models() {
-            try {
-                const response = await fetch(`${get_url()}/mixlab/folder_paths`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        type: 'rembg'
-                    })
-                })
-
-                const data = await response.json()
-                // console.log(data)
-                return data.names
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        //自动抠图
-        async function run_rembg(model, base64) {
-            try {
-                const response = await fetch(`${get_url()}/mixlab/rembg`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model,
-                        base64
-                    })
-                })
-
-                const data = await response.json()
-                // console.log(data)
-                return data.data
-            } catch (error) {
-                console.error(error)
-            }
-        }
-
-        function convertImageToBlackBasedOnAlpha(image) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Draw the image onto the canvas
-            canvas.width = image.width;
-            canvas.height = image.height;
-            ctx.drawImage(image, 0, 0);
-
-            // Get the image data from the canvas
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixels = imageData.data;
-
-            // Modify the RGB values based on the alpha channel
-            for (let i = 0; i < pixels.length; i += 4) {
-                const alpha = pixels[i + 3];
-                if (alpha !== 0) {
-                    // Set non-transparent pixels to black
-                    pixels[i] = 0; // Red
-                    pixels[i + 1] = 0; // Green
-                    pixels[i + 2] = 0; // Blue
-                }
-            }
-
-            // Put the modified image data back onto the canvas
-            ctx.putImageData(imageData, 0, 0);
-
-            // Convert the modified canvas to base64 data URL
-            const base64ImageData = canvas.toDataURL('image/png'); // Replace 'png' with your desired image format
-
-            return base64ImageData;
         }
 
 
@@ -883,7 +665,7 @@
             let autoMaskSelect = iframe.contentDocument.getElementById('automask_image_mixlab');
             const select = iframe.contentDocument.getElementById('automask_models_mixlab');
             if (select.children.length === 0) {
-                let rembgModels = await get_rembg_models()
+                let rembgModels = await Command.get_rembg_models()
                 // 遍历模型列表并创建选项
                 for (const model of rembgModels) {
                     const option = document.createElement('option');
@@ -899,16 +681,16 @@
                 let base64 = getImageBase64FromLayer()
                 resetLayer()
 
-                let res = await run_rembg(select.value, base64)
+                let res = await Command.run_rembg(select.value, base64)
                 const match = res.match(/^data:image\/(\w+);base64,/);
                 if (!match) {
                     res = 'data:image/png;base64,' + res
                 }
 
-                let image = await createImage(res)
+                let image = await Command.createImage(res)
 
-                let mb = convertImageToBlackBasedOnAlpha(image)
-                let mask = await createImage(mb)
+                let mb = Command.convertImageToBlackBasedOnAlpha(image)
+                let mask = await Command.createImage(mb)
                 let id = Layers.auto_increment;
                 addImage(id, 'Mask_' + data.id + id, mask)
             })
@@ -979,9 +761,9 @@
                     // console.log(base64);
                     editor.style.display = 'none';
 
-                    let fileBlob = base64ToBlob(base64)
+                    let fileBlob = Command.base64ToBlob(base64)
                     // // 获取读取的文件内容，即 Blob 对象
-                    let hashId = await calculateImageHash(fileBlob)
+                    let hashId = await Command.calculateImageHash(fileBlob)
 
                     if (window._appData.data && hashId == window._appData.data[data.id].hashId) {
                         document.body.querySelector('.app').style.display = 'flex'
@@ -990,9 +772,9 @@
                     }
 
                     //底图
-                    const { url: imgurl } = await uploadImage(base64ToBlob(data.options.defaultImage))
+                    const { url: imgurl } = await Command.uploadImage(Command.base64ToBlob(data.options.defaultImage))
                     //mask
-                    let { url, name } = await uploadMask(fileBlob, imgurl);
+                    let { url, name } = await Command.uploadMask(fileBlob, imgurl);
                     // 在这里可以对 Blob 对象进行进一步处理
                     // imageElement.src = url;
                     if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
@@ -1013,12 +795,12 @@
 
                     const ctx = canvas.getContext('2d');
 
-                    const defaultImage = await createImage(data.options.defaultImage)
+                    const defaultImage = await Command.createImage(data.options.defaultImage)
                     ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
 
                     // 绘制base64图片
                     // const base64Image = base64
-                    const base64ImageObj = await createImage(base64)
+                    const base64ImageObj = await Command.createImage(base64)
                     ctx.globalCompositeOperation = 'destination-in';
                     ctx.drawImage(base64ImageObj, 0, 0, dim.width, dim.height);
                     image.src = canvas.toDataURL();
@@ -1047,7 +829,7 @@
                 await sleep()
             }
 
-            let im = await createImage(data.options.defaultImage)
+            let im = await Command.createImage(data.options.defaultImage)
             // console.log(layers1, layers1.length)
             if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
                 addImage(0, 'Image_' + data.id, im)
@@ -1062,48 +844,6 @@
         }
 
 
-
-
-        async function getQueue(clientId) {
-            try {
-
-                const res = await fetch(`${get_url()}/queue`);
-                const data = await res.json();
-                return {
-                    // Running action uses a different endpoint for cancelling
-                    Running: Array.from(data.queue_running, prompt => {
-                        if (prompt[3].client_id === clientId) {
-                            let prompt_id = prompt[1];
-                            return {
-                                prompt_id,
-                                remove: () => interrupt(),
-                            }
-                        }
-                    }),
-                    Pending: data.queue_pending.map((prompt) => ({ prompt })),
-                };
-            } catch (error) {
-                console.error(error);
-                return { Running: [], Pending: [] };
-            }
-        }
-
-
-        async function interrupt() {
-            try {
-                await fetch(`${get_url()}/interrupt`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: undefined
-                });
-
-            } catch (error) {
-                console.error(error)
-            }
-            return true
-        }
 
         // 种子的处理
         function randomSeed(seed, data) {
@@ -1158,92 +898,10 @@
             }
         }
 
-        function queuePrompt(appInfo, promptWorkflow, seed, client_id) {
-            // appinfo升级后 兼容，补丁
-            for (const id in promptWorkflow) {
-                if (promptWorkflow[id].class_type == 'AppInfo') {
-                    promptWorkflow[id].inputs.category = promptWorkflow[id].inputs.category || ""
-                }
-            }
-            // 随机seed
-            promptWorkflow = randomSeed(seed, promptWorkflow);
 
-            let url = get_url()
-            const data = JSON.stringify({ prompt: promptWorkflow, client_id });
-            fetch(`${url}/prompt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: data,
-            })
-                .then(async response => {
-                    // Handle response here
-                    // console.log(response)
-                    let res = await response.json();
-                    window.prompt_ids[res.prompt_id] = {
-                        appInfo,
-                        prompt_id: res.prompt_id
-                    }
-                })
-                .catch(error => {
-                    // Handle error here
-                });
-        }
-
-
-        // 新的运行工作流的接口
-        function queuePromptNew(filename, category, seed, input, client_id) {
-            let url = get_url()
-            // var filename = "Text-to-Image_1.json", category = "";
-
-            // 随机seed
-            //  promptWorkflow = randomSeed(seed, promptWorkflow);
-
-            const data = JSON.stringify({ filename, category, seed, input, client_id });
-            fetch(`${url}/mixlab/prompt`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: data,
-            })
-        }
-
-        function success(isSuccess, btn, text) {
-            isSuccess ? btn.innerText = 'success' : text;
-            setTimeout(() => {
-                btn.innerText = text;
-            }, 5000)
-        }
 
         async function get_my_app(category = "", filename = null) {
-            let url = get_url()
-            const res = await fetch(`${url}/mixlab/workflow`, {
-                method: 'POST',
-                mode: 'cors', // 允许跨域请求
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    task: 'my_app',
-                    filename,
-                    category
-                })
-            })
-            let result = await res.json();
-            let data = [];
-            try {
-                for (const res of result.data) {
-                    let { output, app } = res.data;
-                    if (app.filename) data.push({
-                        ...app,
-                        data: output,
-                        date: res.date
-                    })
-                }
-            } catch (error) {
-            }
+            let data = await Command.get_my_app(category, filename);
 
             // 排序 
             let appSelected = localStorage.getItem('app_selected')
@@ -1256,7 +914,7 @@
                             if (i !== 0) {
                                 const targetElement = array.splice(i, 1)[0];
 
-                                let nt = (await get_my_app(targetElement.category, targetElement.filename))[0];
+                                let nt = (await Command.get_my_app(targetElement.category, targetElement.filename))[0];
 
                                 array.unshift(nt);
                             }
@@ -1349,20 +1007,20 @@
                 copyText.style.marginLeft = '18px';
                 copyText.addEventListener('click', e => {
                     e.preventDefault();
-                    copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyText, 'copy text for share'))
+                    Command.copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => Command.success(r, copyText, 'copy text for share'))
                 })
             }
 
             copyImage.addEventListener('click', e => {
                 e.preventDefault();
-                // copyHtmlWithImagesToClipboard(output_card.outerHTML)
-                copyImagesToClipboard(output_card.outerHTML, (r) => success(r, copyImage, 'copy image'))
-                // copyTextToClipboard()
+                // Command.copyHtmlWithImagesToClipboard(output_card.outerHTML)
+                Command.copyImagesToClipboard(output_card.outerHTML, (r) => Command.success(r, copyImage, 'copy image'))
+                // Command.copyTextToClipboard()
             })
             copyHTML.addEventListener('click', e => {
                 e.preventDefault();
-                copyHtmlWithImagesToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => success(r, copyHTML, 'copy as html'))
-                // copyImagesToClipboard(output_card.outerHTML)
+                Command.copyHtmlWithImagesToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => Command.success(r, copyHTML, 'copy as html'))
+                // Command.copyImagesToClipboard(output_card.outerHTML)
             })
 
             //是否显示复制图片，复制html两个按钮
@@ -1397,7 +1055,7 @@
                     let a = document.createElement('div');
                     a.id = `output_${node.id}`
 
-                    let img = await createImage(url)
+                    let img = await Command.createImage(url)
 
                     a.appendChild(img)
                     // a.setAttribute('data-pswp-width', img.naturalWidth);
@@ -1508,13 +1166,6 @@
         }
 
 
-        async function calculateImageHash(blob) {
-            const buffer = await blob.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-            return hashHex;
-        }
 
         async function handleClipboardImage(imageElement, data) {
             //data.class_type === 'LoadImagesToBatch'
@@ -1526,16 +1177,16 @@
                         if (type.startsWith('image/')) {
                             const fileBlob = await clipboardItem.getType(type);
                             // // 获取读取的文件内容，即 Blob 对象
-                            let hashId = await calculateImageHash(fileBlob)
+                            let hashId = await Command.calculateImageHash(fileBlob)
 
                             if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
 
-                            let base64 = await blobToBase64(fileBlob)
+                            let base64 = await Command.blobToBase64(fileBlob)
 
                             if (data.class_type === 'LoadImagesToBatch') {
                                 createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
                             } else {
-                                let { url, name } = await uploadImage(fileBlob);
+                                let { url, name } = await Command.uploadImage(fileBlob);
                                 // 在这里可以对 Blob 对象进行进一步处理
                                 imageElement.src = url;
                                 if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
@@ -1565,130 +1216,16 @@
         }
 
 
-        function copyHtmlWithImagesToClipboard(data, cb) {
-            // 创建一个临时div元素
-            const tempDiv = document.createElement('div');
 
-            // 将HTML字符串赋值给div的innerHTML属性
-            tempDiv.innerHTML = data;
-
-            // 获取div中的所有图像元素
-            const images = tempDiv.getElementsByTagName('img');
-
-            // 遍历图像元素，并将图像数据转换为Base64编码
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                const canvas = document.createElement('canvas');
-                const context = canvas.getContext('2d');
-
-                // 设置canvas尺寸与图像尺寸相同
-                canvas.width = image.width;
-                canvas.height = image.height;
-
-                // 在canvas上绘制图像
-                context.drawImage(image, 0, 0);
-
-                // 将canvas转换为Base64编码
-                const imageData = canvas.toDataURL();
-
-                // 将Base64编码替换图像元素的src属性
-                image.src = imageData;
-            }
-
-
-            let richText = tempDiv.innerHTML;
-
-            // 创建一个新的Blob对象，并将富文本字符串作为数据传递进去
-            const blob = new Blob([richText], { type: 'text/html' });
-
-            // 创建一个ClipboardItem对象，并将Blob对象添加到其中
-            const clipboardItem = new ClipboardItem({ 'text/html': blob });
-
-            // 使用Clipboard API将内容复制到剪贴板
-            navigator.clipboard.write([clipboardItem])
-                .then(() => {
-                    console.log('富文本已成功复制到剪贴板');
-                    tempDiv.remove()
-                    if (cb) cb(true)
-                })
-                .catch((error) => {
-                    console.error('复制到剪贴板失败:', error);
-                    tempDiv.remove()
-                    if (cb) cb(false)
-                });
-
-        }
 
         // const htmlWithImages = "<p>这是要复制的HTML内容</p><img src='data:image/png;base64,iVBORw0KG...'>"
-        // copyHtmlWithImagesToClipboard(htmlWithImages);
+        // Command.copyHtmlWithImagesToClipboard(htmlWithImages);
 
-        function copyImagesToClipboard(html, cb) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-            const images = tempDiv.querySelectorAll('img');
-            const promises = Array.from(images).map((image) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = image.src;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        context.drawImage(img, 0, 0);
-                        canvas.toBlob((blob) => {
-                            const clipboardItem = new ClipboardItem({ 'image/png': blob });
-                            navigator.clipboard.write([clipboardItem])
-                                .then(() => {
-                                    resolve();
-                                    tempDiv.remove()
-                                    if (cb) cb(true)
-                                })
-                                .catch((error) => {
-                                    reject(error);
-                                    tempDiv.remove()
-                                    if (cb) cb(false)
-                                });
-                        });
-                    };
-                });
-            });
-            Promise.all([...promises])
-                .then(() => {
-                    console.log('所有图片已成功复制到剪贴板');
-                    if (cb) cb(true)
-                    tempDiv.remove()
-                })
-                .catch((error) => {
-                    console.error('复制到剪贴板失败:', error);
-                    if (cb) cb(false)
-                    tempDiv.remove()
-                });
-        }
 
-        function copyTextToClipboard(html, cb) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-
-            const text = tempDiv.innerText;
-            const textData = new ClipboardItem({ 'text/plain': new Blob([text], { type: 'text/plain' }) });
-
-            navigator.clipboard.write([textData])
-                .then(() => {
-                    console.log('所有文本已成功复制到剪贴板', text);
-                    if (cb) cb(true)
-                    tempDiv.remove()
-                })
-                .catch((error) => {
-                    console.error('复制到剪贴板失败:', error);
-                    if (cb) cb(false)
-                    tempDiv.remove()
-                });
-        }
 
 
         // const htmlString = "<p>这是要复制的HTML内容</p><img src='url'><img src='url'>";
-        // copyImagesToClipboard(htmlString);
+        // Command.copyImagesToClipboard(htmlString);
 
 
         // 上传音频转为base64
@@ -1752,14 +1289,10 @@
             inputData = inputData.filter(inp => inp);
             // console.log('inputData',inputData)
             inputData.forEach(async data => {
-                console.log('inputData', data);
+                // console.log('inputData', data);
 
                 // 图片 or 视频输入
-
-                if (["LoadImage",
-                    "VHS_LoadVideo",
-                    "ImagesPrompt_",
-                    "LoadImagesToBatch"].includes(data.class_type)) {
+                if (Command._imageNodes.includes(data.class_type)) {
 
                     let isVideoUpload = data.class_type === "VHS_LoadVideo";
 
@@ -1813,7 +1346,7 @@
                             subfolder = "";
                             name = data.inputs.video;
                         }
-                        let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        let url = `${Command.get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
                         imageElement.src = url;
 
                         // imageElement.innerHTML=`<img src="${base64Df}"/>`
@@ -1826,7 +1359,7 @@
                             name = data.inputs.image;
                         }
                         // imageElement.src = base64Df
-                        let url = `${get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        let url = `${Command.get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
                         // 如果有默认图                        
                         imageElement.src = data.options?.defaultImage || url;
                         imageElement.setAttribute('onerror', `this.src='${base64Df}'`)
@@ -1895,19 +1428,19 @@
                             // 获取读取的文件内容，即 Blob 对象
                             const fileBlob = new Blob([reader.result], { type: file.type });
                             // console.log( file.type.split('/')[1])
-                            let hashId = await calculateImageHash(fileBlob)
+                            let hashId = await Command.calculateImageHash(fileBlob)
 
                             if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
 
                             if (data.class_type === 'LoadImagesToBatch') {
                                 // 上传 ，转为base64
-                                let base64 = await blobToBase64(fileBlob)
+                                let base64 = await Command.blobToBase64(fileBlob)
                                 createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
                             } else {
                                 //上传，返回url
-                                let { url, name } = await uploadImage(fileBlob, '.' + file.type.split('/')[1])
+                                let { url, name } = await Command.uploadImage(fileBlob, '.' + file.type.split('/')[1])
 
-                                let base64 = await parseImageToBase64(url);
+                                let base64 = await Command.parseImageToBase64(url);
 
                                 if (data.class_type === 'ImagesPrompt_') {
                                     uploadContainer.querySelector('.images_prompt_main').src = base64;
@@ -1972,7 +1505,7 @@
 
                     })
 
-                    // imageElement.src = `${get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
+                    // imageElement.src = `${Command.get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
                     if (data.class_type !== 'ImagesPrompt_') uploadContainer.appendChild(imageElement);
 
                     // Append the upload container to the main container
@@ -1980,7 +1513,7 @@
                 }
 
                 // 滑块输入
-                if (["PromptSlide"].includes(data.class_type)) {
+                if (Command._slideNodes.includes(data.class_type)) {
                     // 滑块输入
                     let options = data.options || {
                         min: -3,
@@ -2015,7 +1548,7 @@
 
 
                 // 数字输入支持
-                if (['FloatSlider', 'IntNumber'].includes(data.class_type)) {
+                if (Command._numberNodes.includes(data.class_type)) {
                     // console.log('data.options',data.options)
                     // 滑块输入
                     let options = data.options || {
@@ -2045,7 +1578,7 @@
                 }
 
                 // 文本输入支持
-                if (["TextInput_", "CLIPTextEncode", "PromptSimplification", "ChinesePrompt_Mix"].includes(data.class_type)) {
+                if (Command._textNodes.includes(data.class_type)) {
                     // Create a container for the upload control
                     const uploadContainer = document.createElement("div");
                     uploadContainer.className = 'card';
@@ -2057,6 +1590,7 @@
 
                     // Create an input field for the image name
                     const textInput = document.createElement("textarea");
+                    textInput.id = `input_node_id_${data.id}`
                     // textInput.className=;
                     if (data.class_type == "PromptSimplification") {
                         textInput.value = data.inputs.prompt;
@@ -2098,35 +1632,6 @@
                     // autoResize(textInput);
 
 
-                    //动态提示功能
-                    const dynamicPromptsBtn = document.createElement('button');
-                    dynamicPromptsBtn.className = "dynamic_prompt"
-                    dynamicPromptsBtn.innerText = 'dynamic';
-                    dynamicPromptsBtn.style.width = '88px'
-                    uploadContainer.appendChild(dynamicPromptsBtn);
-                    dynamicPromptsBtn.addEventListener('click', e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        let prompt = dynamicPrompts(textInput.value)
-                        textInput.setAttribute('title', prompt)
-                        dynamicPromptsBtn.setAttribute('title', prompt)
-                        if (data.class_type == "PromptSimplification") {
-                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = prompt;
-                            //更新输入参数
-                            updateInputData(data.id, (inputs) => {
-                                inputs.prompt = prompt;
-                                return inputs
-                            })
-                        } else {
-                            if (window._appData.data) window._appData.data[data.id].inputs.text = prompt;
-                            //更新输入参数
-                            updateInputData(data.id, (inputs) => {
-                                inputs.text = prompt;
-                                return inputs
-                            })
-                        }
-                    })
-
 
                     function autoResize(textarea) {
                         textarea.style.height = 'auto';
@@ -2163,9 +1668,8 @@
                 }
 
                 // lora的输入支持
-                if (["CheckpointLoaderSimple", "LoraLoader"].includes(data.class_type)) {
+                if (Command._loraNodes.includes(data.class_type)) {
                     let value = data.inputs.ckpt_name || data.inputs.lora_name;
-
 
                     try {
                         let t = '';
@@ -2175,7 +1679,7 @@
                             t = 'loras'
                         }
                         if (t) {
-                            const response = await fetch(`${get_url()}/mixlab/folder_paths`, {
+                            const response = await fetch(`${Command.get_url()}/mixlab/folder_paths`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
@@ -2257,7 +1761,7 @@
                 }
 
                 // 色彩选择器
-                if (["Color"].includes(data.class_type)) {
+                if (Command._colorNodes.includes(data.class_type)) {
                     let value = data.inputs.color.hex || '#000000';
                     let d = document.createElement('div');
                     d.className = 'card';
@@ -2278,7 +1782,7 @@
                 }
 
                 // 加载音频 base64
-                if (['LoadAndCombinedAudio_'].includes(data.class_type)) {
+                if (Command._audioNodes.includes(data.class_type)) {
                     let inpAudio = document.createElement('div');
 
                     let inputAudio = document.createElement('button');
@@ -2613,7 +2117,7 @@
                     mainImg.querySelector('img').src = opt.imgurl;
                     if (callback) {
                         if (!opt.imgurl.match('data:image')) {
-                            opt.imgurl = await parseImageToBase64(opt.imgurl)
+                            opt.imgurl = await Command.parseImageToBase64(opt.imgurl)
                         }
                         callback(opt.imgurl, opt.keyword);
                     }
@@ -2662,27 +2166,6 @@
             return [div, selectElement];
         }
 
-        function getFilenameAndCategoryFromUrl(url) {
-            const queryString = url.split('?')[1];
-            if (!queryString) {
-                return {};
-            }
-
-            const params = new URLSearchParams(queryString);
-
-            const filename = params.get('filename') ? decodeURIComponent(params.get('filename')) : null;
-            const category = params.get('category') ? decodeURIComponent(params.get('category') || '') : '';
-
-            return { category, filename };
-        }
-
-        function createImage(url) {
-            let im = new Image()
-            return new Promise((res, rej) => {
-                im.onload = () => res(im)
-                im.src = url
-            })
-        }
 
         async function createUI(data, share = true) {
             // appData.input, appData.output, appData.seed, share, appData.link
@@ -2737,8 +2220,8 @@
                 shareBtn.innerText = 'copy url';
                 shareBtn.addEventListener('click', e => {
                     e.preventDefault();
-                    let url = `${get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
-                    copyTextToClipboard(url, success(e, shareBtn, 'copy url'));
+                    let url = `${Command.get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
+                    Command.copyTextToClipboard(url, Command.success(e, shareBtn, 'copy url'));
                 })
 
                 titleDiv.appendChild(shareBtn);
@@ -2767,7 +2250,7 @@
             status.className = 'status';
 
             // seed 汇总
-            var seeds = document.createElement('details');
+            const seeds = document.createElement('details');
             // seeds.textContent = 'Status';
             seeds.className = 'seeds';
 
@@ -2830,6 +2313,58 @@
 
             // statusDiv.appendChild(status);
             statusDiv.appendChild(seeds);
+
+            // 动态组合和批量组合
+            const promptLab = document.createElement('details');
+            promptLab.className = 'prompt_lab';
+
+            //判断是否有 
+            let isPromptLab = false;
+            for (const node of window._appData.input) {
+                if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
+            }
+
+            if (isPromptLab) {
+                promptLab.innerHTML = `<summary>Prompt Lab</summary>
+                <div class="content"> </div>
+                `
+                const content = promptLab.querySelector('.content');
+                //动态提示功能
+                const dynamicPromptsBtn = document.createElement('button');
+                dynamicPromptsBtn.id = "dynamic_prompt"
+                dynamicPromptsBtn.className = "mix_on"
+                dynamicPromptsBtn.innerText = 'dynamic';
+                dynamicPromptsBtn.style.width = '88px'
+                content.appendChild(dynamicPromptsBtn);
+                dynamicPromptsBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dynamicPromptsBtn.classList.toggle("mix_on")
+                    if (dynamicPromptsBtn.classList.contains('mix_on')) {
+                        batchPromptsBtn.classList.remove("mix_on")
+                    }
+                })
+
+
+                //批量提示功能
+                const batchPromptsBtn = document.createElement('button');
+                batchPromptsBtn.id = "batch_prompt"
+                batchPromptsBtn.innerText = 'batch';
+                batchPromptsBtn.style.width = '88px'
+                content.appendChild(batchPromptsBtn);
+                batchPromptsBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    batchPromptsBtn.classList.toggle("mix_on")
+                    if (batchPromptsBtn.classList.contains('mix_on')) {
+                        dynamicPromptsBtn.classList.remove("mix_on")
+                    }
+                })
+
+
+                statusDiv.appendChild(promptLab);
+            };
+
 
             // 创建输入框
             var input1 = createInputs(inputData)
@@ -2915,7 +2450,7 @@
                         console.log(val, id)
                         if (val && type == "image" && output.querySelector(`#output_${id} img`)) {
 
-                            let im = await createImage(val)
+                            let im = await Command.createImage(val)
 
                             output.querySelector(`#output_${id} img`).src = val;
 
@@ -2944,7 +2479,7 @@
                                     prompt = v[1];
                                 }
 
-                                let im = await createImage(url);
+                                let im = await Command.createImage(url);
 
                                 // 构建新的
                                 let a = document.createElement('a');
@@ -3141,7 +2676,7 @@
                 // 保存结果到记录里
                 window.prompt_ids[detail.prompt_id].data = detail
                 window.prompt_ids[detail.prompt_id].createTime = (new Date()).getTime()
-                savePromptResult({
+                Command.savePromptResult({
                     ...window.prompt_ids[detail.prompt_id],
                     prompt_id: detail.prompt_id
                 })
@@ -3163,7 +2698,7 @@
             if (images) {
                 // if (!images) return;
 
-                let url = get_url();
+                let url = Command.get_url();
 
                 show(Array.from(images, img => {
                     return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
@@ -3171,14 +2706,14 @@
 
             } else if (meshes) {
                 //多个
-                let url = get_url();
+                let url = Command.get_url();
 
                 show(Array.from(meshes, mesh => {
                     return `${url}/view?filename=${encodeURIComponent(mesh.filename)}&type=${mesh.type}&subfolder=${encodeURIComponent(mesh.subfolder)}&t=${+new Date()}`;
                 }), detail.node, 'meshes');
 
             } else if (_images && prompts) {
-                let url = get_url();
+                let url = Command.get_url();
 
                 let items = [];
                 // 支持图片的batch
@@ -3198,7 +2733,7 @@
                 show(Array.isArray(text) ? text.join('\n\n') : text, detail.node, 'text')
             } else if (gifs && gifs[0]) {
                 // if (!images) return; 
-                const src = `${get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
+                const src = `${Command.get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
                     }&&format=${gifs[0].format}&t=${+new Date()}`;
 
                 show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
@@ -3238,13 +2773,149 @@
                     //     filename: window._appData.filename
                     // }, window._appData.data, window._appData.seed, api.clientId);
 
-                    queuePromptNew(
+                    //动态提示和批量提示功能
+
+                    let isPromptLab = false;
+                    for (const node of window._appData.input) {
+                        if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
+                    }
+
+                    if (isPromptLab) {
+                        //如果是动态提示
+                        if (document.body.querySelector('#dynamic_prompt').classList.contains("mix_on")) {
+                            for (const node of window._appData.input) {
+                                if (Command._textNodes.includes(node.class_type)) {
+                                    let id = `#input_node_id_${node.id}`
+                                    let prompt = Command.dynamicPrompts(document.body.querySelector(id)?.value || "")
+                                    if (node.class_type == "PromptSimplification") {
+                                        if (window._appData.data) window._appData.data[node.id].inputs.prompt = prompt;
+                                        //更新输入参数
+                                        updateInputData(node.id, (inputs) => {
+                                            inputs.prompt = prompt;
+                                            return inputs
+                                        })
+                                    } else {
+                                        if (window._appData.data) window._appData.data[node.id].inputs.text = prompt;
+                                        //更新输入参数
+                                        updateInputData(node.id, (inputs) => {
+                                            inputs.text = prompt;
+                                            return inputs
+                                        })
+                                    }
+                                }
+                            };
+                        } else {
+                            //是批量功能
+                            let prompts = {};
+                            for (const node of window._appData.input) {
+                                if (Command._textNodes.includes(node.class_type)) {
+                                    let id = `#input_node_id_${node.id}`
+                                    let ps = Command.generateAllCombinations(document.body.querySelector(id)?.value || "")
+                                    if (node.class_type == "PromptSimplification") {
+                                        //更新输入参数
+                                        prompts[node.id] = ["prompt", ps]
+
+                                    } else {
+                                        //更新输入参数
+                                        prompts[node.id] = ["text", ps]
+                                    }
+                                }
+
+                            }
+
+
+                            function generateCombinations(prompts, input) {
+                                let results = [];
+
+                                function combine(currentInput, index) {
+                                    if (index === input.length) {
+                                        results.push(JSON.parse(JSON.stringify(currentInput)));
+                                        return;
+                                    }
+
+                                    let current = input[index];
+                                    let id = current.id;
+                                    let keys = Object.keys(current.inputs);
+
+                                    // 如果 prompts 中没有对应的 id，直接递归下一个
+                                    if (!prompts[id]) {
+                                        combine(currentInput, index + 1);
+                                        return;
+                                    }
+
+                                    let values = prompts[id][1];
+                                    for (let value of values) {
+                                        let newInput = JSON.parse(JSON.stringify(currentInput));
+
+                                        // 替换输入值
+                                        for (let key of keys) {
+                                            if (typeof newInput[index].inputs[key] === 'string') {
+                                                newInput[index].inputs[key] = value;
+                                            }
+                                        }
+                                        combine(newInput, index + 1);
+                                    }
+                                }
+
+                                combine(JSON.parse(JSON.stringify(input)), 0);
+                                return results;
+                            }
+
+                            console.log('##generateCombinations', prompts, [...window._appData.input.filter(inp => inp)])
+                            let inputs = generateCombinations(prompts, [...window._appData.input.filter(inp => inp)])
+
+                            for (const inp of inputs) {
+                                Command.queuePromptNew(
+                                    window._appData.filename,
+                                    window._appData.category,
+                                    window._appData.seed,
+                                    inp,
+                                    api.clientId
+                                ).then(res => {
+
+                                    if (!res) {
+                                        if (api.runningCancel) {
+                                            api.runningCancel();
+                                            api.runningCancel = null;
+                                        }
+
+                                        ui.submitButton.element.classList.remove('disabled');
+                                        ui.submitButton.element.innerText = 'Create';
+
+                                        return true
+
+                                    }
+                                })
+                            }
+
+                            return
+
+                        }
+
+                    }
+
+
+                    Command.queuePromptNew(
                         window._appData.filename,
                         window._appData.category,
                         window._appData.seed,
                         window._appData.input.filter(inp => inp),
                         api.clientId
-                    )
+                    ).then(res => {
+
+                        if (!res) {
+                            if (api.runningCancel) {
+                                api.runningCancel();
+                                api.runningCancel = null;
+                            }
+
+                            ui.submitButton.element.classList.remove('disabled');
+                            ui.submitButton.element.innerText = 'Create';
+
+                            return true
+
+                        }
+                    })
 
                 }, () => {
                     // 取消
@@ -3283,7 +2954,7 @@
 
             api.addEventListener("progress", ({ detail }) => {
                 console.log("progress", detail);
-                const class_type = window._appData.data[detail?.node]?.class_type || ''
+                const class_type = window._appData.data ? (window._appData.data[detail?.node]?.class_type || '') : ""
                 try {
                     ui.status.update(`${parseFloat(100 * detail.value / detail.max).toFixed(1)}% ${class_type}`);
                     ui.submitButton.running()
@@ -3295,17 +2966,20 @@
             api.addEventListener("executed", async ({ detail }) => {
                 console.log("executed", detail)
                 executed(detail, show);
+                let class_type = window._appData.data ? window._appData.data[detail.node]?.class_type : ""
+                if (class_type) {
+                    try {
+                        ui.status.update(`executed_#${class_type}`);
+                        ui.submitButton.reset()
+                    } catch (error) {
 
-                try {
-                    ui.status.update(`executed_#${window._appData.data[detail.node]?.class_type}`);
-                    ui.submitButton.reset()
-                } catch (error) {
-
+                    }
                 }
+
 
                 // console.log(Running, Pending);
                 try {
-                    const { Running, Pending } = await getQueue(api.clientId);
+                    const { Running, Pending } = await Command.getQueue(api.clientId);
                     if (Running && Running[0]) {
                         api.runningCancel = Running[0].remove;
                         ui.submitButton.running()
@@ -3341,7 +3015,7 @@
                 }
 
                 try {
-                    const { Running, Pending } = await getQueue(api.clientId);
+                    const { Running, Pending } = await Command.getQueue(api.clientId);
                     if (Running && Running[0]) {
                         api.runningCancel = Running[0].remove;
                     } else {
@@ -3495,71 +3169,13 @@
             })
         }
 
-        // 请求历史数据
-        async function getPromptResult(category) {
-            let url = get_url()
-            try {
-                const response = await fetch(`${url}/mixlab/prompt_result`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        action: "all",
-                    }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("#getPromptResult:", category, data);
-
-                    return data.result.filter(r => r.appInfo.category == category)
-                    // 处理返回的数据
-                } else {
-                    console.log("Error:", response.status);
-                    // 处理错误情况
-                }
-            } catch (error) {
-                console.log("Error:", error);
-                // 处理异常情况
-            }
-        }
-        // 保存历史数据
-        async function savePromptResult(data) {
-            let url = get_url()
-            try {
-                const response = await fetch(`${url}/mixlab/prompt_result`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        action: "save",
-                        data
-                    }),
-                });
-
-                if (response.ok) {
-                    const res = await response.json();
-                    console.log("Response:", res);
-                    return res
-                    // 处理返回的数据
-                } else {
-                    console.log("Error:", response.status);
-                    // 处理错误情况
-                }
-            } catch (error) {
-                console.log("Error:", error);
-                // 处理异常情况
-            }
-        }
 
 
 
         async function createHistoryList(category) {
             if (document.body.querySelector('#history_container')) document.body.querySelector('#history_container').remove();
 
-            window._historyData = await getPromptResult(category);
+            window._historyData = await Command.getPromptResult(category);
 
             if (!window._historyData || (window._historyData && window._historyData.length === 0)) return
 
@@ -3651,8 +3267,8 @@
             const innerApp = checkIsInnerApp();
 
             if (!innerApp) {
-                const { category, filename } = getFilenameAndCategoryFromUrl(location.href);
-                window._apps = await get_my_app(category, filename);
+
+                window._apps = await Command.getAppInit();
 
                 window._appData = window._apps[0];
 

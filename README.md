@@ -115,7 +115,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [workflow-5](./workflow/5-gpt-workflow.json)
 
-最新：ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
+<!-- 最新：ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
 
 Model download,move to :`models/llamafile/`
 
@@ -143,7 +143,7 @@ pip install 'llama-cpp-python[server]'
 ```
 pip install llama-cpp-python \
   --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/metal
-```
+``` -->
 
 ## Prompt
 
