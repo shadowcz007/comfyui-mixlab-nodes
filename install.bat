@@ -11,9 +11,9 @@ if exist "%python_exec%" (
         %python_exec% -s -m pip install "%%i" -i https://pypi.tuna.tsinghua.edu.cn/simple
     )
 
-    %python_exec% -s -m pip install --upgrade --force llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+    @REM %python_exec% -s -m pip install --upgrade --force llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
 
-    %python_exec% -s -m pip install --upgrade --force llama-cpp-python[server]
+    @REM %python_exec% -s -m pip install --upgrade --force llama-cpp-python[server]
     
 
 ) else (
