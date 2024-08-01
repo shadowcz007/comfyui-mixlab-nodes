@@ -6,6 +6,10 @@
 
 ##### `最新`：
 
+- App模式增加batch prompt，批量提示词，可以把动态提示词批量组成后运行
+
+![alt text](./assets/1722517810720.png)
+
 - 增加 SiliconflowLLM，可以使用由Siliconflow提供的免费LLM
 
 - 增加 Edit Mask，方便在生成的时候手动绘制 mask [workflow](./workflow/edit-mask-workflow.json)
