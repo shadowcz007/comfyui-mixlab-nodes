@@ -1,5 +1,5 @@
 import { app } from '../../../scripts/app.js'
-import { $el } from '../../../scripts/ui.js' 
+import { $el } from '../../../scripts/ui.js'
 
 const getLocalData = key => {
   let data = {}
@@ -122,7 +122,7 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        // console.log('Color nodeData', this.widgets)
+        console.log('Color nodeData', this.div)
 
         const widget = {
           type: 'div',
@@ -273,19 +273,19 @@ app.registerExtension({
 })
 
 const min_max = node => {
-  if(node.widgets){
+  if (node.widgets) {
     const min_value = node.widgets.filter(w => w.name === 'min_value')[0]
     const max_value = node.widgets.filter(w => w.name === 'max_value')[0]
-  
+
     const number = node.widgets.filter(w => w.name === 'number')[0]
     if (number) {
       number.options.min = min_value.value
       number.options.max = max_value.value
-  
+
       number.value = Math.min(number.options.max, number.value)
       number.value = Math.max(number.options.min, number.value)
     }
-  
+
     if (min_value)
       min_value.callback = e => {
         number.options.min = e
@@ -297,22 +297,18 @@ const min_max = node => {
         number.value = e
       }
   }
-  
 }
 
 app.registerExtension({
   name: 'Mixlab.utils.FloatSlider',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-
     if (nodeType.comfyClass == 'FloatSlider') {
-      const orig_nodeCreated = nodeType.prototype.onNodeCreated;
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
         min_max(this)
       }
     }
-
-   
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'FloatSlider') {
@@ -323,7 +319,6 @@ app.registerExtension({
 app.registerExtension({
   name: 'Mixlab.utils.IntNumber',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    
     if (nodeType.comfyClass == 'IntNumber') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
@@ -331,7 +326,6 @@ app.registerExtension({
         min_max(this)
       }
     }
-   
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'IntNumber') {
@@ -340,22 +334,128 @@ app.registerExtension({
   }
 })
 
-
 app.registerExtension({
   name: 'Mixlab.utils.TESTNODE_',
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
-    
     if (nodeType.comfyClass == 'TESTNODE_') {
-    
-      const onExecuted = nodeType.prototype.onExecuted;
-			nodeType.prototype.onExecuted = function (message) {
-				onExecuted?.apply(this, arguments);
-        console.log('##',message)
-				 
-			};
-
-
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        console.log('##', message)
+      }
     }
-   
-  }, 
+  }
+})
+
+app.registerExtension({
+  name: 'Mixlab.utils.KeyInput',
+  init () {},
+  async getCustomWidgets (app) {
+    return {
+      KEY (node, inputName, inputData, app) {
+        // console.log('##node', node)
+        const widget = {
+          type: inputData[0], // the type, CHEESE
+          name: inputName, // the name, slice
+          size: [128, 32], // a default size
+          draw (ctx, node, width, y) {},
+          computeSize (...args) {
+            return [128, 32] // a method to compute the current size of the widget
+          },
+          async serializeValue (nodeId, widgetIndex) {
+            let data = getLocalData('_mixlab_api_key')
+            return data[node.id] || 'by Mixlab'
+          }
+        }
+        //  widget.something = something;          // maybe adds stuff to it
+        node.addCustomWidget(widget) // adds it to the node
+        return widget // and returns it.
+      }
+    }
+  },
+
+  async beforeRegisterNodeDef (nodeType, nodeData, app) {
+    if (nodeType.comfyClass == 'KeyInput') {
+      const orig_nodeCreated = nodeType.prototype.onNodeCreated
+      nodeType.prototype.onNodeCreated = function () {
+        orig_nodeCreated?.apply(this, arguments)
+
+        const widget = {
+          type: 'div',
+          name: 'key_inp',
+          draw (ctx, node, widget_width, y, widget_height) {
+            Object.assign(
+              this.div.style,
+              get_position_style(ctx, widget_width, 44, node.size[1])
+            ) 
+          }
+        }
+
+        widget.div = $el('div', {})
+
+        const inputDiv = (key, placeholder) => {
+          let div = document.createElement('div')
+          const ip = document.createElement('input')
+          ip.type = placeholder === 'Key' ? 'password' : 'text'
+          ip.className = `${'comfy-multiline-input'} ${placeholder}`
+          div.style = `display: flex;
+          align-items: center; 
+          margin: 6px 8px;
+          margin-top: 0;`
+          ip.placeholder = placeholder
+          ip.value = placeholder
+
+          ip.style = `margin-left: 24px;
+          outline: none;
+          border: none;
+          padding: 4px;width: 100%;`
+          const label = document.createElement('label')
+          label.style = 'font-size: 10px;min-width:32px'
+          label.innerText = placeholder
+          div.appendChild(label)
+          div.appendChild(ip)
+
+          ip.addEventListener('change', () => {
+            let data = getLocalData(key)
+            data[this.id] = ip.value.trim()
+            localStorage.setItem(key, JSON.stringify(data))
+            console.log(this.id, key)
+          })
+          return div
+        }
+
+        let inputKey = inputDiv('_mixlab_api_key', 'Key') 
+
+        widget.div.appendChild(inputKey) 
+
+        this.addCustomWidget(widget)
+ 
+        console.log('KeyInput nodeData',widget.div)
+
+      
+        const onRemoved = this.onRemoved
+        this.onRemoved = () => {
+          inputKey.remove()
+          widget.div.remove()
+          return onRemoved?.()
+        }
+
+        this.serialize_widgets = true //需要保存参数
+      }
+    }
+  },
+  async loadedGraphNode (node, app) {
+    // Fires every time a node is constructed
+    // You can modify widgets/add handlers/etc here
+
+    if (node.type === 'KeyInput') {
+      let widget = node.widgets.filter(w => w.div)[0]
+
+      let apiKey = getLocalData('_mixlab_api_key');
+
+      let id = node.id
+ 
+      widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab' 
+    }
+  }
 })

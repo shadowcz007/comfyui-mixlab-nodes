@@ -22,9 +22,8 @@ except:
     print('#fix sys.stdout.isatty')
     sys.stdout.isatty = lambda: False
 
-llama_port=None
-llama_model=""
-llama_chat_format=""
+_URL_=None
+
 
 # try:
 #     from .nodes.ChatGPT import get_llama_models,get_llama_model_path,llama_cpp_client
@@ -320,22 +319,22 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
         
         # 这个代码不需要
         # if len(apps)==1 and category!='' and category!=None:
-            data=read_workflow_json_files(category_path)
+        data=read_workflow_json_files(category_path)
             
-            for item in data:
-                x=item["data"]
-                # print(apps[0]['filename'] ,item["filename"])
-                if apps[0]['filename']!=item["filename"]:
-                    category=''
-                    input=None
-                    output=None
-                    if 'category' in x['app']:
-                        category=x['app']['category']
-                    if 'input' in x['app']:
-                        input=x['app']['input']
-                    if 'output' in x['app']:
-                        output=x['app']['output']
-                    apps.append({
+        for item in data:
+            x=item["data"]
+            # print(apps[0]['filename'] ,item["filename"])
+            if apps[0]['filename']!=item["filename"]:
+                category=''
+                input=None
+                output=None
+                if 'category' in x['app']:
+                    category=x['app']['category']
+                if 'input' in x['app']:
+                    input=x['app']['input']
+                if 'output' in x['app']:
+                    output=x['app']['output']
+                apps.append({
                         "filename":item["filename"],
                         # "category":category,
                         "data":{
@@ -455,6 +454,7 @@ async def check_port_available(address, port):
 
 # https
 async def new_start(self, address, port, verbose=True, call_on_start=None):
+    global _URL_
     try:
         runner = web.AppRunner(self.app, access_log=None)
         await runner.setup()
@@ -534,7 +534,8 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             # print("\033[93mStarting server\n")
             logging.info("\033[93mTo see the GUI go to: http://{}:{} or http://{}:{}".format(ip_address, http_port,address,http_port))
             logging.info("\033[93mTo see the GUI go to: https://{}:{} or https://{}:{}\033[0m".format(ip_address, https_port,address,https_port))
- 
+
+            _URL_="http://{}:{}".format(address,http_port)
             # print("\033[93mTo see the GUI go to: http://{}:{}".format(address, http_port))
             # print("\033[93mTo see the GUI go to: https://{}:{}\033[0m".format(address, https_port))
 
@@ -754,15 +755,16 @@ def random_seed(seed, data):
 
     for id, value in data.items():
         # print(seed,id)
-        if 'seed' in value['inputs'] and not isinstance(value['inputs']['seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
-            value['inputs']['seed'] = round(random.random() * max_seed)
-        
-        if 'noise_seed' in value['inputs'] and not isinstance(value['inputs']['noise_seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
-            value['inputs']['noise_seed'] = round(random.random() * max_seed)
-        
-        if value.get('class_type') == "Seed_" and seed[id] in ['increment', 'decrement', 'randomize']:
-            value['inputs']['seed'] = round(random.random() * max_seed)
-        
+        if id in seed:
+            if 'seed' in value['inputs'] and not isinstance(value['inputs']['seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
+                value['inputs']['seed'] = round(random.random() * max_seed)
+            
+            if 'noise_seed' in value['inputs'] and not isinstance(value['inputs']['noise_seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
+                value['inputs']['noise_seed'] = round(random.random() * max_seed)
+            
+            if value.get('class_type') == "Seed_" and seed[id] in ['increment', 'decrement', 'randomize']:
+                value['inputs']['seed'] = round(random.random() * max_seed)
+            
         print('new Seed', value)
     
     return data
@@ -992,7 +994,10 @@ def re_start(request):
         pass
     return os.execv(sys.executable, [sys.executable] + sys.argv)
 
-
+# 状态
+@routes.get('/mixlab/status')
+def mix_status(request):
+    return web.Response(text="running#"+_URL_)
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
@@ -1001,7 +1006,7 @@ from .nodes.ImageNode import ImageListToBatch_,ComparingTwoFrames,LoadImages_,Co
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.Audio import AudioPlayNode,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import KeyInput,IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
@@ -1061,6 +1066,7 @@ NODE_CLASS_MAPPINGS = {
    
     "SpeechRecognition":SpeechRecognition,
     "SpeechSynthesis":SpeechSynthesis,
+    "KeyInput":KeyInput,
     "Color":ColorInput,
     "FloatSlider":FloatSlider,
     "IntNumber":IntNumber,
@@ -1153,7 +1159,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 # web ui的节点功能
 WEB_DIRECTORY = "./web"
 
-
 logging.info('--------------')
 logging.info('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 # print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
@@ -1162,7 +1167,7 @@ try:
     from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
-    NODE_CLASS_MAPPINGS_V = {
+    NODE_CLASS_MAPPINGS_V = { 
        "ChatGPTOpenAI":ChatGPTNode,
        "SiliconflowLLM":SiliconflowFreeNode,
         "ShowTextForGPT":ShowTextForGPT,
@@ -1171,7 +1176,7 @@ try:
     }
 
     # 一个包含节点友好/可读的标题的字典
-    NODE_DISPLAY_NAME_MAPPINGS_V = {
+    NODE_DISPLAY_NAME_MAPPINGS_V = { 
         "ChatGPTOpenAI":"ChatGPT & Local LLM ♾️Mixlab",
         "SiliconflowLLM":"LLM Siliconflow ♾️Mixlab",
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
@@ -1268,7 +1273,7 @@ except:
 try:
     from .nodes.TripoSR import LoadTripoSRModel,TripoSRSampler,SaveTripoSRMesh
     logging.info('TripoSR.available')
-
+    # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['LoadTripoSRModel_']=LoadTripoSRModel
     NODE_DISPLAY_NAME_MAPPINGS["LoadTripoSRModel_"]= "Load TripoSR Model"
     
@@ -1281,10 +1286,6 @@ try:
 
 except Exception as e:
     logging.info('TripoSR.available False' )
-
-
-
-
 
 
 logging.info('\033[93m -------------- \033[0m')

@@ -3,7 +3,8 @@ import { $el } from '../../../scripts/ui.js'
 import { api } from '../../../scripts/api.js'
 
 import { td_bg } from './td_background.js'
-console.log('td_bg', td_bg)
+// console.log('td_bg', td_bg)
+
 //本机安装的插件节点全集
 window._nodesAll = null
 

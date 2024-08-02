@@ -181,6 +181,28 @@ class ColorInput:
         return (h,r,g,b,a,)
 
 
+class KeyInput:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "key":("KEY",), 
+                             },
+                }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("key",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Input"
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def run(self,key):
+        return (key,)
+
+
 
 class FontInput:
     @classmethod

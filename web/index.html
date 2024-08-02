@@ -1740,7 +1740,7 @@
                         if (data.class_type === 'CheckpointLoaderSimple') {
                             if (window._appData.data) window._appData.data[data.id].inputs.ckpt_name = selectDom.value;
                             //更新输入参数
-                            updateInputData(nodeId, (inputs) => {
+                            updateInputData(data.id, (inputs) => {
                                 inputs.ckpt_name = selectDom.value;
                                 return inputs
                             })
@@ -1748,7 +1748,7 @@
                         if (data.class_type === 'LoraLoader') {
                             if (window._appData.data) window._appData.data[data.id].inputs.lora_name = selectDom.value;
                             //更新输入参数
-                            updateInputData(nodeId, (inputs) => {
+                            updateInputData(data.id, (inputs) => {
                                 inputs.lora_name = selectDom.value;
                                 return inputs
                             })
@@ -2870,7 +2870,12 @@
                                     window._appData.category,
                                     window._appData.seed,
                                     inp,
-                                    api.clientId
+                                    api.clientId,
+                                    window._appData.data ? [{
+                                        data: {
+                                            output: window._appData.data
+                                        }
+                                    }] : null
                                 ).then(res => {
 
                                     if (!res) {
@@ -2900,7 +2905,12 @@
                         window._appData.category,
                         window._appData.seed,
                         window._appData.input.filter(inp => inp),
-                        api.clientId
+                        api.clientId,
+                        window._appData.data ? [{
+                            data: {
+                                output: window._appData.data
+                            }
+                        }] : null
                     ).then(res => {
 
                         if (!res) {
