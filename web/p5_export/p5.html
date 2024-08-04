@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://toolness.github.io/p5.js-widget/p5-widget.js"></script>
-  <script src="https://unpkg.com/p5.js-export/p5.js-export.js"></script>
+  <script src="./p5-widget/p5-widget.js"></script>
+ 
   <style>
     body {
       height: 600px;
@@ -37,43 +37,38 @@
       background: #555;
       /* 滚动条滑块悬停颜色 */
     }
+ 
   </style>
+  <!-- <script src="./p5.js"></script> -->
+  <!-- <script src="./sketch.js"></script> -->
+  <!-- <script src="./src/CCapture.js"></script> -->
+  <!-- <script src="./src/gif.js"></script>
+   <script src="./src/gif.worker.js"></script> -->
+  <!-- <script src="./src/download.js"></script> -->
+  <!-- <script src="./src/webm-writer-0.2.0.js"></script> -->
+
 </head>
 
 <body>
-  <script src="./p5.js"></script>
-  <!-- <script src="./sketch.js"></script> -->
-  <script src="./src/CCapture.js"></script>
-  <!-- <script src="./src/gif.js"></script>
-  <script src="./src/gif.worker.js"></script> -->
-  <!-- <script src="./src/download.js"></script> -->
-  <script src="./src/webm-writer-0.2.0.js"></script>
 
-  <script>
+ <script>
 
-    function blobToBase64(blob) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result.split(',')[1];
-          const base64Url = `data:video/webm;base64,${base64String}`;
-          resolve(base64Url);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }
+  // 监听来自iframe的消息
+window.addEventListener('message', (event) => {
+  const data = event.data;
+  if (data.from === 'p5.widget' && data.status === 'save') {
+    const frames = data.frames;
+    // console.log(frames)
+    window.parent.postMessage({
+      frames,
+      from: 'p5.widget',
+      status: 'save'
+    }, '*');
+  }
+});
 
 
-
-    var capturer = new CCapture({
-      format: 'webm',
-      framerate: 60,
-      verbose: true
-    })
-
-  </script>
-
+ </script>
   <script type="text/p5" data-height="500" data-preview-width="300">
 function setup() {
 createCanvas(100, 100);

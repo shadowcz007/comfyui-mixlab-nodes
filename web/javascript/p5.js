@@ -73,7 +73,7 @@ const p5InputNode = {
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width-24, 44, node.size[1])
+              get_position_style(ctx, widget_width - 24, 44, node.size[1])
             )
           },
           serialize: false
@@ -85,31 +85,18 @@ const p5InputNode = {
 
         document.body.appendChild(widget.div)
 
-       
-        widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5.html" 
+        widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html" 
          style="border:0;width:100%;height:100%;"
-        ></iframe>`;
+        ></iframe>`
 
-      
-        // 如果是复制的，有数据 , 这个不生效，取不到数据， 需要在nodeCreated里获取
-        // console.log('#LoadImagesToBatch', imagesWidget.value?.base64)
-
-        const btn = document.createElement('button')
-        btn.innerText = 'Upload Image'
-
-        btn.style = `cursor: pointer;
-          font-weight: 300;
-          margin: 2px; 
-          color: var(--descrip-text);
-          background-color: var(--comfy-input-bg);
-          border-radius: 8px;
-          border-color: var(--border-color);
-          border-style: solid;height: 30px;min-width: 122px;
-         `
-
-        btn.addEventListener('click', e => {
-          e.preventDefault()
-         
+        // 监听来自iframe的消息
+        window.addEventListener('message', event => {
+          const data = event.data
+          if (data.from === 'p5.widget' && data.status === 'save') {
+            const frames = data.frames
+            console.log(frames)
+             
+          }
         })
 
         this.addCustomWidget(widget)
@@ -118,7 +105,6 @@ const p5InputNode = {
 
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
-        
           widget.div.remove()
           try {
             // document.removeEventListener('wheel', handleMouseWheel)

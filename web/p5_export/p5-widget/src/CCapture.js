@@ -190,12 +190,15 @@ CCTarEncoder.prototype.add = function( blob ) {
 
   var fileReader = new FileReader();
   fileReader.onload = function() {
-    this.tape.append( pad( this.count ) + this.fileExtension, new Uint8Array( fileReader.result ) );
+	console.log(fileReader.result)
+	this.tape.list.push(fileReader.result)
+    // this.tape.append( pad( this.count ) + this.fileExtension, new Uint8Array( fileReader.result ) );
 
     if( this.settings.autoSaveTime > 0 && ( this.frames / this.settings.framerate ) >= this.settings.autoSaveTime ) {
       this.save( function( blob ) {
         this.filename = this.baseFilename + '-part-' + pad( this.part );
-        download( blob, this.filename + this.extension, this.mimeType );
+        // download( blob, this.filename + this.extension, this.mimeType );
+
         var count = this.count;
         this.dispose();
         this.count = count+1;
@@ -211,19 +214,29 @@ CCTarEncoder.prototype.add = function( blob ) {
     }
 
   }.bind( this );
-  fileReader.readAsArrayBuffer(blob);
+  fileReader.readAsDataURL(blob);
 
 }
 
 CCTarEncoder.prototype.save = function( callback ) {
+  
+	window.parent.postMessage({
+		frames: this.tape.save(),
+		from: 'p5.widget',
+		status: 'save'
+	  }, '*');
 
-  callback( this.tape.save() );
+//   callback( this.tape.save() );
 
 }
 
 CCTarEncoder.prototype.dispose = function() {
 
-  this.tape = new Tar();
+  this.tape = {};
+  this.tape.list=[]
+  this.tape.save=()=>{
+	return this.tape.list
+  }
   this.count = 0;
 
 }
