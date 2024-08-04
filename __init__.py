@@ -1001,7 +1001,7 @@ def mix_status(request):
 
 # 导入节点
 from .nodes.PromptNode import GLIGENTextBoxApply_Advanced,EmbeddingPrompt,RandomPrompt,PromptSlide,PromptSimplification,PromptImage,JoinWithDelimiter
-from .nodes.ImageNode import ImageListToBatch_,ComparingTwoFrames,LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
+from .nodes.ImageNode import ImageBatchToList_,ImageListToBatch_,ComparingTwoFrames,LoadImages_,CompositeImages,GridDisplayAndSave,GridInput,ImagesPrompt,SaveImageAndMetadata,SaveImageToLocal,SplitImage,GridOutput,GetImageSize_,MirroredImage,ImageColorTransfer,NoiseImage,TransparentImage,GradientImage,LoadImagesFromPath,LoadImagesFromURL,ResizeImage,TextImage,SvgImage,Image3D,ShowLayer,NewLayer,MergeLayers,CenterImage,AreaToMask,SmoothMask,SplitLongMask,ImageCropByAlpha,EnhanceImage,FaceToMask
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
@@ -1042,6 +1042,7 @@ NODE_CLASS_MAPPINGS = {
     "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
     "ImageListToBatch_":ImageListToBatch_,
+    "ImageBatchToList_":ImageBatchToList_,
     "CompositeImages_":CompositeImages,
     "SplitImage":SplitImage,
     "CenterImage":CenterImage,
@@ -1123,6 +1124,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "3DImage":"3DImage ♾️Mixlab",
     "ImageListToBatch_":"Image List To Batch",
+    "ImageBatchToList_":"Image Batch To List",
     "CompositeImages_":"Composite Images ♾️Mixlab",
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
     "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
