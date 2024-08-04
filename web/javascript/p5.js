@@ -65,8 +65,6 @@ const p5InputNode = {
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        let imagesWidget = this.widgets.filter(w => w.name == 'frames')[0]
-
         const widget = {
           type: 'div',
           name: 'image_base64',
@@ -85,20 +83,6 @@ const p5InputNode = {
 
         document.body.appendChild(widget.div)
 
-        widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html" 
-         style="border:0;width:100%;height:100%;"
-        ></iframe>`
-
-        // 监听来自iframe的消息
-        window.addEventListener('message', event => {
-          const data = event.data
-          if (data.from === 'p5.widget' && data.status === 'save') {
-            const frames = data.frames
-            console.log(frames)
-             
-          }
-        })
-
         this.addCustomWidget(widget)
 
         // document.addEventListener('wheel', handleMouseWheel)
@@ -106,12 +90,7 @@ const p5InputNode = {
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           widget.div.remove()
-          try {
-            // document.removeEventListener('wheel', handleMouseWheel)
-          } catch (error) {
-            console.log(error)
-          }
-
+          // window.removeEventListener('message', ms)
           return onRemoved?.()
         }
 
@@ -127,8 +106,33 @@ const p5InputNode = {
   nodeCreated (node, app) {
     //数据延迟？？
     setTimeout(() => {
-      // console.log('#LoadImagesToBatch', node.type)
+      let widget = node.widgets.filter(w => w.name == 'image_base64')[0]
+      let framesWidget = node.widgets.filter(w => w.name == 'frames')[0]
       if (node.type === 'P5Input') {
+        if (!framesWidget.value) framesWidget.value = { base64: [] }
+
+        let nodeId = node.id
+        //延迟才能获得this.id
+        widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html?id=${nodeId}" 
+          style="border:0;width:100%;height:100%;"
+         ></iframe>`
+
+        // 监听来自iframe的消息
+        const ms = event => {
+          const data = event.data
+          if (
+            data.from === 'p5.widget' &&
+            data.status === 'save' &&
+            data.frames &&
+            data.frames.length > 0 &&
+            data.nodeId == nodeId
+          ) {
+            const frames = data.frames
+            console.log(frames.length, nodeId)
+            framesWidget.value.base64 = frames
+          }
+        }
+        window.addEventListener('message', ms)
       }
     }, 1000)
   }

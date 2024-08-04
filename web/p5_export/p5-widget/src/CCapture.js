@@ -190,7 +190,7 @@ CCTarEncoder.prototype.add = function( blob ) {
 
   var fileReader = new FileReader();
   fileReader.onload = function() {
-	console.log(fileReader.result)
+	// console.log(fileReader.result)
 	this.tape.list.push(fileReader.result)
     // this.tape.append( pad( this.count ) + this.fileExtension, new Uint8Array( fileReader.result ) );
 
@@ -219,12 +219,14 @@ CCTarEncoder.prototype.add = function( blob ) {
 }
 
 CCTarEncoder.prototype.save = function( callback ) {
-  
-	window.parent.postMessage({
-		frames: this.tape.save(),
-		from: 'p5.widget',
-		status: 'save'
-	  }, '*');
+    if(this.tape.save().length>0) {
+		window.parent.postMessage({
+			frames: this.tape.save(),
+			from: 'p5.widget',
+			status: 'save'
+		  }, '*');
+		  this.tape.list=[]
+	}
 
 //   callback( this.tape.save() );
 
@@ -234,7 +236,7 @@ CCTarEncoder.prototype.dispose = function() {
 
   this.tape = {};
   this.tape.list=[]
-  this.tape.save=()=>{
+  this.tape.save=()=>{ 
 	return this.tape.list
   }
   this.count = 0;

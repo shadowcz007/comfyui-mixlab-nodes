@@ -56,8 +56,8 @@
 	];
 	var AVOID_MIXED_CONTENT_WARNINGS = true;
 	var myScriptEl = getMyScriptEl();
-	var myBaseURL = getMyBaseURL(myScriptEl.src);
-	var autoload = !myScriptEl.hasAttribute('data-manual');
+	var myBaseURL = getMyBaseURL(myScriptEl ? myScriptEl.src : "");
+	var autoload = myScriptEl ? !myScriptEl.hasAttribute('data-manual') : false;
 	var nextId = 1;
 	function getMyBaseURL(url) {
 	    var baseURL = url.slice(0, -MY_FILENAME.length);

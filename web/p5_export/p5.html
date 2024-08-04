@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="./p5-widget/p5-widget.js"></script>
- 
+
+
   <style>
     body {
       height: 600px;
@@ -37,7 +37,6 @@
       background: #555;
       /* 滚动条滑块悬停颜色 */
     }
- 
   </style>
   <!-- <script src="./p5.js"></script> -->
   <!-- <script src="./sketch.js"></script> -->
@@ -51,24 +50,37 @@
 
 <body>
 
- <script>
+  <script>
 
-  // 监听来自iframe的消息
-window.addEventListener('message', (event) => {
-  const data = event.data;
-  if (data.from === 'p5.widget' && data.status === 'save') {
-    const frames = data.frames;
-    // console.log(frames)
-    window.parent.postMessage({
-      frames,
-      from: 'p5.widget',
-      status: 'save'
-    }, '*');
-  }
-});
+    function getIdFromUrl(url) {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      return urlParams.get('id');
+    }
 
 
- </script>
+
+    // 监听来自iframe的消息
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      if (data.from === 'p5.widget' && data.status === 'save') {
+        const frames = data.frames;
+        console.log(window.location.href)
+
+        // 示例用法
+        // const url = 'https://example.com/page?id=12345';
+        const nodeId = getIdFromUrl(window.location.href);
+
+        window.parent.postMessage({
+          frames,
+          from: 'p5.widget',
+          status: 'save',
+          nodeId
+        }, '*');
+      }
+    });
+
+
+  </script>
   <script type="text/p5" data-height="500" data-preview-width="300">
 function setup() {
 createCanvas(100, 100);
@@ -78,6 +90,7 @@ function draw() {
 background(255, 0, 200);
 }
     </script>
+  <script src="./p5-widget/p5-widget.js"></script>
 </body>
 
 </html>

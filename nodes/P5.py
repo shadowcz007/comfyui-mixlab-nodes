@@ -46,11 +46,11 @@ class P5Input:
 
     CATEGORY = "♾️Mixlab/Video"
 
-    INPUT_IS_LIST = True
+    INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
     def run(self, frames):
-        # print(images)
+        print(frames)
         ims=[]
         for im in frames['base64']:
             image = base64_to_image(im)
