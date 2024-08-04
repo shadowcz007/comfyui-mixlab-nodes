@@ -114,6 +114,10 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 [Voice + Real-time Face Swap Workflow](./workflow/语音+实时换脸workflow.json)
 
+- Preview Audio
+
+[text-to-audio](./workflow/text-to-audio-base-workflow.json)
+
 ### GPT
 
 > Support for calling multiple GPTs.Local LLM（llama.cpp）、 ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 . Azure OpenAI:https://xxxx.openai.azure.com
