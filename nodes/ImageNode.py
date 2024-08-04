@@ -1829,12 +1829,9 @@ class CompositeImages:
 
     def run(self, foreground,mask,background, is_multiply_blend, position, scale):
         results = []
-        
         f1=[]
         for fg, mask in zip(foreground, mask ):
             f1.append([fg,mask])
-
-        
         for f, bg in product(f1, background):
             [fg,mask]=f
             fg_pil = tensor2pil(fg)

@@ -675,6 +675,17 @@ const createInputImageForBatch = (base64, widget) => {
   return im
 }
 
+// 添加新图片
+const addBase64ToWidgetForLoadImagesToBatch = (
+  base64,
+  imagesWidget,
+  imagesDiv
+) => {
+  imagesWidget.value.base64.push(base64)
+  let im = createInputImageForBatch(base64, imagesWidget)
+  imagesDiv.appendChild(im)
+}
+
 app.registerExtension({
   name: 'Mixlab.Comfy.LoadImagesToBatch',
   async getCustomWidgets (app) {
@@ -705,7 +716,6 @@ app.registerExtension({
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'LoadImagesToBatch') {
-
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
 
       nodeType.prototype.onNodeCreated = function () {
@@ -751,12 +761,17 @@ app.registerExtension({
             base64 = await loadImageToCanvas(base64)
             // console.log(base64)
             if (!imagesWidget.value) imagesWidget.value = { base64: [] }
-            imagesWidget.value.base64.push(base64)
-            let im = createInputImageForBatch(base64, imagesWidget)
-            imagesDiv.appendChild(im)
+            addBase64ToWidgetForLoadImagesToBatch(
+              base64,
+              imagesWidget,
+              imagesDiv
+            )
           }
           reader.readAsDataURL(file)
         })
+
+        // 如果是复制的，有数据 , 这个不生效，取不到数据， 需要在nodeCreated里获取
+        // console.log('#LoadImagesToBatch', imagesWidget.value?.base64)
 
         const btn = document.createElement('button')
         btn.innerText = 'Upload Image'
@@ -829,18 +844,36 @@ app.registerExtension({
       }
     }
   },
+
   async loadedGraphNode (node, app) {
     if (node.type === 'LoadImagesToBatch') {
-      // await sleep(0)
       let imagesWidget = node.widgets.filter(w => w.name === 'images')[0]
       let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
+      // console.log('#LoadImagesToBatch', imagesWidget.value?.base64)
+      let imagesDiv = imagePreview.div.querySelector('.images_preview')
 
-      let pre = imagePreview.div.querySelector('.images_preview')
       for (const d of imagesWidget.value?.base64 || []) {
         let im = createInputImageForBatch(d, imagesWidget)
-        pre.appendChild(im)
+        imagesDiv.appendChild(im)
       }
     }
+  },
+  nodeCreated (node, app) {
+    //数据延迟？？
+    setTimeout(() => {
+      console.log('#LoadImagesToBatch', node.type)
+      if (node.type === 'LoadImagesToBatch') {
+        let imagesWidget = node.widgets.filter(w => w.name === 'images')[0]
+        let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
+
+        let imagesDiv = imagePreview?.div?.querySelector('.images_preview')
+
+        for (const d of imagesWidget.value?.base64 || []) {
+          let im = createInputImageForBatch(d, imagesWidget)
+          imagesDiv.appendChild(im)
+        }
+      }
+    }, 1000)
   }
 })
 
@@ -868,8 +901,8 @@ app.registerExtension({
       const onNodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = function () {
         const r = onNodeCreated
-        ? onNodeCreated.apply(this, arguments)
-        : undefined
+          ? onNodeCreated.apply(this, arguments)
+          : undefined
 
         this.size = [400, this.size[1]]
         console.log('##onNodeCreated', this)
@@ -891,19 +924,14 @@ app.registerExtension({
         this.addCustomWidget(widget)
         this.serialize_widgets = true //需要保存参数
 
-
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           widget.div.remove()
           return onRemoved?.()
         }
 
-
-       return r
-
+        return r
       }
-
-     
 
       const onExecuted = nodeType.prototype.onExecuted
       nodeType.prototype.onExecuted = function (message) {
@@ -964,7 +992,7 @@ app.registerExtension({
             label: 'After'
           }
         ]
-        this.size=[this.size[0],300]
+        this.size = [this.size[0], 300]
       }
     }
   },
@@ -974,7 +1002,6 @@ app.registerExtension({
       // node.widgets[0].div.id = 'mix_comparingtowframes_' + node.id
       // if (node.widgets_values && node.widgets_values[0]) {
       //   node.widgets[0].div.innerHTML = ''
-
       //   let slider = new juxtapose.JXSlider(
       //     '#mix_comparingtowframes_' + node.id,
       //     node.widgets_values,

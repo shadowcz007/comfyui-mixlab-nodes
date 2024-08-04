@@ -53,6 +53,7 @@
 - web app 可以设置分类，在 comfyui 右键菜单可以编辑更新 web app
 - 支持动态提示
 - 支持把输出显示到comfyui背景（TouchDesigner 风格）
+- 如果转为web app打开是空白的，注意检查下插件目录的名字需要是：comfyui-mixlab-nodes(如果是zip包下载会多了个-main的后缀，需要去掉)
 
 ![](./assets/微信图片_20240421205440.png)
 
