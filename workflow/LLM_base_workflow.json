@@ -1,0 +1,408 @@
+{
+  "last_node_id": 21,
+  "last_link_id": 16,
+  "nodes": [
+    {
+      "id": 10,
+      "type": "ChatGPTOpenAI",
+      "pos": [
+        489,
+        689
+      ],
+      "size": {
+        "0": 403.2580261230469,
+        "1": 309.2166442871094
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "custom_api_url",
+          "type": "STRING",
+          "link": 13,
+          "widget": {
+            "name": "custom_api_url"
+          },
+          "slot_index": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            12
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "messages",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ChatGPTOpenAI"
+      },
+      "widgets_values": [
+        "hi",
+        "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+        "gpt-3.5-turbo",
+        447210757728856,
+        "randomize",
+        1,
+        "openai",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 3,
+      "type": "ShowTextForGPT",
+      "pos": [
+        982,
+        686
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 12,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        " Hi there! What can I help you with?"
+      ]
+    },
+    {
+      "id": 11,
+      "type": "SiliconflowLLM",
+      "pos": [
+        489,
+        318
+      ],
+      "size": {
+        "0": 395.197998046875,
+        "1": 262
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 16,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            15
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "messages",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SiliconflowLLM"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible.",
+        "Qwen/Qwen2-7B-Instruct",
+        593422808835285,
+        "randomize",
+        1,
+        ""
+      ]
+    },
+    {
+      "id": 17,
+      "type": "ShowTextForGPT",
+      "pos": [
+        975,
+        329
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 15,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "Hello! How can I assist you today?"
+      ]
+    },
+    {
+      "id": 18,
+      "type": "KeyInput",
+      "pos": [
+        46,
+        319
+      ],
+      "size": {
+        "0": 315,
+        "1": 70
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            16
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 12,
+      "type": "TextInput_",
+      "pos": [
+        31,
+        871
+      ],
+      "size": [
+        407.9377612789413,
+        76
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            13
+          ],
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextInput_"
+      },
+      "widgets_values": [
+        "http://127.0.0.1:8000/v1"
+      ]
+    },
+    {
+      "id": 20,
+      "type": "Note",
+      "pos": [
+        35,
+        664
+      ],
+      "size": [
+        350.04604707424306,
+        116.54209784249178
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "api_key 填写对应平台的Key\ncustom model和api 根据需要自行填写\n\n如果不填写custome，则按照model和api_url选择的选项"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 21,
+      "type": "Note",
+      "pos": [
+        42,
+        438
+      ],
+      "size": {
+        "0": 350.0460510253906,
+        "1": 116.54209899902344
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "properties": {
+        "text": ""
+      },
+      "widgets_values": [
+        "API key节点不会保存到workflow的json文件。\n\n：：会保存到appinfo导出的app.json里\n\n\n注册https://cloud.siliconflow.cn/account/ak 领取免费的API"
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      12,
+      10,
+      0,
+      3,
+      0,
+      "STRING"
+    ],
+    [
+      13,
+      12,
+      0,
+      10,
+      2,
+      "STRING"
+    ],
+    [
+      15,
+      11,
+      0,
+      17,
+      0,
+      "STRING"
+    ],
+    [
+      16,
+      18,
+      0,
+      11,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.9646149645000006,
+      "offset": [
+        170.81398913081276,
+        -128.0066534315481
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -1106,6 +1106,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     
     "Color":"Color Input ♾️MixlabApp",
     "TextInput_":"Text Input ♾️MixlabApp",
+    "KeyInput":"API Key Input ♾️MixlabApp",
     "FloatSlider":"Float Slider Input ♾️MixlabApp",
     "IntNumber":"Int Input ♾️MixlabApp",
     "ImagesPrompt_":"Images Input ♾️MixlabApp",

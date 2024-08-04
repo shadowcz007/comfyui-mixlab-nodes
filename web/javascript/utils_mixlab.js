@@ -357,7 +357,7 @@ app.registerExtension({
         const widget = {
           type: inputData[0], // the type, CHEESE
           name: inputName, // the name, slice
-          size: [128, 32], // a default size
+          size: [128, 24], // a default size
           draw (ctx, node, width, y) {},
           computeSize (...args) {
             return [128, 32] // a method to compute the current size of the widget
@@ -382,57 +382,61 @@ app.registerExtension({
 
         const widget = {
           type: 'div',
-          name: 'key_inp',
+          name: 'input_key',
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1])
-            ) 
+              get_position_style(ctx, widget_width, 24, node.size[1])
+            )
           }
         }
 
         widget.div = $el('div', {})
 
+        document.body.appendChild(widget.div)
+
         const inputDiv = (key, placeholder) => {
           let div = document.createElement('div')
-          const ip = document.createElement('input')
-          ip.type = placeholder === 'Key' ? 'password' : 'text'
-          ip.className = `${'comfy-multiline-input'} ${placeholder}`
-          div.style = `display: flex;
+          div.style = `
+          display: flex;
           align-items: center; 
           margin: 6px 8px;
-          margin-top: 0;`
-          ip.placeholder = placeholder
-          ip.value = placeholder
+          margin-top:0px;
+          height:44px;
+          width:220px; 
+          `
 
-          ip.style = `margin-left: 24px;
+          const ip = document.createElement('input')
+          ip.type = 'password'
+          ip.className = `${'comfy-multiline-input'} ${placeholder}`
+
+          ip.placeholder = placeholder
+          // ip.value = placeholder
+
+          ip.style = `margin-left:8px;
           outline: none;
           border: none;
-          padding: 4px;width: 100%;`
-          const label = document.createElement('label')
-          label.style = 'font-size: 10px;min-width:32px'
-          label.innerText = placeholder
-          div.appendChild(label)
+          padding:12px;
+          width: 100%;
+          `
+
           div.appendChild(ip)
 
           ip.addEventListener('change', () => {
             let data = getLocalData(key)
             data[this.id] = ip.value.trim()
             localStorage.setItem(key, JSON.stringify(data))
-            console.log(this.id, key)
           })
+
           return div
         }
 
-        let inputKey = inputDiv('_mixlab_api_key', 'Key') 
+        let inputKey = inputDiv('_mixlab_api_key', 'Key')
 
-        widget.div.appendChild(inputKey) 
+        widget.div.appendChild(inputKey)
 
         this.addCustomWidget(widget)
- 
-        console.log('KeyInput nodeData',widget.div)
 
-      
         const onRemoved = this.onRemoved
         this.onRemoved = () => {
           inputKey.remove()
@@ -445,17 +449,30 @@ app.registerExtension({
     }
   },
   async loadedGraphNode (node, app) {
-    // Fires every time a node is constructed
-    // You can modify widgets/add handlers/etc here
-
     if (node.type === 'KeyInput') {
       let widget = node.widgets.filter(w => w.div)[0]
 
-      let apiKey = getLocalData('_mixlab_api_key');
+      let apiKey = getLocalData('_mixlab_api_key')
 
       let id = node.id
- 
-      widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab' 
+      if (widget.div.querySelector('.Key'))
+        widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
     }
+  },
+  nodeCreated (node, app) {
+    //数据延迟？？
+    setTimeout(() => {
+      // console.log('#LoadImagesToBatch', node.type)
+      if (node.type === 'KeyInput') {
+        let widget = node.widgets.filter(w => w.div)[0]
+
+        let apiKey = getLocalData('_mixlab_api_key')
+
+        let id = node.id
+
+        if (widget.div.querySelector('.Key'))
+          widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
+      }
+    }, 1000)
   }
 })

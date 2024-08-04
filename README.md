@@ -1,6 +1,6 @@
 ![](https://img.shields.io/github/release/shadowcz007/comfyui-mixlab-nodes)
 
-> 适配了最新版 comfyui 的 py3.11 ，torch 2.1.2+cu121
+> 适配了最新版 comfyui 的 py3.11 ，torch 2.3.1+cu121
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
 
@@ -9,6 +9,8 @@
 - App模式增加batch prompt，批量提示词，可以把动态提示词批量组成后运行
 
 ![alt text](./assets/1722517810720.png)
+
+- 增加 API Key Input 节点，用于管理LLM的Key,同时优化LLM相关节点，为后续agent模式做准备
 
 - 增加 SiliconflowLLM，可以使用由Siliconflow提供的免费LLM
 
@@ -116,9 +118,10 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 > Support for calling multiple GPTs.Local LLM（llama.cpp）、 ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 . Azure OpenAI:https://xxxx.openai.azure.com
 
-![gpt-workflow.svg](./assets/gpt-workflow.svg)
+[LLM_base_workflow](./workflow/LLM_base_workflow.json)
 
-[workflow-5](./workflow/5-gpt-workflow.json)
+- SiliconflowLLM
+- ChatGPTOpenAI
 
 <!-- 最新：ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。
 

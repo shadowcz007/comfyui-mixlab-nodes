@@ -861,7 +861,7 @@ app.registerExtension({
   nodeCreated (node, app) {
     //数据延迟？？
     setTimeout(() => {
-      console.log('#LoadImagesToBatch', node.type)
+      // console.log('#LoadImagesToBatch', node.type)
       if (node.type === 'LoadImagesToBatch') {
         let imagesWidget = node.widgets.filter(w => w.name === 'images')[0]
         let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
