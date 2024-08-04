@@ -142,7 +142,7 @@ async function getPromptResult (category) {
 }
 
 // 新的运行工作流的接口
-function queuePromptNew (filename, category, seed, input, client_id) {
+function queuePromptNew (filename, category, seed, input, client_id,apps=null) {
   let url = get_url()
   // var filename = "Text-to-Image_1.json", category = "";
 
