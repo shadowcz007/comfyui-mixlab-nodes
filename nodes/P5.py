@@ -44,13 +44,14 @@ class P5Input:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Video"
+    CATEGORY = "♾️Mixlab/Input"
 
+    OUTPUT_NODE = True
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
     def run(self, frames):
-        print(frames)
+        # print(frames)
         ims=[]
         for im in frames['base64']:
             image = base64_to_image(im)
@@ -66,4 +67,6 @@ class P5Input:
             if image1.shape[1:] != image2.shape[1:]:
                 image2 = comfy.utils.common_upscale(image2.movedim(-1, 1), image1.shape[2], image1.shape[1], "bilinear", "center").movedim(1, -1)
             image1 = torch.cat((image1, image2), dim=0)
-        return (image1,)
+
+        # 用于节点提示:p5节点提示有多少帧
+        return {"ui": {"_info": len(frames['base64'])}, "result": (image1,)}

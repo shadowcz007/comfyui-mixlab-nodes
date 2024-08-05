@@ -94,7 +94,42 @@ const p5InputNode = {
           return onRemoved?.()
         }
 
+        // 节点的大小控制
+        this.setSize([480, 560])
+        app.canvas.draw(true, true)
+
+        const onResize = this.onResize
+        this.onResize = () => {
+          // 设置最小尺寸
+          if (
+            Math.max(this.size[0], 480) != this.size[0] &&
+            Math.max(this.size[1], 560) != this.size[1]
+          ) {
+            this.setSize([
+              Math.max(this.size[0], 480),
+              Math.max(this.size[1], 560)
+            ])
+          }
+
+          return onResize?.apply(this, arguments)
+        }
+
         this.serialize_widgets = true //需要保存参数
+      }
+
+      const onExecuted = nodeType.prototype.onExecuted
+      nodeType.prototype.onExecuted = function (message) {
+        onExecuted?.apply(this, arguments)
+        // console.log('##onExecuted', this, message._info)
+        if (message._info) {
+          //判断几帧
+          let widget = this.widgets.filter(w => w.name == 'image_base64')[0]
+          if (widget && widget.div) {
+            widget.div.querySelector(
+              '._info'
+            ).innerHTML = `<p>${message._info}</p>`
+          }
+        }
       }
     }
   },
@@ -106,16 +141,17 @@ const p5InputNode = {
   nodeCreated (node, app) {
     //数据延迟？？
     setTimeout(() => {
-      let widget = node.widgets.filter(w => w.name == 'image_base64')[0]
-      let framesWidget = node.widgets.filter(w => w.name == 'frames')[0]
-      if (node.type === 'P5Input') {
-        if (!framesWidget.value) framesWidget.value = { base64: [] }
+      let widget = node.widgets?.filter(w => w.name == 'image_base64')[0]
+      let framesWidget = node.widgets?.filter(w => w.name == 'frames')[0]
+      if (node.type === 'P5Input' && widget) {
+        if (framesWidget && !framesWidget.value)
+          framesWidget.value = { base64: [] }
 
         let nodeId = node.id
         //延迟才能获得this.id
         widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html?id=${nodeId}" 
           style="border:0;width:100%;height:100%;"
-         ></iframe>`
+         ></iframe><div class="_info"></div>`
 
         // 监听来自iframe的消息
         const ms = event => {
@@ -130,6 +166,16 @@ const p5InputNode = {
             const frames = data.frames
             console.log(frames.length, nodeId)
             framesWidget.value.base64 = frames
+          }
+
+          if (
+            data.from === 'p5.widget' &&
+            data.status === 'capture' &&
+            data.nodeId == nodeId
+          ) {
+            const frameCount = data.frameCount,
+              maxCount = data.maxCount
+            console.log(frameCount, maxCount, nodeId)
           }
         }
         window.addEventListener('message', ms)

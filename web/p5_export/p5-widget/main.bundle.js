@@ -86,6 +86,14 @@
 	            status: 'save'
 	        }, '*');
 	    }
+	    // if (data.from === 'p5.widget' && data.status === 'capture') {
+	    //   window.parent.postMessage({
+	    //     from: 'p5.widget',
+	    //     status: 'capture',
+	    //     frameCount: data.frameCount,
+	    //     maxCount: data.maxCount,
+	    //   }, '*');
+	    // }
 	});
 
 
@@ -23769,10 +23777,12 @@
 	            canUndo: false,
 	            canRedo: false,
 	            previewContent: this.props.initialContent,
-	            editorContent: this.props.initialContent
+	            editorContent: this.props.initialContent,
+	            progress: 1
 	        };
 	    }
 	    App.prototype.componentDidMount = function () {
+	        var _this = this;
 	        var autosave = this.props.autosaver && this.props.autosaver.restore();
 	        if (autosave && autosave !== this.state.editorContent) {
 	            this.setState({ editorContent: autosave });
@@ -23780,6 +23790,16 @@
 	        else if (this.props.autoplay) {
 	            this.handlePlayClick();
 	        }
+	        window.addEventListener('message', function (event) {
+	            var data = event.data;
+	            if (data.from === 'p5.widget' && data.status === 'capture'
+	                && data.frameCount != undefined
+	                && data.maxCount != undefined && data.maxCount > 0) {
+	                _this.setState({
+	                    progress: data.frameCount / data.maxCount
+	                });
+	            }
+	        });
 	    };
 	    App.prototype.render = function () {
 	        var errorLine = null;
@@ -23788,7 +23808,7 @@
 	            this.state.editorContent === this.state.previewContent) {
 	            errorLine = this.state.lastError.line;
 	        }
-	        return (React.createElement("div", {className: "app"}, React.createElement(toolbar_1.default, {onPlayClick: this.handlePlayClick, onStopClick: this.state.isPlaying && this.handleStopClick, onUndoClick: this.state.canUndo && this.handleUndoClick, onRedoClick: this.state.canRedo && this.handleRedoClick, onRevertClick: canRevert && this.handleRevertClick}), React.createElement("div", {className: "panes"}, React.createElement(editor_1.default, {ref: "editor", content: this.state.editorContent, errorLine: errorLine, onChange: this.handleEditorChange}), React.createElement("div", {className: "preview-holder-wrapper"}, this.state.isPlaying
+	        return (React.createElement("div", {className: "app"}, React.createElement(toolbar_1.default, {progress: this.state.progress, onPlayClick: this.handlePlayClick, onStopClick: this.state.isPlaying && this.handleStopClick, onUndoClick: this.state.canUndo && this.handleUndoClick, onRedoClick: this.state.canRedo && this.handleRedoClick, onRevertClick: canRevert && this.handleRevertClick}), React.createElement("div", {className: "panes"}, React.createElement(editor_1.default, {ref: "editor", content: this.state.editorContent, errorLine: errorLine, onChange: this.handleEditorChange}), React.createElement("div", {className: "preview-holder-wrapper"}, this.state.isPlaying
 	            ? React.createElement(preview_1.default, {content: this.state.previewContent, baseSketchURL: this.props.baseSketchURL, p5version: this.props.p5version, maxRunTime: this.props.maxRunTime, width: this.props.previewWidth, timestamp: this.state.startPlayTimestamp, onError: this.handlePreviewError})
 	            : null)), React.createElement("div", {className: "status-bar"}, this.state.lastError
 	            ? React.createElement(ErrorMessage, __assign({}, this.state.lastError))
@@ -23936,7 +23956,7 @@
 	    }
 	    Toolbar.prototype.render = function () {
 	        return (React.createElement("div", {className: "toolbar"}, React.createElement("a", {className: "p5-logo", href: "http://p5js.org/", target: "_blank"}, React.createElement("img", {src: "static/img/p5js-beta.svg", alt: "p5js.org"})), React.createElement("button", {onClick: this.props.onPlayClick}, React.createElement(OpenIconicMediaPlay, null), "Play"), this.props.onStopClick
-	            ? React.createElement("button", {onClick: this.props.onStopClick}, React.createElement(OpenIconicMediaStop, null), "Stop")
+	            ? React.createElement("button", {onClick: this.props.onStopClick}, React.createElement(OpenIconicMediaStop, null), "Stop ", this.props.progress)
 	            : null, this.props.onUndoClick
 	            ? React.createElement("button", {onClick: this.props.onUndoClick}, React.createElement(OpenIconicActionUndo, null), "Undo")
 	            : null, this.props.onRedoClick
@@ -34943,38 +34963,7 @@
 	            // since that means the iframe will have been removed from the DOM,
 	            // in which case it shouldn't be emitting events anymore.
 	            var frame = iframe.contentWindow;
-	            //       content = content + `
-	            //       // 保存旧的 draw 函数
-	            // const oldDraw = draw;
-	            // function draw() {
-	            // // 添加截屏功能的代码
-	            // if (frameCount === 1) {
-	            //   capturer.start();
-	            // }
-	            // // 调用旧的 draw 函数
-	            // oldDraw();
-	            // // 添加截屏功能的代码
-	            // if (frameCount < 60) {
-	            //   capturer.capture(canvas);
-	            // } else if (frameCount === 60) {
-	            //   capturer.save(function (blob) {
-	            //     blobToBase64(blob).then(base64String => {
-	            //       console.log(base64String);
-	            //       const video = document.createElement('video');
-	            //       video.controls = true;
-	            //       video.src = base64String;
-	            //       video.width = 640;
-	            //       video.height = 360;
-	            //       document.body.appendChild(video);
-	            //       video.play();
-	            //     }).catch(error => {
-	            //       console.error('转换失败:', error);
-	            //     });
-	            //   });
-	            //   capturer.stop();
-	            // }
-	            // }
-	            // `
+	            console.log("#p5 content", content);
 	            frame.startSketch(content, _this.props.p5version, _this.props.maxRunTime, LOOP_CHECK_FUNC_NAME, _this.props.baseSketchURL, _this.props.onError);
 	        });
 	        this.refs.container.appendChild(iframe);
@@ -35026,12 +35015,17 @@
 	    var ast = parse(src, opts);
 	    var result = {
 	        chunks: src.split(''),
-	        toString: function () { return result.chunks.join(''); },
-	        inspect: function () { return result.toString(); }
+	        toString: function () {
+	            return result.chunks.join('');
+	        },
+	        inspect: function () {
+	            return result.toString();
+	        }
 	    };
 	    var index = 0;
 	    (function walk(node, parent) {
 	        insertHelpers(node, parent, result.chunks);
+	        node = addCapturer(node, result.chunks);
 	        Object.keys(node).forEach(function (key) {
 	            if (key === 'parent')
 	                return;
@@ -35054,7 +35048,6 @@
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = default_1;
-	;
 	function insertHelpers(node, parent, chunks) {
 	    if (!node.range)
 	        return;
@@ -35078,7 +35071,43 @@
 	            chunks[i] = '';
 	        }
 	    }
-	    ;
+	}
+	function addCapturer(node, chunks) {
+	    // Check if the node is a function declaration named 'draw'
+	    if (node.type === 'FunctionDeclaration' &&
+	        node.id &&
+	        node.id.name === 'draw') {
+	        console.log('#Found draw function:', node);
+	        var hasCapturerStart_1 = false;
+	        var hasCapturerEnd_1 = false;
+	        // Traverse the function body to check for `capturer_start()` and `capturer_end()`
+	        (function checkCapturerCalls(bodyNode) {
+	            if (bodyNode.type === 'CallExpression' &&
+	                bodyNode.callee &&
+	                bodyNode.callee.type === 'Identifier') {
+	                if (bodyNode.callee.name === 'capturer_start') {
+	                    hasCapturerStart_1 = true;
+	                }
+	                else if (bodyNode.callee.name === 'capturer_end') {
+	                    hasCapturerEnd_1 = true;
+	                }
+	            }
+	            if (bodyNode.body && Array.isArray(bodyNode.body)) {
+	                bodyNode.body.forEach(checkCapturerCalls);
+	            }
+	        })(node.body);
+	        if (!hasCapturerStart_1) {
+	            console.log('capturer_start() not found in draw function, adding it.');
+	            var startInsertPos = node.body.range[0] + 1;
+	            chunks.splice(startInsertPos, 0, 'capturer_start();\n');
+	        }
+	        if (!hasCapturerEnd_1) {
+	            console.log('capturer_end() not found in draw function, adding it.');
+	            var endInsertPos = node.body.range[1] - 1;
+	            chunks.splice(endInsertPos, 0, '\ncapturer_end();');
+	        }
+	    }
+	    return node;
 	}
 
 

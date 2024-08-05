@@ -866,7 +866,7 @@ function CCapture( settings ) {
 
 	}
 
-	function _capture( canvas ) {
+	function _capture( canvas,maxCount ) {
 
 		if( _capturing ) {
 
@@ -885,6 +885,13 @@ function CCapture( settings ) {
 				_encoder.add( canvas );
 				_frameCount++;
 				_log( 'Full Frame! ' + _frameCount );
+				// 往外发送进度
+				window.parent.postMessage({ 
+					from: 'p5.widget',
+					status: 'capture',
+					frameCount:_frameCount,
+					maxCount
+				  }, '*');
 			}
 
 		}
