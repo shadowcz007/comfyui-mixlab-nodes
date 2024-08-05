@@ -23796,7 +23796,7 @@
 	                && data.frameCount != undefined
 	                && data.maxCount != undefined && data.maxCount > 0) {
 	                _this.setState({
-	                    progress: data.frameCount / data.maxCount
+	                    progress: (data.frameCount / data.maxCount).toFixed(2)
 	                });
 	            }
 	        });

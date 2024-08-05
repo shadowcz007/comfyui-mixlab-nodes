@@ -121,15 +121,11 @@ const p5InputNode = {
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
         // console.log('##onExecuted', this, message._info)
-        if (message._info) {
-          //判断几帧
-          let widget = this.widgets.filter(w => w.name == 'image_base64')[0]
-          if (widget && widget.div) {
-            widget.div.querySelector(
-              '._info'
-            ).innerHTML = `<p>${message._info}</p>`
-          }
-        }
+        // if (message._info) {
+        //   //判断几帧
+        //   let widget = this.widgets.filter(w => w.name == 'image_base64')[0]
+          
+        // }
       }
     }
   },
@@ -147,11 +143,13 @@ const p5InputNode = {
         if (framesWidget && !framesWidget.value)
           framesWidget.value = { base64: [] }
 
+        framesWidget.value._seed = Math.random()
+
         let nodeId = node.id
         //延迟才能获得this.id
         widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html?id=${nodeId}" 
           style="border:0;width:100%;height:100%;"
-         ></iframe><div class="_info"></div>`
+         ></iframe>`
 
         // 监听来自iframe的消息
         const ms = event => {
@@ -165,17 +163,9 @@ const p5InputNode = {
           ) {
             const frames = data.frames
             console.log(frames.length, nodeId)
-            framesWidget.value.base64 = frames
-          }
-
-          if (
-            data.from === 'p5.widget' &&
-            data.status === 'capture' &&
-            data.nodeId == nodeId
-          ) {
-            const frameCount = data.frameCount,
-              maxCount = data.maxCount
-            console.log(frameCount, maxCount, nodeId)
+            framesWidget.value.base64 = frames;
+            framesWidget.value._seed = Math.random()
+            node.title = 'P5 Input #' + frames.length
           }
         }
         window.addEventListener('message', ms)

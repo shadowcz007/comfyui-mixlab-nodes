@@ -69,4 +69,4 @@ class P5Input:
             image1 = torch.cat((image1, image2), dim=0)
 
         # 用于节点提示:p5节点提示有多少帧
-        return {"ui": {"_info": len(frames['base64'])}, "result": (image1,)}
+        return {"ui": {"_info": [len(frames['base64'])]}, "result": (image1,)}

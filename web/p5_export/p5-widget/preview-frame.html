@@ -12,7 +12,7 @@
   <!-- <script src="src/tar.js"></script> -->
 
   <script>
-    const capturer = new CCapture({
+    let capturer = new CCapture({
       format: 'png',
       framerate: 60,
       verbose: true
@@ -31,8 +31,9 @@
       if (frameCount < t) {
         capturer.capture(canvas, t);
       } else if (frameCount === t) {
-        capturer.save(null); 
-        capturer.stop();  
+        capturer.save(null);
+        capturer.stop();
+        capturer = null;
       }
     }
 
