@@ -12460,6 +12460,36 @@
             "title_aux": "Consistency Decoder"
         }
     ],
+    "https://github.com/shadowcz007/Comfyui-ChatTTS": [
+        [
+            "ChatTTS_",
+            "CreateSpeakers",
+            "MultiPersonPodcast",
+            "OpenVoiceClone",
+            "OpenVoiceCloneBySpeaker",
+            "SaveSpeaker",
+            "LoadSpeaker",
+            "MergeSpeaker",
+            "RenameSpeaker",
+            "LoadWhisperModel",
+            "WhisperTranscribe"
+        ],
+        {
+            "title_aux": "Comfyui ChatTTS"
+        }
+    ],
+    "https://github.com/shadowcz007/comfyui-liveportrait": [
+        [
+            "LivePortraitNode",
+            "LivePortraitVideoNode",
+            "FaceCropInfo",
+            "Retargeting",
+            "ExpressionEditor_"
+        ],
+        {
+            "title_aux": "comfyui liveportrait"
+        }
+    ],
     "https://github.com/shadowcz007/comfyui-mixlab-nodes": [
         [
             "3DImage",
@@ -12470,6 +12500,20 @@
             "CharacterInText",
             "ChatGPTOpenAI",
             "CkptNames_",
+            "VAEEncodeForInpaint_Frames",
+            "ImageListReplace_",
+            "LoadVideoAndSegment_",
+            "VideoCombine_Adv",
+            "LoadAndCombinedAudio_",
+            "CombineAudioVideo",
+            "ScenesNode_",
+            "GenerateFramesByCount",
+            "ChatGPTOpenAI",
+            "SiliconflowLLM",
+            "ShowTextForGPT",
+            "CharacterInText",
+            "TextSplitByDelimiter",
+            "AudioPlay",
             "Color",
             "ComparingTwoFrames_",
             "CompositeImages_",
@@ -12554,7 +12598,6 @@
     ],
     "https://github.com/shadowcz007/comfyui-sound-lab": [
         [
-            "AudioPlay",
             "Musicgen_",
             "StableAudio_"
         ],
