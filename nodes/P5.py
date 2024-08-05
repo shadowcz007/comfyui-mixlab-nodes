@@ -84,11 +84,11 @@ class P5Input:
     def run(self, frames):
         ims=[]
         for im in frames['images']:
-            print(im)
+            # print(im)
             if 'type' in im and (not f"[{im['type']}]" in im['name']):
                 im['name']=im['name']+" "+f"[{im['type']}]"
                 
-            output_image, output_mask = load_image(im)
+            output_image, output_mask = load_image(im['name'])
             ims.append(output_image)
 
         if len(ims)==0:
@@ -101,4 +101,4 @@ class P5Input:
             image1 = torch.cat((image1, image2), dim=0)
 
         # 用于节点提示:p5节点提示有多少帧
-        return {"ui": {"_info": [len(frames['base64'])]}, "result": (image1,)}
+        return {"ui": {"_info": [len(frames['images'])]}, "result": (image1,)}
