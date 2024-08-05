@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+
+  <style>
+    body {
+      height: 600px;
+      padding: 24px;
+    }
+
+    iframe {
+      min-height: 600px !important
+    }
+
+    /* 自定义滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      /* 滚动条宽度 */
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      /* 滚动条轨道颜色 */
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      /* 滚动条滑块颜色 */
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+      /* 滚动条滑块悬停颜色 */
+    }
+  </style>
+  <!-- <script src="./p5.js"></script> -->
+  <!-- <script src="./sketch.js"></script> -->
+  <!-- <script src="./src/CCapture.js"></script> -->
+  <!-- <script src="./src/gif.js"></script>
+   <script src="./src/gif.worker.js"></script> -->
+  <!-- <script src="./src/download.js"></script> -->
+  <!-- <script src="./src/webm-writer-0.2.0.js"></script> -->
+
+</head>
+
+<body>
+
+  <script>
+
+    function getIdFromUrl(url) {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      return urlParams.get('id');
+    }
+
+
+
+    // 监听来自iframe的消息
+    window.addEventListener('message', (event) => {
+      const data = event.data;
+      const nodeId = getIdFromUrl(window.location.href);
+
+      if (data.from === 'p5.widget' && data.status === 'save') {
+        const frames = data.frames;
+        // 示例用法
+        // const url = 'https://example.com/page?id=12345';
+        window.parent.postMessage({
+          frames,
+          from: 'p5.widget',
+          status: 'save',
+          nodeId
+        }, '*');
+        window.location.reload()
+      }
+      // console.log(data)
+      // if (data.from === 'p5.widget' && data.status === 'capture') {
+      //   window.parent.postMessage({
+      //     from: 'p5.widget',
+      //     status: 'capture',
+      //     frameCount: data.frameCount,
+      //     maxCount: data.maxCount,
+      //     nodeId
+      //   }, '*');
+      // }
+    });
+
+
+  </script>
+  <script type="text/p5" data-height="500" data-preview-width="300">
+function setup() {
+createCanvas(100, 100);
+}
+    
+function draw() {
+background(255, 0, 200);
+}
+    </script>
+  <script src="./p5-widget/p5-widget.js"></script>
+</body>
+
+</html>

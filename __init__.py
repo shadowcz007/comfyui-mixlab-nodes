@@ -1011,6 +1011,7 @@ from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,F
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
 
+from .nodes.P5 import P5Input
 
 
 # 要导出的所有节点及其名称的字典
@@ -1094,7 +1095,9 @@ NODE_CLASS_MAPPINGS = {
     "MaskListReplace_":MaskListReplace, 
     "IncrementingListNode_":IncrementingListNode,
     "PreviewMask_":PreviewMask_,
-    "AudioPlay":AudioPlayNode
+    "AudioPlay":AudioPlayNode,
+
+    "P5Input":P5Input
 }
 
 # 一个包含节点友好/可读的标题的字典
@@ -1157,6 +1160,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "AudioPlay":"Preview Audio ♾️Mixlab",
 
      "MultiplicationNode":"Math Operation ♾️Mixlab",
+
+     "P5Input":"P5 Input ♾️Mixlab for test"
 }
 
 # web ui的节点功能

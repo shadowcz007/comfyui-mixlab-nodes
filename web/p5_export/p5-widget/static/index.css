@@ -1,0 +1,17 @@
+html {
+  min-width: 768px;
+}
+
+body {
+  font-family: Georgia, serif;
+  max-width: 740px;
+  margin: 0 auto;
+}
+
+h1, h2, h3 {
+  font-weight: normal;
+}
+
+a {
+  color: inherit;
+}

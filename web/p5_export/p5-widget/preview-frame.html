@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Preview</title>
+
+<body>
+  <script src="./p5.js"></script>
+
+  <script src="./src/CCapture.js"></script>
+  <!-- <script src="src/gif.js"></script> -->
+  <!-- <script src="src/gif.worker.js"></script> -->
+  <!-- <script src="src/download.js"></script> -->
+  <!-- <script src="src/tar.js"></script> -->
+
+  <script>
+    let capturer = new CCapture({
+      format: 'png',
+      framerate: 60,
+      verbose: true
+    });
+
+
+    var capturer_start = () => {
+      if (frameCount === 1) {
+        capturer.start();
+      }
+    }
+
+
+    var capturer_end = (t = 24) => {
+
+      if (frameCount < t) {
+        capturer.capture(canvas, t);
+      } else if (frameCount === t) {
+        capturer.save(null);
+        capturer.stop();
+        capturer = null;
+      }
+    }
+
+  </script>
+
+  <script src="./preview-frame.bundle.js"></script>
+</body>
