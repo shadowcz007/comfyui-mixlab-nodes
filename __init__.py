@@ -1161,7 +1161,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
      "MultiplicationNode":"Math Operation ♾️Mixlab",
 
-     "P5Input":"P5 Input ♾️Mixlab"
+     "P5Input":"P5 Input ♾️Mixlab for test"
 }
 
 # web ui的节点功能
