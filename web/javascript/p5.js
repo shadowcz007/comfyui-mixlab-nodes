@@ -121,11 +121,8 @@ const p5InputNode = {
       nodeType.prototype.onExecuted = function (message) {
         onExecuted?.apply(this, arguments)
         // console.log('##onExecuted', this, message._info)
-        // if (message._info) {
-        //   //判断几帧
-        //   let widget = this.widgets.filter(w => w.name == 'image_base64')[0]
-          
-        // }
+        //   app.graph.getNodeById(8).widgets[1].div.querySelector('iframe').contentWindow.postMessage('Hello from parent', '*');
+
       }
     }
   },
