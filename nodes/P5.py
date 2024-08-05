@@ -1,9 +1,12 @@
 import torch
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageSequence,ImageOps
 import base64
 import io
 import comfy.utils
+import folder_paths
+import node_helpers
+
 
 # Tensor to PIL
 def tensor2pil(image):
@@ -13,23 +16,51 @@ def tensor2pil(image):
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
+def load_image( image):
+    image_path = folder_paths.get_annotated_filepath(image)
+        
+    img = node_helpers.pillow(Image.open, image_path)
+        
+    output_images = []
+    output_masks = []
+    w, h = None, None
 
+    excluded_formats = ['MPO']
+        
+    for i in ImageSequence.Iterator(img):
+        i = node_helpers.pillow(ImageOps.exif_transpose, i)
 
+        if i.mode == 'I':
+            i = i.point(lambda i: i * (1 / 255))
+        image = i.convert("RGB")
 
-def base64_to_image(base64_string):
-    # 去除前缀
-    prefix, base64_data = base64_string.split(",", 1)
-    
-    # 从base64字符串中解码图像数据
-    image_data = base64.b64decode(base64_data)
-    
-    # 创建一个内存流对象
-    image_stream = io.BytesIO(image_data)
-    
-    # 使用PIL的Image模块打开图像数据
-    image = Image.open(image_stream)
-    
-    return image
+        if len(output_images) == 0:
+            w = image.size[0]
+            h = image.size[1]
+            
+        if image.size[0] != w or image.size[1] != h:
+            continue
+            
+        image = np.array(image).astype(np.float32) / 255.0
+        image = torch.from_numpy(image)[None,]
+        if 'A' in i.getbands():
+            mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+            mask = 1. - torch.from_numpy(mask)
+        else:
+            mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+        output_images.append(image)
+        output_masks.append(mask.unsqueeze(0))
+
+    if len(output_images) > 1 and img.format not in excluded_formats:
+        output_image = torch.cat(output_images, dim=0)
+        output_mask = torch.cat(output_masks, dim=0)
+    else:
+        output_image = output_images[0]
+        output_mask = output_masks[0]
+
+    return (output_image, output_mask)
+
+          
 
 class P5Input:
     @classmethod
@@ -51,13 +82,14 @@ class P5Input:
     OUTPUT_IS_LIST = (False,)
 
     def run(self, frames):
-        # print(frames)
         ims=[]
-        for im in frames['base64']:
-            image = base64_to_image(im)
-            image=image.convert('RGB')
-            image=pil2tensor(image)
-            ims.append(image)
+        for im in frames['images']:
+            print(im)
+            if 'type' in im and (not f"[{im['type']}]" in im['name']):
+                im['name']=im['name']+" "+f"[{im['type']}]"
+                
+            output_image, output_mask = load_image(im)
+            ims.append(output_image)
 
         if len(ims)==0:
             image1 = Image.new('RGB', (512, 512), color='black')

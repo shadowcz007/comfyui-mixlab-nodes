@@ -1,6 +1,41 @@
 import { app } from '../../../scripts/app.js'
-import { ComfyWidgets } from '../../../scripts/widgets.js'
+import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
+
+function base64ToBlobFromURL (base64URL, contentType) {
+  return fetch(base64URL).then(response => response.blob())
+}
+
+async function uploadImage (blob, fileType = '.svg', filename) {
+  // const blob = await (await fetch(src)).blob();
+  const body = new FormData()
+  body.append(
+    'image',
+    new File([blob], (filename || new Date().getTime()) + fileType)
+  )
+
+  const resp = await api.fetchApi('/upload/image', {
+    method: 'POST',
+    body
+  })
+
+  // console.log(resp)
+  let data = await resp.json()
+  let { name, subfolder } = data
+  // let src = api.apiURL(
+  //   `/view?filename=${encodeURIComponent(
+  //     name
+  //   )}&type=input&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
+  // )
+
+  return data
+}
+// 上传得到url
+async function uploadBase64ToFile (base64) {
+  let bg_blob = await base64ToBlobFromURL(base64)
+  let url = await uploadImage(bg_blob, '.png')
+  return url
+}
 
 function get_position_style (ctx, widget_width, y, node_height) {
   const MARGIN = 4 // the margin around the html element
@@ -41,7 +76,7 @@ const p5InputNode = {
       IMAGEBASE64 (node, inputName, inputData, app) {
         const widget = {
           value: {
-            base64: []
+            images: []
           }, // 不能[x,x,x]
           type: inputData[0], // the type
           name: inputName, // the name, slice
@@ -122,7 +157,6 @@ const p5InputNode = {
         onExecuted?.apply(this, arguments)
         // console.log('##onExecuted', this, message._info)
         //   app.graph.getNodeById(8).widgets[1].div.querySelector('iframe').contentWindow.postMessage('Hello from parent', '*');
-
       }
     }
   },
@@ -138,7 +172,7 @@ const p5InputNode = {
       let framesWidget = node.widgets?.filter(w => w.name == 'frames')[0]
       if (node.type === 'P5Input' && widget) {
         if (framesWidget && !framesWidget.value)
-          framesWidget.value = { base64: [] }
+          framesWidget.value = { images: [] }
 
         framesWidget.value._seed = Math.random()
 
@@ -149,7 +183,7 @@ const p5InputNode = {
          ></iframe>`
 
         // 监听来自iframe的消息
-        const ms = event => {
+        const ms = async event => {
           const data = event.data
           if (
             data.from === 'p5.widget' &&
@@ -160,7 +194,13 @@ const p5InputNode = {
           ) {
             const frames = data.frames
             console.log(frames.length, nodeId)
-            framesWidget.value.base64 = frames;
+            //workflow会存储到local，会卡死
+            framesWidget.value.images = []
+            for (const f of frames) {
+              let file = await uploadBase64ToFile(f)
+              framesWidget.value.images.push(file)
+            }
+            // framesWidget.value.base64 = frames
             framesWidget.value._seed = Math.random()
             node.title = 'P5 Input #' + frames.length
           }

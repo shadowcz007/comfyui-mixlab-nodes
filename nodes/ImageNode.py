@@ -1598,7 +1598,7 @@ class LoadImagesFromURL:
 
     def run(self,url,seed=0):
         global urls_image
-        print(urls_image)
+        # print(urls_image)
         def filter_http_urls(urls):
             filtered_urls = []
             for url in urls.split('\n'):
