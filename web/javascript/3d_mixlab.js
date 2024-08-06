@@ -415,7 +415,8 @@ app.registerExtension({
                 // 创建一个input元素
                 var input = document.createElement('input')
                 input.type = 'file'
-
+                input.accept = 'image/*';
+                
                 // 监听input的change事件
                 input.addEventListener('change', function () {
                   // 获取上传的文件
