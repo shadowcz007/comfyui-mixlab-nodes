@@ -1515,29 +1515,29 @@ class TextImage:
                     "font": (get_files_with_extension(FONT_PATH,['.ttf','.otf']),),#后缀为 ttf
                     "font_size": ("INT",{
                                 "default":100, 
-                                "min": 100, #Minimum value
-                                "max": 1000, #Maximum value
+                                "min": 1, #Minimum value
+                                "max": 10000000, #Maximum value
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
                     "spacing": ("INT",{
                                 "default":12, 
-                                "min": -200, #Minimum value
-                                "max": 200, #Maximum value
+                                "min": -2000000000, #Minimum value
+                                "max": 2000000000, #Maximum value
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
                     "line_spacing": ("INT",{
                                 "default":12, 
-                                "min": -200, #Minimum value
-                                "max": 200, #Maximum value
+                                "min": -2000000000, #Minimum value
+                                "max": 2000000000, #Maximum value
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 
                     "padding": ("INT",{
                                 "default":8, 
                                 "min": 0, #Minimum value
-                                "max": 200, #Maximum value
+                                "max": 2000000000, #Maximum value
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }), 

@@ -4,7 +4,7 @@ watchdog
 opencv-python-headless
 matplotlib
 openai
-simple-lama-inpainting
+# simple-lama-inpainting
 clip-interrogator==0.6.0
 transformers>=4.36.0
 lark-parser
@@ -18,3 +18,4 @@ huggingface-hub
 scikit-image
 torchaudio
 soundfile>=0.12.1
+json-repair

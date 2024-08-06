@@ -16,6 +16,8 @@
 
 - 增加 Edit Mask，方便在生成的时候手动绘制 mask [workflow](./workflow/edit-mask-workflow.json)
 
+- LaMaInpainting 调整为手动安装
+
 <!-- - ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。模型下载后，放置到 `models/llamafile/` -->
 
 <!-- - 右键菜单支持 text-to-text，方便对 prompt 词补全 -->
@@ -120,7 +122,7 @@ https://github.com/shadowcz007/comfyui-mixlab-nodes/assets/12645064/e7e77f90-e43
 
 ### GPT
 
-> Support for calling multiple GPTs.Local LLM（llama.cpp）、 ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 . Azure OpenAI:https://xxxx.openai.azure.com
+> Support for calling multiple GPTs.Local LLM 、 ChatGPT、ChatGLM3 、ChatGLM4 , Some code provided by rui. If you are using OpenAI's service, fill in https://api.openai.com/v1 . If you are using a local LLM service, fill in http://127.0.0.1:xxxx/v1 . Azure OpenAI:https://xxxx.openai.azure.com
 
 [LLM_base_workflow](./workflow/LLM_base_workflow.json)
 
@@ -259,9 +261,13 @@ Add edges to an image.
 
 ![FeatheredMask](./assets/FlVou_Y6kaGWYoEj1Tn0aTd4AjMI.jpg)
 
-> LaMaInpainting
+> LaMaInpainting（需要手动安装）
+
+*  simple-lama-inpainting 里的pillow造成冲突，暂时从依赖里移除，如果有安装 simple-lama-inpainting ，节点会自动添加，没有，则不会自动添加。
 
 from [simple-lama-inpainting](https://github.com/enesmsahin/simple-lama-inpainting)
+
+* [问题汇总](https://github.com/shadowcz007/comfyui-mixlab-nodes/issues/294)
 
 > rembgNode
 
