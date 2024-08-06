@@ -8,6 +8,7 @@ from PIL.PngImagePlugin import PngInfo
 import base64,os,random
 from io import BytesIO
 import folder_paths
+import node_helpers
 import json,io
 import comfy.utils
 from comfy.cli_args import args
@@ -490,6 +491,53 @@ def load_image(fp,white_bg=False):
         })
         
     return images
+
+
+# 读取图片数据，转成tensor
+def load_image_to_tensor( image):
+    image_path = folder_paths.get_annotated_filepath(image)
+        
+    img = node_helpers.pillow(Image.open, image_path)
+        
+    output_images = []
+    output_masks = []
+    w, h = None, None
+
+    excluded_formats = ['MPO']
+        
+    for i in ImageSequence.Iterator(img):
+        i = node_helpers.pillow(ImageOps.exif_transpose, i)
+
+        if i.mode == 'I':
+            i = i.point(lambda i: i * (1 / 255))
+        image = i.convert("RGB")
+
+        if len(output_images) == 0:
+            w = image.size[0]
+            h = image.size[1]
+            
+        if image.size[0] != w or image.size[1] != h:
+            continue
+            
+        image = np.array(image).astype(np.float32) / 255.0
+        image = torch.from_numpy(image)[None,]
+        if 'A' in i.getbands():
+            mask = np.array(i.getchannel('A')).astype(np.float32) / 255.0
+            mask = 1. - torch.from_numpy(mask)
+        else:
+            mask = torch.zeros((64,64), dtype=torch.float32, device="cpu")
+        output_images.append(image)
+        output_masks.append(mask.unsqueeze(0))
+
+    if len(output_images) > 1 and img.format not in excluded_formats:
+        output_image = torch.cat(output_images, dim=0)
+        output_mask = torch.cat(output_masks, dim=0)
+    else:
+        output_image = output_images[0]
+        output_mask = output_masks[0]
+
+    return (output_image, output_mask)
+
 
 def load_image_and_mask_from_url(url, timeout=10):
     # Load the image from the URL
@@ -1687,28 +1735,51 @@ class Image3D:
     def run(self,upload,material=None):
         # print('material',material)
         # print(upload )
-        image = base64_to_image(upload['image'])
 
-        mat=None
-        if 'material' in upload and upload['material']:
-            mat=base64_to_image(upload['material'])
-            mat=mat.convert('RGB')
-            mat=pil2tensor(mat)
+        # 截取的系列角度截图
+        images=upload['images'] if "images" in upload else []
 
-        mask = image.split()[3]
-        image=image.convert('RGB')
+        ims=[]
+        for im in images:
+            if 'type' in im and (not f"[{im['type']}]" in im['name']):
+                im['name']=im['name']+" "+f"[{im['type']}]"
+            output_image, output_mask = load_image_to_tensor(im['name'])
+            ims.append(output_image)
         
-        mask=mask.convert('L')
-
+        
+        mask=None
         bg_image=None
-        if 'bg_image' in upload and upload['bg_image']:
-            bg_image = base64_to_image(upload['bg_image'])
-            bg_image=bg_image.convert('RGB')
-            bg_image=pil2tensor(bg_image)
+        mat=None
+
+        # 如果没有系列截图
+        if len(ims)==0:
+            # 这个是3d模型当前截图
+            image = base64_to_image(upload['image'])
+
+            
+            if 'material' in upload and upload['material']:
+                mat=base64_to_image(upload['material'])
+                mat=mat.convert('RGB')
+                mat=pil2tensor(mat)
+
+            mask = image.split()[3]
+            image=image.convert('RGB')
+            
+            mask=mask.convert('L')
+
+            
+            if 'bg_image' in upload and upload['bg_image']:
+                bg_image = base64_to_image(upload['bg_image'])
+                bg_image=bg_image.convert('RGB')
+                bg_image=pil2tensor(bg_image)
 
 
-        mask=pil2tensor(mask)
-        image=pil2tensor(image)
+            mask=pil2tensor(mask)
+            image=pil2tensor(image)
+        else:
+            
+            image = torch.cat(ims, dim=0)
+
         
         m=[]
         if not material is None:

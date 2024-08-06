@@ -26,7 +26,8 @@ const setLocalDataOfWin = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value))
   // window[key] = value
 }
-async function uploadImage (blob, fileType = '.svg', filename) {
+
+async function uploadImage_ (blob, fileType = '.svg', filename) {
   // const blob = await (await fetch(src)).blob();
   const body = new FormData()
   body.append(
@@ -41,13 +42,17 @@ async function uploadImage (blob, fileType = '.svg', filename) {
 
   // console.log(resp)
   let data = await resp.json()
+  return data
+}
+
+async function uploadImage (blob, fileType = '.svg', filename) {
+  let data = await uploadImage_(blob, fileType, filename)
   let { name, subfolder } = data
   let src = api.apiURL(
     `/view?filename=${encodeURIComponent(
       name
     )}&type=input&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
   )
-
   return src
 }
 
@@ -189,7 +194,7 @@ app.registerExtension({
             let d = getLocalData('_mixlab_3d_image')
             // console.log('serializeValue', node)
             if (d && d[node.id]) {
-              let { url, bg, material } = d[node.id]
+              let { url, bg, material, images } = d[node.id]
               let data = {}
               if (url) {
                 data.image = await parseImage(url)
@@ -203,6 +208,10 @@ app.registerExtension({
 
               if (material) {
                 data.material = await parseImage(material)
+              }
+
+              if (images) {
+                data.images = images
               }
 
               return JSON.parse(JSON.stringify(data))
@@ -276,6 +285,7 @@ app.registerExtension({
               const fileURL = URL.createObjectURL(file)
               // console.log('文件URL: ', fileURL)
               let html = `<model-viewer  src="${fileURL}" 
+                oncontextmenu="return false;"
                 min-field-of-view="0deg" max-field-of-view="180deg"
                  shadow-intensity="1" 
                  camera-controls 
@@ -286,6 +296,10 @@ app.registerExtension({
                   <div>Material: <select class="material"></select></div>
                   <div>Material: <div class="material_img"> </div></div>
                   <div><button class="bg">BG</button></div>
+                  <div>
+                   <input class="ddcap_range" type="range" min="-120" max="120" step="1" value="0">
+                  <button class="ddcap">Capture Rotational Screenshots</button></div>
+                  
                   <div><button class="export">Export GLB</button></div>
                   
                 </div></model-viewer>`
@@ -303,8 +317,73 @@ app.registerExtension({
               const bg = preview.querySelector('.bg')
               const exportGLB = preview.querySelector('.export')
 
+              const ddcap_range = preview.querySelector('.ddcap_range')
+              const ddCap = preview.querySelector('.ddcap')
+              const sleep = (t = 1000) => {
+                return new Promise((res, rej) => {
+                  return setTimeout(() => {
+                    res(t)
+                  }, t)
+                })
+              }
+
+              async function captureImage (isUrl = true) {
+                let base64Data = modelViewerVariants.toDataURL()
+
+                const contentType = getContentTypeFromBase64(base64Data)
+
+                const blob = await base64ToBlobFromURL(base64Data, contentType)
+
+                if (isUrl) return await uploadImage(blob, '.png')
+                return await uploadImage_(blob, '.png')
+              }
+
+              async function captureImages (totalRotation = 120) {
+                // 记录初始旋转角度
+                const initialCameraOrbit =
+                  modelViewerVariants.cameraOrbit.split(' ')
+
+                const totalImages = 12
+                const angleIncrement = totalRotation / totalImages // Each increment in degrees
+                let currentAngle =
+                  Number(initialCameraOrbit[0].replace('deg', '')) -
+                  totalRotation / 2 // Start from the leftmost angle
+                let frames = []
+
+                modelViewerVariants.removeAttribute('camera-controls')
+
+                for (let i = 0; i < totalImages; i++) {
+                  modelViewerVariants.cameraOrbit = `${currentAngle}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
+                  await sleep(1000)
+                  console.log(`Capturing image at angle: ${currentAngle}deg`)
+                  let file = await captureImage(false)
+                  frames.push(file)
+                  currentAngle += angleIncrement
+                }
+                await sleep(1000)
+                // 恢复到初始旋转角度
+                modelViewerVariants.cameraOrbit = initialCameraOrbit.join(' ')
+                modelViewerVariants.setAttribute('camera-controls', '')
+                return frames
+              }
+              ddCap.addEventListener('click', async e => {
+                let images = await captureImages()
+                // console.log(images)
+                let dd = getLocalData(key)
+                dd[that.id].images = images
+                setLocalDataOfWin(key, dd)
+              })
+
+              ddcap_range.addEventListener('input', async e => {
+                // console.log(ddcap_range.value)
+                const initialCameraOrbit =
+                  modelViewerVariants.cameraOrbit.split(' ')
+                modelViewerVariants.cameraOrbit = `${ddcap_range.value}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
+                modelViewerVariants.setAttribute('camera-controls', '')
+              })
+
               if (modelViewerVariants) {
-                modelViewerVariants.style.width = `${that.size[0] - 24}px`
+                modelViewerVariants.style.width = `${that.size[0] - 48}px`
                 modelViewerVariants.style.height = `${that.size[1] - 48}px`
               }
 
@@ -339,15 +418,9 @@ app.registerExtension({
 
               async function checkCameraChange () {
                 let dd = getLocalData(key)
-                let base64Data = modelViewerVariants.toDataURL()
-
-                const contentType = getContentTypeFromBase64(base64Data)
-
-                const blob = await base64ToBlobFromURL(base64Data, contentType)
 
                 //  const fileBlob = new Blob([e.target.result], { type: file.type });
-                let url = await uploadImage(blob, '.png')
-                // console.log(url)
+                let url = await captureImage()
 
                 let bg_blob = await base64ToBlobFromURL(
                   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN88uXrPQAFwwK/6xJ6CQAAAABJRU5ErkJggg=='
@@ -411,12 +484,30 @@ app.registerExtension({
                 checkCameraChange()
               })
 
+              //更新bg
+              const updateBgData = (id, key, url, w, h) => {
+                let dd = getLocalData(key)
+                // console.log(dd[that.id],url)
+                if (!dd[id]) dd[id] = { url: '', bg: url }
+                dd[id] = {
+                  ...dd[id],
+                  bg: url,
+                  bg_w: w,
+                  bg_h: h
+                }
+                setLocalDataOfWin(key, dd)
+              }
+
               bg.addEventListener('click', () => {
+                //更新bg
+                updateBgData(that.id, key, '', 0, 0)
+                preview.style.backgroundImage = 'none'
+
                 // 创建一个input元素
                 var input = document.createElement('input')
                 input.type = 'file'
-                input.accept = 'image/*';
-                
+                input.accept = 'image/*'
+
                 // 监听input的change事件
                 input.addEventListener('change', function () {
                   // 获取上传的文件
@@ -439,20 +530,17 @@ app.registerExtension({
                     let bg_url = await uploadImage(blob, '.png')
                     let bg_img = await createImage(base64)
 
-                    let dd = getLocalData(key)
-                    // console.log(dd[that.id],bg_url)
-                    if (!dd[that.id]) dd[that.id] = { url: '', bg: bg_url }
-                    dd[that.id] = {
-                      ...dd[that.id],
-                      bg: bg_url,
-                      bg_w: bg_img.naturalWidth,
-                      bg_h: bg_img.naturalHeight
-                    }
-
-                    setLocalDataOfWin(key, dd)
+                    //更新bg
+                    updateBgData(
+                      that.id,
+                      key,
+                      bg_url,
+                      bg_img.naturalWidth,
+                      bg_img.naturalHeight
+                    )
 
                     // 更新尺寸
-                    let w = that.size[0] - 24,
+                    let w = that.size[0] - 48,
                       h = (w * bg_img.naturalHeight) / bg_img.naturalWidth
 
                     if (modelViewerVariants) {
@@ -487,7 +575,7 @@ app.registerExtension({
               if (dd[that.id]) {
                 const { bg_w, bg_h } = dd[that.id]
                 if (bg_h && bg_w) {
-                  let w = that.size[0] - 24,
+                  let w = that.size[0] - 48,
                     h = (w * bg_h) / bg_w
 
                   if (modelViewerVariants) {
@@ -507,9 +595,11 @@ app.registerExtension({
 
         let preview = document.createElement('div')
         preview.className = 'preview'
-        preview.style = `margin-top: 12px;display: flex;
+        preview.style = `margin-top: 12px;
+          display: flex;
           justify-content: center;
-          align-items: center;background-repeat: no-repeat;background-size: contain;`
+          align-items: center;background-repeat: no-repeat;
+          background-size: contain;`
 
         let upload = inputDiv('_mixlab_3d_image', '3D Model', preview)
 
@@ -528,7 +618,7 @@ app.registerExtension({
           if (dd[that.id]) {
             const { bg_w, bg_h } = dd[that.id]
             if (bg_h && bg_w) {
-              let w = that.size[0] - 24,
+              let w = that.size[0] - 48,
                 h = (w * bg_h) / bg_w
 
               if (modelViewerVariants) {
@@ -562,7 +652,7 @@ app.registerExtension({
         const r = onExecuted?.apply?.(this, arguments)
 
         let div = this.widgets.filter(d => d.div)[0]?.div
-        console.log('Test', this.widgets)
+        // console.log('Test', this.widgets)
 
         let material = message.material[0]
         if (material) {

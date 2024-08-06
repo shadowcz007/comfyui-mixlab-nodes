@@ -16,7 +16,7 @@ def tensor2pil(image):
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
-def load_image( image):
+def load_image_to_tensor( image):
     image_path = folder_paths.get_annotated_filepath(image)
         
     img = node_helpers.pillow(Image.open, image_path)
@@ -88,7 +88,7 @@ class P5Input:
             if 'type' in im and (not f"[{im['type']}]" in im['name']):
                 im['name']=im['name']+" "+f"[{im['type']}]"
                 
-            output_image, output_mask = load_image(im['name'])
+            output_image, output_mask = load_image_to_tensor(im['name'])
             ims.append(output_image)
 
         if len(ims)==0:
