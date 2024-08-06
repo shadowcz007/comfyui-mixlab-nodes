@@ -46,26 +46,35 @@ except ImportError:
     print("or")
     print("pip install -r requirements.txt")
     sys.exit()
-   
-def is_installed(package, package_overwrite=None):
+
+
+def is_installed(package, package_overwrite=None,auto_install=True):
+    is_has=False
     try:
         spec = importlib.util.find_spec(package)
+        is_has=spec is not None
     except ModuleNotFoundError:
         pass
 
     package = package_overwrite or package
 
     if spec is None:
-        print(f"Installing {package}...")
-        # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
-        command = f'"{python}" -m pip install {package}'
-  
-        result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
+        if auto_install==True:
+            print(f"Installing {package}...")
+            # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
+            command = f'"{python}" -m pip install {package}'
+    
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
 
-        if result.returncode != 0:
-            print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
+            is_has=True
+
+            if result.returncode != 0:
+                print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
+                is_has=False
     else:
         print(package+'## OK')
+
+    return is_has
      
 try:
     import OpenSSL
@@ -86,7 +95,6 @@ except ImportError:
     print("pip install -r requirements.txt")
     is_installed('watchdog')
     sys.exit()
-
 
 
 def install_openai():
@@ -1172,7 +1180,7 @@ logging.info('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 # print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 
 try:
-    from .nodes.ChatGPT import ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
+    from .nodes.ChatGPT import JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
     NODE_CLASS_MAPPINGS_V = { 
@@ -1181,6 +1189,7 @@ try:
         "ShowTextForGPT":ShowTextForGPT,
         "CharacterInText":CharacterInText,
         "TextSplitByDelimiter":TextSplitByDelimiter,
+        "JsonRepair":JsonRepair
     }
 
     # 一个包含节点友好/可读的标题的字典
@@ -1190,6 +1199,7 @@ try:
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
         "CharacterInText":"Character In Text",
         "TextSplitByDelimiter":"Text Split By Delimiter",
+        "JsonRepair":"Json Repair"
     }
 
 
@@ -1209,10 +1219,12 @@ except Exception as e:
     logging.info('edit_mask.available False')
 
 try:
-    from .nodes.Lama import LaMaInpainting
-    logging.info('LaMaInpainting.available {}'.format(LaMaInpainting.available))
-    if LaMaInpainting.available:
-        NODE_CLASS_MAPPINGS['LaMaInpainting']=LaMaInpainting
+    is_has=is_installed('simple_lama_inpainting',None,False)
+    if is_has:
+        from .nodes.Lama import LaMaInpainting
+        logging.info('LaMaInpainting.available {}'.format(LaMaInpainting.available))
+        if LaMaInpainting.available:
+            NODE_CLASS_MAPPINGS['LaMaInpainting']=LaMaInpainting
 except Exception as e:
     logging.info('LaMaInpainting.available False')
 

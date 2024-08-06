@@ -6,14 +6,69 @@ import folder_paths
 import hashlib
 import codecs,sys
 import importlib.util
+import subprocess
+
+python = sys.executable
+
+# 从文本中提取json
+def extract_json_strings(text):
+    json_strings = []
+    brace_level = 0
+    json_str = ''
+    in_json = False
+    
+    for char in text:
+        if char == '{':
+            brace_level += 1
+            in_json = True
+        if in_json:
+            json_str += char
+        if char == '}':
+            brace_level -= 1
+        if in_json and brace_level == 0:
+            json_strings.append(json_str)
+            json_str = ''
+            in_json = False
+
+    return json_strings[0] if len(json_strings)>0 else "{}"
 
 
-def is_installed(package):
+def is_installed(package, package_overwrite=None,auto_install=True):
+    is_has=False
     try:
         spec = importlib.util.find_spec(package)
+        is_has=spec is not None
     except ModuleNotFoundError:
-        return False
-    return spec is not None
+        pass
+
+    package = package_overwrite or package
+
+    if spec is None:
+        if auto_install==True:
+            print(f"Installing {package}...")
+            # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
+            command = f'"{python}" -m pip install {package}'
+    
+            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
+
+            is_has=True
+
+            if result.returncode != 0:
+                print(f"Couldn't install\nCommand: {command}\nError code: {result.returncode}")
+                is_has=False
+    else:
+        print(package+'## OK')
+
+    return is_has
+  
+
+
+# def is_installed(package):
+#     try:
+#         spec = importlib.util.find_spec(package)
+#     except ModuleNotFoundError:
+#         return False
+#     return spec is not None
 
 
 def get_unique_hash(string):
@@ -59,24 +114,8 @@ def openai_client(key,url):
     return client
 
 def ZhipuAI_client(key):
-
     try:
-        if is_installed('zhipuai')==False:
-            import subprocess
-
-            # 安装
-            print('#pip install zhipuai')
-
-            result = subprocess.run([sys.executable, '-s', '-m', 'pip', 'install', 'zhipuai'], capture_output=True, text=True)
-
-            #检查命令执行结果
-            if result.returncode == 0:
-                print("#install success")
-                from zhipuai import ZhipuAI
-            else:
-                print("#install error")
-            
-        else:
+        if is_installed('zhipuai')==True:
             from zhipuai import ZhipuAI
     except:
         print("#install zhipuai error")
@@ -160,7 +199,9 @@ def get_llama_path():
 
 #         return llm
 
-    
+
+if is_installed('json_repair'):
+    from json_repair import repair_json
 
 
 def chat(client, model_name,messages ):
@@ -645,3 +686,35 @@ class TextSplitByDelimiter:
         arr= arr[start_index:start_index + max_count * (skip_every+1):(skip_every+1)]
 
         return (arr,)
+
+
+class JsonRepair:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {
+            "required": {
+                 "json_string":("STRING", {"forceInput": True,}), 
+            }
+        }
+
+    INPUT_IS_LIST = False
+    RETURN_TYPES = ("STRING",)
+    FUNCTION = "run"
+    # OUTPUT_NODE = True
+    OUTPUT_IS_LIST = (False,)
+
+    CATEGORY = "♾️Mixlab/GPT"
+
+    def run(self, json_string):
+
+        json_string=extract_json_strings(json_string)
+        # print(json_string)
+        good_json_string = repair_json(json_string)
+
+        # 将 JSON 字符串解析为 Python 对象
+        data = json.loads(good_json_string)
+
+        # 将 Python 对象转换回 JSON 字符串，确保中文字符不被转义
+        json_str_with_chinese = json.dumps(data, ensure_ascii=False)
+
+        return (json_str_with_chinese,)
