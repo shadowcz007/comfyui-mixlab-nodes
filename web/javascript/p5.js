@@ -94,7 +94,7 @@ const p5InputNode = {
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'P5Input') {
-      console.log('P5Input')
+      // console.log('P5Input')
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
 
       nodeType.prototype.onNodeCreated = function () {

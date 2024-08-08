@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="/extensions/comfyui-mixlab-nodes/style/threeStyle.css">
+		<link type="text/css" rel="stylesheet" href="/extensions/comfyui-mixlab-nodes/style/progressStyle.css">
+	</head>
+
+	<body>
+		<div id="progress-container">
+			<dialog open id="progress-dialog">
+				<p>
+					<label for="progress-indicator">Loading scene...</label>
+				</p>
+				<progress max="100" id="progress-indicator"></progress>
+			</dialog>
+		</div>
+
+		<div id="container"></div>
+	 
+		<script id="visualizer" type="module" filepath="" crossorigin src="/extensions/comfyui-mixlab-nodes/lib/threeVisualizer.js"></script>
+		<button id="screenshotButton">Take Screenshot</button>
+	</body>
+
+</html>

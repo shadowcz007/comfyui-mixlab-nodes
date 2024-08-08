@@ -3291,3 +3291,95 @@ class ImageListToBatch_:
         out = torch.cat(out, dim=0)
 
         return (out,)
+
+
+# https://github.com/gokayfem/ComfyUI-Depth-Visualization?tab=readme-ov-file
+class DepthViewer_:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "depth_map": ("IMAGE",),
+
+            },
+             "optional":{
+                  "frames":("IMAGEBASE64",), 
+                },
+        }
+
+    def __init__(self):
+        self.saved_reference = []
+        self.saved_depth = []
+
+        self.full_output_folder,self.filename,self.counter, self.subfolder, self.filename_prefix = folder_paths.get_save_image_path(
+            "imagesave", 
+            folder_paths.get_output_directory())
+
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("frames",)
+    
+    OUTPUT_NODE = True
+
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/3D"
+    def run(self, image, depth_map,frames=None):
+        self.saved_reference.clear()
+        self.saved_depth.clear()
+        image = image[0].detach().cpu().numpy()
+        depth = depth_map[0].detach().cpu().numpy()
+
+        image = Image.fromarray(np.clip(255. * image, 0, 255).astype(np.uint8)).convert('RGB')
+        depth = Image.fromarray(np.clip(255. * depth, 0, 255).astype(np.uint8))
+
+        return self.display([image], [depth],frames)
+
+    def display(self, reference_image, depth_map,frames):
+        for (batch_number, (single_image, single_depth)) in enumerate(zip(reference_image, depth_map)):
+            filename_with_batch_num = self.filename.replace("%batch_num%", str(batch_number))
+
+            image_file = f"{filename_with_batch_num}_{self.counter:05}_reference.png"
+            single_image.save(os.path.join(self.full_output_folder, image_file))
+
+            depth_file = f"{filename_with_batch_num}_{self.counter:05}_depth.png"
+            single_depth.save(os.path.join(self.full_output_folder, depth_file))
+
+            self.saved_reference.append({
+                "filename": image_file,
+                "subfolder": self.subfolder,
+                "type": "output"
+            })
+
+            self.saved_depth.append({
+                "filename": depth_file,
+                "subfolder": self.subfolder,
+                "type": "output"
+            })
+            self.counter += 1
+
+
+        ims=[]
+        image1 = Image.new('RGB', (512, 512), color='black')
+        image1=pil2tensor(image1)
+
+        if frames!=None:
+            for im in frames['images']:
+                # print(im)
+                if 'type' in im and (not f"[{im['type']}]" in im['name']):
+                    im['name']=im['name']+" "+f"[{im['type']}]"
+                    
+                output_image, output_mask = load_image_to_tensor(im['name'])
+                ims.append(output_image)
+
+            if len(ims)>0:
+                image1 = ims[0]
+                for image2 in ims[1:]:
+                    if image1.shape[1:] != image2.shape[1:]:
+                        image2 = comfy.utils.common_upscale(image2.movedim(-1, 1), image1.shape[2], image1.shape[1], "bilinear", "center").movedim(1, -1)
+                    image1 = torch.cat((image1, image2), dim=0)
+
+        return {"ui": {"reference_image": self.saved_reference, "depth_map": self.saved_depth}, "result": (image1,)}

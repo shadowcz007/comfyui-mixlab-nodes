@@ -694,18 +694,20 @@ class JsonRepair:
         return {
             "required": {
                  "json_string":("STRING", {"forceInput": True,}), 
+                 "key":("STRING", {"multiline": False,"dynamicPrompts": False,"default": ""}),
             }
         }
 
     INPUT_IS_LIST = False
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("STRING","STRING",)
+    RETURN_NAMES = ("json_string","value",)
     FUNCTION = "run"
     # OUTPUT_NODE = True
-    OUTPUT_IS_LIST = (False,)
+    OUTPUT_IS_LIST = (False,False,)
 
     CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, json_string):
+    def run(self, json_string,key=""):
 
         json_string=extract_json_strings(json_string)
         # print(json_string)
@@ -714,7 +716,11 @@ class JsonRepair:
         # 将 JSON 字符串解析为 Python 对象
         data = json.loads(good_json_string)
 
+        v=""
+        if key!="" and (key in data):
+            v=data[key]
+
         # 将 Python 对象转换回 JSON 字符串，确保中文字符不被转义
         json_str_with_chinese = json.dumps(data, ensure_ascii=False)
 
-        return (json_str_with_chinese,)
+        return (json_str_with_chinese,v,)
