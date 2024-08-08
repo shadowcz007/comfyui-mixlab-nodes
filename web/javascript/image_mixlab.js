@@ -681,6 +681,7 @@ const addBase64ToWidgetForLoadImagesToBatch = (
   imagesWidget,
   imagesDiv
 ) => {
+  if(!imagesWidget.value.base64) imagesWidget.value.base64=[]
   imagesWidget.value.base64.push(base64)
   let im = createInputImageForBatch(base64, imagesWidget)
   imagesDiv.appendChild(im)
