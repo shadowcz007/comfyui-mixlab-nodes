@@ -799,7 +799,7 @@ async def mixlab_post_prompt(request):
     
     prompt=json_data['prompt'] if 'prompt' in json_data else None
 
-    if len(apps)==1:
+    if len(apps)>0:
         # 取到prompt
         prompt=apps[0]['data']['output']
         # 更新input_data到prompt里
