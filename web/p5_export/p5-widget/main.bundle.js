@@ -73,28 +73,22 @@
 	    }
 	    initialContent = initialContent.replace(/\r\n/g, '\n').trim();
 	    ReactDOM.render(React.createElement(app_1.default, {initialContent: initialContent, autosaver: new autosaver_1.SessionStorageAutosaver(id), baseSketchURL: baseSketchURL, p5version: p5version, previewWidth: previewWidth, maxRunTime: maxRunTime, autoplay: autoplay}), document.getElementById('app-holder'));
+	    // 监听来自iframe的消息
+	    window.addEventListener('message', function (event) {
+	        var data = event.data;
+	        // console.log("#main", data)
+	        if (data.from === 'p5.widget' && data.status === 'save') {
+	            var frames_1 = data.frames;
+	            window.parent.postMessage({
+	                frames: frames_1,
+	                from: 'p5.widget',
+	                status: 'save',
+	                _from: "main"
+	            }, '*');
+	        }
+	    });
 	}
 	window.addEventListener('load', start);
-	// 监听来自iframe的消息
-	window.addEventListener('message', function (event) {
-	    var data = event.data;
-	    if (data.from === 'p5.widget' && data.status === 'save') {
-	        var frames_1 = data.frames;
-	        window.parent.postMessage({
-	            frames: frames_1,
-	            from: 'p5.widget',
-	            status: 'save'
-	        }, '*');
-	    }
-	    // if (data.from === 'p5.widget' && data.status === 'capture') {
-	    //   window.parent.postMessage({
-	    //     from: 'p5.widget',
-	    //     status: 'capture',
-	    //     frameCount: data.frameCount,
-	    //     maxCount: data.maxCount,
-	    //   }, '*');
-	    // }
-	});
 
 
 /***/ }),
@@ -23670,7 +23664,7 @@
 /***/ (function(module, exports) {
 
 	"use strict";
-	exports.P5_VERSION = '0.4.23';
+	exports.P5_VERSION = '1.10.0';
 	exports.PREVIEW_WIDTH = 150;
 	exports.HEIGHT = 300;
 	exports.MAX_RUN_TIME = 1000;
@@ -23766,6 +23760,10 @@
 	        };
 	        this.handleStopClick = function () {
 	            _this.setState({ isPlaying: false });
+	            window.parent.postMessage({
+	                from: 'p5.widget',
+	                status: 'stop'
+	            }, '*');
 	        };
 	        this.handleUndoClick = function () {
 	            _this.refs.editor.undo();
@@ -23956,7 +23954,7 @@
 	    }
 	    Toolbar.prototype.render = function () {
 	        return (React.createElement("div", {className: "toolbar"}, React.createElement("a", {className: "p5-logo", href: "http://p5js.org/", target: "_blank"}, React.createElement("img", {src: "static/img/p5js-beta.svg", alt: "p5js.org"})), React.createElement("button", {onClick: this.props.onPlayClick}, React.createElement(OpenIconicMediaPlay, null), "Play"), this.props.onStopClick
-	            ? React.createElement("button", {onClick: this.props.onStopClick}, React.createElement(OpenIconicMediaStop, null), "Stop ", this.props.progress)
+	            ? React.createElement("button", {onClick: this.props.onStopClick}, React.createElement(OpenIconicMediaStop, null), "Stop")
 	            : null, this.props.onUndoClick
 	            ? React.createElement("button", {onClick: this.props.onUndoClick}, React.createElement(OpenIconicActionUndo, null), "Undo")
 	            : null, this.props.onRedoClick
@@ -34945,8 +34943,7 @@
 	        content = implicit_sketch_1.default(content);
 	        try {
 	            content = falafel_1.default(content, {}, loop_inserter_1.default(function (node) {
-	                return LOOP_CHECK_FUNC_NAME + "(" +
-	                    JSON.stringify(node.range) + ");";
+	                return LOOP_CHECK_FUNC_NAME + "(" + JSON.stringify(node.range) + ");";
 	            })).toString();
 	        }
 	        catch (e) {
@@ -34998,6 +34995,7 @@
 	"use strict";
 	var esprima = __webpack_require__(204);
 	var parse = esprima.parse;
+	var LOOP_CHECK_FUNC_NAME = '__loopCheck';
 	function default_1(src, opts, fn) {
 	    if (typeof opts === 'function') {
 	        fn = opts;
@@ -35080,7 +35078,6 @@
 	        console.log('#Found draw function:', node);
 	        var hasCapturerStart_1 = false;
 	        var hasCapturerEnd_1 = false;
-	        // Traverse the function body to check for `capturer_start()` and `capturer_end()`
 	        (function checkCapturerCalls(bodyNode) {
 	            if (bodyNode.type === 'CallExpression' &&
 	                bodyNode.callee &&
@@ -40865,25 +40862,48 @@
 	"use strict";
 	function defaultInserter(name) {
 	    return function (node) {
-	        return name + "();";
+	        return name + '();';
 	    };
 	}
+	var LOOP_CHECK_FUNC_NAME = '__loopCheck';
 	function LoopInserter(fn) {
-	    if (typeof (fn) == "string")
-	        fn = defaultInserter(fn);
 	    return function (node) {
-	        if (node.type == 'WhileStatement' ||
-	            node.type == 'ForStatement' ||
-	            node.type == 'DoWhileStatement') {
-	            node.body.update('{ ' + fn(node) + node.body.source() + ' }');
-	            return true;
+	        if (node.type === 'ForStatement' ||
+	            node.type === 'WhileStatement' ||
+	            node.type === 'DoWhileStatement') {
+	            var loopCheckCode = {
+	                type: 'ExpressionStatement',
+	                expression: {
+	                    type: 'CallExpression',
+	                    callee: {
+	                        type: 'Identifier',
+	                        name: LOOP_CHECK_FUNC_NAME
+	                    },
+	                    arguments: [
+	                        {
+	                            type: 'Literal',
+	                            value: JSON.stringify(node.range)
+	                        }
+	                    ]
+	                }
+	            };
+	            if (node.body.type === 'BlockStatement') {
+	                // Insert the loop check at the beginning of the block
+	                node.body.body.unshift(loopCheckCode);
+	            }
+	            else {
+	                // Wrap the single statement body in a block and insert the loop check
+	                node.body = {
+	                    type: 'BlockStatement',
+	                    body: [loopCheckCode, node.body]
+	                };
+	            }
 	        }
-	        return false;
+	        return '';
 	    };
 	}
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = LoopInserter;
-	;
 
 
 /***/ }),

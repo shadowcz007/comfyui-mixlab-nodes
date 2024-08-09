@@ -782,7 +782,7 @@ def random_seed(seed, data):
 @routes.post("/mixlab/prompt")
 async def mixlab_post_prompt(request):
     p_intance=PromptServer.instance
-    logging.info("got prompt")
+    logging.info("/mixlab/prompt")
     resp_code = 200
     out_string = ""
     json_data =  await request.json()
@@ -798,10 +798,11 @@ async def mixlab_post_prompt(request):
     apps=get_my_workflow_for_app(json_data['filename'],json_data['category'],False)
     
     prompt=json_data['prompt'] if 'prompt' in json_data else None
-
+    
     if len(apps)>0:
         # 取到prompt
         prompt=apps[0]['data']['output']
+        # logging.info(prompt)
         # 更新input_data到prompt里
         '''
           {

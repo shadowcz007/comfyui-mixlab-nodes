@@ -47,14 +47,12 @@
       return urlParams.get('id');
     }
 
-
-
     // 监听来自iframe的消息
     window.addEventListener('message', (event) => {
       const data = event.data;
       const nodeId = getIdFromUrl(window.location.href);
-
-      if (data.from === 'p5.widget' && data.status === 'save') {
+      // console.log('#p5html', data)
+      if (data.from === 'p5.widget' && data.status === 'save' && data._from == 'main') {
         const frames = data.frames;
         // 示例用法
         // const url = 'https://example.com/page?id=12345';
@@ -62,32 +60,77 @@
           frames,
           from: 'p5.widget',
           status: 'save',
+          nodeId,
+          id:(new Date()).getTime()
+        }, '*');
+        // window.location.reload()
+      }
+      if (data.from === 'p5.widget' && data.status === 'stop') {
+
+        window.parent.postMessage({
+          from: 'p5.widget',
+          status: 'stop',
           nodeId
         }, '*');
-        window.location.reload()
+        // window.location.reload()
       }
-      // console.log(data)
-      // if (data.from === 'p5.widget' && data.status === 'capture') {
-      //   window.parent.postMessage({
-      //     from: 'p5.widget',
-      //     status: 'capture',
-      //     frameCount: data.frameCount,
-      //     maxCount: data.maxCount,
-      //     nodeId
-      //   }, '*');
-      // }
+
+
     });
 
 
   </script>
-  <script type="text/p5" data-height="500" data-preview-width="300">
-function setup() {
-createCanvas(100, 100);
-}
+  <script type="text/p5" data-height="500" data-preview-width="300" >
+    const TO_GOAL = 0.3
+    const NOISE_AMP = 3.1415 / 100
     
-function draw() {
-background(255, 0, 200);
-}
+    let g_width
+    let g_red
+    let g_green
+    let g_blue
+    
+    function draw_triangle (angle) {
+      triangle(
+        cos(TWO_PI / 3 + angle) * g_width,
+        sin(TWO_PI / 3 + angle) * g_width,
+        cos((TWO_PI / 3) * 2 + angle) * g_width,
+        sin((TWO_PI / 3) * 2 + angle) * g_width,
+        cos((TWO_PI / 3) * 3 + angle) * g_width,
+        sin((TWO_PI / 3) * 3 + angle) * g_width
+      )
+    }
+    
+    function setup () {
+      createCanvas(300, 300)
+      mouseX = 300 / 2
+      mouseY = 300 / 2
+      g_red = map(mouseX, 0, 300, 0, PI)
+      g_green = map(mouseX, 0, 300, 0, PI)
+      g_blue = map(mouseX, 0, 300, 0, PI)
+      g_width = min(300, 300) / 3
+    }
+    
+    function draw () {
+      background(0)
+      push()
+      translate(300 / 2, 300 / 2)
+      blendMode(ADD)
+      g_red =
+        g_red +
+        (map(0, 0, windowWidth, 0, PI) - g_red) * TO_GOAL +
+        random(-NOISE_AMP, NOISE_AMP)
+      g_green =
+        g_green + (g_red - g_green) * TO_GOAL + random(-NOISE_AMP, NOISE_AMP)
+      g_blue = g_blue + (g_green - g_blue) * TO_GOAL + random(-NOISE_AMP, NOISE_AMP)
+      fill(255, 0, 0)
+      draw_triangle(g_red)
+      fill(0, 255, 0)
+      draw_triangle(g_green)
+      fill(0, 0, 255)
+      draw_triangle(g_blue)
+      pop()
+    }
+    
     </script>
   <script src="./p5-widget/p5-widget.js"></script>
 </body>

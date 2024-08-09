@@ -6,6 +6,9 @@
 
 ##### `最新`：
 
+- 增加p5.js作为输入节点
+[workflow](./workflow/p5workflow.json)
+
 - App模式增加batch prompt，批量提示词，可以把动态提示词批量组成后运行
 
 ![alt text](./assets/1722517810720.png)

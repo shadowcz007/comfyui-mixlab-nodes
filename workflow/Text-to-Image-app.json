@@ -1,6 +1,6 @@
 {
-  "last_node_id": 27,
-  "last_link_id": 35,
+  "last_node_id": 26,
+  "last_link_id": 34,
   "nodes": [
     {
       "id": 5,
@@ -53,7 +53,7 @@
         "1": 58
       },
       "flags": {},
-      "order": 11,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -233,6 +233,55 @@
       ]
     },
     {
+      "id": 2,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        567,
+        -2422
+      ],
+      "size": {
+        "0": 315,
+        "1": 98
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            5,
+            6
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            8
+          ],
+          "slot_index": 2
+        }
+      ],
+      "title": "Model",
+      "properties": {
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "deliberate_v2.safetensors"
+      ]
+    },
+    {
       "id": 1,
       "type": "KSampler",
       "pos": [
@@ -292,7 +341,7 @@
         "Node name for S&R": "KSampler"
       },
       "widgets_values": [
-        1075183199100584,
+        52336089190516,
         "randomize",
         15,
         6.9,
@@ -398,8 +447,8 @@
           "name": "IMAGE",
           "type": "IMAGE",
           "links": [
-            34,
-            35
+            33,
+            34
           ],
           "slot_index": 0
         }
@@ -407,6 +456,43 @@
       "properties": {
         "Node name for S&R": "VAEDecode"
       }
+    },
+    {
+      "id": 26,
+      "type": "AppInfo",
+      "pos": [
+        2134,
+        -2264
+      ],
+      "size": {
+        "0": 400,
+        "1": 344.00006103515625
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "LOGO",
+          "type": "IMAGE",
+          "link": 33
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AppInfo"
+      },
+      "widgets_values": [
+        "Text-to-Image",
+        "4\n22\n23\n2\n\n\n",
+        "16",
+        "演示基本的文生图流程",
+        1,
+        "#comfyui-mixlab-nodes# ",
+        "https://",
+        "",
+        "enable",
+        1
+      ]
     },
     {
       "id": 14,
@@ -420,7 +506,7 @@
         "1": 130
       },
       "flags": {},
-      "order": 2,
+      "order": 3,
       "mode": 0,
       "outputs": [
         {
@@ -493,92 +579,6 @@
         512,
         512,
         1
-      ]
-    },
-    {
-      "id": 27,
-      "type": "AppInfo",
-      "pos": [
-        2135,
-        -2298
-      ],
-      "size": {
-        "0": 400,
-        "1": 344
-      },
-      "flags": {},
-      "order": 12,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "image",
-          "type": "IMAGE",
-          "link": 35
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "AppInfo"
-      },
-      "widgets_values": [
-        "Text-to-Image",
-        "4\n22\n23\n2\n\n\n",
-        "16",
-        "演示基本的文生图流程",
-        1,
-        "#comfyui-mixlab-nodes# ",
-        "https://",
-        "",
-        "enable",
-        2
-      ]
-    },
-    {
-      "id": 2,
-      "type": "CheckpointLoaderSimple",
-      "pos": [
-        569,
-        -2352
-      ],
-      "size": {
-        "0": 315,
-        "1": 98
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "MODEL",
-          "type": "MODEL",
-          "links": [
-            1
-          ],
-          "slot_index": 0
-        },
-        {
-          "name": "CLIP",
-          "type": "CLIP",
-          "links": [
-            5,
-            6
-          ],
-          "slot_index": 1
-        },
-        {
-          "name": "VAE",
-          "type": "VAE",
-          "links": [
-            8
-          ],
-          "slot_index": 2
-        }
-      ],
-      "title": "Model",
-      "properties": {
-        "Node name for S&R": "CheckpointLoaderSimple"
-      },
-      "widgets_values": [
-        "deliberate_v2.safetensors"
       ]
     }
   ],
@@ -696,32 +696,24 @@
       "INT"
     ],
     [
+      33,
+      6,
+      0,
+      26,
+      0,
+      "IMAGE"
+    ],
+    [
       34,
       6,
       0,
       15,
       0,
       "IMAGE"
-    ],
-    [
-      35,
-      6,
-      0,
-      27,
-      0,
-      "IMAGE"
     ]
   ],
   "groups": [],
   "config": {},
-  "extra": {
-    "ds": {
-      "scale": 0.5989500000000009,
-      "offset": [
-        -460.5491671202501,
-        3156.827063152762
-      ]
-    }
-  },
+  "extra": {},
   "version": 0.4
 }

@@ -171,6 +171,7 @@ const p5InputNode = {
       let widget = node.widgets?.filter(w => w.name == 'image_base64')[0]
       let framesWidget = node.widgets?.filter(w => w.name == 'frames')[0]
       if (node.type === 'P5Input' && widget) {
+        console.log('#nodeCreated P5Input')
         if (framesWidget && !framesWidget.value)
           framesWidget.value = { images: [] }
 
@@ -185,15 +186,17 @@ const p5InputNode = {
         // 监听来自iframe的消息
         const ms = async event => {
           const data = event.data
+          console.log('#P5 Input #', data)
           if (
             data.from === 'p5.widget' &&
             data.status === 'save' &&
             data.frames &&
-            data.frames.length > 0 &&
-            data.nodeId == nodeId
+            data.frames.length >= 0 &&
+            data.nodeId == nodeId &&
+            data.id != framesWidget.value.id
           ) {
             const frames = data.frames
-            console.log(frames.length, nodeId)
+
             //workflow会存储到local，会卡死
             framesWidget.value.images = []
             for (const f of frames) {
@@ -201,10 +204,12 @@ const p5InputNode = {
               framesWidget.value.images.push(file)
             }
             // framesWidget.value.base64 = frames
-            framesWidget.value._seed = Math.random()
+            // framesWidget.value._seed = Math.random()
             node.title = 'P5 Input #' + frames.length
+            framesWidget.value.id = data.id
           }
         }
+
         window.addEventListener('message', ms)
       }
     }, 1000)

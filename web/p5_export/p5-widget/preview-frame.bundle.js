@@ -54,7 +54,7 @@
 	    cb = cb || (function () { });
 	    script.onload = cb;
 	    script.onerror = function () {
-	        console.log("Failed to load script: " + url);
+	        console.log('Failed to load script: ' + url);
 	    };
 	    script.setAttribute('src', url);
 	    document.body.appendChild(script);
@@ -92,7 +92,7 @@
 	        if (Date.now() - startTime > maxRunTime) {
 	            self.wasTriggered = true;
 	            loopCheckFailureRange = range;
-	            throw new Error("Loop took over " + maxRunTime + " ms to run");
+	            throw new Error('Loop took over ' + maxRunTime + ' ms to run');
 	        }
 	    };
 	    setInterval(function () {
@@ -115,11 +115,12 @@
 	    global.addEventListener('error', function (e) {
 	        var message = e.message;
 	        var line = undefined;
+	        // console.log(message)
 	        if (loopChecker.wasTriggered) {
-	            message = "Your loop is taking too long to run.";
+	            message = 'Your loop is taking too long to run.';
 	            line = loopChecker.getLineNumber();
 	        }
-	        else if (typeof (e.lineno) === 'number' &&
+	        else if (typeof e.lineno === 'number' &&
 	            (e.filename === '' || e.filename === window.location.href)) {
 	            line = e.lineno;
 	        }
@@ -131,12 +132,15 @@
 	        catch (e) { }
 	        errorCb(message, line);
 	    });
-	    loadScripts([
-	        p5url(p5version),
-	    ], function () {
+	    loadScripts([p5url(p5version)], function () {
 	        document.body.appendChild(sketchScript);
 	        if (document.readyState === 'complete') {
-	            new global.p5();
+	            try {
+	                new global.p5();
+	            }
+	            catch (e) {
+	                console.error('Failed to initialize p5:', e);
+	            }
 	        }
 	    });
 	}

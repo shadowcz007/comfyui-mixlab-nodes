@@ -229,7 +229,7 @@
 /***/ (function(module, exports) {
 
 	"use strict";
-	exports.P5_VERSION = '0.4.23';
+	exports.P5_VERSION = '1.10.0';
 	exports.PREVIEW_WIDTH = 150;
 	exports.HEIGHT = 300;
 	exports.MAX_RUN_TIME = 1000;
