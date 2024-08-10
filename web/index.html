@@ -2749,7 +2749,7 @@
             // console.log(appData)
             // 使用示例：
             var ui = await createUI(appData, share);
-
+            if (!ui) return
             // 更新标题
             ui.title.update(appData.name || 'Mixlab APP');
 
@@ -3088,15 +3088,18 @@
             //     return true;
             // });
 
-            // author信息
-            if (appData.author) {
+           // author信息
+           if (appData.author) {
                 let div = document.body.querySelector('#author');
-                if (appData.author.link) div.href = appData.author.link
-                div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 24px;left: 24px;cursor: pointer;text-decoration: none;color: black;`
-                div.innerHTML = `<p style="font-size:12px;margin: 8px 0;">Author:</p>
+                if (div) {
+                    if (appData.author.link) div.href = appData.author.link
+                    div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 24px;left: 24px;cursor: pointer;text-decoration: none;color: black;`
+                    div.innerHTML = `<p style="font-size:12px;margin: 8px 0;">Author:</p>
                 <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
                 <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
+                }
+
             }
 
         }

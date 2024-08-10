@@ -795,7 +795,10 @@ async def mixlab_post_prompt(request):
     # 种子
     seed=json_data['seed'] if "seed" in json_data else {}
 
-    apps=get_my_workflow_for_app(json_data['filename'],json_data['category'],False)
+    try:
+        apps=json_data['apps']
+    except:
+        apps=get_my_workflow_for_app(json_data['filename'],json_data['category'],False)
     
     prompt=json_data['prompt'] if 'prompt' in json_data else None
     
