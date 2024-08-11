@@ -208,6 +208,21 @@
             box-shadow: 0px 0px 10px 10px #fbe9f0;
         }
 
+        .image-with-grid {
+            position: relative;
+            width: fit-content;
+            display: flex;
+            background-size: 20px 20px;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
+                linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+            background-position: 0 0, 10px 10px;
+        }
+
+        .image-with-grid> :first-child {
+            margin-left: 0;
+            margin-top: 0;
+        }
+
         /* .card:hover {
     box-shadow: 0px 0px 10px 10px #e9fbfa;
 } */
@@ -343,7 +358,7 @@
             width: fit-content;
             max-width: 100%;
             margin-left: 12px;
-            /*min-height: 200px;*/
+            min-height: 200px;
         }
 
         .input_card {
@@ -665,6 +680,16 @@
             user-select: none;
         }
     </style>
+
+    <style>
+        .editor_canvas {
+            border: 1px solid #ccc;
+            position: absolute;
+            top: 178px;
+            left: 49px;
+
+        }
+    </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
     <link href="/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css" rel="stylesheet">
     <link href="/extensions/comfyui-mixlab-nodes/lib/classic.min.css" rel="stylesheet">
@@ -676,10 +701,33 @@
 
 <body>
 
-    <div id="editor_container">
-        <iframe style="width:100%; height:100vh;" id="miniPaint"
-            src="/extensions/comfyui-mixlab-nodes/lib/miniPaint-4.14.2/index.html" allow="camera"></iframe>
+    <div class="editor" id="editor_container">
+        <h1>蒙版绘制工具</h1>
+        <div class="controls">
+            <div class="tool-group">
+                <button id="autoCut">Auto Cut</button>
+                <select id="modelSelect"></select>
+                <button id="brush" class="active">画笔</button>
+                <button id="eraser">橡皮擦</button>
+            </div>
+            <div class="tool-group">
+                <label for="size">笔刷大小：</label>
+                <input type="range" id="size" min="1" max="50" value="10">
+                <span id="sizeValue">10</span>
+            </div>
+            <div class="tool-group">
+                <button id="clear">清空画布</button>
+                <button id="save">保存蒙版</button>
+                <button id="closeEditor">Close</button>
+            </div>
+        </div>
+        <div id="canvasContainer">
+            <canvas id="baseCanvas" class="editor_canvas" width="800" height="600"></canvas>
+            <canvas id="maskCanvas" class="editor_canvas" width="800" height="600"></canvas>
+        </div>
     </div>
+
+
     <div class="header">
         <div id="logo">Explore your creative potential with <a class="link"
                 href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
@@ -760,120 +808,92 @@
 
         // 图像编辑
         async function editImage(image, data) {
-            //判断mask是否有输出
-            let isMask = data.options.hasMask;
 
+            let baseImage = await Command.createImage(data.options.defaultImage)
             //app
             document.body.querySelector('.app').style.display = 'none'
             document.body.querySelector('#author').style.display = 'none'
 
             let editor = document.querySelector('#editor_container')
             editor.style.display = 'block';
-            const iframe = editor.querySelector('iframe');
 
-            const sleep = (t = 1000) => {
-                return new Promise((res, rej) => {
-                    setTimeout(() => {
-                        res(true)
-                    }, t)
-                })
-            }
 
-            //清空 图层
-            const removeAllLayer = () => {
-                let Layers = iframe.contentWindow.Layers;
-                //清空
-                Layers.reset_layers()
-                Layers.refresh_gui()
-            }
+            // 使用示例
+            const maskDrawer = new MaskDrawer(
+                'baseCanvas',
+                'maskCanvas',
+                'brush',
+                'eraser',
+                'size',
+                'sizeValue',
+                'clear',
+                'save',
+                'autoCut',
+                'modelSelect',
+                'closeEditor'
+            );
 
-            // 复原
-            const resetLayer = () => {
-                let Layers = iframe.contentWindow.Layers;
-                for (const layer of Layers.get_layers()) {
-                    layer.visible = true;
-                }
-                Layers.refresh_gui()
-            }
-            //取image
-            const getImageBase64FromLayer = () => {
-                let Layers = iframe.contentWindow.Layers;
-                let tempCanvas = document.createElement("canvas");
-                let tempCtx = tempCanvas.getContext("2d");
-                let dim = Layers.get_dimensions();
-                tempCanvas.width = dim.width;
-                tempCanvas.height = dim.height;
-                for (const layer of Layers.get_layers()) {
-                    if (layer.name === 'Image_' + data.id) {
-                        layer.visible = true;
-                    } else {
-                        layer.visible = false;
+            // 对外提供的接口
+            maskDrawer.newImageForMaskEdit(baseImage);
+
+
+            function imageParseMask(im) {
+                // 创建一个临时canvas
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // 设置临时canvas的尺寸
+                tempCanvas.width = im.naturalWidth;
+                tempCanvas.height = im.naturalHeight;
+
+                // 将图像绘制到临时canvas上
+                tempCtx.drawImage(im, 0, 0);
+
+                // 获取图像数据
+                const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = imageData.data;
+
+                // 遍历每个像素并修改透明通道
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i + 3] < 255) { // 透明
+                        data[i] = 0;     // R
+                        data[i + 1] = 255; // G
+                        data[i + 2] = 0; // B
+                        data[i + 3] = 255 - data[i + 3]; // A
+                    } else { // 不透明
+                        data[i + 3] = 0; // 透明
                     }
                 }
-                Layers.refresh_gui()
 
-                Layers.convert_layers_to_canvas(tempCtx);
-                return tempCanvas.toDataURL()
+                // 将修改后的数据放回临时canvas
+                tempCtx.putImageData(imageData, 0, 0);
+
+                return tempCanvas;
             }
 
-            //add mask
-            const addMask = (id, name, image) => {
-                let Layers = iframe.contentWindow.Layers;
-                var new_mask_layer = {
-                    id,
-                    name,
-                    type: 'brush',
-                    data: [],
-                    render_function: ['brush', 'render'],
-                    width: image.naturalWidth || image.width,
-                    height: image.naturalHeight || image.height,
+            let im = await Command.createImage(image.src)
+            console.log(im.naturalWidth)
+            let maskElement = imageParseMask(im)
+            maskDrawer.loadMask(maskElement);
 
-                };
-                Layers.insert(new_mask_layer);
-            }
-
-            //add image
-            const addImage = (id, name, image) => {
-                let Layers = iframe.contentWindow.Layers;
-                var new_mask_layer = {
-                    id,
-                    name,
-                    type: 'image',
-                    data: image,
-                    width: image.naturalWidth || image.width,
-                    height: image.naturalHeight || image.height,
-                    width_original: image.naturalWidth || image.width,
-                    height_original: image.naturalHeight || image.height,
-                };
-                Layers.insert(new_mask_layer);
-            }
-
-            //默认的画笔size设置大
-            // let inputSize = (iframe.contentDocument.getElementById('size')).querySelector('input');
-            // inputSize.value=50;
-            // (iframe.contentDocument.getElementById('size')).querySelector('.increase_number').click()
+            // maskDrawer.saveMask();
+            // maskDrawer.autoCut();
+            // maskDrawer.initializeModelOptions(['Model 1', 'Model 2', 'Model 3']);
 
             //自动抠图
-            let autoMaskSelect = iframe.contentDocument.getElementById('automask_image_mixlab');
-            const select = iframe.contentDocument.getElementById('automask_models_mixlab');
-            if (select.children.length === 0) {
-                let rembgModels = await Command.get_rembg_models()
-                // 遍历模型列表并创建选项
-                for (const model of rembgModels) {
-                    const option = document.createElement('option');
-                    option.value = model;
-                    option.textContent = model;
-                    select.appendChild(option);
-                }
+            let rembgModels = await Command.get_rembg_models()
+            // 遍历模型列表并创建选项
+            maskDrawer.initializeModelOptions(rembgModels)
+
+            maskDrawer.close = () => {
+                editor.style.display = 'none';
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
             }
 
-            let autoMaskBtn = iframe.contentDocument.getElementById('automask_image_mixlab');
-            if (!autoMaskBtn.getAttribute('init')) autoMaskBtn.addEventListener('click', async e => {
+            maskDrawer.autoCutCallback = async (modelName, base64) => {
                 //api请求
-                let base64 = getImageBase64FromLayer()
-                resetLayer()
-
-                let res = await Command.run_rembg(select.value, base64)
+                let res = await Command.run_rembg(modelName, base64)
                 const match = res.match(/^data:image\/(\w+);base64,/);
                 if (!match) {
                     res = 'data:image/png;base64,' + res
@@ -883,155 +903,65 @@
 
                 let mb = Command.convertImageToBlackBasedOnAlpha(image)
                 let mask = await Command.createImage(mb)
-                let id = Layers.auto_increment;
-                addImage(id, 'Mask_' + data.id + id, mask)
-            })
+                return mask
+            }
 
-            autoMaskBtn.setAttribute('init', 1)
-            let cancelImageBtn = iframe.contentDocument.getElementById('cancel_image_mixlab');
-            if (!cancelImageBtn.getAttribute('init')) cancelImageBtn.addEventListener('click', e => {
+            maskDrawer.saveCallback = async (base64, width, height) => {
+
+                let fileBlob = Command.base64ToBlob(base64)
+                // // 获取读取的文件内容，即 Blob 对象
+                let hashId = await Command.calculateImageHash(fileBlob)
+
+                if (window._appData.data && hashId == window._appData.data[data.id].hashId) {
+                    document.body.querySelector('.app').style.display = 'flex'
+                    document.body.querySelector('#author').style.display = 'block'
+                    return;
+                }
+
+                //底图
+                const { url: imgurl } = await Command.uploadImage(
+                    Command.base64ToBlob(data.options.defaultImage
+                    ))
+
+                //mask
+                let { url, name } = await Command.uploadMask(fileBlob, imgurl);
+                // 在这里可以对 Blob 对象进行进一步处理
+                // imageElement.src = url;
+                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
+
+                //更新输入参数
+                updateInputData(data.id, (inputs) => {
+                    inputs.image = name
+                    return inputs
+                })
+
+
+                // console.log("上传的文件：", url, data.id, name);
+                //更新图片
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+
+                const defaultImage = await Command.createImage(data.options.defaultImage)
+                ctx.drawImage(defaultImage, 0, 0, width, height);
+
+                // 绘制base64图片
+                // const base64Image = base64
+                const base64ImageObj = await Command.createImage(base64)
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.drawImage(base64ImageObj, 0, 0, width, height);
+                image.src = canvas.toDataURL();
+
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
+                // console.log(base64);
                 editor.style.display = 'none';
-                document.body.querySelector('.app').style.display = 'flex'
-                document.body.querySelector('#author').style.display = 'block'
-            })
-
-            cancelImageBtn.setAttribute('init', 1)
-            // 获取 id 为 "mix" 的 button 元素
-            let saveImageBtn = iframe.contentDocument.getElementById('save_image_mixlab');
-            saveImageBtn.style = `width: 98px;
-            height: 36px;
-            margin: 0 12px;
-            background-color: var(--background-color-active);
-            color: var(--text-color-active);`
-            if (!saveImageBtn.getAttribute('init')) saveImageBtn.addEventListener('click', async e => {
-                //保存，并更新图片
-                e.preventDefault();
-
-                //image的合成，排除mask和brush
-                if (isMask) {
-
-                    let Layers = iframe.contentWindow.Layers;
-                    let tempCanvas = document.createElement("canvas");
-                    let tempCtx = tempCanvas.getContext("2d");
-                    let dim = Layers.get_dimensions();
-                    tempCanvas.width = dim.width;
-                    tempCanvas.height = dim.height;
-
-                    //todo 获取Image更新后的数据(暂不支持image的修改)
-
-                    for (const layer of Layers.get_layers()) {
-                        if (layer.name !== 'Image_' + data.id) {
-                            layer.visible = true;
-                        } else {
-                            layer.visible = false;
-                        }
-                    }
-                    Layers.refresh_gui()
-
-                    Layers.convert_layers_to_canvas(tempCtx);
-
-                    // 复原
-                    resetLayer()
-
-                    // 获取图像数据
-                    const imageData = tempCtx.getImageData(0, 0, dim.width, dim.height);
-                    const imageDataData = imageData.data;
-
-                    // 反相图像数据
-                    for (let i = 0; i < imageDataData.length; i += 4) {
-                        // imageDataData[i] = 255 - imageDataData[i];
-                        // imageDataData[i + 1] = 255 - imageDataData[i + 1];
-                        // imageDataData[i + 2] = 255 - imageDataData[i + 2];
-                        imageDataData[i + 3] = 255 - imageDataData[i + 3]; // 反相透明度
-                    }
-
-                    // 更新画布
-                    tempCtx.putImageData(imageData, 0, 0);
-
-
-                    let base64 = tempCanvas.toDataURL();
-                    // console.log(base64);
-                    editor.style.display = 'none';
-
-                    let fileBlob = Command.base64ToBlob(base64)
-                    // // 获取读取的文件内容，即 Blob 对象
-                    let hashId = await Command.calculateImageHash(fileBlob)
-
-                    if (window._appData.data && hashId == window._appData.data[data.id].hashId) {
-                        document.body.querySelector('.app').style.display = 'flex'
-                        document.body.querySelector('#author').style.display = 'block'
-                        return;
-                    }
-
-                    //底图
-                    const { url: imgurl } = await Command.uploadImage(Command.base64ToBlob(data.options.defaultImage))
-                    //mask
-                    let { url, name } = await Command.uploadMask(fileBlob, imgurl);
-                    // 在这里可以对 Blob 对象进行进一步处理
-                    // imageElement.src = url;
-                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
-                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
-
-                    //更新输入参数
-                    updateInputData(data.id, (inputs) => {
-                        inputs.image = name
-                        return inputs
-                    })
-
-
-                    // console.log("上传的文件：", url, data.id, name);
-                    //更新图片
-                    const canvas = document.createElement("canvas");
-                    canvas.width = dim.width;
-                    canvas.height = dim.height;
-
-                    const ctx = canvas.getContext('2d');
-
-                    const defaultImage = await Command.createImage(data.options.defaultImage)
-                    ctx.drawImage(defaultImage, 0, 0, dim.width, dim.height);
-
-                    // 绘制base64图片
-                    // const base64Image = base64
-                    const base64ImageObj = await Command.createImage(base64)
-                    ctx.globalCompositeOperation = 'destination-in';
-                    ctx.drawImage(base64ImageObj, 0, 0, dim.width, dim.height);
-                    image.src = canvas.toDataURL();
-
-                }
-
-                document.body.querySelector('.app').style.display = 'flex'
-                document.body.querySelector('#author').style.display = 'block'
-            })
-
-            saveImageBtn.setAttribute('init', 1)
-
-            var Layers = iframe.contentWindow.Layers;
-            // console.log(Layers)
-
-            //判断是否已经存在
-            let layers1 = Layers.get_layers();
-
-            //通过layer.link.src 判断是否图片更新
-            console.log(layers1.filter(l => l.name == 'Image_' + data.id)[0]?.link?.currentSrc !== data.options.defaultImage)
-            if (layers1.filter(l => l.name == 'Image_' + data.id)[0]
-                && layers1.filter(l => l.name == 'Image_' + data.id)[0].link.src !== data.options.defaultImage) {
-                //清空图层
-                removeAllLayer();
-                layers1 = [];
-                await sleep()
             }
 
-            let im = await Command.createImage(data.options.defaultImage)
-            // console.log(layers1, layers1.length)
-            if (!layers1.filter(l => l.name == 'Image_' + data.id)[0]) {
-                addImage(0, 'Image_' + data.id, im)
-            }
 
-            if (isMask) {
-                if (!layers1.filter(l => l.name == 'Mask_' + data.id)[0]) {
-                    addMask(1, 'Mask_' + data.id, im)
-                }
-            }
 
         }
 
@@ -1713,7 +1643,13 @@
                     })
 
                     // imageElement.src = `${Command.get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
-                    if (data.class_type !== 'ImagesPrompt_') uploadContainer.appendChild(imageElement);
+                    if (data.class_type !== 'ImagesPrompt_') {
+                        //增加div，用于放背景
+                        let imageGrid = document.createElement('div');
+                        imageGrid.className = "image-with-grid"
+                        imageGrid.appendChild(imageElement);
+                        uploadContainer.appendChild(imageGrid);
+                    }
 
                     // Append the upload container to the main container
                     container.appendChild(uploadContainer);
@@ -2382,7 +2318,7 @@
 
 
             if (document.body.querySelector('#app_container')) document.body.querySelector('#app_container').remove()
-
+            if (document.body.querySelector('#workflow_submit_pannel')) document.body.querySelector('#workflow_submit_pannel').remove()
             // 创建标题
             // let titleDiv = document.createElement('div');
             // titleDiv.className = 'header'
@@ -3534,6 +3470,209 @@
 
             return innerApp == 1
 
+        }
+
+
+    </script>
+
+    <script>
+        class MaskDrawer {
+            constructor(
+                baseCanvasId,
+                maskCanvasId,
+                brushBtnId,
+                eraserBtnId,
+                sizeSliderId,
+                sizeValueId,
+                clearBtnId,
+                saveBtnId,
+                autoCutBtnId,
+                modelSelectId,
+                closeBtnId
+            ) {
+                this.baseCanvas = document.getElementById(baseCanvasId);
+                this.maskCanvas = document.getElementById(maskCanvasId);
+                this.maskCanvas.style.opacity = "0.8"
+                this.baseCtx = this.baseCanvas.getContext('2d');
+                this.maskCtx = this.maskCanvas.getContext('2d');
+                this.isDrawing = false;
+                this.currentTool = 'brush';
+                this.brushSize = 10;
+
+                // 设置初始底图背景为白色
+                this.baseCtx.fillStyle = 'white';
+                this.baseCtx.fillRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
+
+                // 工具选择
+                this.brushBtn = document.getElementById(brushBtnId);
+                this.eraserBtn = document.getElementById(eraserBtnId);
+
+                this.brushBtn.addEventListener('click', () => this.selectTool('brush'));
+                this.eraserBtn.addEventListener('click', () => this.selectTool('eraser'));
+
+                // 笔刷大小调节
+                this.sizeSlider = document.getElementById(sizeSliderId);
+                this.sizeValue = document.getElementById(sizeValueId);
+                this.sizeSlider.addEventListener('input', (e) => this.changeBrushSize(e));
+
+                // 清空画布
+                document.getElementById(clearBtnId).addEventListener('click', () => this.clearCanvas());
+
+                // 保存蒙版
+                document.getElementById(saveBtnId).addEventListener('click', () => this.saveMask());
+
+                // 自动抠图
+                this.autoCutBtn = document.getElementById(autoCutBtnId);
+                this.autoCutBtn.addEventListener('click', () => this.autoCut());
+
+                // 退出
+                this.closeBtn = document.getElementById(closeBtnId);
+                this.closeBtn.addEventListener('click', () => this.closeEdit());
+
+                // 模型选择
+                this.modelSelect = document.getElementById(modelSelectId);
+
+                // 绘制
+                this.maskCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
+                this.maskCanvas.addEventListener('mousemove', (e) => this.draw(e));
+                this.maskCanvas.addEventListener('mouseup', () => this.stopDrawing());
+                this.maskCanvas.addEventListener('mouseout', () => this.stopDrawing());
+            }
+
+            closeEdit() {
+                if (this.close) this.close()
+            }
+
+            newImageForMaskEdit(img) {
+                let width = img.naturalWidth, height = img.naturalHeight;
+                this.baseCanvas.width = width;
+                this.baseCanvas.height = height;
+                this.maskCanvas.width = width;
+                this.maskCanvas.height = height;
+                this.baseCtx.drawImage(img, 0, 0, this.baseCanvas.width, this.baseCanvas.height);
+            }
+
+            loadMask(maskImg) {
+                let width = maskImg.naturalWidth || maskImg.width, height = maskImg.naturalHeight || maskImg.height;
+                this.maskCanvas.width = width;
+                this.maskCanvas.height = height;
+                this.maskCtx.drawImage(maskImg, 0, 0, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            selectTool(tool) {
+                this.currentTool = tool;
+                if (tool === 'brush') {
+                    this.brushBtn.classList.add('active');
+                    this.eraserBtn.classList.remove('active');
+                } else {
+                    this.eraserBtn.classList.add('active');
+                    this.brushBtn.classList.remove('active');
+                }
+            }
+
+            changeBrushSize(e) {
+                this.brushSize = parseInt(e.target.value);
+                this.sizeValue.textContent = this.brushSize;
+            }
+
+            clearCanvas() {
+                this.maskCtx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            saveMask() {
+                const dataURL = this.maskCanvas.toDataURL('image/png');
+
+                // 获取图像数据
+                const imageData = this.maskCtx.getImageData(
+                    0, 0,
+                    this.maskCanvas.width, this.maskCanvas.height);
+                const imageDataData = imageData.data;
+
+                // 反相图像数据
+                for (let i = 0; i < imageDataData.length; i += 4) {
+                    // imageDataData[i] = 255 - imageDataData[i];
+                    // imageDataData[i + 1] = 255 - imageDataData[i + 1];
+                    // imageDataData[i + 2] = 255 - imageDataData[i + 2];
+                    imageDataData[i + 3] = 255 - imageDataData[i + 3]; // 反相透明度
+                }
+
+                // 更新画布
+                let tempCanvas = document.createElement('canvas');
+                tempCanvas.width = this.maskCanvas.width;
+                tempCanvas.height = this.maskCanvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.putImageData(imageData, 0, 0);
+
+                let base64 = tempCanvas.toDataURL();
+
+
+                // 对外提供接口，可以将dataURL传递到需要的地方
+                // console.log(dataURL);
+                this.saveCallback(base64, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            autoCut() {
+                // 获取选中的模型名称
+                const selectedModel = this.modelSelect.value;
+                console.log(`Using model: ${selectedModel}`);
+
+                const dataURL = this.baseCanvas.toDataURL('image/png');
+
+                this.autoCutCallback(selectedModel, dataURL).then(maskImg => {
+                    this.maskCtx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+                    this.loadMask(maskImg);
+                    // 这里假设自动抠图算法已经实现
+                    // 我们简单模拟一下这个功能
+                    // this.maskCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                    // this.maskCtx.fillRect(50, 50, this.maskCanvas.width - 100, this.maskCanvas.height - 100);
+
+                });
+
+            }
+
+            startDrawing(e) {
+                this.isDrawing = true;
+                this.draw(e);
+            }
+
+            draw(e) {
+                if (!this.isDrawing) return;
+
+                const rect = this.maskCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                this.maskCtx.lineWidth = this.brushSize;
+                this.maskCtx.lineCap = 'round';
+                this.maskCtx.lineJoin = 'round';
+
+                if (this.currentTool === 'brush') {
+                    this.maskCtx.globalCompositeOperation = 'source-over';
+                    this.maskCtx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                } else {
+                    this.maskCtx.globalCompositeOperation = 'destination-out';
+                }
+
+                this.maskCtx.lineTo(x, y);
+                this.maskCtx.stroke();
+                this.maskCtx.beginPath();
+                this.maskCtx.moveTo(x, y);
+            }
+
+            stopDrawing() {
+                this.isDrawing = false;
+                this.maskCtx.beginPath();
+            }
+
+            initializeModelOptions(models) {
+                this.modelSelect.innerHTML = '';
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    this.modelSelect.appendChild(option);
+                });
+            }
         }
 
 

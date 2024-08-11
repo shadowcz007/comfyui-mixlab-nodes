@@ -142,7 +142,14 @@ async function getPromptResult (category) {
 }
 
 // 新的运行工作流的接口
-function queuePromptNew (filename, category, seed, input, client_id,apps=null) {
+function queuePromptNew (
+  filename,
+  category,
+  seed,
+  input,
+  client_id,
+  apps = null
+) {
   let url = get_url()
   // var filename = "Text-to-Image_1.json", category = "";
 
@@ -325,8 +332,9 @@ function convertImageToBlackBasedOnAlpha (image) {
     const alpha = pixels[i + 3]
     if (alpha !== 0) {
       // Set non-transparent pixels to black
+      // 蒙版是黑色？
       pixels[i] = 0 // Red
-      pixels[i + 1] = 0 // Green
+      pixels[i + 1] = 255 // Green
       pixels[i + 2] = 0 // Blue
     }
   }
