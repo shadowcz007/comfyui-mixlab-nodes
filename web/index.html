@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Mixlab APP</title>
 
     <style>
@@ -35,10 +35,15 @@
 
         /* 设置滚动条宽度 */
         ::-webkit-scrollbar {
-            width: 12px;
+            width: 8px;
             /* 滚动条的宽度 */
-            height: 12px;
+            height: 8px;
             /* 滚动条的高度 */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            height: 8px;
+            /* 滚动条拇指的高度 */
         }
     </style>
 
@@ -54,17 +59,78 @@
         /* 移动端布局 */
         @media (max-width: 768px) {
             body {
-                width: 100% !important;
+                width: 96% !important;
                 padding: 10px !important;
             }
 
+            /* 设置滚动条宽度 */
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* 滚动条的宽度 */
+                height: 4px;
+                /* 滚动条的高度 */
+            }
+
+            ::-webkit-scrollbar-thumb {
+                height: 4px;
+                /* 滚动条拇指的高度 */
+            }
+
             #workflow_submit_pannel {
-                left: 8px !important;
+                width: 100% !important;
+                /* 确保面板在移动端的宽度适应屏幕 */
+                height: fit-content;
+                position: static !important;
+            }
+
+            #app_input_pannel {
+                max-height: none !important;
+            }
+
+            .app {
+                width: 100%;
+                margin-left: 0;
+                min-width: none !important;
+            }
+
+            .apps{
+                margin: 20px !important;
+                padding:0 !important;
+            }
+
+            .panel {
+                min-width: 100%!important;
+                margin: 12px 0!important;
+                width: fit-content!important;
+            }
+
+            .apps .card,
+            #history_container .card {
+                width: 100%;
+                margin: 12px 0;
+            }
+
+            .description {
+                width: 100%;
+            }
+
+            .output_card img,
+            video {
+                max-width: 100%;
+                margin: 8px 0;
+            }
+
+            .run_btn {
+                width: 100%;
+                max-width: none;
+                margin-top: 12px;
+            }
+
+            .status {
+                width: 100%;
             }
         }
-    </style>
 
-    <style>
         .header {
             display: flex;
             align-items: center;
@@ -117,7 +183,6 @@
             flex-wrap: wrap;
         }
 
-
         .apps .card {
             width: 320px;
             margin: 12px;
@@ -139,16 +204,16 @@
         }
 
         .selected {
-            box-shadow: 0px 0px 10px 10px #fbe9f0
+            box-shadow: 0px 0px 10px 10px #fbe9f0;
         }
 
         /* .card:hover {
-            box-shadow: 0px 0px 10px 10px #e9fbfa
-        } */
+    box-shadow: 0px 0px 10px 10px #e9fbfa;
+} */
 
         .card h5 {
             font-size: 14px;
-            margin: 0 0 10px 0
+            margin: 0 0 10px 0;
         }
 
         .card p {
@@ -192,7 +257,6 @@
             align-items: center;
         }
 
-
         .card .version {
             font-size: 12px;
         }
@@ -211,21 +275,22 @@
             color: #7f7f7f !important;
         }
 
-
         .detail_parent {
             display: flex;
             flex-direction: column;
             margin: 12px;
         }
 
-
         .detail {
             font-size: 12px;
             margin-top: 4px;
         }
+        .detail .content{
+            margin-top: 6px;
+        }
 
         #app_input_pannel {
-            max-height: calc(80vh - 28px);
+            max-height: calc(76vh - 28px);
             overflow-y: scroll;
             overflow-x: hidden;
         }
@@ -263,7 +328,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
         }
 
         .panel h1 {
@@ -294,13 +358,11 @@
         .output_card {
             height: 100%;
             width: 100%;
-
             margin-top: 24px;
             display: flex;
             flex-wrap: wrap;
             /* justify-content: center;
-            align-items: center; */
-
+    align-items: center; */
         }
 
         .output_card img,
@@ -322,9 +384,9 @@
 
         .card textarea {
             width: 100%;
-            height: 'fit-content';
+            height: fit-content;
             /* min-width: 300px; */
-            margin-top: 12px;
+            margin-top: 14px;
             resize: none;
             overflow: hidden;
         }
@@ -369,7 +431,7 @@
 
         .submit_div {
             display: flex;
-            justify-content: space-between
+            justify-content: space-between;
         }
 
         .run_btn {
@@ -415,7 +477,6 @@
             cursor: pointer;
         }
 
-
         .disabled {
             background-color: #eee !important;
             color: #4a4a4a !important;
@@ -436,9 +497,9 @@
         }
 
         /* .upload_btn:hover {
-            outline: 4px solid yellow;
-            color: yellow;
-        } */
+    outline: 4px solid yellow;
+    color: yellow;
+} */
 
         .show_text {
             font-size: 14px;
@@ -462,12 +523,11 @@
             /* Set the initial content using the data-content attribute */
             /* position: absolute; */
             /* top: 100%;
-            left: 0; */
+    left: 0; */
             margin-left: 4px;
             font-size: 12px;
             color: #555;
         }
-
 
         .card select,
         .card button,
@@ -481,8 +541,9 @@
             border-radius: 4px;
             margin-top: 8px;
         }
+    </style>
 
-
+    <style>
         .pickr .pcr-button {
             width: 56px !important;
             height: 56px !important;
@@ -508,7 +569,7 @@
             height: 100vh;
             width: 100%;
             display: none;
-            left:0;
+            left: 0;
         }
 
 
@@ -1392,13 +1453,13 @@
                     const btnForImageEdit = document.createElement("button");
                     btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
                     btnForImageEdit.innerHTML = '<?xml version="1.0" ?><svg version="1.1" style="width: 24px;" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1_1_"><path d="M18.293,31.707h6.414l24-24l-6.414-6.414l-24,24V31.707z M45.879,7.707l-3.586,3.586l-3.586-3.586l3.586-3.586   L45.879,7.707z M20.293,26.121l17-17l3.586,3.586l-17,17h-3.586V26.121z"/><polygon points="43.293,19.707 41.293,19.707 41.293,46.707 3.293,46.707 3.293,8.707 31.293,8.707 31.293,6.707 1.293,6.707    1.293,48.707 43.293,48.707  "/></g></svg>'
-                    
+
                     // mask有输出，才有编辑mask功能
-                    if (!isVideoUpload 
-                    && !isBase64Upload 
-                    && data.class_type !== 'ImagesPrompt_'
-                    && data.options.hasMask
-                ) actionDiv.appendChild(btnForImageEdit);
+                    if (!isVideoUpload
+                        && !isBase64Upload
+                        && data.class_type !== 'ImagesPrompt_'
+                        && data.options.hasMask
+                    ) actionDiv.appendChild(btnForImageEdit);
 
 
                     uploadContainer.appendChild(actionDiv)
