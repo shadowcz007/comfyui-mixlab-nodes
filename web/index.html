@@ -5,16 +5,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mixlab APP</title>
+
     <style>
-        body {
-            margin: 0;
-            padding: 0;
+        /* 定义滚动条轨道的背景颜色 */
+        ::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            /* 轨道背景颜色 */
         }
 
+        /* 定义滚动条滑块的颜色 */
+        ::-webkit-scrollbar-thumb {
+            background-color: #888;
+            /* 滑块颜色 */
+            border-radius: 4px;
+            /* 滑块圆角 */
+        }
+
+        /* 鼠标悬停时滚动条滑块的颜色 */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+            /* 悬停时滑块颜色 */
+        }
+
+        /* 定义滚动条角落的颜色 */
+        ::-webkit-scrollbar-corner {
+            background-color: transparent;
+            /* 角落颜色 */
+        }
+
+        /* 设置滚动条宽度 */
+        ::-webkit-scrollbar {
+            width: 12px;
+            /* 滚动条的宽度 */
+            height: 12px;
+            /* 滚动条的高度 */
+        }
+    </style>
+
+    <style>
+        /* 全局样式 */
+        /* 默认桌面布局 */
+        body {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 移动端布局 */
+        @media (max-width: 768px) {
+            body {
+                width: 100% !important;
+                padding: 10px !important;
+            }
+
+            #workflow_submit_pannel {
+                left: 8px !important;
+            }
+        }
+    </style>
+
+    <style>
         .header {
             display: flex;
             align-items: center;
-            justify-content: space-around;
+            justify-content: flex-end;
+        }
+
+        #logo {
+            margin: 0 24px;
+            margin-bottom: 24px;
+            font-size: 12px;
+            padding: 0;
+            color: #4a4a4a;
+            border-bottom: 1px dashed #595959;
         }
 
         .app {
@@ -25,6 +88,19 @@
             user-select: none;
             margin-top: 32px;
             margin-bottom: 120px;
+            justify-content: flex-end;
+        }
+
+        .app .panel {
+            flex: none;
+        }
+
+        .max_view {
+            justify-content: flex-start;
+        }
+
+        .max_view .panel {
+            flex: 1;
         }
 
         .apps {
@@ -135,22 +211,24 @@
             color: #7f7f7f !important;
         }
 
-        .status_seed {
+
+        .detail_parent {
             display: flex;
             flex-direction: column;
             margin: 12px;
         }
 
-        .seeds {
+
+        .detail {
             font-size: 12px;
             margin-top: 4px;
         }
 
-        .prompt_lab {
-            font-size: 12px;
-            margin-top: 4px;
+        #app_input_pannel {
+            max-height: calc(80vh - 28px);
+            overflow-y: scroll;
+            overflow-x: hidden;
         }
-
 
         .description {
             display: flex;
@@ -175,9 +253,9 @@
             min-width: 400px;
             /* background: #eee; */
             margin: 24px;
-            flex: 1;
+            /* flex: 1; */
             align-items: center;
-            /* justify-content: center; */
+            /* justify-content: center;*/
         }
 
         .panel .header {
@@ -260,18 +338,19 @@
             margin-top: 12px;
         }
 
-        .run_div {
+        #workflow_submit_pannel {
             position: fixed;
             bottom: 28px;
             display: flex;
-            left: 144px;
+            left: 72px;
             z-index: 100;
+            width: 480px;
             /* align-items: center; */
             /* justify-content: space-around; */
             /* width: calc(50% - 100px); */
             flex-direction: column;
             background-color: #f7f7f7;
-            box-shadow: 3px 3px 8px #cacaca;
+            box-shadow: 3px 3px 8px 3px #cacaca;
             border-radius: 8px;
         }
 
@@ -286,6 +365,11 @@
             justify-content: flex-start;
             align-items: center;
             height: 48px;
+        }
+
+        .submit_div {
+            display: flex;
+            justify-content: space-between
         }
 
         .run_btn {
@@ -303,6 +387,18 @@
         .run_btn:hover {
             border-color: yellow !important;
             cursor: pointer;
+        }
+
+        #author {
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
         }
 
         .mix_on {
@@ -407,11 +503,12 @@
         #editor_container {
             position: fixed;
             top: 0;
-            z-index: 9;
+            z-index: 9999;
             background: #eee;
             height: 100vh;
             width: 100%;
             display: none;
+            left:0;
         }
 
 
@@ -439,35 +536,7 @@
             display: none;
         }
 
-        /* 定义滚动条轨道的背景颜色 */
 
-        ::-webkit-scrollbar-track {
-            background-color: #f1f1f1;
-            /* 轨道背景颜色 */
-        }
-
-        /* 定义滚动条滑块的颜色 */
-
-        ::-webkit-scrollbar-thumb {
-            background-color: #888;
-            /* 滑块颜色 */
-            border-radius: 4px;
-            /* 滑块圆角 */
-        }
-
-        /* 鼠标悬停时滚动条滑块的颜色 */
-
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: #555;
-            /* 悬停时滑块颜色 */
-        }
-
-        /* 定义滚动条角落的颜色 */
-
-        ::-webkit-scrollbar-corner {
-            background-color: transparent;
-            /* 角落颜色 */
-        }
 
         /* 
         .dynamic_prompt::after {
@@ -499,16 +568,11 @@
             src="/extensions/comfyui-mixlab-nodes/lib/miniPaint-4.14.2/index.html" allow="camera"></iframe>
     </div>
     <div class="header">
-        <div id="logo" style="margin: 0 24px;
-            margin-bottom: 24px;
-            padding: 8px;
-            color: #4a4a4a;
-            border-bottom: 1px dashed #595959;">Explore your creative potential with <a class="link"
+        <div id="logo">Explore your creative potential with <a class="link"
                 href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
             <br>
             <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
         </div>
-
         <a id="login_btn" target="_blank" href="https://discord.gg/xbP2GZF6gn" style="text-decoration: none;
         color: black;font-size:12px">
             <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
@@ -531,7 +595,6 @@
         // console.log('api', api)
         const base64Df =
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
-
 
 
         //给load image to batch节点使用的输入
@@ -1329,7 +1392,13 @@
                     const btnForImageEdit = document.createElement("button");
                     btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
                     btnForImageEdit.innerHTML = '<?xml version="1.0" ?><svg version="1.1" style="width: 24px;" viewBox="0 0 50 50" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Layer_1_1_"><path d="M18.293,31.707h6.414l24-24l-6.414-6.414l-24,24V31.707z M45.879,7.707l-3.586,3.586l-3.586-3.586l3.586-3.586   L45.879,7.707z M20.293,26.121l17-17l3.586,3.586l-17,17h-3.586V26.121z"/><polygon points="43.293,19.707 41.293,19.707 41.293,46.707 3.293,46.707 3.293,8.707 31.293,8.707 31.293,6.707 1.293,6.707    1.293,48.707 43.293,48.707  "/></g></svg>'
-                    if ((!isVideoUpload && !isBase64Upload) && data.class_type !== 'ImagesPrompt_') actionDiv.appendChild(btnForImageEdit);
+                    
+                    // mask有输出，才有编辑mask功能
+                    if (!isVideoUpload 
+                    && !isBase64Upload 
+                    && data.class_type !== 'ImagesPrompt_'
+                    && data.options.hasMask
+                ) actionDiv.appendChild(btnForImageEdit);
 
 
                     uploadContainer.appendChild(actionDiv)
@@ -2173,88 +2242,86 @@
             // console.log('#createUI', data)
             const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
 
-            let mainDiv = document.createElement('div');
 
             if (document.body.querySelector('#app_container')) document.body.querySelector('#app_container').remove()
-            let appDetails = document.createElement('details');
-            appDetails.id = "app_container"
-            appDetails.setAttribute('open', true)
-            appDetails.innerHTML = `<summary>${name}</summary>`;
-            appDetails.style = `background: whitesmoke;
-            color: black;
-            padding: 12px;
-            cursor: pointer;
-            margin: 8px 44px;`
-
-
-            let leftDetails = document.createElement('details');
-            leftDetails.setAttribute('open', 'true')
-            leftDetails.id = 'app_input_pannel'
-            leftDetails.innerHTML = `<summary>INPUT</summary>
-                <div class="content"></div>`
-
-            let leftDiv = leftDetails.querySelector('.content');
-            let rightDiv = document.createElement('div');
-
-            mainDiv.className = 'app'
-            leftDiv.className = 'panel'
-            leftDiv.style.alignItems = 'flex-start';
-            rightDiv.className = 'panel'
-            leftDiv.style.flex = 0.4
-            rightDiv.style.flex = 1;
-            // rightDiv.style.height='70vh'
-            //         rightDiv.style=`position: fixed;
-            // right: 0;
-            // top: 12px;flex:0.6`
 
             // 创建标题
-            let titleDiv = document.createElement('div');
-            titleDiv.className = 'header'
+            // let titleDiv = document.createElement('div');
+            // titleDiv.className = 'header'
 
-            var title = document.createElement('h1');
-            title.textContent = 'My Application';
-            titleDiv.appendChild(title);
+            // var title = document.createElement('h1');
+            // title.textContent = 'My Application';
+            // titleDiv.appendChild(title);
 
-            if (share) {
-                const shareBtn = document.createElement('button');
-                shareBtn.innerText = 'copy url';
-                shareBtn.addEventListener('click', e => {
-                    e.preventDefault();
-                    let url = `${Command.get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
-                    Command.copyTextToClipboard(url, Command.success(e, shareBtn, 'copy url'));
-                })
+            // if (share) {
+            //     const shareBtn = document.createElement('button');
+            //     shareBtn.innerText = 'copy url';
+            //     shareBtn.addEventListener('click', e => {
+            //         e.preventDefault();
+            //         let url = `${Command.get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
+            //         Command.copyTextToClipboard(url, Command.success(e, shareBtn, 'copy url'));
+            //     })
 
-                titleDiv.appendChild(shareBtn);
-            }
+            //     titleDiv.appendChild(shareBtn);
+            // }
 
 
 
-            let iconDes = document.createElement('div');
-            // 创建应用图标
-            var icon = document.createElement('img');
-            icon.style.width = '48px';
-            // icon.style.height = '98px';
-            icon.src = base64Df;
+            // let iconDes = document.createElement('div');
+            // // 创建应用图标
+            // var icon = document.createElement('img');
+            // icon.style.width = '48px';
+            // // icon.style.height = '98px';
+            // icon.src = base64Df;
 
-            var des = document.createElement('p');
-            des.style = `margin-left: 12px; font-size: 14px;`
-            iconDes.appendChild(icon)
-            iconDes.appendChild(des);
-            iconDes.className = 'description'
+            // var des = document.createElement('p');
+            // des.style = `margin-left: 12px; font-size: 14px;`
+            // iconDes.appendChild(icon)
+            // iconDes.appendChild(des);
+            // iconDes.className = 'description'
 
-            // 创建状态标签
-            let statusDiv = document.createElement('div');
-            statusDiv.className = 'status_seed'
-            var status = document.createElement('div');
-            status.textContent = 'Status';
-            status.className = 'status';
+
+            // *********** 输入面板 - 提交面板 合并 ：
+            // 输入、参数控制、状态、提交
+
+            // 创建输入框
+            const input1 = createInputs(inputData)
+
+            let inputDetailsCard = document.createElement('div');
+            inputDetailsCard.className = 'detail_parent';
+
+            inputDetailsCard.innerHTML = `
+                <details 
+                open="true" 
+                id="app_input_pannel" 
+                class= "detail" 
+                > 
+                <summary>INPUT</summary> 
+                <div class="content"></div>
+                </details>
+            `;
+
+            inputDetailsCard.querySelector('details').addEventListener('toggle', e => {
+                e.preventDefault();
+                document.body.querySelector('.app')?.classList.toggle("max_view")
+            })
+
+
+            let inputCards = inputDetailsCard.querySelector('.content');
+            inputCards.className = 'panel'
+            inputCards.style.alignItems = 'flex-start';
+            inputCards.style.flex = 0.4
+
+            inputCards.appendChild(input1);
+
+            // 创建参数控制
+            let ksamplerCard = document.createElement('div');
+            ksamplerCard.className = 'detail_parent'
 
             // seed 汇总
             const seeds = document.createElement('details');
-            // seeds.textContent = 'Status';
-            seeds.className = 'seeds';
 
-            console.log('#createUI', seed, data.data)
+            seeds.className = 'seeds detail';
             try {
                 if (Object.keys(seed).length > 0) {
                     seeds.innerHTML = `<summary>SEED</summary>
@@ -2302,21 +2369,18 @@
 
                         }
 
-
                     }
                 }
 
             } catch (error) {
                 console.log(error)
             }
-
-
-            // statusDiv.appendChild(status);
-            statusDiv.appendChild(seeds);
+            // ksamplerCard.appendChild(status);
+            ksamplerCard.appendChild(seeds);
 
             // 动态组合和批量组合
             const promptLab = document.createElement('details');
-            promptLab.className = 'prompt_lab';
+            promptLab.className = 'prompt_lab detail';
 
             //判断是否有 
             let isPromptLab = false;
@@ -2362,80 +2426,81 @@
                 })
 
 
-                statusDiv.appendChild(promptLab);
+                ksamplerCard.appendChild(promptLab);
             };
 
 
-            // 创建输入框
-            var input1 = createInputs(inputData)
+            // 运行状态
+            const appStatus = document.createElement('div');
+            appStatus.textContent = 'Status';
+            appStatus.className = 'status';
 
-            var output = await createOutputs(outputData, link)
-
-            // 创建提交按钮
+            // 底部的运行状态和提交按钮
             let submitDiv = document.createElement('div');
-            submitDiv.appendChild(statusDiv);
+            submitDiv.className = "submit_div"
 
-            let submitDivBtn = document.createElement('div');
-            submitDivBtn.style.display = 'flex'
-            submitDiv.appendChild(submitDivBtn);
 
-            submitDivBtn.appendChild(status);
+            submitDiv.appendChild(appStatus);
 
-            submitDiv.className = 'run_div';
-            var submitButton = document.createElement('button');
-            submitButton.textContent = 'Create';
-            submitButton.className = 'run_btn'
+            const promptButton = document.createElement('button');
+            promptButton.textContent = 'Create';
+            promptButton.className = 'run_btn'
 
-            // 将所有UI元素添加到页面中
-            // leftDiv.appendChild(titleDiv);
-            // leftDiv.appendChild(iconDes);
-            // leftDiv.appendChild(des);
-            // leftDiv.appendChild(statusDiv);
-            leftDiv.appendChild(input1);
+            submitDiv.appendChild(promptButton);
 
-            submitDivBtn.appendChild(submitButton);
-            mainDiv.appendChild(submitDiv);
+            // 创建输入和提交面板
+            let workflowSubmitPannel = document.createElement('div');
+            workflowSubmitPannel.id = 'workflow_submit_pannel';
 
-            rightDiv.appendChild(output);
+            workflowSubmitPannel.appendChild(inputDetailsCard);
+            workflowSubmitPannel.appendChild(ksamplerCard);
+            workflowSubmitPannel.appendChild(submitDiv);
 
-            // mainDiv.appendChild(titleDiv);
-            // mainDiv.appendChild(iconDes);
+            document.body.appendChild(workflowSubmitPannel);
 
-            mainDiv.appendChild(leftDetails);
-            mainDiv.appendChild(rightDiv);
 
-            appDetails.appendChild(mainDiv);
-            document.body.appendChild(appDetails)
+            // 创建输出
+            const output = await createOutputs(outputData, link);
+            let outputCards = document.createElement('div');
+            outputCards.className = 'panel'
 
-            appDetails.addEventListener('toggle', e => {
-                e.preventDefault();
-                document.body.querySelector('#author').style.display = appDetails.open ? 'flex' : 'none'
-            })
+            outputCards.appendChild(output);
+
+
+            // app结果输出
+            let currentAppOutput = document.createElement('div');
+            currentAppOutput.className = 'app'
+            // currentAppOutput.appendChild(titleDiv);
+            // currentAppOutput.appendChild(iconDes);
+            currentAppOutput.appendChild(outputCards);
+
+            document.body.appendChild(currentAppOutput)
+
 
             // 返回每个UI元素的引用和对应的更新方法
             return {
-                title: {
-                    element: title,
-                    update: function (newTitle) {
-                        title.textContent = newTitle;
-                    }
-                },
-                icon: {
-                    element: icon,
-                    update: function (newIconPath) {
-                        icon.src = newIconPath;
-                    }
-                },
-                des: {
-                    element: des,
-                    update: function (text) {
-                        des.textContent = text;
-                    }
-                },
+                // title: {
+                //     element: title,
+                //     update: function (newTitle) {
+                //         title.textContent = newTitle;
+                //     }
+                // },
+                // icon: {
+                //     element: icon,
+                //     update: function (newIconPath) {
+                //         icon.src = newIconPath;
+                //     }
+                // },
+                // des: {
+                //     element: des,
+                //     update: function (text) {
+                //         des.textContent = text;
+                //     }
+                // },
                 status: {
                     element: status,
                     update: function (newStatus) {
-                        status.textContent = newStatus;
+                        appStatus.textContent = newStatus;
                     }
                 },
                 input1: {
@@ -2579,44 +2644,44 @@
                         }
                     }
                 },
-                submitButton: {
-                    element: submitButton,
+                promptButton: {
+                    element: promptButton,
                     update: function (runFn, cancelFn) {
-                        submitButton.addEventListener('dblclick', (e) => {
+                        promptButton.addEventListener('dblclick', (e) => {
                             e.preventDefault()
-                            submitButton.classList.remove('disabled');
+                            promptButton.classList.remove('disabled');
                         });
-                        submitButton.addEventListener('click', (e) => {
+                        promptButton.addEventListener('click', (e) => {
                             e.preventDefault();
 
-                            if (submitButton.classList.contains('data-click')) {
+                            if (promptButton.classList.contains('data-click')) {
                                 return
                             } else {
-                                submitButton.classList.add('data-click')
-                                setTimeout(() => submitButton.classList.remove('data-click'), 500)
+                                promptButton.classList.add('data-click')
+                                setTimeout(() => promptButton.classList.remove('data-click'), 500)
                             }
 
-                            if (!submitButton.classList.contains('disabled')) {
+                            if (!promptButton.classList.contains('disabled')) {
                                 runFn && runFn();
-                                submitButton.classList.add('disabled');
-                                submitButton.innerText = 'Cancel'
+                                promptButton.classList.add('disabled');
+                                promptButton.innerText = 'Cancel'
                             } else {
                                 // 如果能取消
                                 let canCancel = cancelFn && cancelFn();
-                                if (canCancel) submitButton.classList.remove('disabled');
-                                if (canCancel) submitButton.innerText = 'Create';
+                                if (canCancel) promptButton.classList.remove('disabled');
+                                if (canCancel) promptButton.innerText = 'Create';
                             }
 
                         });
                     },
                     running: () => {
-                        submitButton.innerText = 'Cancel';
-                        if (!submitButton.classList.contains('disabled')) submitButton.classList.add('disabled');
+                        promptButton.innerText = 'Cancel';
+                        if (!promptButton.classList.contains('disabled')) promptButton.classList.add('disabled');
                     },
                     reset: () => {
-                        submitButton.innerText = 'Create';
-                        submitButton.classList.remove('disabled');
-                        submitButton.classList.remove('data-click');
+                        promptButton.innerText = 'Create';
+                        promptButton.classList.remove('disabled');
+                        promptButton.classList.remove('data-click');
                     }
                 },
             };
@@ -2751,18 +2816,18 @@
             var ui = await createUI(appData, share);
             if (!ui) return
             // 更新标题
-            ui.title.update(appData.name || 'Mixlab APP');
+            ui.title?.update(appData.name || 'Mixlab APP');
 
             // 更新应用图标
-            ui.icon.update(appData.icon || appData.output[0]?.options?.defaultImage || base64Df);
+            ui.icon?.update(appData.icon || appData.output[0]?.options?.defaultImage || base64Df);
 
-            ui.des.update(appData.description || '-');
+            ui.des?.update(appData.description || '-');
 
             // 更新状态标签
             ui.status.update(appData ? 'READY' : '-');
 
             // 添加提交按钮点击事件
-            ui.submitButton.update(
+            ui.promptButton.update(
                 () => {
                     // 在提交按钮点击时执行的逻辑
                     // queuePrompt({
@@ -2884,8 +2949,8 @@
                                             api.runningCancel = null;
                                         }
 
-                                        ui.submitButton.element.classList.remove('disabled');
-                                        ui.submitButton.element.innerText = 'Create';
+                                        ui.promptButton.element.classList.remove('disabled');
+                                        ui.promptButton.element.innerText = 'Create';
 
                                         return true
 
@@ -2919,8 +2984,8 @@
                                 api.runningCancel = null;
                             }
 
-                            ui.submitButton.element.classList.remove('disabled');
-                            ui.submitButton.element.innerText = 'Create';
+                            ui.promptButton.element.classList.remove('disabled');
+                            ui.promptButton.element.innerText = 'Create';
 
                             return true
 
@@ -2952,7 +3017,7 @@
                     window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}` }, '*');
                     if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
-                        ui.submitButton.reset()
+                        ui.promptButton.reset()
                         console.log('运行按钮重设')
                     }
                 } catch (error) {
@@ -2967,7 +3032,7 @@
                 const class_type = window._appData.data ? (window._appData.data[detail?.node]?.class_type || '') : ""
                 try {
                     ui.status.update(`${parseFloat(100 * detail.value / detail.max).toFixed(1)}% ${class_type}`);
-                    ui.submitButton.running()
+                    ui.promptButton.running()
                 } catch (error) {
 
                 }
@@ -2980,7 +3045,7 @@
                 if (class_type) {
                     try {
                         ui.status.update(`executed_#${class_type}`);
-                        ui.submitButton.reset()
+                        ui.promptButton.reset()
                     } catch (error) {
 
                     }
@@ -2992,7 +3057,7 @@
                     const { Running, Pending } = await Command.getQueue(api.clientId);
                     if (Running && Running[0]) {
                         api.runningCancel = Running[0].remove;
-                        ui.submitButton.running()
+                        ui.promptButton.running()
                     } else {
                         api.runningCancel = null;
                     }
@@ -3019,7 +3084,7 @@
                 console.log("execution_start", detail)
                 try {
                     ui.status.update(`execution_start`);
-                    ui.submitButton.running()
+                    ui.promptButton.running()
                 } catch (error) {
 
                 }
@@ -3088,12 +3153,11 @@
             //     return true;
             // });
 
-           // author信息
-           if (appData.author) {
+            // author信息
+            if (appData.author) {
                 let div = document.body.querySelector('#author');
                 if (div) {
-                    if (appData.author.link) div.href = appData.author.link
-                    div.style = `z-index:20;display: flex;flex-direction: column;position: fixed;bottom: 24px;left: 24px;cursor: pointer;text-decoration: none;color: black;`
+                    if (appData.author.link) div.href = appData.author.link;
                     div.innerHTML = `<p style="font-size:12px;margin: 8px 0;">Author:</p>
                 <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
                 src="${appData.author.avatar || base64Df}"/>
@@ -3327,12 +3391,7 @@
                         // todo welcome页面
                         document.body.innerHTML = `<h3 id="welcome_info" style="padding: 99px;">Welcome to Mixlab Nodes App!</h3>`
                     }
-
-
-
                 });
-
-
             }
 
             return innerApp == 1
