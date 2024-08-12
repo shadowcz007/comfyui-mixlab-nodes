@@ -5,6 +5,7 @@
 
 
 ##### `最新`：
+- 移动端适配、修改app模式的Mask编辑器
 
 - 增加p5.js作为输入节点
 [workflow](./workflow/p5workflow.json)
@@ -17,10 +18,6 @@
 - 增加 API Key Input 节点，用于管理LLM的Key,同时优化LLM相关节点，为后续agent模式做准备
 
 - 增加 SiliconflowLLM，可以使用由Siliconflow提供的免费LLM
-
-- 增加 Edit Mask，方便在生成的时候手动绘制 mask [workflow](./workflow/edit-mask-workflow.json)
-
-- LaMaInpainting 调整为手动安装
 
 <!-- - ChatGPT 节点支持 Local LLM（llama.cpp），Phi3、llama3 都可以直接一个节点运行了。模型下载后，放置到 `models/llamafile/` -->
 
@@ -249,6 +246,8 @@ pip install llama-cpp-python \
 - [CkptNames compare the effects of different models.](./workflow/ckpts-image-workflow.json)
 
 ### Other Nodes
+
+- 增加 Edit Mask，方便在生成的时候手动绘制 mask [workflow](./workflow/edit-mask-workflow.json)
 
 ![main](./assets/all-workflow.svg)
 ![main2](./assets/detect-face-all.png)

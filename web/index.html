@@ -392,11 +392,13 @@
         }
 
         .card {
-            background-color: #eee;
+            /* background-color: #eee; */
             display: flex;
             flex-direction: column;
             padding: 8px;
             font-size: 12px;
+            /* outline: 1px solid #e0e0e0; */
+            margin: 6px 0;
         }
 
         .card textarea {
@@ -459,7 +461,7 @@
             justify-content: center;
             width: 56px !important;
             min-width: 56px !important;
-            height: 40px !important;
+            height: 36px !important;
             /* 可根据需要调整高度 */
             background-color: transparent !important;
             /* 透明背景色 */
@@ -470,7 +472,8 @@
             cursor: pointer;
             /* 鼠标悬停时显示手型光标 */
             transition: background-color 0.3s, color 0.3s;
-            /* 背景色和颜色过渡效果 */
+
+            margin-top: 0px !important;
         }
 
         .icon_btn:hover {
@@ -627,17 +630,6 @@
         }
 
 
-        /* 图像编辑器 */
-        #editor_container {
-            position: fixed;
-            top: 0;
-            z-index: 9999;
-            background: #eee;
-            height: 100vh;
-            width: 100%;
-            display: none;
-            left: 0;
-        }
 
 
         /* 图片的字幕 */
@@ -682,12 +674,46 @@
     </style>
 
     <style>
-        .editor_canvas {
-            border: 1px solid #ccc;
-            position: absolute;
-            top: 178px;
-            left: 49px;
+        /* 图像编辑器 */
+        #editor_container {
+            position: fixed;
+            top: 0;
+            z-index: 9999;
+            background: #eee;
+            width: 100%;
+            display: none;
+            left: 0;
+            height: calc(100vh - 48px);
+            padding: 24px;
+        }
 
+        #canvasContainer {
+            position: absolute;
+            /* bottom: 0;
+            left: 0; */
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .editor_canvas {
+            position: absolute;
+        }
+
+        .unactive:hover {
+            background: none !important;
+            color: black !important;
+        }
+        .active:hover {
+            /* border-color: yellow !important; */
+            border:1px solid yellow
+        }
+
+        .unactive {
+            background: none !important;
+            color: #4a4a4a !important;
         }
     </style>
     <!-- <script src="../../../scripts/api.js" type="module"></script> -->
@@ -702,28 +728,35 @@
 <body>
 
     <div class="editor" id="editor_container">
-        <h1>蒙版绘制工具</h1>
-        <div class="controls">
-            <div class="tool-group">
-                <button id="autoCut">Auto Cut</button>
-                <select id="modelSelect"></select>
-                <button id="brush" class="active">画笔</button>
-                <button id="eraser">橡皮擦</button>
-            </div>
-            <div class="tool-group">
-                <label for="size">笔刷大小：</label>
-                <input type="range" id="size" min="1" max="50" value="10">
-                <span id="sizeValue">10</span>
-            </div>
-            <div class="tool-group">
+        <div class="card" style="flex-direction: row;
+        font-size: 16px; 
+        align-items: center;">
+            <h4>蒙版绘制工具 </h4>
+            <div style="margin-left: 24px;">
                 <button id="clear">清空画布</button>
                 <button id="save">保存蒙版</button>
-                <button id="closeEditor">Close</button>
+                <button id="closeEditor">关闭</button>
             </div>
+        </div>
+
+        <div class="card">
+            <div class="">
+                <button id="autoCut">Auto Cut</button>
+                <select id="modelSelect"></select>
+            </div>
+            <div class="">
+                <button id="brush" class="active">画笔</button>
+                <button id="eraser" class="unactive">橡皮擦</button>
+                <input type="range" id="size" min="1" max="150" value="10">
+                <span id="sizeValue">10</span>
+            </div>
+
         </div>
         <div id="canvasContainer">
             <canvas id="baseCanvas" class="editor_canvas" width="800" height="600"></canvas>
+            <canvas id="hintCanvas" class="editor_canvas" width="800" height="600"></canvas>
             <canvas id="maskCanvas" class="editor_canvas" width="800" height="600"></canvas>
+
         </div>
     </div>
 
@@ -822,6 +855,7 @@
             const maskDrawer = new MaskDrawer(
                 'baseCanvas',
                 'maskCanvas',
+                "hintCanvas",
                 'brush',
                 'eraser',
                 'size',
@@ -1431,7 +1465,7 @@
                     uploadContainer.appendChild(nameLabel);
 
                     let actionDiv = document.createElement('div');
-                    actionDiv.style = `padding: 0 8px;`
+                    actionDiv.style = `margin-bottom:8px;`
 
                     // Create an input field for the image name
                     const uploadImageInput = document.createElement("button");
@@ -3480,6 +3514,7 @@
             constructor(
                 baseCanvasId,
                 maskCanvasId,
+                hintCanvasId,  // 添加新参数
                 brushBtnId,
                 eraserBtnId,
                 sizeSliderId,
@@ -3492,9 +3527,11 @@
             ) {
                 this.baseCanvas = document.getElementById(baseCanvasId);
                 this.maskCanvas = document.getElementById(maskCanvasId);
-                this.maskCanvas.style.opacity = "0.8"
+                this.hintCanvas = document.getElementById(hintCanvasId);  // 获取新的 canvas
+                this.maskCanvas.style.opacity = "0.8";
                 this.baseCtx = this.baseCanvas.getContext('2d');
                 this.maskCtx = this.maskCanvas.getContext('2d');
+                this.hintCtx = this.hintCanvas.getContext('2d');  // 获取上下文
                 this.isDrawing = false;
                 this.currentTool = 'brush';
                 this.brushSize = 10;
@@ -3502,6 +3539,10 @@
                 // 设置初始底图背景为白色
                 this.baseCtx.fillStyle = 'white';
                 this.baseCtx.fillRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
+
+                // 设置 hintCanvas 的尺寸与其他 canvas 一致
+                this.hintCanvas.width = this.baseCanvas.width;
+                this.hintCanvas.height = this.baseCanvas.height;
 
                 // 工具选择
                 this.brushBtn = document.getElementById(brushBtnId);
@@ -3537,10 +3578,44 @@
                 this.maskCanvas.addEventListener('mousemove', (e) => this.draw(e));
                 this.maskCanvas.addEventListener('mouseup', () => this.stopDrawing());
                 this.maskCanvas.addEventListener('mouseout', () => this.stopDrawing());
+
+                this.maskCanvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.startDrawing(e.touches[0]);
+                });
+                this.maskCanvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.draw(e.touches[0]);
+                });
+                this.maskCanvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.stopDrawing();
+                });
+                this.maskCanvas.addEventListener('touchcancel', (e) => {
+                    e.preventDefault();
+                    this.stopDrawing();
+                });
             }
 
             closeEdit() {
-                if (this.close) this.close()
+                if (this.close) this.close();
+            }
+
+            drawBrushCircle(x, y) {
+                // 清除之前的提示圈
+                this.hintCtx.clearRect(0, 0, this.hintCanvas.width, this.hintCanvas.height);
+
+                this.hintCtx.fillStyle = `rgba(${this.currentTool === 'brush' ? 255 : 0},0,${this.currentTool === 'brush' ? 0 : 255},0.5)`
+                // 绘制新的提示圈
+                this.hintCtx.beginPath();
+                this.hintCtx.arc(x, y, this.brushSize / 2, 0, 2 * Math.PI);
+                // this.hintCtx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                // this.hintCtx.lineWidth = 1;
+                // this.hintCtx.stroke();
+                this.hintCtx.fill();
+            }
+            clearBrushCircle() {
+                this.hintCtx.clearRect(0, 0, this.hintCanvas.width, this.hintCanvas.height)
             }
 
             newImageForMaskEdit(img) {
@@ -3549,7 +3624,19 @@
                 this.baseCanvas.height = height;
                 this.maskCanvas.width = width;
                 this.maskCanvas.height = height;
+                // 设置 hintCanvas 的尺寸与其他 canvas 一致
+                this.hintCanvas.width = width;
+                this.hintCanvas.height = height;
+
                 this.baseCtx.drawImage(img, 0, 0, this.baseCanvas.width, this.baseCanvas.height);
+                //设置笔刷最大值和间隔
+                this.sizeSlider.setAttribute("max", parseInt(Math.max(width, height) * 0.5))
+                this.sizeSlider.setAttribute("step", Math.max(5, parseInt(Math.max(width, height) * 0.01)));
+
+                this.drawBrushCircle(
+                    parseInt(parseInt(this.maskCanvas.width * 0.5)),
+                    parseInt(parseInt(this.maskCanvas.height * 0.5))
+                );
             }
 
             loadMask(maskImg) {
@@ -3564,15 +3651,27 @@
                 if (tool === 'brush') {
                     this.brushBtn.classList.add('active');
                     this.eraserBtn.classList.remove('active');
+
+                    this.brushBtn.classList.remove('unactive');
+                    this.eraserBtn.classList.add('unactive');
+
                 } else {
                     this.eraserBtn.classList.add('active');
                     this.brushBtn.classList.remove('active');
+
+                    this.eraserBtn.classList.remove('unactive');
+                    this.brushBtn.classList.add('unactive');
                 }
             }
 
             changeBrushSize(e) {
                 this.brushSize = parseInt(e.target.value);
                 this.sizeValue.textContent = this.brushSize;
+
+                this.drawBrushCircle(
+                    parseInt(parseInt(this.maskCanvas.width * 0.5)),
+                    parseInt(parseInt(this.maskCanvas.height * 0.5))
+                );
             }
 
             clearCanvas() {
@@ -3590,9 +3689,6 @@
 
                 // 反相图像数据
                 for (let i = 0; i < imageDataData.length; i += 4) {
-                    // imageDataData[i] = 255 - imageDataData[i];
-                    // imageDataData[i + 1] = 255 - imageDataData[i + 1];
-                    // imageDataData[i + 2] = 255 - imageDataData[i + 2];
                     imageDataData[i + 3] = 255 - imageDataData[i + 3]; // 反相透明度
                 }
 
@@ -3605,42 +3701,36 @@
 
                 let base64 = tempCanvas.toDataURL();
 
-
                 // 对外提供接口，可以将dataURL传递到需要的地方
-                // console.log(dataURL);
                 this.saveCallback(base64, this.maskCanvas.width, this.maskCanvas.height);
             }
 
             autoCut() {
-                // 获取选中的模型名称
                 const selectedModel = this.modelSelect.value;
                 console.log(`Using model: ${selectedModel}`);
-
                 const dataURL = this.baseCanvas.toDataURL('image/png');
 
                 this.autoCutCallback(selectedModel, dataURL).then(maskImg => {
                     this.maskCtx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
                     this.loadMask(maskImg);
-                    // 这里假设自动抠图算法已经实现
-                    // 我们简单模拟一下这个功能
-                    // this.maskCtx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                    // this.maskCtx.fillRect(50, 50, this.maskCanvas.width - 100, this.maskCanvas.height - 100);
-
                 });
-
             }
 
             startDrawing(e) {
                 this.isDrawing = true;
+                this.clearBrushCircle()
                 this.draw(e);
             }
 
             draw(e) {
-                if (!this.isDrawing) return;
-
                 const rect = this.maskCanvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+
+                if (!this.isDrawing) {
+                    this.drawBrushCircle(x, y);
+                    return;
+                }
 
                 this.maskCtx.lineWidth = this.brushSize;
                 this.maskCtx.lineCap = 'round';
@@ -3674,6 +3764,7 @@
                 });
             }
         }
+
 
 
     </script>
