@@ -331,13 +331,15 @@ class ChinesePrompt:
 
         for t in texts:
             if t:
-                # translated_text =  translated_word = translate(zh_en_tokenizer,zh_en_model,str(t))
                 parser = Lark(grammar, start="start", parser="lalr", transformer=ChinesePromptTranslate())
-                # print('t',t)
-                result = parser.parse(t).children
-                # print('en_result',result)        
-                # en_text=translate(zh_en_tokenizer,zh_en_model,text_without_syntax)
-                en_texts.append(result[0])
+                try:
+                    result = parser.parse(t).children
+                    en_texts.append(result[0])
+                except:
+                    print(f"Error parsing '{t}'")
+                    t = translate(str(t))
+                    en_texts.append(t)
+                
 
         zh_en_model.to('cpu')
         print("test en_text",en_texts)
