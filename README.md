@@ -3,6 +3,9 @@
 > 适配了最新版 comfyui 的 py3.11 ，torch 2.3.1+cu121
 > [Mixlab nodes discord](https://discord.gg/cXs9vZSqeK)
 
+商务合作请联系 389570357@qq.com
+For business cooperation, please contact email 389570357@qq.com
+
 
 ##### `最新`：
 - 移动端适配、修改app模式的Mask编辑器
