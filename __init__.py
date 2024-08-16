@@ -587,14 +587,39 @@ async def mixlab_hander(request):
 
 @routes.get('/mixlab/app')
 async def mixlab_app_handler(request):
-    html_file = os.path.join(current_path, "web/index.html")
+    html_file = os.path.join(current_path, "webApp/index.html")
     if os.path.exists(html_file):
         with open(html_file, 'r', encoding='utf-8', errors='ignore') as f:
             html_data = f.read()
             return web.Response(text=html_data, content_type='text/html')
     else:
         return web.Response(text="HTML file not found", status=404)
+
+# web app模式独立
+@routes.get('/mixlab/app/{filename:.*}')
+async def static_file_handler(request):
+    filename = request.match_info['filename']
+    file_path = os.path.join(current_path, "webApp", filename)
+    print(file_path)
     
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        if filename.endswith('.js'):
+            content_type = 'application/javascript'
+        elif filename.endswith('.css'):
+            content_type = 'text/css'
+        elif filename.endswith('.html'):
+            content_type = 'text/html'
+        elif filename.endswith('.svg'):
+            content_type = 'image/svg+xml'
+        else:
+            content_type = 'application/octet-stream'
+        
+        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            file_data = f.read()
+            return web.Response(text=file_data, content_type=content_type)
+    else:
+        return web.Response(text="File not found", status=404)
+
 
 @routes.post('/mixlab/workflow')
 async def mixlab_workflow_hander(request):

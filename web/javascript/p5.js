@@ -53,7 +53,10 @@ function get_position_style (ctx, widget_width, y, node_height) {
   return {
     transformOrigin: '0 0',
     transform: transform,
-    left: `0`,
+    left:
+    document.querySelector('.comfy-menu').style.display === 'none'
+      ? `60px`
+      : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -179,7 +182,7 @@ const p5InputNode = {
 
         let nodeId = node.id
         //延迟才能获得this.id
-        widget.div.innerHTML = `<iframe src="extensions/comfyui-mixlab-nodes/p5_export/p5.html?id=${nodeId}" 
+        widget.div.innerHTML = `<iframe src="mixlab/app/p5_export/p5.html?id=${nodeId}" 
           style="border:0;width:100%;height:100%;"
          ></iframe>`
 

@@ -3,7 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
-import PhotoSwipeLightbox from '/extensions/comfyui-mixlab-nodes/lib/photoswipe-lightbox.esm.min.js'
+import PhotoSwipeLightbox from '/mixlab/app/lib/photoswipe-lightbox.esm.min.js'
 function loadCSS (url) {
   var link = document.createElement('link')
   link.rel = 'stylesheet'
@@ -40,14 +40,14 @@ function loadCSS (url) {
   // Append the style element to the document head
   document.head.appendChild(style)
 }
-loadCSS('/extensions/comfyui-mixlab-nodes/lib/photoswipe.min.css')
+loadCSS('/mixlab/app/lib/photoswipe.min.css')
 
 function initLightBox () {
   const lightbox = new PhotoSwipeLightbox({
     gallery: '.prompt_image_output',
     children: 'a',
     pswpModule: () =>
-      import('/extensions/comfyui-mixlab-nodes/lib/photoswipe.esm.min.js')
+      import('/mixlab/app/lib/photoswipe.esm.min.js')
   })
 
   lightbox.on('uiRegister', function () {
@@ -100,7 +100,10 @@ function get_position_style (ctx, widget_width, y, node_height) {
   return {
     transformOrigin: '0 0',
     transform: transform,
-    left: `0`,
+    left:
+    document.querySelector('.comfy-menu').style.display === 'none'
+      ? `60px`
+      : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -178,7 +181,7 @@ app.registerExtension({
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
-         
+
         const mutable_prompt = this.widgets.filter(
           w => w.name == 'mutable_prompt'
         )[0]
@@ -190,7 +193,12 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, y, node.size[1])
+              get_position_style(
+                ctx,
+                widget_width,
+                y + widget_height + 24,
+                node.size[1]
+              )
             )
           }
         }
@@ -207,7 +215,7 @@ app.registerExtension({
         background-color: var(--comfy-input-bg);
         border-radius: 8px;
         border-color: var(--border-color);
-        border-style: solid;    height: 30px;min-width: 122px;
+        border-style: solid;height: 30px;min-width: 122px;
        `
 
         // const btn=document.createElement('button');
@@ -266,7 +274,6 @@ app.registerExtension({
   },
   async loadedGraphNode (node, app) {
     if (node.type === 'RandomPrompt') {
-     
     }
   }
 })
@@ -408,7 +415,7 @@ const _createResult = async (node, widget, message) => {
   const width = node.size[0] * 0.5 - 12
 
   let height_add = 0
-  
+
   for (let index = 0; index < message._images.length; index++) {
     const imgs = message._images[index]
 
@@ -559,7 +566,7 @@ app.registerExtension({
 
       let cards = widget.div.querySelectorAll('.card')
       if (cards.length == 0) node.size = [280, 120]
-      if(widget.value) _createResult(node, widget, widget.value)
+      if (widget.value) _createResult(node, widget, widget.value)
     }
   }
 })

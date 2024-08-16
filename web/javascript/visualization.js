@@ -40,7 +40,7 @@ class Visualizer {
       scrolling: 'no',
       overflow: 'hidden'
     })
-    this.iframe.src = '/extensions/comfyui-mixlab-nodes/' + visualSrc + '.html'
+    this.iframe.src = '/mixlab/app/' + visualSrc + '.html'
     console.log('#Visualizer', container, this.iframe)
     container.appendChild(this.iframe)
   }

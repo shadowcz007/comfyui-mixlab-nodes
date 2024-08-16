@@ -145,6 +145,32 @@ function resizeImage (base64Image) {
   })
 }
 
+const createMixlabBtn=()=>{
+  const appsButton = document.createElement('button')
+  appsButton.id = 'mixlab_chatbot_by_llamacpp'
+  appsButton.className="comfyui-button"
+  appsButton.textContent = '♾️Mixlab'
+
+  // appsButton.onclick = () =>
+  appsButton.onclick = async () => {
+    // if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
+    //   //显示运行的模型
+    //   createModelsModal([
+    //     window._mixlab_llamacpp.url,
+    //     window._mixlab_llamacpp.model
+    //   ])
+    // } else {
+    //   // let ms = await get_llamafile_models()
+    //   // ms = ms.filter(m => !m.match('-mmproj-'))
+    //   // if (ms.length > 0) createModelsModal(ms)
+    // }
+    createModelsModal([
+    
+    ])
+  }
+  return appsButton
+}
+
 // 菜单入口
 async function createMenu () {
   const menu = document.querySelector('.comfy-menu')
@@ -156,51 +182,49 @@ async function createMenu () {
   `
   menu.append(separator)
 
-  if (!menu.querySelector('#mixlab_chatbot_by_llamacpp')) {
-    const appsButton = document.createElement('button')
-    appsButton.id = 'mixlab_chatbot_by_llamacpp'
-    appsButton.textContent = '♾️Mixlab'
-
-    // appsButton.onclick = () =>
-    appsButton.onclick = async () => {
-      // if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
-      //   //显示运行的模型
-      //   createModelsModal([
-      //     window._mixlab_llamacpp.url,
-      //     window._mixlab_llamacpp.model
-      //   ])
-      // } else {
-      //   // let ms = await get_llamafile_models()
-      //   // ms = ms.filter(m => !m.match('-mmproj-'))
-      //   // if (ms.length > 0) createModelsModal(ms)
-      // }
-      createModelsModal([
-      
-      ])
+  if(menu.style.display==="none"&&document.querySelector('.comfyui-menu-push')){
+    //新版ui
+    document.querySelector('.comfyui-menu-push').append(createMixlabBtn())
+  }else{
+    if (!menu.querySelector('#mixlab_chatbot_by_llamacpp')) {
+      menu.append(createMixlabBtn())
     }
-    menu.append(appsButton)
   }
+
+ 
 }
 
 let isScriptLoaded = {}
 
-function loadExternalScript (url) {
+function loadExternalScript(url) {
   return new Promise((resolve, reject) => {
     if (isScriptLoaded[url]) {
-      resolve()
-      return
+      resolve();
+      return;
     }
 
-    const script = document.createElement('script')
-    script.src = url
-    script.onload = () => {
-      isScriptLoaded[url] = true
-      resolve()
+    const existingScript = document.querySelector(`script[src="${url}"]`);
+    if (existingScript) {
+      existingScript.onload = () => {
+        isScriptLoaded[url] = true;
+        resolve();
+      };
+      existingScript.onerror = reject;
+      return;
     }
-    script.onerror = reject
-    document.head.appendChild(script)
-  })
+
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = () => {
+      isScriptLoaded[url] = true;
+      resolve();
+    };
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
 }
+
+
 
 //
 
@@ -234,7 +258,7 @@ function createChart (chartDom, nodes) {
 
 async function createNodesCharts () {
   await loadExternalScript(
-    '/extensions/comfyui-mixlab-nodes/lib/echarts.min.js'
+    '/mixlab/app/lib/echarts.min.js'
   )
   const templates = await loadTemplate()
   var nodes = {}
@@ -666,7 +690,10 @@ function get_position_style (ctx, widget_width, y, node_height) {
   return {
     transformOrigin: '0 0',
     transform: transform,
-    left: `0`,
+    left:
+    document.querySelector('.comfy-menu').style.display === 'none'
+      ? `60px`
+      : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',

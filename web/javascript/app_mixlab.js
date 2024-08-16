@@ -61,7 +61,10 @@ function get_position_style (ctx, widget_width, y, node_height) {
   return {
     transformOrigin: '0 0',
     transform: transform,
-    left: `0`,
+    left:
+      document.querySelector('.comfy-menu').style.display === 'none'
+        ? `60px`
+        : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -257,9 +260,9 @@ async function extractInputAndOutputData (
         node.type === 'KSampler' ||
         node.type == 'SamplerCustom' ||
         node.type === 'ChinesePrompt_Mix' ||
-        node.type === 'Seed_'||
-        node.type==='SiliconflowLLM'||
-        node.type==='ChatGPTOpenAI'
+        node.type === 'Seed_' ||
+        node.type === 'SiliconflowLLM' ||
+        node.type === 'ChatGPTOpenAI'
       ) {
         // seed 的类型收集
         try {
@@ -473,15 +476,15 @@ app.registerExtension({
           type: 'div',
           name: 'AppInfoRun',
           draw (ctx, node, widget_width, y, widget_height) {
-            Object.assign(
-              this.div.style,
-              {...get_position_style(
+            Object.assign(this.div.style, {
+              ...get_position_style(
                 ctx,
                 widget_width,
                 node.size[1] - widget_height,
                 node.size[1]
-              ),zIndex:1}
-            )
+              ),
+              zIndex: 1
+            })
           }
         }
 
@@ -711,7 +714,6 @@ app.registerExtension({
         this.serialize_widgets = true //需要保存参数
 
         window._mixlab_app_json = null
- 
       }
 
       const onExecuted = nodeType.prototype.onExecuted
