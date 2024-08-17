@@ -11,6 +11,8 @@ import { smart_init, addSmartMenu } from './smart_connect.js'
 
 import { completion_ } from './chat.js'
 
+import { getLocalData, saveLocalData, updateLLMAPIKey } from './common.js'
+
 function showTextByLanguage (key, json) {
   // 获取浏览器语言
   var language = navigator.language
@@ -28,33 +30,40 @@ function showTextByLanguage (key, json) {
 //系统prompt
 // const systemPrompt = `You are a prompt creator, your task is to create prompts for the user input request, the prompts are image descriptions that include keywords for (an adjective, type of image, framing/composition, subject, subject appearance/action, environment, lighting situation, details of the shoot/illustration, visuals aesthetics and artists), brake keywords by comas, provide high quality, non-verboose, coherent, brief, concise, and not superfluous prompts, the subject from the input request must be included verbatim on the prompt,the prompt is english`
 
-let tool ={
-  "name": "create_prompt",
-  "description": "Create a prompt with a given subject, content, and style based on user input for image descriptions.",
-  "parameter": {
-    "type": "object",
-    "properties": {
-      "subject": {
-        "type": "string",
-        "description": "The subject of the prompt, included verbatim from the input request.",
-        "required": true
+let tool = {
+  name: 'create_prompt',
+  description:
+    'Create a prompt with a given subject, content, and style based on user input for image descriptions.',
+  parameter: {
+    type: 'object',
+    properties: {
+      subject: {
+        type: 'string',
+        description:
+          'The subject of the prompt, included verbatim from the input request.',
+        required: true
       },
-      "content": {
-        "type": "string",
-        "description": "The content of the prompt, primarily focusing on the scene and objects, including keywords for adjective, type of image, framing/composition, subject appearance/action, and environment.",
-        "required": true
+      content: {
+        type: 'string',
+        description:
+          'The content of the prompt, primarily focusing on the scene and objects, including keywords for adjective, type of image, framing/composition, subject appearance/action, and environment.',
+        required: true
       },
-      "style": {
-        "type": "string",
-        "description": "The style of the prompt, including lighting situation, details of the shoot/illustration, visual aesthetics, and artists. Ensure it is high quality, non-verbose, coherent, brief, concise, and not superfluous.",
-        "required": true
+      style: {
+        type: 'string',
+        description:
+          'The style of the prompt, including lighting situation, details of the shoot/illustration, visual aesthetics, and artists. Ensure it is high quality, non-verbose, coherent, brief, concise, and not superfluous.',
+        required: true
       }
     }
   }
 }
 
-const systemPrompt=`You are a helpful assistant with access to the following functions. Use them if required - ${JSON.stringify(tool,null,2)}`
-
+const systemPrompt = `You are a helpful assistant with access to the following functions. Use them if required - ${JSON.stringify(
+  tool,
+  null,
+  2
+)}`
 
 if (!localStorage.getItem('_mixlab_system_prompt')) {
   localStorage.setItem('_mixlab_system_prompt', systemPrompt)
@@ -100,7 +109,7 @@ async function start_llama (model = 'Phi-3-mini-4k-instruct-Q5_K_S.gguf') {
     })
 
     const data = await response.json()
-    if (data.llama_cpp_error||!data.port) {
+    if (data.llama_cpp_error || !data.port) {
       return
     }
 
@@ -145,14 +154,15 @@ function resizeImage (base64Image) {
   })
 }
 
-const createMixlabBtn=()=>{
+const createMixlabBtn = () => {
   const appsButton = document.createElement('button')
   appsButton.id = 'mixlab_chatbot_by_llamacpp'
-  appsButton.className="comfyui-button"
+  appsButton.className = 'comfyui-button'
   appsButton.textContent = '♾️Mixlab'
 
   // appsButton.onclick = () =>
   appsButton.onclick = async () => {
+    let llm_key = await updateLLMAPIKey()
     // if (window._mixlab_llamacpp&&window._mixlab_llamacpp.model&&window._mixlab_llamacpp.model.length>0) {
     //   //显示运行的模型
     //   createModelsModal([
@@ -164,9 +174,7 @@ const createMixlabBtn=()=>{
     //   // ms = ms.filter(m => !m.match('-mmproj-'))
     //   // if (ms.length > 0) createModelsModal(ms)
     // }
-    createModelsModal([
-    
-    ])
+    createModelsModal([], llm_key)
   }
   return appsButton
 }
@@ -182,49 +190,48 @@ async function createMenu () {
   `
   menu.append(separator)
 
-  if(menu.style.display==="none"&&document.querySelector('.comfyui-menu-push')){
+  if (
+    menu.style.display === 'none' &&
+    document.querySelector('.comfyui-menu-push')
+  ) {
     //新版ui
     document.querySelector('.comfyui-menu-push').append(createMixlabBtn())
-  }else{
+  } else {
     if (!menu.querySelector('#mixlab_chatbot_by_llamacpp')) {
       menu.append(createMixlabBtn())
     }
   }
-
- 
 }
 
 let isScriptLoaded = {}
 
-function loadExternalScript(url) {
+function loadExternalScript (url) {
   return new Promise((resolve, reject) => {
     if (isScriptLoaded[url]) {
-      resolve();
-      return;
+      resolve()
+      return
     }
 
-    const existingScript = document.querySelector(`script[src="${url}"]`);
+    const existingScript = document.querySelector(`script[src="${url}"]`)
     if (existingScript) {
       existingScript.onload = () => {
-        isScriptLoaded[url] = true;
-        resolve();
-      };
-      existingScript.onerror = reject;
-      return;
+        isScriptLoaded[url] = true
+        resolve()
+      }
+      existingScript.onerror = reject
+      return
     }
 
-    const script = document.createElement('script');
-    script.src = url;
+    const script = document.createElement('script')
+    script.src = url
     script.onload = () => {
-      isScriptLoaded[url] = true;
-      resolve();
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
+      isScriptLoaded[url] = true
+      resolve()
+    }
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
 }
-
-
 
 //
 
@@ -257,9 +264,7 @@ function createChart (chartDom, nodes) {
 }
 
 async function createNodesCharts () {
-  await loadExternalScript(
-    '/mixlab/app/lib/echarts.min.js'
-  )
+  await loadExternalScript('/mixlab/app/lib/echarts.min.js')
   const templates = await loadTemplate()
   var nodes = {}
   Array.from(templates, t => {
@@ -691,9 +696,9 @@ function get_position_style (ctx, widget_width, y, node_height) {
     transformOrigin: '0 0',
     transform: transform,
     left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
+      document.querySelector('.comfy-menu').style.display === 'none'
+        ? `60px`
+        : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -830,21 +835,67 @@ async function fetchReadmeContent (url) {
 
 async function startLLM (model) {
   let res = await start_llama(model)
-  window._mixlab_llamacpp = res||{ model:[] }
+  window._mixlab_llamacpp = res || { model: [] }
 
-  localStorage.setItem('_mixlab_llama_select', res?.model||'')
+  localStorage.setItem('_mixlab_llama_select', res?.model || '')
 
-  if (document.body.querySelector('#mixlab_chatbot_by_llamacpp')&&window._mixlab_llamacpp?.url) {
+  if (
+    document.body.querySelector('#mixlab_chatbot_by_llamacpp') &&
+    window._mixlab_llamacpp?.url
+  ) {
     document.body
       .querySelector('#mixlab_chatbot_by_llamacpp')
       .setAttribute('title', window._mixlab_llamacpp.url)
   }
-  if (document.body.querySelector('#llm_status_btn')&&window._mixlab_llamacpp) {
-    document.body.querySelector('#llm_status_btn').innerText = window._mixlab_llamacpp.model
+  if (
+    document.body.querySelector('#llm_status_btn') &&
+    window._mixlab_llamacpp
+  ) {
+    document.body.querySelector('#llm_status_btn').innerText =
+      window._mixlab_llamacpp.model
   }
 }
 
-function createModelsModal (models) {
+function createInputOfLabel(labelText,key,id){
+  const label = document.createElement('p')
+  label.innerText = labelText
+
+  const input = document.createElement('input')
+  input.type = 'text'
+  input.style = `color: var(--input-text);
+  background-color: var(--comfy-input-bg);
+  border-radius: 8px;
+  border-color: var(--border-color);
+  height: 26px;
+  padding: 4px 10px;
+  width: 150px;
+  margin-left: 12px;`
+
+  input.value = getLocalData(key)["-"] ||Object.values(getLocalData(key))[0] || 'by Mixlab'
+
+  input.addEventListener('change', e => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    saveLocalData(key, '-', input.value)
+  })
+ 
+
+  const div=document.createElement('div');
+  div.style=`display: flex;
+    justify-content: flex-start;
+    align-items: baseline;padding: 0 18px;`
+ 
+    div.addEventListener('click', e => {
+    e.stopPropagation()
+  })
+
+  div.appendChild(label)
+  div.appendChild(input)
+  return div
+}
+
+function createModelsModal (models, llmKey) {
   var div =
     document.querySelector('#model-modal') || document.createElement('div')
   div.id = 'model-modal'
@@ -910,8 +961,6 @@ function createModelsModal (models) {
       user-select: none;
     `
 
-  // headTitleElement.href = 'https://github.com/shadowcz007/comfyui-mixlab-nodes'
-  // headTitleElement.target = '_blank'
   const linkIcon = document.createElement('small')
   linkIcon.textContent = showTextByLanguage('Auto Open', {
     'Auto Open': '自动开启'
@@ -923,7 +972,7 @@ function createModelsModal (models) {
     Status: 'OFF'
   })
   statusIcon.id = 'llm_status_btn'
-  statusIcon.style=`padding: 4px;
+  statusIcon.style = `padding: 4px;
   background-color: rgb(102, 255, 108);
   color: black;
   font-size: 12px;
@@ -939,35 +988,12 @@ function createModelsModal (models) {
     // startLLM()
   })
 
-  const n_gpu = document.createElement('input')
-  n_gpu.type = 'number'
-  n_gpu.setAttribute('min', -1)
-  n_gpu.setAttribute('max', 9999)
-
-  n_gpu.style = `color: var(--input-text);
-  background-color: var(--comfy-input-bg);
-  border-radius: 8px;
-  border-color: var(--border-color);
-  height: 26px;
-  padding: 4px 10px;
-  width: 48px;
-  margin-left: 12px;`
-  if (localStorage.getItem('_mixlab_llama_n_gpu')) {
-    n_gpu.value = parseInt(localStorage.getItem('_mixlab_llama_n_gpu'))
-  } else {
-    n_gpu.value = -1
-    localStorage.setItem('_mixlab_llama_n_gpu', -1)
-  }
-
-  const n_gpu_p = document.createElement('p')
-  n_gpu_p.innerText = 'n_gpu_layers'
-
   const batchPageBtn = document.createElement('div')
   batchPageBtn.style = `display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;`
-  batchPageBtn.innerHTML=`<a href="${get_url()}/mixlab/app" target="_blank" style="color: var(--input-text);
+  batchPageBtn.innerHTML = `<a href="${get_url()}/mixlab/app" target="_blank" style="color: var(--input-text);
   background-color: var(--comfy-input-bg);">App</a>`
 
   const title = document.createElement('p')
@@ -983,12 +1009,8 @@ function createModelsModal (models) {
   font-size: 12px;
   flex-direction: column; `
   left_d.appendChild(title)
-  // title.appendChild(statusIcon)
-  // left_d.appendChild(linkIcon)
   left_d.appendChild(batchPageBtn)
   headTitleElement.appendChild(left_d)
-
-  // headTitleElement.appendChild(n_gpu_div)
 
   //重启
   const reStart = document.createElement('small')
@@ -996,7 +1018,7 @@ function createModelsModal (models) {
     restart: '重启'
   })
 
-  reStart.style=`padding: 8px;
+  reStart.style = `padding: 8px;
   font-size: 16px;
   outline: 1px solid;
   padding-top: 4px;
@@ -1029,23 +1051,23 @@ function createModelsModal (models) {
     })
   })
 
-  n_gpu.addEventListener('click', e => {
-    e.stopPropagation()
-    localStorage.setItem('_mixlab_llama_n_gpu', n_gpu.value)
-  })
-
   modal.appendChild(headTitleElement)
 
   // Create modal content area
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
 
+  let llmKeyDiv=createInputOfLabel('LLM Key','_mixlab_llm_api_key',"-")
+
+  saveLocalData("_mixlab_llm_api_url","-","https://api.siliconflow.cn/v1")
+  let llmAPIDiv=createInputOfLabel('LLM API','_mixlab_llm_api_url',"-")
+
+  modalContent.appendChild(llmKeyDiv);
+  modalContent.appendChild(llmAPIDiv)
+
   var inputForSystemPrompt = document.createElement('textarea')
   inputForSystemPrompt.className = 'comfy-multiline-input'
-  inputForSystemPrompt.style = `    height: 260px;
-  width: 480px;
-  font-size: 16px;
-  padding: 18px;`
+  inputForSystemPrompt.style = `height: 260px;width: 480px;font-size: 16px;padding: 18px;`
   inputForSystemPrompt.value = localStorage.getItem('_mixlab_system_prompt')
 
   inputForSystemPrompt.addEventListener('change', e => {
@@ -1057,9 +1079,9 @@ function createModelsModal (models) {
     e.stopPropagation()
   })
 
-  // modalContent.appendChild(inputForSystemPrompt)
+  modalContent.appendChild(inputForSystemPrompt)
 
-  if (!window._mixlab_llamacpp||(window._mixlab_llamacpp?.model?.length==0)) {
+  if (!window._mixlab_llamacpp || window._mixlab_llamacpp?.model?.length == 0) {
     for (const m of models) {
       let d = document.createElement('div')
       d.innerText = `${showTextByLanguage('Run', {
@@ -1443,7 +1465,7 @@ app.registerExtension({
           .querySelector('#mixlab_chatbot_by_llamacpp')
           .setAttribute('title', res.url)
       })
-    }else{
+    } else {
       // startLLM('')
     }
 
@@ -1470,19 +1492,18 @@ app.registerExtension({
     LGraphCanvas.prototype.fixTheNode = function (node) {
       let new_node = LiteGraph.createNode(node.comfyClass)
       console.log(node)
-      if(new_node){
+      if (new_node) {
         new_node.pos = [node.pos[0], node.pos[1]]
         app.canvas.graph.add(new_node, false)
         copyNodeValues(node, new_node)
         app.canvas.graph.remove(node)
       }
-     
     }
 
     smart_init()
 
     LGraphCanvas.prototype.text2text = async function (node) {
-      // console.log(node)
+
       let widget = node.widgets.filter(
         w => w.name === 'text' && typeof w.value == 'string'
       )[0]
@@ -1494,10 +1515,12 @@ app.registerExtension({
         let userInput = widget.value
         widget.value = widget.value.trim()
         widget.value += '\n'
-        let jsonStr="";
+        let jsonStr = ''
         try {
           await completion_(
-            window._mixlab_llamacpp.url + '/v1/chat/completions',
+            getLocalData('_mixlab_llm_api_key')['-']||Object.values(getLocalData('_mixlab_llm_api_key'))[0],
+            getLocalData("_mixlab_llm_api_url")['-']||Object.values(getLocalData("_mixlab_llm_api_url"))[0],
+ 
             [
               {
                 role: 'system',
@@ -1509,7 +1532,7 @@ app.registerExtension({
             t => {
               // console.log(t)
               widget.value += t
-              jsonStr+=t
+              jsonStr += t
             }
           )
         } catch (error) {
@@ -1533,29 +1556,34 @@ app.registerExtension({
                 ],
                 controller,
                 t => {
-                  // console.log(t)
+                  console.log(t)
                   widget.value += t
-                  jsonStr+=t
+                  jsonStr += t
                 }
               )
             })
           }
         }
 
-        let json=null;
+        // let json = jsonStr
+        // widget.value = widget.value.trim()+json
+        // console.log(jsonStr)
+        // try {
+        //   json = JSON.parse(jsonStr.trim())
+        // } catch (error) {
+           
+        //   try {
+        //     json = JSON.parse(jsonStr.trim() + '}')
+        //   } catch (error) {
+            
+        //   }
+        // }
 
-        try {
-          json=JSON.parse(jsonStr.trim())
-        } catch (error) {
-          json=JSON.parse(jsonStr.trim()+"}")
-        }
-
-        if(json){
-          widget.value = [json.subject,json.content,json.style].join('\n')
-        }else{
-          widget.value = widget.value.trim()
-        }
-        
+        // if (json) {
+        //   widget.value = [json.subject, json.content, json.style].join('\n')
+        // } else {
+        //   widget.value = widget.value.trim()
+        // }
       }
     }
 
@@ -1836,15 +1864,14 @@ app.registerExtension({
         )
 
         let text_input = node.inputs?.filter(
-          inp => inp.name == 'text' && inp.type == 'STRING'
+          inp => inp.name == 'text' && (inp.type == 'STRING' )
         )
-
+     
         if (
-          text_input &&
-          text_input.length == 0 &&
+         
           text_widget &&
           text_widget.length == 1 &&
-          window._mixlab_llamacpp &&
+          false &&
           node.type != 'ShowTextForGPT'
         ) {
           opts.push({
@@ -1855,19 +1882,19 @@ app.registerExtension({
           })
         }
 
-        if (
-          node.imgs &&
-          node.imgs.length > 0 &&
-          window._mixlab_llamacpp &&
-          window._mixlab_llamacpp.chat_format === 'llava-1-5'
-        ) {
-          opts.push({
-            content: 'Image-to-Text ♾️Mixlab', // with a name
-            callback: () => {
-              LGraphCanvas.prototype.image2text(node)
-            } // and the callback
-          })
-        }
+        // if (
+        //   node.imgs &&
+        //   node.imgs.length > 0 &&
+        //   window._mixlab_llamacpp &&
+        //   window._mixlab_llamacpp.chat_format === 'llava-1-5'
+        // ) {
+        //   opts.push({
+        //     content: 'Image-to-Text ♾️Mixlab', // with a name
+        //     callback: () => {
+        //       LGraphCanvas.prototype.image2text(node)
+        //     } // and the callback
+        //   })
+        // }
       }
 
       return [...opts, null, ...options] // and return the options

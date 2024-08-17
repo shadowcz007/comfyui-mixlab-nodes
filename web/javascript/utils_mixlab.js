@@ -1,49 +1,13 @@
 import { app } from '../../../scripts/app.js'
 import { $el } from '../../../scripts/ui.js'
+import {
+  loadExternalScript,
+  updateLLMAPIKey,
+  get_position_style,
+  getLocalData
+} from './common.js'
 
-const getLocalData = key => {
-  let data = {}
-  try {
-    data = JSON.parse(localStorage.getItem(key)) || {}
-  } catch (error) {
-    return {}
-  }
-  return data
-}
-function get_position_style (ctx, widget_width, y, node_height) {
-  const MARGIN = 4 // the margin around the html element
-
-  /* Create a transform that deals with all the scrolling and zooming */
-  const elRect = ctx.canvas.getBoundingClientRect()
-  const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
-    .multiplySelf(ctx.getTransform())
-    .translateSelf(MARGIN, MARGIN + y)
-
-  return {
-    transformOrigin: '0 0',
-    transform: transform,
-    left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
-    top: `0`,
-    cursor: 'pointer',
-    position: 'absolute',
-    maxWidth: `${widget_width - MARGIN * 2}px`,
-    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    width: `${widget_width - MARGIN * 2}px`,
-    // height: `${node_height * 0.3 - MARGIN * 2}px`,
-    // background: '#EEEEEE',
-    display: 'flex',
-    flexDirection: 'column',
-    // alignItems: 'center',
-    justifyContent: 'space-around'
-  }
-}
+loadExternalScript('/mixlab/app/lib/pickr.min.js')
 
 function hexToRGBA (hexColor) {
   var hex = hexColor.replace('#', '')
@@ -125,7 +89,7 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
-        console.log('Color nodeData', this.div)
+        // console.log('Color nodeData', this.div)
 
         const widget = {
           type: 'div',
@@ -366,7 +330,7 @@ app.registerExtension({
             return [128, 32] // a method to compute the current size of the widget
           },
           async serializeValue (nodeId, widgetIndex) {
-            let data = getLocalData('_mixlab_api_key')
+            let data = getLocalData('_mixlab_llm_api_key')
             return data[node.id] || 'by Mixlab'
           }
         }
@@ -383,13 +347,14 @@ app.registerExtension({
       nodeType.prototype.onNodeCreated = function () {
         orig_nodeCreated?.apply(this, arguments)
 
+        const rowHeight = this.rowHeight
         const widget = {
           type: 'div',
           name: 'input_key',
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 24, node.size[1])
+              get_position_style(ctx, widget_width, y, node.size[1])
             )
           }
         }
@@ -417,11 +382,11 @@ app.registerExtension({
           // ip.value = placeholder
 
           ip.style = `margin-left:8px;
-          outline: none;
-          border: none;
-          padding:12px;
-          width: 100%;
-          `
+            outline: none;
+            border: none;
+            padding:12px;
+            width: 100%;
+            `
 
           div.appendChild(ip)
 
@@ -429,12 +394,13 @@ app.registerExtension({
             let data = getLocalData(key)
             data[this.id] = ip.value.trim()
             localStorage.setItem(key, JSON.stringify(data))
+            updateLLMAPIKey(data[this.id])
           })
 
           return div
         }
 
-        let inputKey = inputDiv('_mixlab_api_key', 'Key')
+        let inputKey = inputDiv('_mixlab_llm_api_key', 'Key')
 
         widget.div.appendChild(inputKey)
 
@@ -447,6 +413,12 @@ app.registerExtension({
           return onRemoved?.()
         }
 
+        // const processMouseWheel=app.canvas.processMouseWheel
+        // app.canvas.processMouseWheel=()=>{
+        //   console.log(app.canvas.ds.scale)
+        //   return processMouseWheel?.()
+        // }
+
         this.serialize_widgets = true //需要保存参数
       }
     }
@@ -455,11 +427,13 @@ app.registerExtension({
     if (node.type === 'KeyInput') {
       let widget = node.widgets.filter(w => w.div)[0]
 
-      let apiKey = getLocalData('_mixlab_api_key')
+      let apiKey = getLocalData('_mixlab_llm_api_key')
 
       let id = node.id
       if (widget.div.querySelector('.Key'))
         widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
+
+      if (apiKey[id]) updateLLMAPIKey(apiKey[id])
     }
   },
   nodeCreated (node, app) {
@@ -469,12 +443,14 @@ app.registerExtension({
       if (node.type === 'KeyInput') {
         let widget = node.widgets.filter(w => w.div)[0]
 
-        let apiKey = getLocalData('_mixlab_api_key')
+        let apiKey = getLocalData('_mixlab_llm_api_key')
 
         let id = node.id
 
         if (widget.div.querySelector('.Key'))
           widget.div.querySelector('.Key').value = apiKey[id] || 'by Mixlab'
+
+        if (apiKey[id]) updateLLMAPIKey(apiKey[id])
       }
     }, 1000)
   }

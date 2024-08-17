@@ -4,27 +4,10 @@ import { api } from '../../../scripts/api.js'
 
 import { td_bg } from './td_background.js'
 // console.log('td_bg', td_bg)
+import { getUrl, base64Df, get_position_style, getObjectInfo } from './common.js'
 
 //本机安装的插件节点全集
 window._nodesAll = null
-
-//获取当前系统的插件，节点清单
-function getObjectInfo () {
-  return new Promise(async (resolve, reject) => {
-    let url = getUrl()
-
-    try {
-      const response = await fetch(`${url}/object_info`)
-      const data = await response.json()
-      resolve(data)
-    } catch (error) {
-      reject(error)
-    }
-  })
-}
-
-const base64Df =
-  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
 const parseImageToBase64 = url => {
   return new Promise((res, rej) => {
@@ -43,42 +26,6 @@ const parseImageToBase64 = url => {
         console.log('发生错误:', error)
       })
   })
-}
-
-function get_position_style (ctx, widget_width, y, node_height) {
-  const MARGIN = 12 // the margin around the html element
-
-  /* Create a transform that deals with all the scrolling and zooming */
-  const elRect = ctx.canvas.getBoundingClientRect()
-  const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
-    .multiplySelf(ctx.getTransform())
-    .translateSelf(MARGIN, MARGIN + y)
-
-  return {
-    transformOrigin: '0 0',
-    transform: transform,
-    left:
-      document.querySelector('.comfy-menu').style.display === 'none'
-        ? `60px`
-        : `0`,
-    top: `0`,
-    cursor: 'pointer',
-    position: 'absolute',
-    maxWidth: `${widget_width - MARGIN * 2}px`,
-    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    width: `${widget_width - MARGIN * 2}px`,
-    // height: `${node_height * 0.3 - MARGIN * 2}px`,
-    // background: '#EEEEEE',
-    display: 'flex',
-    flexDirection: 'column',
-    // alignItems: 'center',
-    justifyContent: 'flex-start',
-    zIndex: 9999999
-  }
 }
 
 async function drawImageToCanvas (imageUrl, sFactor = 320) {
@@ -280,13 +227,6 @@ async function extractInputAndOutputData (
   output = output.filter(i => i)
 
   return { input, output, seed, seedTitle }
-}
-
-function getUrl () {
-  let api_host = `${window.location.hostname}:${window.location.port}`
-  let api_base = ''
-  let url = `${window.location.protocol}//${api_host}${api_base}`
-  return url
 }
 
 const getLocalData = key => {

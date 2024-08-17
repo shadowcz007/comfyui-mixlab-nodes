@@ -2,35 +2,7 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
 
-let isScriptLoaded = {}
-function loadExternalScript(url,type) {
-  return new Promise((resolve, reject) => {
-    if (isScriptLoaded[url]) {
-      resolve();
-      return;
-    }
-
-    const existingScript = document.querySelector(`script[src="${url}"]`);
-    if (existingScript) {
-      existingScript.onload = () => {
-        isScriptLoaded[url] = true;
-        resolve();
-      };
-      existingScript.onerror = reject;
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = url;
-    script.type = type;  // Add this line to load the script as an ES module
-    script.onload = () => {
-      isScriptLoaded[url] = true;
-      resolve();
-    };
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
+import { loadExternalScript } from './common.js'
 
 const getLocalData = key => {
   let data = {}
@@ -130,9 +102,9 @@ function get_position_style (ctx, widget_width, y, node_height) {
     transformOrigin: '0 0',
     transform: transform,
     left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
+      document.querySelector('.comfy-menu').style.display === 'none'
+        ? `60px`
+        : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -299,7 +271,6 @@ app.registerExtension({
     if (nodeType.comfyClass == '3DImage') {
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
-
         await loadExternalScript(
           '/mixlab/app/lib/model-viewer.min.js',
           'module'
