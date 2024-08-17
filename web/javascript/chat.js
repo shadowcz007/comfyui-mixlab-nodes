@@ -1,4 +1,4 @@
-import { getUrl } from "./common.js"
+import { getUrl } from './common.js'
 
 async function* completion (url, messages, controller) {
   let data = {
@@ -93,45 +93,34 @@ async function* completion (url, messages, controller) {
   return content
   // return (await response.json()).content
 }
-
-export async function completion_ (apiKey,url, messages, controller, callback) {
-  // let request = await completion(url, messages, controller)
-  let request=await chatCompletion(apiKey,url, messages, controller)
+export async function completion_ (apiKey, url, messages, controller, callback) {
+  let request = await chatCompletion(apiKey, url, messages, controller)
   for await (const chunk of request) {
-    let content = chunk.data.choices[0].delta.content || ''
-    if (chunk.data.choices[0].role == 'assistant') {
-      //开始
-      content = ''
-    }
-
-    if (callback) callback(content)
+    if (callback) callback(chunk)
   }
 }
 
-
-
-export async function* chatCompletion(apiKey, url,messages,controller){
-  // const apiKey = 'YOUR_API_KEY'
+export async function* chatCompletion (apiKey, url, messages, controller) {
   url = `${getUrl()}/chat/completions`
-  
+
   const requestBody = {
     model: '01-ai/Yi-1.5-9B-Chat-16K',
     messages: messages,
     stream: true,
-    key:apiKey
+    key: apiKey
   }
 
-  let response=await fetch(url, {
+  let response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-      signal: controller.signal
+      Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify(requestBody),
-    mode: 'cors' // This is to ensure the request is made with CORS
-  }) 
-  
+    mode: 'cors', // This is to ensure the request is made with CORS
+    signal: controller.signal
+  })
+
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
 
@@ -150,10 +139,10 @@ export async function* chatCompletion(apiKey, url,messages,controller){
       const text = leftover + decoder.decode(result.value)
 
       // Check if the last character is a line break
-      const endsWithLineBreak = text.endsWith('\n')
+      const endsWithLineBreak = text.endsWith('\r\n')
 
       // Split the text into lines
-      let lines = text.split('\n')
+      let lines = text.split('\r\n')
 
       // If the text doesn't end with a line break, then the last line is incomplete
       // Store it in leftover to be added to the next chunk of data
@@ -163,36 +152,18 @@ export async function* chatCompletion(apiKey, url,messages,controller){
         leftover = '' // Reset leftover if we have a line break at the end
       }
 
-      // Parse all sse events and add them to result
-      const regex = /^(\S+):\s(.*)$/gm
       for (const line of lines) {
-        const match = regex.exec(line)
-        if (match) {
-          result[match[1]] = match[2]
-          // since we know this is llama.cpp, let's just decode the json in data
-          if (result.data) {
-            result.data = JSON.parse(result.data)
-            console.log('#result.data',result.data)
-
-            content += result.data.choices[0].delta?.content || ''
-
-            // yield
-            yield result
-
-            // if we got a stop token from server, we will break here
-            if (result.data.choices[0].finish_reason == 'stop') {
-              if (result.data.generation_settings) {
-                // generation_settings = result.data.generation_settings;
-              }
-              cont = false
-              break
-            }
-          }
+        if (line) {
+          content += line
+          yield line // Yield the trimmed line
+        } else {
+          cont = false
+          break
         }
       }
     }
   } catch (e) {
-    console.error('llama error: ', e)
+    console.error('chat error: ', e)
     throw e
   } finally {
     controller.abort()

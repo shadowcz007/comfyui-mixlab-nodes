@@ -13,6 +13,8 @@ import { completion_ } from './chat.js'
 
 import { getLocalData, saveLocalData, updateLLMAPIKey } from './common.js'
 
+const BIZYAIR_SERVER_ADDRESS = 'https://api.siliconflow.cn'
+
 function showTextByLanguage (key, json) {
   // 获取浏览器语言
   var language = navigator.language
@@ -59,11 +61,19 @@ let tool = {
   }
 }
 
-const systemPrompt = `You are a helpful assistant with access to the following functions. Use them if required - ${JSON.stringify(
-  tool,
-  null,
-  2
-)}`
+const systemPrompt = `
+Prompt:
+
+Describe a scene with a specific theme in fluent and highly detailed English, focusing on the content and style. The description should be within 100 words.
+
+Theme: [Insert Theme Here]
+
+Example:
+
+Theme: Sunset
+
+The sun sets in a blaze of orange and pink, casting a warm glow over a tranquil lake. Silhouetted trees line the shore, their reflections shimmering in the water. A lone figure sits at the end of a wooden pier, feet dangling above the mirrored surface, lost in thought. The scene exudes peacefulness and quiet beauty.
+`
 
 if (!localStorage.getItem('_mixlab_system_prompt')) {
   localStorage.setItem('_mixlab_system_prompt', systemPrompt)
@@ -856,7 +866,7 @@ async function startLLM (model) {
   }
 }
 
-function createInputOfLabel(labelText,key,id){
+function createInputOfLabel (labelText, key, id) {
   const label = document.createElement('p')
   label.innerText = labelText
 
@@ -871,7 +881,8 @@ function createInputOfLabel(labelText,key,id){
   width: 150px;
   margin-left: 12px;`
 
-  input.value = getLocalData(key)["-"] ||Object.values(getLocalData(key))[0] || 'by Mixlab'
+  input.value =
+    getLocalData(key)['-'] || Object.values(getLocalData(key))[0] || 'by Mixlab'
 
   input.addEventListener('change', e => {
     e.stopPropagation()
@@ -879,14 +890,13 @@ function createInputOfLabel(labelText,key,id){
 
     saveLocalData(key, '-', input.value)
   })
- 
 
-  const div=document.createElement('div');
-  div.style=`display: flex;
+  const div = document.createElement('div')
+  div.style = `display: flex;
     justify-content: flex-start;
     align-items: baseline;padding: 0 18px;`
- 
-    div.addEventListener('click', e => {
+
+  div.addEventListener('click', e => {
     e.stopPropagation()
   })
 
@@ -996,6 +1006,17 @@ function createModelsModal (models, llmKey) {
   batchPageBtn.innerHTML = `<a href="${get_url()}/mixlab/app" target="_blank" style="color: var(--input-text);
   background-color: var(--comfy-input-bg);">App</a>`
 
+  
+  const siliconflowHelp = document.createElement('a')
+  siliconflowHelp.textContent = showTextByLanguage('Siliconflow', {
+    Siliconflow: '硅基流动'
+  })
+  siliconflowHelp.style = `color: var(--input-text);
+  background-color: var(--comfy-input-bg);margin-top:14px`
+  siliconflowHelp.href = 'https://cloud.siliconflow.cn/s/mixlabs'
+  siliconflowHelp.target = '_blank' 
+
+
   const title = document.createElement('p')
   title.innerText = 'Mixlab Nodes'
   title.style = `font-size: 18px;
@@ -1010,6 +1031,8 @@ function createModelsModal (models, llmKey) {
   flex-direction: column; `
   left_d.appendChild(title)
   left_d.appendChild(batchPageBtn)
+  left_d.appendChild(siliconflowHelp)
+
   headTitleElement.appendChild(left_d)
 
   //重启
@@ -1057,12 +1080,12 @@ function createModelsModal (models, llmKey) {
   var modalContent = document.createElement('div')
   modalContent.classList.add('modal-content')
 
-  let llmKeyDiv=createInputOfLabel('LLM Key','_mixlab_llm_api_key',"-")
+  let llmKeyDiv = createInputOfLabel('LLM Key', '_mixlab_llm_api_key', '-')
 
-  saveLocalData("_mixlab_llm_api_url","-","https://api.siliconflow.cn/v1")
-  let llmAPIDiv=createInputOfLabel('LLM API','_mixlab_llm_api_url',"-")
+  saveLocalData('_mixlab_llm_api_url', '-', BIZYAIR_SERVER_ADDRESS)
+  let llmAPIDiv = createInputOfLabel('LLM API', '_mixlab_llm_api_url', '-')
 
-  modalContent.appendChild(llmKeyDiv);
+  modalContent.appendChild(llmKeyDiv)
   modalContent.appendChild(llmAPIDiv)
 
   var inputForSystemPrompt = document.createElement('textarea')
@@ -1081,23 +1104,6 @@ function createModelsModal (models, llmKey) {
 
   modalContent.appendChild(inputForSystemPrompt)
 
-  if (!window._mixlab_llamacpp || window._mixlab_llamacpp?.model?.length == 0) {
-    for (const m of models) {
-      let d = document.createElement('div')
-      d.innerText = `${showTextByLanguage('Run', {
-        Run: '运行'
-      })} ${m}`
-      d.className = `mix_tag`
-
-      d.addEventListener('click', async e => {
-        e.stopPropagation()
-        div.remove()
-        // startLLM(m)
-      })
-
-      // modalContent.appendChild(d)
-    }
-  }
   modal.appendChild(modalContent)
 
   const helpInfo = document.createElement('a')
@@ -1503,7 +1509,6 @@ app.registerExtension({
     smart_init()
 
     LGraphCanvas.prototype.text2text = async function (node) {
-
       let widget = node.widgets.filter(
         w => w.name === 'text' && typeof w.value == 'string'
       )[0]
@@ -1518,9 +1523,11 @@ app.registerExtension({
         let jsonStr = ''
         try {
           await completion_(
-            getLocalData('_mixlab_llm_api_key')['-']||Object.values(getLocalData('_mixlab_llm_api_key'))[0],
-            getLocalData("_mixlab_llm_api_url")['-']||Object.values(getLocalData("_mixlab_llm_api_url"))[0],
- 
+            getLocalData('_mixlab_llm_api_key')['-'] ||
+              Object.values(getLocalData('_mixlab_llm_api_key'))[0],
+            getLocalData('_mixlab_llm_api_url')['-'] ||
+              Object.values(getLocalData('_mixlab_llm_api_url'))[0],
+
             [
               {
                 role: 'system',
@@ -1530,60 +1537,15 @@ app.registerExtension({
             ],
             controller,
             t => {
-              // console.log(t)
+              // console.log(t.endsWith('\r'))
               widget.value += t
               jsonStr += t
             }
           )
         } catch (error) {
-          //是否要自动加载模型
-          if (localStorage.getItem('_mixlab_auto_llama_open')) {
-            let model = localStorage.getItem('_mixlab_llama_select')
-            start_llama(model).then(async res => {
-              window._mixlab_llamacpp = res
-              document.body
-                .querySelector('#mixlab_chatbot_by_llamacpp')
-                .setAttribute('title', res.url)
-
-              await completion_(
-                window._mixlab_llamacpp.url + '/v1/chat/completions',
-                [
-                  {
-                    role: 'system',
-                    content: localStorage.getItem('_mixlab_system_prompt')
-                  },
-                  { role: 'user', content: userInput }
-                ],
-                controller,
-                t => {
-                  console.log(t)
-                  widget.value += t
-                  jsonStr += t
-                }
-              )
-            })
-          }
+          console.log(error)
         }
-
-        // let json = jsonStr
-        // widget.value = widget.value.trim()+json
-        // console.log(jsonStr)
-        // try {
-        //   json = JSON.parse(jsonStr.trim())
-        // } catch (error) {
-           
-        //   try {
-        //     json = JSON.parse(jsonStr.trim() + '}')
-        //   } catch (error) {
-            
-        //   }
-        // }
-
-        // if (json) {
-        //   widget.value = [json.subject, json.content, json.style].join('\n')
-        // } else {
-        //   widget.value = widget.value.trim()
-        // }
+ 
       }
     }
 
@@ -1864,14 +1826,20 @@ app.registerExtension({
         )
 
         let text_input = node.inputs?.filter(
-          inp => inp.name == 'text' && (inp.type == 'STRING' )
+          inp => inp.name == 'text' && inp.type == 'STRING'
         )
-     
+
+        const llm_api_key =
+            getLocalData('_mixlab_llm_api_key')['-'] ||
+            Object.values(getLocalData('_mixlab_llm_api_key'))[0],
+          llm_api_url =
+            getLocalData('_mixlab_llm_api_url')['-'] ||
+            Object.values(getLocalData('_mixlab_llm_api_url'))[0]
+
         if (
-         
           text_widget &&
           text_widget.length == 1 &&
-          false &&
+          llm_api_key &&llm_api_url&&
           node.type != 'ShowTextForGPT'
         ) {
           opts.push({
@@ -1955,127 +1923,127 @@ app.registerExtension({
       // Add canvas menu options
       const orig = LGraphCanvas.prototype.getCanvasMenuOptions
 
-      const apps = await get_my_app()
-      if (!apps) return
+      // const apps = await get_my_app()
+      // if (!apps) return
 
-      console.log('apps', apps)
+      // console.log('apps', apps)
 
-      let apps_map = { 0: [] }
+      // let apps_map = { 0: [] }
 
-      for (const app of apps) {
-        if (app.category) {
-          if (!apps_map[app.category]) apps_map[app.category] = []
-          apps_map[app.category].push(app)
-        } else {
-          apps_map['0'].push(app)
-        }
-      }
+      // for (const app of apps) {
+      //   if (app.category) {
+      //     if (!apps_map[app.category]) apps_map[app.category] = []
+      //     apps_map[app.category].push(app)
+      //   } else {
+      //     apps_map['0'].push(app)
+      //   }
+      // }
 
       let apps_opts = []
-      for (const category in apps_map) {
-        // console.log('category', typeof category)
-        if (category === '0') {
-          apps_opts.push(
-            ...Array.from(apps_map[category], a => {
-              // console.log('#1级',a)
-              return {
-                content: `${a.name}_${a.version}`,
-                has_submenu: false,
-                callback: async () => {
-                  try {
-                    let ddd = await get_my_app(a.filename)
-                    if (!ddd) return
-                    let item = ddd[0]
-                    if (item) {
-                      if (item.author) {
-                        // 有作者信息
-                        if (item.author.avatar)
-                          localStorage.setItem(
-                            '_mixlab_author_avatar',
-                            item.author.avatar
-                          )
-                        if (item.author.name)
-                          localStorage.setItem(
-                            '_mixlab_author_name',
-                            item.author.name
-                          )
+      // for (const category in apps_map) {
+      //   // console.log('category', typeof category)
+      //   if (category === '0') {
+      //     apps_opts.push(
+      //       ...Array.from(apps_map[category], a => {
+      //         // console.log('#1级',a)
+      //         return {
+      //           content: `${a.name}_${a.version}`,
+      //           has_submenu: false,
+      //           callback: async () => {
+      //             try {
+      //               let ddd = await get_my_app(a.filename)
+      //               if (!ddd) return
+      //               let item = ddd[0]
+      //               if (item) {
+      //                 if (item.author) {
+      //                   // 有作者信息
+      //                   if (item.author.avatar)
+      //                     localStorage.setItem(
+      //                       '_mixlab_author_avatar',
+      //                       item.author.avatar
+      //                     )
+      //                   if (item.author.name)
+      //                     localStorage.setItem(
+      //                       '_mixlab_author_name',
+      //                       item.author.name
+      //                     )
 
-                        if (item.author.link)
-                          localStorage.setItem(
-                            '_mixlab_author_link',
-                            item.author.link
-                          )
-                      }
+      //                   if (item.author.link)
+      //                     localStorage.setItem(
+      //                       '_mixlab_author_link',
+      //                       item.author.link
+      //                     )
+      //                 }
 
-                      // console.log(item.data)
-                      app.loadGraphData(item.data)
-                      setTimeout(() => {
-                        const node = app.graph._nodes_in_order[0]
-                        if (!node) return
-                        app.canvas.centerOnNode(node)
-                        app.canvas.setZoom(0.5)
-                      }, 1000)
-                    }
-                  } catch (error) {}
-                }
-              }
-            })
-          )
-        } else {
-          // 二级
-          apps_opts.push({
-            content: '🚀 ' + category,
-            has_submenu: true,
-            disabled: false,
-            submenu: {
-              options: Array.from(apps_map[category], a => {
-                // console.log('#二级',a)
-                return {
-                  content: `${a.name}_${a.version}`,
-                  callback: async () => {
-                    try {
-                      let ddd = await get_my_app(a.filename, a.category)
+      //                 // console.log(item.data)
+      //                 app.loadGraphData(item.data)
+      //                 setTimeout(() => {
+      //                   const node = app.graph._nodes_in_order[0]
+      //                   if (!node) return
+      //                   app.canvas.centerOnNode(node)
+      //                   app.canvas.setZoom(0.5)
+      //                 }, 1000)
+      //               }
+      //             } catch (error) {}
+      //           }
+      //         }
+      //       })
+      //     )
+      //   } else {
+      //     // 二级
+      //     apps_opts.push({
+      //       content: '🚀 ' + category,
+      //       has_submenu: true,
+      //       disabled: false,
+      //       submenu: {
+      //         options: Array.from(apps_map[category], a => {
+      //           // console.log('#二级',a)
+      //           return {
+      //             content: `${a.name}_${a.version}`,
+      //             callback: async () => {
+      //               try {
+      //                 let ddd = await get_my_app(a.filename, a.category)
 
-                      if (!ddd) return
-                      let item = ddd[0]
-                      if (item) {
-                        console.log(item)
-                        if (item.author) {
-                          // 有作者信息
-                          if (item.author.avatar)
-                            localStorage.setItem(
-                              '_mixlab_author_avatar',
-                              item.author.avatar
-                            )
-                          if (item.author.name)
-                            localStorage.setItem(
-                              '_mixlab_author_name',
-                              item.author.name
-                            )
-                          if (item.author.link)
-                            localStorage.setItem(
-                              '_mixlab_author_link',
-                              item.author.link
-                            )
-                        }
+      //                 if (!ddd) return
+      //                 let item = ddd[0]
+      //                 if (item) {
+      //                   console.log(item)
+      //                   if (item.author) {
+      //                     // 有作者信息
+      //                     if (item.author.avatar)
+      //                       localStorage.setItem(
+      //                         '_mixlab_author_avatar',
+      //                         item.author.avatar
+      //                       )
+      //                     if (item.author.name)
+      //                       localStorage.setItem(
+      //                         '_mixlab_author_name',
+      //                         item.author.name
+      //                       )
+      //                     if (item.author.link)
+      //                       localStorage.setItem(
+      //                         '_mixlab_author_link',
+      //                         item.author.link
+      //                       )
+      //                   }
 
-                        // console.log(item.data)
-                        app.loadGraphData(item.data)
-                        setTimeout(() => {
-                          const node = app.graph._nodes_in_order[0]
-                          if (!node) return
-                          app.canvas.centerOnNode(node)
-                          app.canvas.setZoom(0.5)
-                        }, 1000)
-                      }
-                    } catch (error) {}
-                  }
-                }
-              })
-            }
-          })
-        }
-      }
+      //                   // console.log(item.data)
+      //                   app.loadGraphData(item.data)
+      //                   setTimeout(() => {
+      //                     const node = app.graph._nodes_in_order[0]
+      //                     if (!node) return
+      //                     app.canvas.centerOnNode(node)
+      //                     app.canvas.setZoom(0.5)
+      //                   }, 1000)
+      //                 }
+      //               } catch (error) {}
+      //             }
+      //           }
+      //         })
+      //       }
+      //     })
+      //   }
+      // }
 
       // console.log('apps',apps_map, apps_opts,apps)
       LGraphCanvas.prototype.getCanvasMenuOptions = function () {
