@@ -73,7 +73,7 @@ export function get_position_style (ctx, widget_width, y, node_height) {
     transform: transform,
     left:
       document.querySelector('.comfy-menu').style.display === 'none'
-        ? `60px`
+        ? `${44*ctx.canvas.width/elRect.width }px`
         : `0`,
     top: `0`,
     cursor: 'pointer',
