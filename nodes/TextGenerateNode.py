@@ -280,7 +280,7 @@ class ChinesePrompt:
                              },
                
                 "optional":{
-                    "seed":("INT", {"default": 100, "min": 100, "max": 1000000}), 
+                    "seed":("INT", {"default": 100, "min": 100, "max":  0xffffffffffffffff}), 
                     
                 },
 
@@ -386,7 +386,7 @@ class PromptGenerate:
 
                 "optional":{
                     "multiple": (["off","on"],), 
-                    "seed":("INT", {"default": 100, "min": 100, "max": 1000000}), 
+                    "seed":("INT", {"default": 100, "min": 100, "max":  0xffffffffffffffff}), 
                 },
 
                 }
