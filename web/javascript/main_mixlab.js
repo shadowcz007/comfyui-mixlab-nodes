@@ -194,7 +194,6 @@ async function shareScreen (
   }
 }
 
- 
 async function compareImages (threshold, previousImage, currentImage) {
   // 将 base64 转换为 Image 对象
   var previousImg = await createImage(previousImage)
@@ -526,17 +525,12 @@ app.registerExtension({
           type: 'HTML', // whatever
           name: 'sreen_share', // whatever
           draw (ctx, node, widget_width, y, widget_height) {
-            // console.log('ScreenSHare', y, widget_height)
+            // console.log('ScreenSHare', node)
             Object.assign(
               this.card.style,
-              get_position_style(
-                ctx,
-                widget_width,
-                widget_height * 5,
-                node.size[1],
-                40
-              )
+              get_position_style(ctx, widget_width, y, node.size[1], 40)
             )
+ 
           }
         }
 

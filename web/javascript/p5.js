@@ -2,6 +2,8 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
 
+import { get_position_style } from './common.js'
+
 function base64ToBlobFromURL (base64URL, contentType) {
   return fetch(base64URL).then(response => response.blob())
 }
@@ -35,41 +37,6 @@ async function uploadBase64ToFile (base64) {
   let bg_blob = await base64ToBlobFromURL(base64)
   let url = await uploadImage(bg_blob, '.png')
   return url
-}
-
-function get_position_style (ctx, widget_width, y, node_height) {
-  const MARGIN = 4 // the margin around the html element
-
-  /* Create a transform that deals with all the scrolling and zooming */
-  const elRect = ctx.canvas.getBoundingClientRect()
-  const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
-    .multiplySelf(ctx.getTransform())
-    .translateSelf(MARGIN, MARGIN + y)
-
-  return {
-    transformOrigin: '0 0',
-    transform: transform,
-    left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
-    top: `0`,
-    cursor: 'pointer',
-    position: 'absolute',
-    maxWidth: `${widget_width - MARGIN * 2}px`,
-    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    width: `${widget_width - MARGIN * 2}px`,
-    // height: `${node_height * 0.3 - MARGIN * 2}px`,
-    // background: '#EEEEEE',
-    display: 'flex',
-    flexDirection: 'column',
-    // alignItems: 'center',
-    justifyContent: 'space-around'
-  }
 }
 
 const p5InputNode = {
@@ -109,7 +76,13 @@ const p5InputNode = {
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width - 24, 44, node.size[1])
+              get_position_style(
+                ctx,
+                widget_width - 24,
+                44,
+                node.size[1] * 2.8,
+                44
+              )
             )
           },
           serialize: false

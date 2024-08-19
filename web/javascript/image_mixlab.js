@@ -4,6 +4,8 @@ import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
 import { applyTextReplacements } from '../../../scripts/utils.js'
 
+import { loadExternalScript,get_position_style } from './common.js'
+
 function loadImageToCanvas (base64Image) {
   var img = new Image()
   var canvas = document.createElement('canvas')
@@ -88,40 +90,40 @@ function getContentTypeFromBase64 (base64Data) {
 // const blob = base64ToBlob(base64Data, contentType);
 // console.log(blob);
 
-function get_position_style (ctx, widget_width, y, node_height) {
-  const MARGIN = 4 // the margin around the html element
+// function get_position_style (ctx, widget_width, y, node_height) {
+//   const MARGIN = 4 // the margin around the html element
 
-  /* Create a transform that deals with all the scrolling and zooming */
-  const elRect = ctx.canvas.getBoundingClientRect()
-  const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
-    .multiplySelf(ctx.getTransform())
-    .translateSelf(MARGIN, MARGIN + y)
+//   /* Create a transform that deals with all the scrolling and zooming */
+//   const elRect = ctx.canvas.getBoundingClientRect()
+//   const transform = new DOMMatrix()
+//     .scaleSelf(
+//       elRect.width / ctx.canvas.width,
+//       elRect.height / ctx.canvas.height
+//     )
+//     .multiplySelf(ctx.getTransform())
+//     .translateSelf(MARGIN, MARGIN + y)
 
-  return {
-    transformOrigin: '0 0',
-    transform: transform,
-    left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
-    top: `0`,
-    cursor: 'pointer',
-    position: 'absolute',
-    maxWidth: `${widget_width - MARGIN * 2}px`,
-    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    width: `${widget_width - MARGIN * 2}px`,
-    // height: `${node_height * 0.3 - MARGIN * 2}px`,
-    // background: '#EEEEEE',
-    display: 'flex',
-    flexDirection: 'column',
-    // alignItems: 'center',
-    justifyContent: 'space-around'
-  }
-}
+//   return {
+//     transformOrigin: '0 0',
+//     transform: transform,
+//     left:
+//       document.querySelector('.comfy-menu').style.display === 'none'
+//         ? `60px`
+//         : `0`,
+//     top: `0`,
+//     cursor: 'pointer',
+//     position: 'absolute',
+//     maxWidth: `${widget_width - MARGIN * 2}px`,
+//     // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
+//     width: `${widget_width - MARGIN * 2}px`,
+//     // height: `${node_height * 0.3 - MARGIN * 2}px`,
+//     // background: '#EEEEEE',
+//     display: 'flex',
+//     flexDirection: 'column',
+//     // alignItems: 'center',
+//     justifyContent: 'space-around'
+//   }
+// }
 
 const getLocalData = key => {
   let data = {}
@@ -347,8 +349,9 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1])
+              get_position_style(ctx, widget_width, 44, node.size[1],36)
             )
+           
           }
         }
 
@@ -684,7 +687,7 @@ const addBase64ToWidgetForLoadImagesToBatch = (
   imagesWidget,
   imagesDiv
 ) => {
-  if(!imagesWidget.value.base64) imagesWidget.value.base64=[]
+  if (!imagesWidget.value.base64) imagesWidget.value.base64 = []
   imagesWidget.value.base64.push(base64)
   let im = createInputImageForBatch(base64, imagesWidget)
   imagesDiv.appendChild(im)
@@ -885,6 +888,8 @@ app.registerExtension({
 app.registerExtension({
   name: 'Mixlab.output.ComparingTwoFrames_',
   init () {
+    loadExternalScript('/mixlab/app/lib/juxtapose.min.js')
+
     $el('link', {
       rel: 'stylesheet',
       href: '/mixlab/app/lib/juxtapose.css',
@@ -914,10 +919,14 @@ app.registerExtension({
           type: 'div',
           name: 'preview',
           draw (ctx, node, widget_width, y, widget_height) {
+            let s=get_position_style(ctx, widget_width, 44, node.size[1],36);
+            delete s.height
+          
             Object.assign(
               this.div.style,
-              get_position_style(ctx, 400, 44, node.size[1])
+              s
             )
+             
           },
           serialize: false
         }

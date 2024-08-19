@@ -55,25 +55,32 @@ export function getObjectInfo () {
   })
 }
 
-export function get_position_style (ctx, widget_width, y, node_height) {
+export function get_position_style (
+  ctx,
+  widget_width,
+  y,
+  node_height,
+  left = 44
+) {
   const MARGIN = 0 // the margin around the html element
 
   /* Create a transform that deals with all the scrolling and zooming */
   const elRect = ctx.canvas.getBoundingClientRect()
+
+  const scaleX = elRect.width / ctx.canvas.width
+  const scaleY = elRect.height / ctx.canvas.height
+
   const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
+    .scaleSelf(scaleX, scaleY)
     .multiplySelf(ctx.getTransform())
     .translateSelf(MARGIN, MARGIN + y)
-
+ 
   return {
     transformOrigin: '0 0',
     transform: transform,
     left:
       document.querySelector('.comfy-menu').style.display === 'none'
-        ? `${44*ctx.canvas.width/elRect.width }px`
+        ? `${left}px`
         : `0`,
     top: `0`,
     cursor: 'pointer',
