@@ -80,7 +80,7 @@ export function get_position_style (ctx, widget_width, y, node_height) {
     position: 'absolute',
     maxWidth: `${widget_width - MARGIN * 2}px`,
     // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    // width: `${widget_width - MARGIN * 2}px`,
+    width: `${widget_width - MARGIN * 2}px`,
     height: `${node_height * 0.3 - MARGIN * 2}px`,
     // background: '#EEEEEE',
     display: 'flex',

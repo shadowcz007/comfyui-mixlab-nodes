@@ -976,12 +976,13 @@ async function setArea (src) {
   div.innerHTML = `
     <div id='ml_overlay' style='position: absolute;top:0;background: #251f1fc4;
     height: 100vh;
-    z-index:999999;
+    z-index:99999999999999;
     width: 100%;'>
       <img id='ml_video' style='position: absolute; 
       height: ${displayHeight}px;user-select: none; 
       -webkit-user-drag: none;
       outline: 2px solid #eaeaea;
+      left: 0;
       box-shadow: 8px 9px 17px #575757;' />
       <div id='ml_selection' style='position: absolute; 
       border: 2px dashed red; 
