@@ -5,7 +5,7 @@ import torch
 import folder_paths
 from transformers import AutoTokenizer, AutoModel
 from torchvision.transforms.v2 import ToPILImage
-from decord import VideoReader, cpu  # pip install decord
+# from decord import VideoReader, cpu  # pip install decord
 from PIL import Image
 
 def get_model_path(n=""):
