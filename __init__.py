@@ -1397,5 +1397,16 @@ try:
 except Exception as e:
     logging.info('TripoSR.available False' )
 
+from .nodes.MiniCPMNode import MiniCPM_VQA_Simple
+try:
+    
+    logging.info('MiniCPMNode.available')
+    # logging.info( folder_paths.get_temp_directory())
+    NODE_CLASS_MAPPINGS['MiniCPM_VQA_Simple']=MiniCPM_VQA_Simple
+    NODE_DISPLAY_NAME_MAPPINGS["MiniCPM_VQA_Simple"]= "MiniCPM VQA Simple"
+    
+except Exception as e:
+    logging.info('MiniCPMNode.available False' )
+
 
 logging.info('\033[93m -------------- \033[0m')

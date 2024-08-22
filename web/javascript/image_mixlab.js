@@ -4,7 +4,7 @@ import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
 import { applyTextReplacements } from '../../../scripts/utils.js'
 
-import { loadExternalScript,get_position_style } from './common.js'
+import { loadExternalScript, get_position_style } from './common.js'
 
 function loadImageToCanvas (base64Image) {
   var img = new Image()
@@ -349,9 +349,8 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1],36)
+              get_position_style(ctx, widget_width, 44, node.size[1], 36)
             )
-           
           }
         }
 
@@ -536,7 +535,7 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, y, node.size[1])
+              get_position_style(ctx, widget_width, y, node.size[1], 36)
             )
           }
         }
@@ -736,7 +735,7 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1])
+              get_position_style(ctx, widget_width, 44, node.size[1], 44)
             )
           },
           serialize: false
@@ -919,14 +918,10 @@ app.registerExtension({
           type: 'div',
           name: 'preview',
           draw (ctx, node, widget_width, y, widget_height) {
-            let s=get_position_style(ctx, widget_width, 44, node.size[1],36);
+            let s = get_position_style(ctx, widget_width, 44, node.size[1], 36)
             delete s.height
-          
-            Object.assign(
-              this.div.style,
-              s
-            )
-             
+
+            Object.assign(this.div.style, s)
           },
           serialize: false
         }

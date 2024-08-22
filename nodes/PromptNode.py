@@ -18,7 +18,13 @@ import json
 #     req =  request.Request("http://127.0.0.1:8188/prompt", data=data)
 #     request.urlopen(req)    
 
-embeddings_path=os.path.join(folder_paths.models_dir, "embeddings")
+def get_model_path(n=""):
+    try:
+        return folder_paths.get_folder_paths(n)[0]
+    except:
+        return os.path.join(folder_paths.models_dir, n)
+    
+embeddings_path=get_model_path("embeddings")
 
 def get_files_with_extension(directory, extension):
     
