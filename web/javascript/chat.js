@@ -127,14 +127,14 @@ export async function* chatCompletion (
     stream: true,
     key: apiKey,
     model_name: model_name,
-    api_url,
+    api_url
   }
 
   let response = await fetch(mixlabAPI, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`
+      'Content-Type': 'application/json'
+      // Authorization: `Bearer ${apiKey}`
     },
     body: JSON.stringify(requestBody),
     mode: 'cors', // This is to ensure the request is made with CORS
@@ -154,15 +154,12 @@ export async function* chatCompletion (
       if (result.done) {
         break
       }
-
-      // Add any leftover data to the current chunk of data
       const text = leftover + decoder.decode(result.value)
-
       // Check if the last character is a line break
-      const endsWithLineBreak = text.endsWith('\r\n')
+      const endsWithLineBreak = text.endsWith('\n')
 
       // Split the text into lines
-      let lines = text.split('\r\n')
+      let lines = text.split('\n')
 
       // If the text doesn't end with a line break, then the last line is incomplete
       // Store it in leftover to be added to the next chunk of data
@@ -172,13 +169,31 @@ export async function* chatCompletion (
         leftover = '' // Reset leftover if we have a line break at the end
       }
 
+      // Parse all sse events and add them to result
+      const regex = /^(\S+):\s(.*)$/gm
       for (const line of lines) {
-        if (line) {
-          content += line
-          yield line // Yield the trimmed line
-        } else {
-          cont = false
-          break
+        const match = regex.exec(line)
+        if (match) {
+          result[match[1]] = match[2]
+          // since we know this is llama.cpp, let's just decode the json in data
+          if (result.data) {
+            result.data = JSON.parse(result.data)
+            
+
+            content += result.data.choices[0].delta?.content || ''
+            // console.log('#result.content',content)
+            // yield
+            yield result
+
+            // if we got a stop token from server, we will break here
+            if (result.data.choices[0].finish_reason == 'stop') {
+              if (result.data.generation_settings) {
+                // generation_settings = result.data.generation_settings;
+              }
+              cont = false
+              break
+            }
+          }
         }
       }
     }

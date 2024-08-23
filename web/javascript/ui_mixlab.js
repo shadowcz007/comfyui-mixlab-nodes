@@ -834,11 +834,14 @@ function createModelsModal (models, llmKey) {
   background-color: var(--comfy-input-bg);font-size: 16px;">MixLab App</a>`
 
   const siliconflowHelp = document.createElement('a')
-  siliconflowHelp.textContent = showTextByLanguage('Use Siliconflow', {
-    "Use Siliconflow": '使用硅基流动'
-  }) +'\n' +showTextByLanguage('Or Local LLM', {
-    "Or Local LLM": '或者本地LLM'
-  })
+  siliconflowHelp.textContent =
+    showTextByLanguage('Use Siliconflow', {
+      'Use Siliconflow': '使用硅基流动'
+    }) +
+    '\n' +
+    showTextByLanguage('Or Local LLM', {
+      'Or Local LLM': '或者本地LLM'
+    })
   siliconflowHelp.style = `color: var(--input-text);
   background-color: var(--comfy-input-bg);margin-top:14px;font-size: 16px;`
   siliconflowHelp.href = 'https://cloud.siliconflow.cn/s/mixlabs'
@@ -1356,7 +1359,7 @@ app.registerExtension({
               Object.values(getLocalData('_mixlab_llm_api_key'))[0],
             getLocalData('_mixlab_llm_api_url')['-'] ||
               Object.values(getLocalData('_mixlab_llm_api_url'))[0],
-              getLocalData('_mixlab_llm_model_name')['-'] ||
+            getLocalData('_mixlab_llm_model_name')['-'] ||
               Object.values(getLocalData('_mixlab_llm_model_name'))[0],
             [
               {
@@ -1367,9 +1370,11 @@ app.registerExtension({
             ],
             controller,
             t => {
-              // console.log(t.endsWith('\r'))
-              widget.value += t
-              jsonStr += t
+              let content = t.data?.choices[0]?.delta?.content || ''
+
+              console.log(content)
+              widget.value += content
+              // jsonStr += content
             }
           )
         } catch (error) {
@@ -1410,7 +1415,6 @@ app.registerExtension({
           //       content: localStorage.getItem('_mixlab_system_prompt')
           //     },
           //     // { role: 'user', content: userInput }
-
           //     {
           //       role: 'user',
           //       content: [
@@ -1428,7 +1432,6 @@ app.registerExtension({
           //   t => {
           //     // console.log(t)
           //     widget.value += t
-
           //     NoteNode.size[1] = widget.element.scrollHeight + 20
           //     widget.computedHeight = NoteNode.size[1]
           //     app.canvas.centerOnNode(NoteNode)

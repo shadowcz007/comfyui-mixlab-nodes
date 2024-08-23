@@ -634,19 +634,19 @@ async def chat_completions(request):
 
     async def generate():
         try:
-            client=openai_client(key,api_url)
-
-            response = client.chat.completions.create(
-                model=model_name,
-                messages=messages,
-                stream=True
-            )
-
-            for chunk in response:
-                if hasattr(chunk.choices[0].delta, 'content'):
-                    content = chunk.choices[0].delta.content
-                    if content is not None:
-                        yield content.encode('utf-8') + b"\r\n"
+            headers = {
+                'Authorization': f'Bearer {key}',
+                'Content-Type': 'application/json'
+            }
+            payload = {
+                'model': model_name,
+                'messages': messages,
+                'stream': True
+            }
+            async with aiohttp.ClientSession() as session:
+                async with session.post(f'{api_url}/chat/completions', json=payload, headers=headers) as resp:
+                    async for line in resp.content:
+                        yield line
 
         except Exception as e:
             yield f"Error: {str(e)}".encode('utf-8') + b"\r\n"
