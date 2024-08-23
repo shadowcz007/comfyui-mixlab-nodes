@@ -602,9 +602,7 @@ const missingNodeGithub = (missingNodeTypes, nodesMap) => {
 
     >${n.title}
     <div 
-    
     style="display: flex; 
-    
      flex-direction: row;
      align-items: center;
      ${!n.author ? 'line-height: 4px;' : ''}
@@ -639,22 +637,7 @@ app.showMissingNodesError = async function (
       : await getCustomnodeMappings()
 
   this.ui.dialog.show(
-    `<a 
-    style="color: white;
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      font-family: sans-serif;
-      text-decoration: none;
-      "
-    class="help_link"
-    href="https://discord.gg/cXs9vZSqeK"  target="_blank">${showTextByLanguage(
-      'Welcome to Mixlab nodes discord, seeking help.',
-      {
-        'Welcome to Mixlab nodes discord, seeking help.':
-          '寻求帮助，加入Mixlab nodes交流频道'
-      }
-    )}</a><br><br>${showTextByLanguage(
+    `${showTextByLanguage(
       'When loading the graph, the following node types were not found:',
       {
         'When loading the graph, the following node types were not found:':
@@ -665,7 +648,24 @@ app.showMissingNodesError = async function (
    <ul class="comfy-missing-nodes">${missingNodeGithub(
      missingNodeTypes,
      nodesMap
-   ).join('')}</ul>${hasAddedNodes ? '' : ''}`
+   ).join('')}</ul>${hasAddedNodes ? '' : ''} 
+   <br><br><a 
+    style="color: #dedede;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-family: sans-serif;
+    text-decoration: none;
+      "
+    class="help_link"
+    href="https://discord.gg/cXs9vZSqeK"  target="_blank">${showTextByLanguage(
+      'Welcome to Mixlab nodes discord, seeking help.',
+      {
+        'Welcome to Mixlab nodes discord, seeking help.':
+          '寻求帮助，加入Mixlab nodes交流频道'
+      }
+    )}</a>
+    `
   )
   this.logging.addEntry('Comfy.App', 'warn', {
     MissingNodes: missingNodeTypes
