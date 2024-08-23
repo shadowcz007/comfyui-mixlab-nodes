@@ -307,11 +307,12 @@ from [simple-lama-inpainting](https://github.com/enesmsahin/simple-lama-inpainti
 ![node-not-found](./assets/node-not-found.png)
 
 
-
 - Right-click shortcut
 
 右键菜单支持 text-to-text，方便对 prompt 词补全，支持云LLM或者是本地LLM。
 The right-click menu supports text-to-text conversion, facilitating prompt word completion, and supports cloud LLMs or local LLMs.
+
+Local LLM API example:```http://localhost:1234/v1```
 
 ![alt text](./assets/1724380841822.png)
 
