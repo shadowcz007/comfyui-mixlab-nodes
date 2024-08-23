@@ -3,24 +3,7 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 
 import { $el } from '../../../scripts/ui.js'
-
-// The code is based on ComfyUI-VideoHelperSuite modification.
-
-function injectCSS (css) {
-  // 检查页面中是否已经存在具有相同内容的style标签
-  const existingStyle = document.querySelector('style')
-  if (existingStyle && existingStyle.textContent === css) {
-    return // 如果已经存在相同的样式，则不进行注入
-  }
-
-  // 创建一个新的style标签，并将CSS内容注入其中
-  const style = document.createElement('style')
-  style.textContent = css
-
-  // 将style标签插入到页面的head元素中
-  const head = document.querySelector('head')
-  head.appendChild(style)
-}
+import { injectCSS } from './common.js'
 
 injectCSS(`
 .hidden{
@@ -44,9 +27,9 @@ function get_position_style (ctx, widget_width, y, node_height) {
     transformOrigin: '0 0',
     transform: transform,
     left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
+      document.querySelector('.comfy-menu').style.display === 'none'
+        ? `60px`
+        : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',
@@ -471,7 +454,7 @@ app.registerExtension({
         const prefix = 'vhs_gif_preview_'
         const r = onExecuted ? onExecuted.apply(this, message) : undefined
 
-        if(!this.widgets) this.widgets=[]
+        if (!this.widgets) this.widgets = []
 
         if (this.widgets) {
           const pos = this.widgets.findIndex(w => w.name === `${prefix}_0`)

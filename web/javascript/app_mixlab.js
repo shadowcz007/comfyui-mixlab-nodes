@@ -229,15 +229,7 @@ async function extractInputAndOutputData (
   return { input, output, seed, seedTitle }
 }
 
-const getLocalData = key => {
-  let data = {}
-  try {
-    data = JSON.parse(localStorage.getItem(key)) || {}
-  } catch (error) {
-    return {}
-  }
-  return data
-}
+ 
 
 async function save_app (json) {
   let url = getUrl()

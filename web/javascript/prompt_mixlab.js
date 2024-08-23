@@ -3,51 +3,37 @@ import { api } from '../../../scripts/api.js'
 import { ComfyWidgets } from '../../../scripts/widgets.js'
 import { $el } from '../../../scripts/ui.js'
 
+import { loadCSS, injectCSS } from './common.js'
+
 import PhotoSwipeLightbox from '/mixlab/app/lib/photoswipe-lightbox.esm.min.js'
-function loadCSS (url) {
-  var link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.type = 'text/css'
-  link.href = url
-  document.getElementsByTagName('head')[0].appendChild(link)
 
-  // Create a style element
-  const style = document.createElement('style')
-  // Define the CSS rule for scrollbar width
-  const cssRule = `.pswp__custom-caption {
-    background: rgb(20 27 70);
-    font-size: 16px;
-    color: #fff;
-    width: calc(100% - 32px);
-    max-width: 980px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    position: absolute;
-    left: 50%;
-    bottom: 16px;
-    transform: translateX(-50%);
-  }
-  .pswp__custom-caption a {
-    color: #fff;
-    text-decoration: underline;
-  }
-  .hidden-caption-content {
-    display: none;
-  }`
-  // Add the CSS rule to the style element
-  style.appendChild(document.createTextNode(cssRule))
-
-  // Append the style element to the document head
-  document.head.appendChild(style)
-}
 loadCSS('/mixlab/app/lib/photoswipe.min.css')
+injectCSS(`.pswp__custom-caption {
+      background: rgb(20 27 70);
+      font-size: 16px;
+      color: #fff;
+      width: calc(100% - 32px);
+      max-width: 980px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      position: absolute;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+    }
+    .pswp__custom-caption a {
+      color: #fff;
+      text-decoration: underline;
+    }
+    .hidden-caption-content {
+      display: none;
+    }`)
 
 function initLightBox () {
   const lightbox = new PhotoSwipeLightbox({
     gallery: '.prompt_image_output',
     children: 'a',
-    pswpModule: () =>
-      import('/mixlab/app/lib/photoswipe.esm.min.js')
+    pswpModule: () => import('/mixlab/app/lib/photoswipe.esm.min.js')
   })
 
   lightbox.on('uiRegister', function () {
@@ -101,9 +87,9 @@ function get_position_style (ctx, widget_width, y, node_height) {
     transformOrigin: '0 0',
     transform: transform,
     left:
-    document.querySelector('.comfy-menu').style.display === 'none'
-      ? `60px`
-      : `0`,
+      document.querySelector('.comfy-menu').style.display === 'none'
+        ? `60px`
+        : `0`,
     top: `0`,
     cursor: 'pointer',
     position: 'absolute',

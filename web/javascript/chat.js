@@ -93,24 +93,44 @@ async function* completion (url, messages, controller) {
   return content
   // return (await response.json()).content
 }
-export async function completion_ (apiKey, url, messages, controller, callback) {
-  let request = await chatCompletion(apiKey, url, messages, controller)
+export async function completion_ (
+  apiKey,
+  url,
+  model_name,
+  messages,
+  controller,
+  callback
+) {
+  let request = await chatCompletion(
+    apiKey,
+    url,
+    model_name,
+    messages,
+    controller
+  )
   for await (const chunk of request) {
     if (callback) callback(chunk)
   }
 }
 
-export async function* chatCompletion (apiKey, url, messages, controller) {
-  url = `${getUrl()}/chat/completions`
+export async function* chatCompletion (
+  apiKey,
+  api_url,
+  model_name,
+  messages,
+  controller
+) {
+  const mixlabAPI = `${getUrl()}/chat/completions`
 
   const requestBody = {
-    model: '01-ai/Yi-1.5-9B-Chat-16K',
     messages: messages,
     stream: true,
-    key: apiKey
+    key: apiKey,
+    model_name: model_name,
+    api_url,
   }
 
-  let response = await fetch(url, {
+  let response = await fetch(mixlabAPI, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
