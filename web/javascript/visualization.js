@@ -85,7 +85,7 @@ function createVisualizer (node, inputName, typeName, inputData, app) {
         .translateSelf(margin, margin + widgetY)
 
       Object.assign(this.visualizer.style, {
-        left: `${transform.a * margin + transform.e}px`,
+        left: `${transform.a * margin + transform.e + 40}px`,
         top: `${transform.d + transform.f + top_offset}px`,
         width: `${w * transform.a}px`,
         height: `${
