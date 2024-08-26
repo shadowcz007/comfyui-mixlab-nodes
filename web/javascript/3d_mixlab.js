@@ -287,7 +287,7 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 88, node.size[1])
+              get_position_style(ctx, widget_width-88, 88, node.size[1])
             )
           }
         }
