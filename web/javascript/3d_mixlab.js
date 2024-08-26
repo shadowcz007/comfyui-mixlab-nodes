@@ -267,19 +267,20 @@ app.registerExtension({
     }
   },
 
+  async init(){
+    await loadExternalScript(
+      '/mixlab/app/lib/model-viewer.min.js',
+      'module'
+    )
+  },
+
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == '3DImage') {
+      console.log("nodeType.comfyClass",nodeType.comfyClass)
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
-        await loadExternalScript(
-          '/mixlab/app/lib/model-viewer.min.js',
-          'module'
-        )
-
         orig_nodeCreated?.apply(this, arguments)
-
         const uploadWidget = this.widgets.filter(w => w.name == 'upload')[0]
-
         const widget = {
           type: 'div',
           name: 'upload-preview',
@@ -293,7 +294,6 @@ app.registerExtension({
 
         widget.div = $el('div', {})
         widget.div.style.width = `120px`
-
         document.body.appendChild(widget.div)
 
         const inputDiv = (key, placeholder, preview) => {
