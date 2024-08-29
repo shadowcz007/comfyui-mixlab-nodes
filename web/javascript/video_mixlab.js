@@ -21,7 +21,7 @@ function videoUpload (node, inputName, inputData, app) {
     name: 'upload-preview',
     draw (ctx, node, widget_width, y, widget_height) {
       let d = {
-        ...get_position_style(ctx, widget_width - 12, 220, node.size[1], 44),
+        ...get_position_style(ctx, widget_width - 20, 220, node.size[1], 72),
         outline: '1px solid',
         top: `${widget_height + 24}px`
       }
@@ -219,7 +219,6 @@ function offsetDOMWidget (widget, ctx, node, widgetWidth, widgetY, height) {
     zIndex: 5 //app.graph._nodes.indexOf(node),
   })
 }
- 
 
 export const hasWidgets = node => {
   if (!node.widgets || !node.widgets?.[Symbol.iterator]) {
