@@ -209,9 +209,9 @@ function offsetDOMWidget (widget, ctx, node, widgetWidth, widgetY, height) {
   Object.assign(widget.inputEl.style, {
     transformOrigin: '0 0',
     transform: scale,
-    left: `${transform.a + transform.e}px`,
-    top: `${transform.d + transform.f}px`,
-    width: `${widgetWidth}px`,
+    left: `${transform.a + transform.e + 44}px`,
+    top: `${transform.d + transform.f + 24}px`,
+    width: `${widgetWidth - 32}px`,
     height: `${(height || widget.parent?.inputHeight || 32) - margin * 2}px`,
     position: 'absolute',
     background: !node.color ? '' : node.color,
@@ -219,6 +219,7 @@ function offsetDOMWidget (widget, ctx, node, widgetWidth, widgetY, height) {
     zIndex: 5 //app.graph._nodes.indexOf(node),
   })
 }
+ 
 
 export const hasWidgets = node => {
   if (!node.widgets || !node.widgets?.[Symbol.iterator]) {
@@ -295,13 +296,14 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width, 188, node.size[1]),
+              get_position_style(ctx, widget_width - 12, 220, node.size[1], 44),
               {
                 outline: '1px solid',
                 display: 'flex',
                 flexWrap: 'wrap',
                 flexDirection: 'row',
-                justifyContent: 'flex-start'
+                justifyContent: 'flex-start',
+                top: `${widget_height + 24}px`
               }
             )
           }
