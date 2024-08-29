@@ -857,7 +857,7 @@ app.registerExtension({
       let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
       // console.log('#LoadImagesToBatch', imagesWidget.value?.base64)
       let imagesDiv = imagePreview.div.querySelector('.images_preview')
-
+      imagesDiv.innerHTML = ''
       for (const d of imagesWidget.value?.base64 || []) {
         let im = createInputImageForBatch(d, imagesWidget)
         imagesDiv.appendChild(im)
@@ -873,7 +873,7 @@ app.registerExtension({
         let imagePreview = node.widgets.filter(w => w.name == 'image_base64')[0]
 
         let imagesDiv = imagePreview?.div?.querySelector('.images_preview')
-
+        imagesDiv.innerHTML = ''
         for (const d of imagesWidget.value?.base64 || []) {
           let im = createInputImageForBatch(d, imagesWidget)
           imagesDiv.appendChild(im)
