@@ -733,10 +733,10 @@ app.registerExtension({
           type: 'div',
           name: 'image_base64',
           draw (ctx, node, widget_width, y, widget_height) {
-            Object.assign(
-              this.div.style,
-              get_position_style(ctx, widget_width, 44, node.size[1], 44)
-            )
+            Object.assign(this.div.style, {
+              ...get_position_style(ctx, widget_width, y, node.size[1], 72),
+              top: `${widget_height}px`
+            })
           },
           serialize: false
         }
