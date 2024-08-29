@@ -1342,7 +1342,9 @@ app.registerExtension({
 
     LGraphCanvas.prototype.text2text = async function (node) {
       let widget = node.widgets.filter(
-        w => w.name === 'text' && typeof w.value == 'string'
+        w =>
+          (w.name === 'text' || w.name === 'prompt') &&
+          typeof w.value == 'string'
       )[0]
       if (widget) {
         app.canvas.centerOnNode(node)
@@ -1653,7 +1655,9 @@ app.registerExtension({
 
       if (node.widgets) {
         let text_widget = node.widgets.filter(
-          w => w.name === 'text' && typeof w.value == 'string'
+          w =>
+            (w.name === 'text' || w.name === 'prompt') &&
+            typeof w.value == 'string'
         )
 
         let text_input = node.inputs?.filter(
