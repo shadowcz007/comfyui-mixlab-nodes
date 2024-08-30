@@ -389,14 +389,30 @@ function base64ToBlob (base64) {
   return blob
 }
 
+function generateRandomString (length = 16) {
+  const array = new Uint8Array(length)
+  window.crypto.getRandomValues(array)
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+}
+// window.crypto.subtle 在https协议下才能访问
 async function calculateImageHash (blob) {
-  const buffer = await blob.arrayBuffer()
-  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const hashHex = hashArray
-    .map(byte => byte.toString(16).padStart(2, '0'))
-    .join('')
-  return hashHex
+  if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+    try {
+      const buffer = await blob.arrayBuffer()
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const hashHex = hashArray
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('')
+      return hashHex
+    } catch (error) {
+      console.error('Error computing hash with Web Crypto API:', error)
+      return generateRandomString()
+    }
+  } else {
+    console.error('Web Crypto API is not supported in this browser.')
+    return generateRandomString()
+  }
 }
 
 // 获取 rembg 模型
