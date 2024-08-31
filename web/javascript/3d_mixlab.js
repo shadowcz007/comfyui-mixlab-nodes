@@ -2,7 +2,57 @@ import { app } from '../../../scripts/app.js'
 import { api } from '../../../scripts/api.js'
 import { $el } from '../../../scripts/ui.js'
 
-import { loadExternalScript } from './common.js'
+import { loadExternalScript, get_position_style } from './common.js'
+
+function setCameraOrbit (modelview, distant, angles, screenNumber) {
+  //2.1 20
+  // const angles = {
+  //   1: -20.0,
+  //   2: -17.9,
+  //   3: -15.8,
+  //   4: -13.7,
+  //   5: -11.6,
+  //   6: -9.5,
+  //   7: -7.4,
+  //   8: -5.3,
+  //   9: -3.2,
+  //   10: -1.1,
+  //   11: 1.1,
+  //   12: 3.2,
+  //   13: 5.3,
+  //   14: 7.4,
+  //   15: 9.5,
+  //   16: 11.6,
+  //   17: 13.7,
+  //   18: 15.8,
+  //   19: 17.9,
+  //   20: 20.0
+  // };
+
+  // 12 3.6
+  // const angles = {
+  //   1: -20.0,
+  //   2: -16.4,
+  //   3: -12.7,
+  //   4: -9.1,
+  //   5: -5.5,
+  //   6: -1.8,
+  //   7: 1.8,
+  //   8: 5.5,
+  //   9: 9.1,
+  //   10: 12.7,
+  //   11: 16.4,
+  //   12: 20.0
+  // }
+
+  const angle = angles[screenNumber]
+  if (angle !== undefined) {
+    modelview.cameraOrbit = `${angle}deg 90deg ${distant}m`
+    console.log(screenNumber, angle)
+  } else {
+    console.error('Invalid screen number')
+  }
+}
 
 const getLocalData = key => {
   let data = {}
@@ -83,41 +133,6 @@ const parseImage = url => {
         console.log('发生错误:', error)
       })
   })
-}
-
-function get_position_style (ctx, widget_width, y, node_height) {
-  const MARGIN = 4 // the margin around the html element
-
-  /* Create a transform that deals with all the scrolling and zooming */
-  const elRect = ctx.canvas.getBoundingClientRect()
-  const transform = new DOMMatrix()
-    .scaleSelf(
-      elRect.width / ctx.canvas.width,
-      elRect.height / ctx.canvas.height
-    )
-    .multiplySelf(ctx.getTransform())
-    .translateSelf(MARGIN, MARGIN + y)
-
-  return {
-    transformOrigin: '0 0',
-    transform: transform,
-    left:
-      document.querySelector('.comfy-menu').style.display === 'none'
-        ? `60px`
-        : `0`,
-    top: `0`,
-    cursor: 'pointer',
-    position: 'absolute',
-    maxWidth: `${widget_width - MARGIN * 2}px`,
-    // maxHeight: `${node_height - MARGIN * 2}px`, // we're assuming we have the whole height of the node
-    width: `${widget_width - MARGIN * 2}px`,
-    // height: `${node_height * 0.3 - MARGIN * 2}px`,
-    // background: '#EEEEEE',
-    display: 'flex',
-    flexDirection: 'column',
-    // alignItems: 'center',
-    justifyContent: 'space-around'
-  }
 }
 
 async function extractMaterial (
@@ -267,16 +282,13 @@ app.registerExtension({
     }
   },
 
-  async init(){
-    await loadExternalScript(
-      '/mixlab/app/lib/model-viewer.min.js',
-      'module'
-    )
+  async init () {
+    await loadExternalScript('/mixlab/app/lib/model-viewer.min.js', 'module')
   },
 
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == '3DImage') {
-      console.log("nodeType.comfyClass",nodeType.comfyClass)
+      console.log('nodeType.comfyClass', nodeType.comfyClass)
       const orig_nodeCreated = nodeType.prototype.onNodeCreated
       nodeType.prototype.onNodeCreated = async function () {
         orig_nodeCreated?.apply(this, arguments)
@@ -287,7 +299,7 @@ app.registerExtension({
           draw (ctx, node, widget_width, y, widget_height) {
             Object.assign(
               this.div.style,
-              get_position_style(ctx, widget_width-88, 88, node.size[1])
+              get_position_style(ctx, widget_width - 122, 88, node.size[1], 44)
             )
           }
         }
@@ -335,10 +347,9 @@ app.registerExtension({
                    
                   </div>
                   <div>
-                   <input class="ddcap_step" type="number" min="1" max="20" step="1" value="1">
+                   <input class="ddcap_distant" type="number" min="1" max="50" step="1" value="23">
                    <input class="total_images" type="number" min="1" max="180" step="1" value="40">
-                   <input class="ddcap_range" type="range" min="-180" max="180" step="1" value="0">
-                   <input class="ddcap_range_top" type="range" min="-180" max="180" step="1" value="0">
+                   <input class="ddcap_range" type="number" min="0" max="20" step="0.1" value="2.1"> 
                   <button class="ddcap">Capture Rotational Screenshots</button></div>
                   
                   <div><button class="export">Export GLB</button></div>
@@ -359,10 +370,9 @@ app.registerExtension({
 
             const exportGLB = preview.querySelector('.export')
 
-            const ddcap_step = preview.querySelector('.ddcap_step')
+            const ddcap_distant = preview.querySelector('.ddcap_distant')
             const total_images = preview.querySelector('.total_images')
             const ddcap_range = preview.querySelector('.ddcap_range')
-            const ddcap_range_top = preview.querySelector('.ddcap_range_top')
             const ddCap = preview.querySelector('.ddcap')
             const sleep = (t = 1000) => {
               return new Promise((res, rej) => {
@@ -383,64 +393,75 @@ app.registerExtension({
               return await uploadImage_(blob, '.png')
             }
 
-            async function captureImages (angleIncrement = 1, totalImages = 12) {
-              // 记录初始旋转角度
-              const initialCameraOrbit =
-                modelViewerVariants.cameraOrbit.split(' ')
-              console.log(
-                '#captureImages',
-                initialCameraOrbit,
-                angleIncrement * totalImages
-              )
-              // const totalImages = 12
-              // const angleIncrement = totalRotation / totalImages // Each increment in degrees
-              let currentAngle =
-                Number(initialCameraOrbit[0].replace('deg', '')) -
-                (angleIncrement * totalImages) / 2 // Start from the leftmost angle
+            async function captureImages (
+              ddcap_range = 1,
+              total_images = 12,
+              distant = 0.23
+            ) {
+              //  初始 角度
+              var center = modelViewerVariants.getBoundingBoxCenter().toString()
+              modelViewerVariants.cameraTarget = center
+
+              const startAngle = -((total_images - 1) / 2) * ddcap_range
+              const angles = {}
+
+              for (let i = 0; i < total_images; i++) {
+                angles[i + 1] = startAngle + i * ddcap_range
+              }
+              console.log(angles)
+
               let frames = []
 
               modelViewerVariants.removeAttribute('camera-controls')
 
-              for (let i = 0; i < totalImages; i++) {
-                modelViewerVariants.cameraOrbit = `${currentAngle}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
+              for (let i = 0; i < total_images; i++) {
+                setCameraOrbit(modelViewerVariants, distant, angles, i + 1)
+
+                // modelViewerVariants.cameraOrbit = `${currentAngle}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
                 await sleep(1000)
-                console.log(`Capturing image at angle: ${currentAngle}deg`)
+                // console.log(`Capturing image at angle: ${currentAngle}deg`)
                 let file = await captureImage(false)
                 frames.push(file)
-                currentAngle += angleIncrement
+                // currentAngle += angleIncrement
               }
               await sleep(1000)
               // 恢复到初始旋转角度
-              modelViewerVariants.cameraOrbit = initialCameraOrbit.join(' ')
+              // modelViewerVariants.cameraOrbit = initialCameraOrbit.join(' ')
               modelViewerVariants.setAttribute('camera-controls', '')
               return frames
             }
-            ddCap.addEventListener('click', async e => {
-              const angleIncrement = Number(ddcap_step.value),
-                totalImages = Number(total_images.value)
 
-              let images = await captureImages(angleIncrement, totalImages)
-              // console.log(images)
+            ddCap.addEventListener('click', async e => {
+              const distant = Number(ddcap_distant.value * 0.01), // 0.23m
+                totalImages = Number(total_images.value),
+                angleIncrement = Number(ddcap_range.value)
+              console.log(angleIncrement, totalImages)
+              let images = await captureImages(
+                angleIncrement,
+                totalImages,
+                distant
+              )
+
               let dd = getLocalData(key)
               dd[that.id].images = images
               setLocalDataOfWin(key, dd)
             })
 
-            ddcap_range.addEventListener('input', async e => {
-              // console.log(ddcap_range.value)
-              const initialCameraOrbit =
-                modelViewerVariants.cameraOrbit.split(' ')
-              modelViewerVariants.cameraOrbit = `${ddcap_range.value}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
-              modelViewerVariants.setAttribute('camera-controls', '')
-            })
+            // ddcap_range.addEventListener('input', async e => {
+            //   // console.log(ddcap_range.value)
+            //   const initialCameraOrbit =
+            //     modelViewerVariants.cameraOrbit.split(' ')
+            //   modelViewerVariants.cameraOrbit = `${ddcap_range.value}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
+            //   modelViewerVariants.setAttribute('camera-controls', '')
+            // })
 
-            ddcap_range_top.addEventListener('input', async e => {
-              // console.log(ddcap_range.value)
-              const initialCameraOrbit =
-                modelViewerVariants.cameraOrbit.split(' ')
-              modelViewerVariants.cameraOrbit = `${initialCameraOrbit[0]} ${ddcap_range_top.value}deg ${initialCameraOrbit[2]}`
-              modelViewerVariants.setAttribute('camera-controls', '')
-            })
+            // ddcap_range_top.addEventListener('input', async e => {
+            //   // console.log(ddcap_range.value)
+            //   const initialCameraOrbit =
+            //     modelViewerVariants.cameraOrbit.split(' ')
+            //   modelViewerVariants.cameraOrbit = `${initialCameraOrbit[0]} ${ddcap_range_top.value}deg ${initialCameraOrbit[2]}`
+            //   modelViewerVariants.setAttribute('camera-controls', '')
+            // })
 
             if (modelViewerVariants) {
               modelViewerVariants.style.width = `${that.size[0] - 48}px`
@@ -579,7 +600,7 @@ app.registerExtension({
               )
 
               // 更新尺寸
-              let w = that.size[0] - 48,
+              let w = that.size[0] - 128,
                 h = (w * bg_img.naturalHeight) / bg_img.naturalWidth
 
               if (modelViewerVariants) {
@@ -641,18 +662,25 @@ app.registerExtension({
 
           // 更新尺寸
           let dd = getLocalData('_mixlab_3d_image')
-          // console.log(dd[that.id],bg_url)
+
           if (dd[that.id]) {
             const { bg_w, bg_h } = dd[that.id]
-            if (bg_h && bg_w) {
-              let w = that.size[0] - 48,
-                h = (w * bg_h) / bg_w
+            let w = that.size[0] - 128
+            preview.style.width = `${w}px`
+            console.log('更新尺寸', w)
 
+            if (modelViewerVariants) {
+              modelViewerVariants.style.width = `${w}px`
+              modelViewerVariants.style.height = `${Math.round(
+                that.size[1] * 0.8
+              )}px`
+            }
+
+            if (bg_h && bg_w) {
+              let h = (w * bg_h) / bg_w
               if (modelViewerVariants) {
-                modelViewerVariants.style.width = `${w}px`
                 modelViewerVariants.style.height = `${h}px`
               }
-              preview.style.width = `${w}px`
             }
           }
 
@@ -735,7 +763,7 @@ app.registerExtension({
       // let base64 = await parseImage(url)
 
       let pre = widget.div.querySelector('.preview')
-      pre.style.width = `${node.size[0]}px`
+      pre.style.width = `${node.size[0] - 24}px`
       pre.innerHTML = `
         ${url ? `<img src="${url}" style="width:100%"/>` : ''}
         `
