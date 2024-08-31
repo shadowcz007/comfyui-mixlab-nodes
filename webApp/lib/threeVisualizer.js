@@ -1,7 +1,14 @@
 import * as THREE from './three/three.module.js'
-import { api } from '../../../scripts/api.js'
+// import { api } from '../../../scripts/api.js'
 import { OrbitControls } from './three/OrbitControls.js'
 import { RoomEnvironment } from './three/RoomEnvironment.js'
+
+const api = {
+  apiURL: url => {
+    console.log(url)
+    return url
+  }
+}
 
 const visualizer = document.getElementById('visualizer')
 const container = document.getElementById('container')
@@ -97,6 +104,7 @@ async function main (referenceImageParams, depthMapParams) {
   let imageHeight = 10 // Default height, will be updated based on the image's aspect ratio
   //   console.log('#referenceImageParams', referenceImageParams)
   if (referenceImageParams?.filename) {
+    console.log('referenceImageParams', referenceImageParams)
     const referenceImageUrl = api
       .apiURL('/view?' + new URLSearchParams(referenceImageParams))
       .replace(/extensions.*\//, '')
@@ -228,8 +236,8 @@ const sleep = (t = 1000) => {
 
 // 方法：旋转摄像机并拍摄图片 // 每次旋转的角度增量，转换为弧度
 async function captureImages (
-  totalFrames = 40,
-  angleIncrement = THREE.MathUtils.degToRad(0.5)
+  totalFrames = 20,
+  angleIncrement = THREE.MathUtils.degToRad(1.5)
 ) {
   // 计算场景中所有物体的中心点
   const box = new THREE.Box3().setFromObject(scene)
@@ -253,7 +261,8 @@ async function captureImages (
   )
 
   // 起始角度为从当前角度往左旋转 20 度的位置
-  const startAngle = initialAngle - (angleIncrement * totalFrames) / 2
+  const startAngle = initialAngle
+  //  - (angleIncrement * totalFrames) / 2
 
   for (let i = 0; i < totalFrames; i++) {
     const angle = startAngle + i * angleIncrement

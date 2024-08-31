@@ -3301,7 +3301,6 @@ class DepthViewer_:
             "required": {
                 "image": ("IMAGE",),
                 "depth_map": ("IMAGE",),
-
             },
              "optional":{
                   "frames":("IMAGEBASE64",), 
@@ -3315,7 +3314,6 @@ class DepthViewer_:
         self.full_output_folder,self.filename,self.counter, self.subfolder, self.filename_prefix = folder_paths.get_save_image_path(
             "imagesave", 
             folder_paths.get_output_directory())
-
 
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("frames",)
@@ -3366,7 +3364,9 @@ class DepthViewer_:
         image1 = Image.new('RGB', (512, 512), color='black')
         image1=pil2tensor(image1)
 
-        if frames!=None:
+        # print('frames',frames)
+        if frames!=None and "images" in frames:
+            
             for im in frames['images']:
                 # print(im)
                 if 'type' in im and (not f"[{im['type']}]" in im['name']):

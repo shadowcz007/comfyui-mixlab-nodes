@@ -46,8 +46,12 @@ function setCameraOrbit (modelview, distant, angles, screenNumber) {
   // }
 
   const angle = angles[screenNumber]
+
+  let co=modelview.cameraOrbit.split(" ")
+
   if (angle !== undefined) {
-    modelview.cameraOrbit = `${angle}deg 90deg ${distant}m`
+    
+    modelview.cameraOrbit = `${angle}deg ${co[1]} ${distant}m`
     console.log(screenNumber, angle)
   } else {
     console.error('Invalid screen number')
@@ -333,7 +337,11 @@ app.registerExtension({
             // console.log('文件URL: ', fileURL)
             let html = `<model-viewer  src="${fileURL}" 
                 oncontextmenu="return false;"
-                min-field-of-view="0deg" max-field-of-view="180deg"
+                style="outline:1px solid white"
+                min-field-of-view="0deg" 
+                max-field-of-view="180deg"
+                min-camera-orbit="auto auto 0m"
+                max-camera-orbit="auto auto 1000m"
                  shadow-intensity="1" 
                  camera-controls 
                  touch-action="pan-y">
@@ -347,8 +355,8 @@ app.registerExtension({
                    
                   </div>
                   <div>
-                   <input class="ddcap_distant" type="number" min="1" max="50" step="1" value="23">
-                   <input class="total_images" type="number" min="1" max="180" step="1" value="40">
+                   <input class="ddcap_distant" type="number" min="1" step="1" value="55">
+                   <input class="total_images" type="number" min="1" max="180" step="1" value="20">
                    <input class="ddcap_range" type="number" min="0" max="20" step="0.1" value="2.1"> 
                   <button class="ddcap">Capture Rotational Screenshots</button></div>
                   
@@ -432,7 +440,7 @@ app.registerExtension({
             }
 
             ddCap.addEventListener('click', async e => {
-              const distant = Number(ddcap_distant.value * 0.01), // 0.23m
+              const distant = Number(ddcap_distant.value), //  23m
                 totalImages = Number(total_images.value),
                 angleIncrement = Number(ddcap_range.value)
               console.log(angleIncrement, totalImages)
@@ -447,13 +455,15 @@ app.registerExtension({
               setLocalDataOfWin(key, dd)
             })
 
-            // ddcap_range.addEventListener('input', async e => {
-            //   // console.log(ddcap_range.value)
-            //   const initialCameraOrbit =
-            //     modelViewerVariants.cameraOrbit.split(' ')
-            //   modelViewerVariants.cameraOrbit = `${ddcap_range.value}deg ${initialCameraOrbit[1]} ${initialCameraOrbit[2]}`
-            //   modelViewerVariants.setAttribute('camera-controls', '')
-            // })
+            ddcap_distant.addEventListener('input', async e => {
+              // console.log(ddcap_distant.value)
+              const center = modelViewerVariants.getBoundingBoxCenter().toString()
+              modelViewerVariants.cameraTarget = center;
+              const initialCameraOrbit =
+                modelViewerVariants.cameraOrbit.split(' ')
+              modelViewerVariants.cameraOrbit = `${initialCameraOrbit[2]} ${initialCameraOrbit[1]} ${ddcap_distant.value}m`
+              modelViewerVariants.setAttribute('camera-controls', '')
+            })
 
             // ddcap_range_top.addEventListener('input', async e => {
             //   // console.log(ddcap_range.value)

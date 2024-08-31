@@ -188,6 +188,7 @@ function registerVisualizer (nodeType, nodeData, nodeClassName, typeName) {
 
     nodeType.prototype.onExecuted = async function (message) {
       // Check if reference image and depth map are available
+      console.log("#message",message)
       if (message.reference_image && message.depth_map) {
         const params = {}
         params.reference_image = message.reference_image[0]
