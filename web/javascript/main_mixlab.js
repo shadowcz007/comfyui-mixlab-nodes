@@ -1147,10 +1147,10 @@ app.registerExtension({
           type: 'video',
           name: 'FloatingVideo',
           draw (ctx, node, widget_width, y, widget_height) {
-            Object.assign(
-              this.card.style,
-              get_position_style(ctx, widget_width, y, node.size[1], 0)
-            )
+            Object.assign(this.card.style, {
+              ...get_position_style(ctx, widget_width, y, node.size[1], 40),
+              top: `${widget_height}px`
+            })
           }
         }
 
