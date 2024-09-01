@@ -209,8 +209,8 @@ function offsetDOMWidget (widget, ctx, node, widgetWidth, widgetY, height) {
   Object.assign(widget.inputEl.style, {
     transformOrigin: '0 0',
     transform: scale,
-    left: `${transform.a + transform.e + 44}px`,
-    top: `${transform.d + transform.f + 24}px`,
+    left: `${transform.a + transform.e + 56}px`,
+    top: `${transform.d + transform.f + 44}px`,
     width: `${widgetWidth - 32}px`,
     height: `${(height || widget.parent?.inputHeight || 32) - margin * 2}px`,
     position: 'absolute',
