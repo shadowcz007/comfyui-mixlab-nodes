@@ -44,14 +44,13 @@ def get_files_with_extension(directory, extensions):
                 # 直接将文件名添加到列表中
                 file_list.append(file)
     return file_list
-	
 def composite_images(foreground, background, mask, is_multiply_blend=False, position="overall", scale=0.25):
     width, height = foreground.size
     bg_image = background
     bwidth, bheight = bg_image.size
 
-    scale=max(scale,1/bwidth)
-    scale=max(scale,1/bheight)
+    scale = max(scale, 1 / bwidth)
+    scale = max(scale, 1 / bheight)
 
     def determine_scale_option(width, height):
         return 'height' if height > width else 'width'
@@ -70,9 +69,9 @@ def composite_images(foreground, background, mask, is_multiply_blend=False, posi
     else:
         scale_option = determine_scale_option(width, height)
         if scale_option == 'height':
-            scale = int(bheight * scale) / height
+            scale = bheight * scale / height
         else:
-            scale = int(bwidth * scale) / width
+            scale = bwidth * scale / width
 
         new_width = int(width * scale)
         new_height = int(height * scale)
@@ -110,22 +109,13 @@ def composite_images(foreground, background, mask, is_multiply_blend=False, posi
             "mask": mask
         }
 
-    layer_image = layer['image']
-    layer_mask = layer['mask']
+    # Resize the foreground image with antialiasing
+    layer_image = layer['image'].resize((layer['width'], layer['height']), Image.ANTIALIAS)
+    layer_mask = layer['mask'].resize((layer['width'], layer['height']), Image.ANTIALIAS)
 
-    bg_image = merge_images(bg_image,
-                            layer_image,
-                            layer_mask,
-                            layer['x'],
-                            layer['y'],
-                            layer['width'],
-                            layer['height'],
-                            layer['scale_option'],
-                            is_multiply_blend)
+    bg_image.paste(layer_image, (layer['x'], layer['y']), layer_mask)
 
-    bg_image = bg_image.convert('RGB')
-
-    return bg_image
+    return bg_image.convert('RGB')
 
 
 
