@@ -983,7 +983,9 @@ async def handle_ar_page(request):
 # 重启服务
 @routes.post('/mixlab/re_start')
 def re_start(request):
+    p_intance=PromptServer.instance
     try:
+        p_intance.prompt_queue.set_flag("free_memory", True)
         sys.stdout.close_log()
     except Exception as e:
         pass
