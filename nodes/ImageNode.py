@@ -3371,9 +3371,13 @@ class DepthViewer_:
                 # print(im)
                 if 'type' in im and (not f"[{im['type']}]" in im['name']):
                     im['name']=im['name']+" "+f"[{im['type']}]"
-                    
-                output_image, output_mask = load_image_to_tensor(im['name'])
-                ims.append(output_image)
+                
+                try:
+                    output_image, output_mask = load_image_to_tensor(im['name'])
+                    ims.append(output_image)
+                except:
+                    print("no")
+                
 
             if len(ims)>0:
                 image1 = ims[0]
