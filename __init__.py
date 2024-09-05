@@ -64,7 +64,7 @@ def is_installed(package, package_overwrite=None,auto_install=True):
             print(f"Installing {package}...")
             # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
             command = f'"{python}" -m pip install {package}'
-    
+
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
 
             is_has=True
@@ -76,7 +76,7 @@ def is_installed(package, package_overwrite=None,auto_install=True):
         print(package+'## OK')
 
     return is_has
-     
+
 try:
     import OpenSSL
 except ImportError:
@@ -211,11 +211,11 @@ def read_workflow_json_files_all(folder_path):
                 data.append(file_info)
         except Exception as e:
             print(e)
-    
+
     sorted_data = sorted(data, key=lambda x: x['date'], reverse=True)
     return sorted_data
 
-# workflow  
+# workflow
 def read_workflow_json_files(folder_path ):
     json_files = []
     for filename in os.listdir(folder_path):
@@ -263,12 +263,12 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
     apps=[]
     if filename==None:
 
-        #TODO 支持目录内遍历 
+        #TODO 支持目录内遍历
         if is_all:
             data=read_workflow_json_files_all(category_path)
         else:
             data=read_workflow_json_files(category_path)
-        
+
         i=0
         for item in data:
             # print(item)
@@ -325,11 +325,11 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                 }]
         except Exception as e:
             print("发生异常：", str(e))
-        
+
         # 这个代码不需要
         # if len(apps)==1 and category!='' and category!=None:
         data=read_workflow_json_files(category_path)
-            
+
         for item in data:
             x=item["data"]
             # print(apps[0]['filename'] ,item["filename"])
@@ -371,9 +371,9 @@ def save_prompt_result(id,data):
     if os.path.exists(prompt_result_path):
         with open(prompt_result_path) as json_file:
             prompt_result = json.load(json_file)
-    
+
     prompt_result[id]=data
-    
+
     with open(prompt_result_path, 'w') as file:
         json.dump(prompt_result, file)
     return prompt_result_path
@@ -403,16 +403,16 @@ def save_workflow_for_app(data,filename="my_workflow_app.json",category=""):
     category_path=os.path.join(app_path,category)
     if not os.path.exists(category_path):
         os.mkdir(category_path)
-    
+
     app_workflow_path=os.path.join(category_path, filename)
- 
+
     try:
         output_str = json.dumps(data['output'])
         data['app']['id']=calculate_md5(output_str)
         # id=data['app']['id']
     except Exception as e:
         print("发生异常：", str(e))
-    
+
     with open(app_workflow_path, 'w') as file:
         json.dump(data, file)
     return filename
@@ -439,7 +439,7 @@ _original_request = aiohttp.ClientSession._request
 # 定义新的 get 方法
 async def new_request(self, method, url, *args, **kwargs):
    # 检查环境变量以确定是否使用代理
-    proxy = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy') 
+    proxy = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy')
     # print('Proxy Config:',proxy)
     if proxy and 'proxy' not in kwargs:
         kwargs['proxy'] = proxy
@@ -470,7 +470,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
         # if not await check_port_available(address, port):
         #     raise RuntimeError(f"Port {port} is already in use.")
-        
+
         http_success = False
         http_port=port
         for i in range(11):  # 尝试最多11次
@@ -483,7 +483,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
         if not http_success:
             raise RuntimeError(f"Ports {port} to {port + 10} are all in use.")
-        
+
 
         # site = web.TCPSite(runner, address, port)
         # await site.start()
@@ -526,7 +526,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             address = '127.0.0.1'
         if address=='0.0.0.0':
             address = '127.0.0.1'
-            
+
         if verbose:
 
             logging.info("\n")
@@ -535,10 +535,14 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             import socket
 
             hostname = socket.gethostname()
-            ip_address = socket.gethostbyname(hostname)
+            # logging.debug("hostname:", hostname)
+            try:
+                ip_address = socket.gethostbyname(hostname)
+            except Exception as e:
+                logging.debug("[mixlab]gethostbyname() downgraded due to exception:", e)
+                ip_address = socket.gethostbyname("")
 
-            # print(f"本机的IP地址是: {ip_address}")
-
+            # print(f"本机的 IP 地址是：{ip_address}")
 
             # print("\033[93mStarting server\n")
             logging.info("\033[93mTo see the GUI go to: http://{}:{} or http://{}:{}".format(ip_address, http_port,address,http_port))
@@ -556,7 +560,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
                     call_on_start(scheme,address, http_port)
             except:
                 call_on_start(address,http_port)
-            
+
 
     except Exception as e:
         print(f"Error starting the server: {e}")
@@ -586,9 +590,9 @@ async def mixlab_hander(request):
     return web.json_response(data)
 
 # llm的api key，使用硅基流动
-@routes.post('/mixlab/llm_api_key')  
-async def mixlab_llm_api_key_handler(request):  
-    data = await request.json()  
+@routes.post('/mixlab/llm_api_key')
+async def mixlab_llm_api_key_handler(request):
+    data = await request.json()
     api_key = data.get('key')
 
     app_folder = os.path.join(current_path, "app")
@@ -670,7 +674,7 @@ async def static_file_handler(request):
     filename = request.match_info['filename']
     file_path = os.path.join(current_path, "webApp", filename)
     print(file_path)
-    
+
     if os.path.exists(file_path) and os.path.isfile(file_path):
         if filename.endswith('.js'):
             content_type = 'application/javascript'
@@ -682,7 +686,7 @@ async def static_file_handler(request):
             content_type = 'image/svg+xml'
         else:
             content_type = 'application/octet-stream'
-        
+
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             file_data = f.read()
             return web.Response(text=file_data, content_type=content_type)
@@ -723,7 +727,7 @@ async def mixlab_workflow_hander(request):
                     admin=data['admin']
 
                 ds=get_my_workflow_for_app(filename,category,admin)
-                data=[]           
+                data=[]
                 for json_data in ds:
                     # 不传给前端
                     if 'output' in json_data['data']:
@@ -760,7 +764,7 @@ async def mixlab_workflow_hander(request):
 async def nodes_map_hander(request):
     data = await request.json()
     result={}
-    try: 
+    try:
         result={
             'data':get_nodes_map(),
             'status':'success',
@@ -793,7 +797,7 @@ async def get_checkpoints(request):
             names=get_rembg_models(U2NET_HOME)
     except:
         print("rembg none")
-    
+
     return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
 
 
@@ -805,7 +809,7 @@ async def rembg_hander(request):
 
     data_base64=remove_base64_prefix(data['base64'])
     image_data = base64.b64decode(data_base64)
-    
+
     # 创建一个BytesIO对象
     image_stream = io.BytesIO(image_data)
 
@@ -821,8 +825,8 @@ async def rembg_hander(request):
         rgba_images[0].save(buf, format='PNG')
         img_bytes = buf.getvalue()
     img_base64 = base64.b64encode(img_bytes).decode('utf-8')
-    
-    try: 
+
+    try:
         result={
             'data':img_base64,
             'model':model,
@@ -848,7 +852,7 @@ async def rembg_hander(request):
 #             res=get_prompt_result()
 #     except Exception as e:
 #         print('/mixlab/prompt_result',False,e)
-    
+
 #     return web.json_response({"result":res})
 
 # 种子设置
@@ -860,15 +864,15 @@ def random_seed(seed, data):
         if id in seed:
             if 'seed' in value['inputs'] and not isinstance(value['inputs']['seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['seed'] = round(random.random() * max_seed)
-            
+
             if 'noise_seed' in value['inputs'] and not isinstance(value['inputs']['noise_seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['noise_seed'] = round(random.random() * max_seed)
-            
+
             if value.get('class_type') == "Seed_" and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['seed'] = round(random.random() * max_seed)
-            
+
         print('new Seed', value)
-    
+
     return data
 
 
@@ -893,9 +897,9 @@ async def mixlab_post_prompt(request):
         apps=json_data['apps']
     except:
         apps=get_my_workflow_for_app(json_data['filename'],json_data['category'],False)
-    
+
     prompt=json_data['prompt'] if 'prompt' in json_data else None
-    
+
     if len(apps)>0:
         # 取到prompt
         prompt=apps[0]['data']['output']
@@ -917,13 +921,13 @@ async def mixlab_post_prompt(request):
         for inp in input_data:
             id=inp['id']
             if prompt[id]['class_type']==inp['class_type']:
-                prompt[id]['inputs'].update(inp['inputs']) 
+                prompt[id]['inputs'].update(inp['inputs'])
 
 
     if prompt==None:
         return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
     else:
-        # 种子更新 
+        # 种子更新
         '''
             "seed": {
                     "45": "randomize",
@@ -935,7 +939,7 @@ async def mixlab_post_prompt(request):
     # print("#json_data",prompt)
     # 需要把apps处理成 prompt
     # 注意seed的处理
-    
+
     if "number" in json_data:
         number = float(json_data['number'])
     else:
@@ -1035,7 +1039,7 @@ NODE_CLASS_MAPPINGS = {
     "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
-    "3DImage":Image3D, 
+    "3DImage":Image3D,
     "ImageColorTransfer":ImageColorTransfer,
     "ShowLayer":ShowLayer,
     "NewLayer":NewLayer,
@@ -1063,7 +1067,7 @@ NODE_CLASS_MAPPINGS = {
     # "VAEDecodeConsistencyDecoder":VAEDecode,
     "ScreenShare":ScreenShareNode,
     "FloatingVideo":FloatingVideo,
-   
+
     "SpeechRecognition":SpeechRecognition,
     "SpeechSynthesis":SpeechSynthesis,
     "KeyInput":KeyInput,
@@ -1077,7 +1081,7 @@ NODE_CLASS_MAPPINGS = {
     "MultiplicationNode":MultiplicationNode,
     "GetImageSize_":GetImageSize_,
     "SwitchByIndex":SwitchByIndex,
-    "LimitNumber":LimitNumber, 
+    "LimitNumber":LimitNumber,
     "OutlineMask":OutlineMask,
     "MaskListMerge_":MaskListMerge,
     "JoinWithDelimiter":JoinWithDelimiter,
@@ -1088,9 +1092,9 @@ NODE_CLASS_MAPPINGS = {
     "ApplyVisualStylePrompting_":ApplyVisualStylePrompting,
     "StyleAlignedReferenceSampler_": StyleAlignedReferenceSampler,
     "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
-    "StyleAlignedBatchAlign_": StyleAlignedBatchAlign, 
+    "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
     "ListSplit_":ListSplit,
-    "MaskListReplace_":MaskListReplace, 
+    "MaskListReplace_":MaskListReplace,
     "IncrementingListNode_":IncrementingListNode,
     "PreviewMask_":PreviewMask_,
     "AudioPlay":AudioPlayNode,
@@ -1104,7 +1108,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "ScreenShare":"Screen Share ♾️Mixlab",
     "FloatingVideo":"Floating Video ♾️Mixlab",
     "TextImage":"Text Image ♾️Mixlab",
-    
+
     "Color":"Color Input ♾️MixlabApp",
     "TextInput_":"Text Input ♾️MixlabApp",
     "KeyInput":"API Key Input ♾️MixlabApp",
@@ -1119,8 +1123,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SplitLongMask":"Splitting a long image into sections",
     "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
     "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
-    
-    
+
+
     "MergeLayers":"Merge Layers ♾️Mixlab",
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
@@ -1173,7 +1177,7 @@ try:
     from .nodes.ChatGPT import JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
-    NODE_CLASS_MAPPINGS_V = { 
+    NODE_CLASS_MAPPINGS_V = {
        "ChatGPTOpenAI":ChatGPTNode,
        "SiliconflowLLM":SiliconflowFreeNode,
         "ShowTextForGPT":ShowTextForGPT,
@@ -1183,7 +1187,7 @@ try:
     }
 
     # 一个包含节点友好/可读的标题的字典
-    NODE_DISPLAY_NAME_MAPPINGS_V = { 
+    NODE_DISPLAY_NAME_MAPPINGS_V = {
         "ChatGPTOpenAI":"ChatGPT & Local LLM ♾️Mixlab",
         "SiliconflowLLM":"LLM Siliconflow ♾️Mixlab",
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
@@ -1248,7 +1252,7 @@ except Exception as e:
 
 try:
     from .nodes.Video import GenerateFramesByCount,scenesNode_,CombineAudioVideo,VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames,LoadAndCombinedAudio_
-    
+
     NODE_CLASS_MAPPINGS_V = {
         "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames,
         "ImageListReplace_":ImageListReplace,
@@ -1257,7 +1261,7 @@ try:
         "LoadAndCombinedAudio_":LoadAndCombinedAudio_,
         "CombineAudioVideo":CombineAudioVideo,
         "ScenesNode_":scenesNode_,
-        "GenerateFramesByCount":GenerateFramesByCount 
+        "GenerateFramesByCount":GenerateFramesByCount
     }
 
     # 一个包含节点友好/可读的标题的字典
@@ -1268,7 +1272,7 @@ try:
         "VideoCombine_Adv":"Video Combine",
         "LoadAndCombinedAudio_":"Load And Combined Audio",
         "CombineAudioVideo":"Combine Audio Video",
-        "ScenesNode_":"Select Scene", 
+        "ScenesNode_":"Select Scene",
         "GenerateFramesByCount":"Generate Frames By Count"
     }
 
@@ -1286,25 +1290,25 @@ try:
     # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['LoadTripoSRModel_']=LoadTripoSRModel
     NODE_DISPLAY_NAME_MAPPINGS["LoadTripoSRModel_"]= "Load TripoSR Model"
-    
+
     NODE_CLASS_MAPPINGS['TripoSRSampler_']=TripoSRSampler
     NODE_DISPLAY_NAME_MAPPINGS["TripoSRSampler_"]= "TripoSR Sampler"
 
     NODE_CLASS_MAPPINGS['SaveTripoSRMesh']=SaveTripoSRMesh
     NODE_DISPLAY_NAME_MAPPINGS["SaveTripoSRMesh"]= "Save TripoSR Mesh"
-    
+
 
 except Exception as e:
     logging.info('TripoSR.available False' )
 
 from .nodes.MiniCPMNode import MiniCPM_VQA_Simple
 try:
-    
+
     logging.info('MiniCPMNode.available')
     # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['MiniCPM_VQA_Simple']=MiniCPM_VQA_Simple
     NODE_DISPLAY_NAME_MAPPINGS["MiniCPM_VQA_Simple"]= "MiniCPM VQA Simple"
-    
+
 except Exception as e:
     logging.info('MiniCPMNode.available False' )
 
