@@ -19,7 +19,6 @@ from .Watcher import FolderWatcher
 
 from itertools import product
 
-
 # 将PIL图片转换为OpenCV格式
 def pil_to_opencv(image):
     open_cv_image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
@@ -1380,8 +1379,8 @@ class LoadImagesFromPath:
                     }),
                     "watcher":(["disable","enable"],),
                     "result": ("WATCHER",),#为了激活本节点运行
-                     "prompt": ("PROMPT",),
-                    # "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
+                    "prompt": ("PROMPT",),
+                    "seed": (any_type,  {"default": 0, "min": 0, "max": 0xffffffffffffffff}),
                 }
             }
     
@@ -1399,7 +1398,7 @@ class LoadImagesFromPath:
     watcher_folder=None
 
     # 运行的函数
-    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result,prompt):
+    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result,prompt,seed=1):
         global watcher_folder
         # print('###监听:',watcher_folder,watcher,file_path,result)
 
@@ -1447,7 +1446,8 @@ class LoadImagesFromPath:
             print("发生了一个未知的错误：", str(e))
 
         # print('#prompt::::',prompt)
-        return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,file_names,)}
+        # return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,file_names,)}
+        return  (imgs,masks,prompt,file_names,)
 
 
 # TODO 扩大选区的功能,重新输出mask
