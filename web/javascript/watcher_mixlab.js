@@ -105,13 +105,14 @@ app.registerExtension({
         orig_nodeCreated?.apply(this, arguments)
 
         // 虚拟的widget，用于更新节点，让其每次都运行
-        const widget = {
-          type: 'div',
-          name: 'seed',
-          draw (ctx, node, widget_width, y, widget_height) {}
-        }
+        // 改成了seed输入
+        // const widget = {
+        //   type: 'div',
+        //   name: 'seed',
+        //   draw (ctx, node, widget_width, y, widget_height) {}
+        // }
 
-        this.addCustomWidget(widget)
+        // this.addCustomWidget(widget)
 
         const watcher = this.widgets.filter(w => w.name == 'watcher')[0]
 
@@ -156,18 +157,19 @@ app.registerExtension({
         this.serialize_widgets = true
       }
 
-      const onExecuted = nodeType.prototype.onExecuted
-      nodeType.prototype.onExecuted = function (message) {
-        onExecuted?.apply(this, arguments)
-        console.log(message)
-        try {
-          let seed = this.widgets.filter(w => w.name === 'seed')[0]
-          if (seed) {
-            if (!seed.value) seed.value = 0
-            seed.value += 1
-          }
-        } catch (error) {}
-      }
+      // 改成seed的输入
+      // const onExecuted = nodeType.prototype.onExecuted
+      // nodeType.prototype.onExecuted = function (message) {
+      //   onExecuted?.apply(this, arguments)
+      //   console.log(message)
+      //   try {
+      //     let seed = this.widgets.filter(w => w.name === 'seed')[0]
+      //     if (seed) {
+      //       if (!seed.value) seed.value = 0
+      //       seed.value += 1
+      //     }
+      //   } catch (error) {}
+      // }
     }
   },
   async loadedGraphNode (node, app) {
@@ -196,13 +198,13 @@ app.registerExtension({
         }
       }
 
-      try {
-        let seed = node.widgets.filter(w => w.name === 'seed')[0]
-        if (seed) {
-          if (!seed.value) seed.value = 0
-          seed.value += 1
-        }
-      } catch (error) {}
+      // try {
+      //   let seed = node.widgets.filter(w => w.name === 'seed')[0]
+      //   if (seed) {
+      //     if (!seed.value) seed.value = 0
+      //     seed.value += 1
+      //   }
+      // } catch (error) {}
     }
   }
 })

@@ -677,6 +677,47 @@ const _textNodes = [
   _colorNodes = ['Color'],
   _audioNodes = ['LoadAndCombinedAudio_']
 
+async function createVideoFromBase64Images (base64Images, frameRate = 24) {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+
+  // Load the first image to set the canvas dimensions
+  const firstImage = new Image()
+  firstImage.src = base64Images[0]
+  await new Promise(resolve => (firstImage.onload = resolve))
+
+  canvas.width = firstImage.width
+  canvas.height = firstImage.height
+
+  const stream = canvas.captureStream(frameRate)
+  const recorder = new MediaRecorder(stream)
+  const chunks = []
+
+  recorder.ondataavailable = event => {
+    if (event.data.size > 0) {
+      chunks.push(event.data)
+    }
+  }
+
+  recorder.start()
+
+  for (const base64Image of base64Images) {
+    const img = new Image()
+    img.src = base64Image
+    await new Promise(resolve => (img.onload = resolve))
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    await new Promise(resolve => setTimeout(resolve, 1000 / frameRate))
+  }
+
+  recorder.stop()
+
+  await new Promise(resolve => (recorder.onstop = resolve))
+
+  const videoBlob = new Blob(chunks, { type: 'video/webm' })
+  return URL.createObjectURL(videoBlob)
+}
+
 export default {
   get_url,
   get_my_app,
@@ -709,5 +750,7 @@ export default {
   _slideNodes,
   _imageNodes,
   _colorNodes,
-  _audioNodes
+  _audioNodes,
+
+  createVideoFromBase64Images //把图片的base64转为video src使用
 }

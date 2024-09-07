@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Mixlab APP</title>
+    <title>Mixlab Her</title>
 
     <style>
         /* 定义滚动条轨道的背景颜色 */
@@ -334,7 +334,8 @@
             flex-direction: column;
             min-width: 400px;
             /* background: #eee; */
-            margin: 24px;
+            /* her */
+            margin: 14px;
             /* flex: 1; */
             align-items: center;
             /* justify-content: center;*/
@@ -423,7 +424,8 @@
             position: fixed;
             bottom: 28px;
             display: flex;
-            left: 72px;
+            /* her */
+            left: calc(50% - 240px);
             z-index: 100;
             width: 480px;
             /* align-items: center; */
@@ -1085,7 +1087,7 @@
         }
 
 
-        async function createOutputs(outputData, link) {
+        async function createOutputsForHer(outputData, link) {
             const url = new URL(window.location.href);
             const params = new URLSearchParams(url.search);
             const innerApp = params.get("innerApp");
@@ -1093,92 +1095,25 @@
             const container = document.createElement('div');
             container.className = "output";
 
-            const action = document.createElement('div');
-            container.appendChild(action)
-
-            const copyHTML = document.createElement('button');
-            copyHTML.innerText = 'copy as html'
-            if (!innerApp) action.appendChild(copyHTML)
-
-            const copyImage = document.createElement('button');
-            copyImage.innerText = 'copy image'
-            if (!innerApp) action.appendChild(copyImage)
-            copyImage.style.marginLeft = '18px';
-
-            let isURL = false;
-            try {
-                new URL(link)
-                isURL = true;
-            } catch (error) {
-                isURL = false;
-            }
-
-            let isAElement = undefined;
-            try {
-                let div = document.createElement('div');
-                div.innerHTML = link;
-                let a = div.querySelector('a');
-                if (a.href) {
-                    new URL(a.href);
-                    isAElement = div.innerHTML;
-                }
-            } catch (error) {
-
-            }
-            // new URL(link)
-            if (isURL || isAElement) {
-                const linkBtn = document.createElement('button');
-
-                if (isURL) {
-                    // linkBtn.href = link;
-                    linkBtn.innerText = 'go to'
-                } else if (isAElement) {
-                    linkBtn.innerHTML = isAElement
-                }
-
-                action.appendChild(linkBtn)
-                linkBtn.style.marginLeft = '18px';
-                linkBtn.addEventListener('click', e => {
-
-                    if (isURL) {
-                        e.preventDefault();
-                        window.open(link);
-                    }
-                    //   if(isURL)  window.open(link);
-                })
-
-            }
-
-
             const output_card = document.createElement("div");
             output_card.className = 'output_card'
+
+            output_card.style = `max-width: 100%;
+                width: 100%;
+                height: fit-content;
+                max-height: fit-content;
+                position: fixed;
+                top: 72px;
+                left: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #ededed;
+                margin-top:0;
+                padding-top:24px
+                `
+
             container.appendChild(output_card)
-
-            if (window._appData.share_prefix) {
-                const copyText = document.createElement('button');
-                copyText.innerText = 'copy text for share'
-                action.appendChild(copyText)
-                copyText.style.marginLeft = '18px';
-                copyText.addEventListener('click', e => {
-                    e.preventDefault();
-                    Command.copyTextToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => Command.success(r, copyText, 'copy text for share'))
-                })
-            }
-
-            copyImage.addEventListener('click', e => {
-                e.preventDefault();
-                // Command.copyHtmlWithImagesToClipboard(output_card.outerHTML)
-                Command.copyImagesToClipboard(output_card.outerHTML, (r) => Command.success(r, copyImage, 'copy image'))
-                // Command.copyTextToClipboard()
-            })
-            copyHTML.addEventListener('click', e => {
-                e.preventDefault();
-                Command.copyHtmlWithImagesToClipboard((window._appData.share_prefix || '') + " " + output_card.outerHTML, (r) => Command.success(r, copyHTML, 'copy as html'))
-                // Command.copyImagesToClipboard(output_card.outerHTML)
-            })
-
-            //是否显示复制图片，复制html两个按钮
-            let isShowImageFn = false;
 
             for (const node of outputData) {
                 // console.log('output', node)
@@ -1190,87 +1125,50 @@
                     output_card.appendChild(div);
                 };
 
-                if (node.class_type == "ClipInterrogator") {
-                    let div = document.createElement('div');
-                    div.className = "show_text";
-                    div.id = `output_${node.id}`;
-                    div.innerText = '#ClipInterrogator: …… '
-                    output_card.appendChild(div);
-                };
-
-                if (["SaveImage",
-                    "PreviewImage",
-                    "PromptImage",
-                    "Image Save",
-                    "SaveImageAndMetadata_",
-                    "TransparentImage"].includes(node.class_type)) {
-
-                    const url = node.options?.defaultImage || window._appData?.icon || base64Df;
-                    let a = document.createElement('div');
-                    a.id = `output_${node.id}`
-
-                    let img = await Command.createImage(url)
-
-                    a.appendChild(img)
-                    // a.setAttribute('data-pswp-width', img.naturalWidth);
-                    // a.setAttribute('data-pswp-height', img.naturalHeight);
-                    // a.setAttribute('target', "_blank");
-                    // a.setAttribute('href', url);
-                    // a.setAttribute('title', node.title);
-
-                    output_card.appendChild(a);
-                    isShowImageFn = true;
-
-                }
-
-                //3d 
-                if (["SaveTripoSRMesh"].includes(node.class_type)) {
-                    let a = document.createElement('a');
-                    a.id = `output_${node.id}`
-                    a.setAttribute('data-pswp-width', "200");
-                    a.setAttribute('data-pswp-height', "200");
-                    a.setAttribute('target', "_blank");
-                    a.setAttribute('href', base64Df);
-
-                    let img = new Image();
-                    // img;
-                    img.src = base64Df;
-                    a.appendChild(img)
-                    output_card.appendChild(a);
-                }
-
                 // video ,gif
                 if (["VHS_VideoCombine", "VideoCombine_Adv", "CombineAudioVideo"].includes(node.class_type)) {
 
                     let a = document.createElement('a');
                     a.id = `output_${node.id}`
-                    a.setAttribute('data-pswp-width', "200");
-                    a.setAttribute('data-pswp-height', "200");
-                    a.setAttribute('target', "_blank");
-                    a.setAttribute('href', base64Df);
-
-                    // TODO 支持视频 https://photoswipe.com/custom-content/
-
-                    // let v = document.createElement('div');
                     let video = document.createElement('video'), img = new Image();
                     video.style.display = 'none'
-                    video.controls = 'true'
+                    // video.controls = 'true'
                     video.autoplay = 'true'
-                    video.loop = 'true'
-                    // v.id = `output_${node.id}`;
-
-                    img.src = base64Df;
+                    // video.loop = 'false'
+                    video.style = `display: none;
+                        max-width: 500px;
+                        width: fit-content; 
+                        height: 70vh;
+                        max-height: fit-content;`
 
                     a.appendChild(video);
-                    a.appendChild(img);
+
+                    // _appData.her 设置了
+                    if (window._idle_animation_url) {
+                        video.src = window._idle_animation_url;
+                        video.style.display = 'block';
+                        video.onended = function () {
+                            //播放完，播放停顿视频
+                            // _appData.herIdleAnimation
+                            console.log("//播放完，播放停顿视频")
+                            //her
+                            if (window._idle_animation_url && video.src != window._idle_animation_url) {
+                                video.src = window._idle_animation_url;
+                            };
+                            video.play()
+                        };
+                    } else {
+                        img.src = _appData.icon || base64Df;
+                        img.style = `max-width: 500px;
+                            width: fit-content; 
+                            height: 70vh;
+                            max-height: fit-content; `
+
+                        a.appendChild(img);
+                    }
                     output_card.appendChild(a);
                 }
 
-            }
-
-            if (isShowImageFn === false) {
-                copyImage.remove();
-                copyHTML.remove();
             }
 
             return container
@@ -1983,6 +1881,7 @@
                         let inp = document.createElement('input')
                         inp.type = 'file'
                         inp.setAttribute('accept', "audio/*")
+
                         inp.style.display = 'none'
                         inp.addEventListener('change', async e => {
                             e.preventDefault()
@@ -2347,8 +2246,13 @@
             // appData.input, appData.output, appData.seed, share, appData.link
             if (!data) return
             // console.log('#createUI', data)
-            const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name } = data;
+            //her
+            const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name, idle_animation
+            } = data;
 
+            if (idle_animation && idle_animation.length > 0) {
+                window._idle_animation_url = await Command.createVideoFromBase64Images(idle_animation)
+            }
 
             if (document.body.querySelector('#app_container')) document.body.querySelector('#app_container').remove()
             if (document.body.querySelector('#workflow_submit_pannel')) document.body.querySelector('#workflow_submit_pannel').remove()
@@ -2397,24 +2301,14 @@
             let inputDetailsCard = document.createElement('div');
             inputDetailsCard.className = 'detail_parent';
 
-            inputDetailsCard.innerHTML = `
-                <details 
-                open="true" 
-                id="app_input_pannel" 
-                class= "detail" 
-                > 
-                <summary>INPUT</summary> 
-                <div class="content"></div>
-                </details>
-            `;
-
-            inputDetailsCard.querySelector('details').addEventListener('toggle', e => {
-                e.preventDefault();
-                document.body.querySelector('.app')?.classList.toggle("max_view")
-            })
-
-
-            let inputCards = inputDetailsCard.querySelector('.content');
+            //her
+            inputDetailsCard.innerHTML = ` `;
+            // inputDetailsCard.querySelector('details').addEventListener('toggle', e => {
+            //     e.preventDefault();
+            //     document.body.querySelector('.app')?.classList.toggle("max_view")
+            // })
+            //her
+            let inputCards = inputDetailsCard;
             inputCards.className = 'panel'
             inputCards.style.alignItems = 'flex-start';
             inputCards.style.flex = 0.4
@@ -2483,7 +2377,8 @@
                 console.log(error)
             }
             // ksamplerCard.appendChild(status);
-            if (seeds.innerHTML) ksamplerCard.appendChild(seeds);
+            //her
+            // if (seeds.innerHTML) ksamplerCard.appendChild(seeds);
 
             // 动态组合和批量组合
             const promptLab = document.createElement('details');
@@ -2532,8 +2427,8 @@
                     }
                 })
 
-
-                ksamplerCard.appendChild(promptLab);
+                //her
+                // ksamplerCard.appendChild(promptLab);
             };
 
 
@@ -2546,11 +2441,10 @@
             let submitDiv = document.createElement('div');
             submitDiv.className = "submit_div"
 
-
             submitDiv.appendChild(appStatus);
 
             const promptButton = document.createElement('button');
-            promptButton.textContent = 'Create';
+            promptButton.textContent = 'Send'; //her
             promptButton.className = 'main_btn'
 
             submitDiv.appendChild(promptButton);
@@ -2567,7 +2461,7 @@
 
 
             // 创建输出
-            const output = await createOutputs(outputData, link);
+            const output = await createOutputsForHer(outputData, link);
             let outputCards = document.createElement('div');
             outputCards.className = 'panel'
 
@@ -2684,18 +2578,15 @@
 
                         if (val && type == "video" && output.querySelector(`#output_${id} video`)) {
 
+                            //her
                             let video = output.querySelector(`#output_${id} video`);
                             let img = output.querySelector(`#output_${id} img`);
-                            img.style.display = 'none';
+                            if (img) img.style.display = 'none';
                             video.style.display = 'block';
 
                             video.onloadeddata = function () {
-
-                                let a = output.querySelector(`#output_${id}`);
-                                a.setAttribute('data-pswp-width', video.videoWidth);
-                                a.setAttribute('data-pswp-height', video.videoHeight);
-                                a.setAttribute('target', "_blank");
-                                a.setAttribute('href', val);
+                                //加载完自动播放
+                                console.log("//加载完自动播放")
                             };
 
                             video.src = val;
@@ -2770,13 +2661,15 @@
 
                             if (!promptButton.classList.contains('disabled')) {
                                 runFn && runFn();
+                                //her
+                                //播放停顿的动画帧
                                 promptButton.classList.add('disabled');
                                 promptButton.innerText = 'Cancel'
                             } else {
                                 // 如果能取消
                                 let canCancel = cancelFn && cancelFn();
                                 if (canCancel) promptButton.classList.remove('disabled');
-                                if (canCancel) promptButton.innerText = 'Create';
+                                if (canCancel) promptButton.innerText = 'Send'; //her
                             }
 
                         });
@@ -2786,7 +2679,7 @@
                         if (!promptButton.classList.contains('disabled')) promptButton.classList.add('disabled');
                     },
                     reset: () => {
-                        promptButton.innerText = 'Create';
+                        promptButton.innerText = 'Send';//her
                         promptButton.classList.remove('disabled');
                         promptButton.classList.remove('data-click');
                     }
@@ -2936,6 +2829,7 @@
             // 添加提交按钮点击事件
             ui.promptButton.update(
                 () => {
+
                     // 在提交按钮点击时执行的逻辑
                     // queuePrompt({
                     //     name: window._appData.name,
@@ -2947,129 +2841,130 @@
 
                     //动态提示和批量提示功能
 
-                    let isPromptLab = false;
-                    for (const node of window._appData.input) {
-                        if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
-                    }
+                    //her
+                    // let isPromptLab = false;
+                    // for (const node of window._appData.input) {
+                    //     if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
+                    // }
 
-                    if (isPromptLab) {
-                        //如果是动态提示
-                        if (document.body.querySelector('#dynamic_prompt').classList.contains("mix_on")) {
-                            for (const node of window._appData.input) {
-                                if (Command._textNodes.includes(node.class_type)) {
-                                    let id = `#input_node_id_${node.id}`
-                                    let prompt = Command.dynamicPrompts(document.body.querySelector(id)?.value || "")
-                                    if (node.class_type == "PromptSimplification") {
-                                        if (window._appData.data) window._appData.data[node.id].inputs.prompt = prompt;
-                                        //更新输入参数
-                                        updateInputData(node.id, (inputs) => {
-                                            inputs.prompt = prompt;
-                                            return inputs
-                                        })
-                                    } else {
-                                        if (window._appData.data) window._appData.data[node.id].inputs.text = prompt;
-                                        //更新输入参数
-                                        updateInputData(node.id, (inputs) => {
-                                            inputs.text = prompt;
-                                            return inputs
-                                        })
-                                    }
-                                }
-                            };
-                        } else {
-                            //是批量功能
-                            let prompts = {};
-                            for (const node of window._appData.input) {
-                                if (Command._textNodes.includes(node.class_type)) {
-                                    let id = `#input_node_id_${node.id}`
-                                    let ps = Command.generateAllCombinations(document.body.querySelector(id)?.value || "")
-                                    if (node.class_type == "PromptSimplification") {
-                                        //更新输入参数
-                                        prompts[node.id] = ["prompt", ps]
+                    // if (isPromptLab) {
+                    //     //如果是动态提示
+                    //     if (document.body.querySelector('#dynamic_prompt').classList.contains("mix_on")) {
+                    //         for (const node of window._appData.input) {
+                    //             if (Command._textNodes.includes(node.class_type)) {
+                    //                 let id = `#input_node_id_${node.id}`
+                    //                 let prompt = Command.dynamicPrompts(document.body.querySelector(id)?.value || "")
+                    //                 if (node.class_type == "PromptSimplification") {
+                    //                     if (window._appData.data) window._appData.data[node.id].inputs.prompt = prompt;
+                    //                     //更新输入参数
+                    //                     updateInputData(node.id, (inputs) => {
+                    //                         inputs.prompt = prompt;
+                    //                         return inputs
+                    //                     })
+                    //                 } else {
+                    //                     if (window._appData.data) window._appData.data[node.id].inputs.text = prompt;
+                    //                     //更新输入参数
+                    //                     updateInputData(node.id, (inputs) => {
+                    //                         inputs.text = prompt;
+                    //                         return inputs
+                    //                     })
+                    //                 }
+                    //             }
+                    //         };
+                    //     } else {
+                    //         //是批量功能
+                    //         let prompts = {};
+                    //         for (const node of window._appData.input) {
+                    //             if (Command._textNodes.includes(node.class_type)) {
+                    //                 let id = `#input_node_id_${node.id}`
+                    //                 let ps = Command.generateAllCombinations(document.body.querySelector(id)?.value || "")
+                    //                 if (node.class_type == "PromptSimplification") {
+                    //                     //更新输入参数
+                    //                     prompts[node.id] = ["prompt", ps]
 
-                                    } else {
-                                        //更新输入参数
-                                        prompts[node.id] = ["text", ps]
-                                    }
-                                }
+                    //                 } else {
+                    //                     //更新输入参数
+                    //                     prompts[node.id] = ["text", ps]
+                    //                 }
+                    //             }
 
-                            }
+                    //         }
 
 
-                            function generateCombinations(prompts, input) {
-                                let results = [];
+                    //         function generateCombinations(prompts, input) {
+                    //             let results = [];
 
-                                function combine(currentInput, index) {
-                                    if (index === input.length) {
-                                        results.push(JSON.parse(JSON.stringify(currentInput)));
-                                        return;
-                                    }
+                    //             function combine(currentInput, index) {
+                    //                 if (index === input.length) {
+                    //                     results.push(JSON.parse(JSON.stringify(currentInput)));
+                    //                     return;
+                    //                 }
 
-                                    let current = input[index];
-                                    let id = current.id;
-                                    let keys = Object.keys(current.inputs);
+                    //                 let current = input[index];
+                    //                 let id = current.id;
+                    //                 let keys = Object.keys(current.inputs);
 
-                                    // 如果 prompts 中没有对应的 id，直接递归下一个
-                                    if (!prompts[id]) {
-                                        combine(currentInput, index + 1);
-                                        return;
-                                    }
+                    //                 // 如果 prompts 中没有对应的 id，直接递归下一个
+                    //                 if (!prompts[id]) {
+                    //                     combine(currentInput, index + 1);
+                    //                     return;
+                    //                 }
 
-                                    let values = prompts[id][1];
-                                    for (let value of values) {
-                                        let newInput = JSON.parse(JSON.stringify(currentInput));
+                    //                 let values = prompts[id][1];
+                    //                 for (let value of values) {
+                    //                     let newInput = JSON.parse(JSON.stringify(currentInput));
 
-                                        // 替换输入值
-                                        for (let key of keys) {
-                                            if (typeof newInput[index].inputs[key] === 'string') {
-                                                newInput[index].inputs[key] = value;
-                                            }
-                                        }
-                                        combine(newInput, index + 1);
-                                    }
-                                }
+                    //                     // 替换输入值
+                    //                     for (let key of keys) {
+                    //                         if (typeof newInput[index].inputs[key] === 'string') {
+                    //                             newInput[index].inputs[key] = value;
+                    //                         }
+                    //                     }
+                    //                     combine(newInput, index + 1);
+                    //                 }
+                    //             }
 
-                                combine(JSON.parse(JSON.stringify(input)), 0);
-                                return results;
-                            }
+                    //             combine(JSON.parse(JSON.stringify(input)), 0);
+                    //             return results;
+                    //         }
 
-                            console.log('##generateCombinations', prompts, [...window._appData.input.filter(inp => inp)])
-                            let inputs = generateCombinations(prompts, [...window._appData.input.filter(inp => inp)])
+                    //         console.log('##generateCombinations', prompts, [...window._appData.input.filter(inp => inp)])
+                    //         let inputs = generateCombinations(prompts, [...window._appData.input.filter(inp => inp)])
 
-                            for (const inp of inputs) {
-                                Command.queuePromptNew(
-                                    window._appData.filename,
-                                    window._appData.category,
-                                    window._appData.seed,
-                                    inp,
-                                    api.clientId,
-                                    window._appData.data ? [{
-                                        data: {
-                                            output: window._appData.data
-                                        }
-                                    }] : null
-                                ).then(res => {
+                    //         for (const inp of inputs) {
+                    //             Command.queuePromptNew(
+                    //                 window._appData.filename,
+                    //                 window._appData.category,
+                    //                 window._appData.seed,
+                    //                 inp,
+                    //                 api.clientId,
+                    //                 window._appData.data ? [{
+                    //                     data: {
+                    //                         output: window._appData.data
+                    //                     }
+                    //                 }] : null
+                    //             ).then(res => {
 
-                                    if (!res) {
-                                        if (api.runningCancel) {
-                                            api.runningCancel();
-                                            api.runningCancel = null;
-                                        }
+                    //                 if (!res) {
+                    //                     if (api.runningCancel) {
+                    //                         api.runningCancel();
+                    //                         api.runningCancel = null;
+                    //                     }
 
-                                        ui.promptButton.element.classList.remove('disabled');
-                                        ui.promptButton.element.innerText = 'Create';
+                    //                     ui.promptButton.element.classList.remove('disabled');
+                    //                     ui.promptButton.element.innerText = 'Create';
 
-                                        return true
+                    //                     return true
 
-                                    }
-                                })
-                            }
+                    //                 }
+                    //             })
+                    //         }
 
-                            return
+                    //         return
 
-                        }
+                    //     }
 
-                    }
+                    // }
 
 
                     Command.queuePromptNew(
@@ -3092,7 +2987,7 @@
                             }
 
                             ui.promptButton.element.classList.remove('disabled');
-                            ui.promptButton.element.innerText = 'Create';
+                            ui.promptButton.element.innerText = 'Send'; //her
 
                             return true
 
@@ -3125,7 +3020,12 @@
                     if (detail.exec_info?.queue_remaining === 0) {
                         // 运行按钮重设
                         ui.promptButton.reset()
-                        console.log('运行按钮重设')
+                        console.log('运行按钮重设');
+
+                        document.body.addEventListener('mousemove', function () {
+                            document.body.querySelector('video')?.play()
+                        });
+
                     }
                 } catch (error) {
                     console.log(error)
@@ -3214,44 +3114,44 @@
             // 外挂的UI
             createAllColorInput();
 
-
-            const lightbox = new PhotoSwipeLightbox({
-                gallery: '.output_card',
-                children: 'a',
-                pswpModule: () => import('/mixlab/app/lib/photoswipe.esm.min.js'),
-                // appendToEl: document.querySelector('#result')
-            });
-            lightbox.on('uiRegister', function () {
-                lightbox.pswp.ui.registerElement({
-                    name: 'custom-caption',
-                    order: 9,
-                    isButton: false,
-                    appendTo: 'root',
-                    html: 'Caption text',
-                    onInit: (el, pswp) => {
-                        lightbox.pswp.on('change', () => {
-                            const currSlideElement = lightbox.pswp.currSlide.data.element
-                            let captionHTML = ''
-                            if (currSlideElement) {
-                                const hiddenCaption = currSlideElement.querySelector(
-                                    '.hidden-caption-content'
-                                )
-                                if (hiddenCaption) {
-                                    // get caption from element with class hidden-caption-content
-                                    captionHTML = hiddenCaption.innerHTML
-                                } else {
-                                    // get caption from alt attribute
-                                    captionHTML = currSlideElement
-                                        .querySelector('img')
-                                        .getAttribute('alt')
-                                }
-                            }
-                            el.innerHTML = captionHTML || ''
-                        })
-                    }
-                })
-            })
-            lightbox.init();
+            //her
+            // const lightbox = new PhotoSwipeLightbox({
+            //     gallery: '.output_card',
+            //     children: 'a',
+            //     pswpModule: () => import('/mixlab/app/lib/photoswipe.esm.min.js'),
+            //     // appendToEl: document.querySelector('#result')
+            // });
+            // lightbox.on('uiRegister', function () {
+            //     lightbox.pswp.ui.registerElement({
+            //         name: 'custom-caption',
+            //         order: 9,
+            //         isButton: false,
+            //         appendTo: 'root',
+            //         html: 'Caption text',
+            //         onInit: (el, pswp) => {
+            //             lightbox.pswp.on('change', () => {
+            //                 const currSlideElement = lightbox.pswp.currSlide.data.element
+            //                 let captionHTML = ''
+            //                 if (currSlideElement) {
+            //                     const hiddenCaption = currSlideElement.querySelector(
+            //                         '.hidden-caption-content'
+            //                     )
+            //                     if (hiddenCaption) {
+            //                         // get caption from element with class hidden-caption-content
+            //                         captionHTML = hiddenCaption.innerHTML
+            //                     } else {
+            //                         // get caption from alt attribute
+            //                         captionHTML = currSlideElement
+            //                             .querySelector('img')
+            //                             .getAttribute('alt')
+            //                     }
+            //                 }
+            //                 el.innerHTML = captionHTML || ''
+            //             })
+            //         }
+            //     })
+            // })
+            // lightbox.init();
             // window._lightbox = lightbox
 
             // lightbox.addFilter('preventPointerEvent', (preventPointerEvent, originalEvent, pointerType) => {
@@ -3259,6 +3159,8 @@
             //     // (also applies to touchmove/mousemove)
             //     return true;
             // });
+
+
 
             // author信息
             if (appData.author) {
