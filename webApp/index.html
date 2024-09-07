@@ -706,9 +706,10 @@
             background: none !important;
             color: black !important;
         }
+
         .active:hover {
             /* border-color: yellow !important; */
-            border:1px solid yellow
+            border: 1px solid yellow
         }
 
         .unactive {
@@ -716,7 +717,7 @@
             color: #4a4a4a !important;
         }
     </style>
-   
+
     <link href="/mixlab/app/lib/photoswipe.min.css" rel="stylesheet">
     <link href="/mixlab/app/lib/classic.min.css" rel="stylesheet">
     <script src="/mixlab/app/lib/pickr.min.js"></script>
@@ -783,7 +784,7 @@
         // console.log(Lightbox)
         import { api } from "/mixlab/app/javascript/api.js";
         import Command from '/mixlab/app/javascript/command.js'
- 
+
         const base64Df =
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
 
@@ -1981,6 +1982,7 @@
                         e.preventDefault()
                         let inp = document.createElement('input')
                         inp.type = 'file'
+                        inp.setAttribute('accept', "audio/*")
                         inp.style.display = 'none'
                         inp.addEventListener('change', async e => {
                             e.preventDefault()
@@ -2481,7 +2483,7 @@
                 console.log(error)
             }
             // ksamplerCard.appendChild(status);
-            ksamplerCard.appendChild(seeds);
+            if (seeds.innerHTML) ksamplerCard.appendChild(seeds);
 
             // 动态组合和批量组合
             const promptLab = document.createElement('details');
@@ -2558,7 +2560,7 @@
             workflowSubmitPannel.id = 'workflow_submit_pannel';
 
             workflowSubmitPannel.appendChild(inputDetailsCard);
-            workflowSubmitPannel.appendChild(ksamplerCard);
+            if (ksamplerCard.children.length > 0) workflowSubmitPannel.appendChild(ksamplerCard);
             workflowSubmitPannel.appendChild(submitDiv);
 
             document.body.appendChild(workflowSubmitPannel);

@@ -867,7 +867,7 @@ def random_seed(seed, data):
             if value.get('class_type') == "Seed_" and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['seed'] = round(random.random() * max_seed)
             
-        print('new Seed', value)
+        # print('new Seed', value)
     
     return data
 
