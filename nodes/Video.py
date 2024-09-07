@@ -913,7 +913,7 @@ class GenerateFramesByCount:
     def r(self, frames, frame_count, revert):
         
         image_list = [frames[i:i + 1, ...] for i in range(frames.shape[0])]
-
+        print('#image_list',len(image_list),frame_count)
         image_list=get_frames(frame_count,image_list,revert)
 
         images = torch.cat(image_list, dim=0)
