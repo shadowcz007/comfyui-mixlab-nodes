@@ -251,8 +251,21 @@ const createPreviewElement = (name, val, format) => {
     type,
     value: val,
     draw: function (ctx, node, widgetWidth, widgetY, height) {
-      const [cw, ch] = this.computeSize(widgetWidth)
-      offsetDOMWidget(this, ctx, node, widgetWidth, widgetY, ch)
+      
+      Object.assign(
+        this.inputEl.style,
+        get_position_style(ctx, widgetWidth - 12, 220, node.size[1], 44),
+        {
+          outline: '1px solid',
+          display: 'flex',
+          flexWrap: 'wrap',
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          top: `${height + 24}px`
+        }
+      )
+
+
     },
     computeSize: function (_) {
       const ratio = this.inputRatio || 1
