@@ -6,6 +6,8 @@
 商务合作请联系 389570357@qq.com
 For business cooperation, please contact email 389570357@qq.com
 
+![Her 的DEMO页面](assets/1725710761451.png)
+
 ##### `最新`：
 
 - [增加 Her 的DEMO页面，和数字人对话](https://github.com/shadowcz007/ComfyUI-Backend-MixlabNodes/blob/main/workflow/her_demo_workflow.json)
