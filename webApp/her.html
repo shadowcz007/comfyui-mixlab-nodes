@@ -1,0 +1,3677 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Mixlab Her</title>
+
+    <style>
+        /* 定义滚动条轨道的背景颜色 */
+        ::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            /* 轨道背景颜色 */
+        }
+
+        /* 定义滚动条滑块的颜色 */
+        ::-webkit-scrollbar-thumb {
+            background-color: #888;
+            /* 滑块颜色 */
+            border-radius: 4px;
+            /* 滑块圆角 */
+        }
+
+        /* 鼠标悬停时滚动条滑块的颜色 */
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #555;
+            /* 悬停时滑块颜色 */
+        }
+
+        /* 定义滚动条角落的颜色 */
+        ::-webkit-scrollbar-corner {
+            background-color: transparent;
+            /* 角落颜色 */
+        }
+
+        /* 设置滚动条宽度 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            /* 滚动条的宽度 */
+            height: 8px;
+            /* 滚动条的高度 */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            height: 8px;
+            /* 滚动条拇指的高度 */
+        }
+    </style>
+
+    <style>
+        /* 全局样式 */
+        /* 默认桌面布局 */
+        body {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 移动端布局 */
+        @media (max-width: 768px) {
+            body {
+                width: 96% !important;
+                padding: 10px !important;
+            }
+
+            /* 设置滚动条宽度 */
+            ::-webkit-scrollbar {
+                width: 4px;
+                /* 滚动条的宽度 */
+                height: 4px;
+                /* 滚动条的高度 */
+            }
+
+            ::-webkit-scrollbar-thumb {
+                height: 4px;
+                /* 滚动条拇指的高度 */
+            }
+
+            #workflow_submit_pannel {
+                width: 100% !important;
+                /* 确保面板在移动端的宽度适应屏幕 */
+                height: fit-content;
+                position: static !important;
+            }
+
+            #app_input_pannel {
+                max-height: none !important;
+            }
+
+            .app {
+                width: 100%;
+                margin-left: 0;
+                min-width: none !important;
+            }
+
+            .apps {
+                margin: 20px !important;
+                padding: 0 !important;
+            }
+
+            .panel {
+                min-width: 100% !important;
+                margin: 12px 0 !important;
+                width: fit-content !important;
+            }
+
+            .apps .card,
+            #history_container .card {
+                width: 100%;
+                margin: 12px 0;
+            }
+
+            .description {
+                width: 100%;
+            }
+
+            .output_card img,
+            video {
+                max-width: 100%;
+                margin: 8px 0;
+            }
+
+            .main_btn {
+                width: 100% !important;
+                max-width: none !important;
+                margin-top: 12px !important;
+            }
+
+            .status {
+                width: 100%;
+            }
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        #logo {
+            margin: 0 24px;
+            margin-bottom: 24px;
+            font-size: 12px;
+            padding: 0;
+            color: #4a4a4a;
+            border-bottom: 1px dashed #595959;
+        }
+
+        .app {
+            display: flex;
+            width: 90%;
+            min-width: 400px;
+            margin-left: 5%;
+            user-select: none;
+            margin-top: 32px;
+            margin-bottom: 120px;
+            justify-content: flex-end;
+        }
+
+        .app .panel {
+            flex: none;
+            width: 66%;
+        }
+
+        .max_view {
+            justify-content: flex-start;
+        }
+
+        .max_view .panel {
+            flex: 1;
+        }
+
+        .apps {
+            margin: 0 32px;
+            background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+            margin: 8px 44px;
+        }
+
+        .apps .content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .apps .card {
+            width: 320px;
+            margin: 12px;
+            display: flex;
+            flex-direction: row;
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        #history_container .card {
+            width: 200px;
+            margin: 12px;
+            display: flex;
+            flex-direction: row;
+            background: #ffffff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .selected {
+            box-shadow: 0px 0px 10px 10px #fbe9f0;
+        }
+
+        .image-with-grid {
+            position: relative;
+            width: fit-content;
+            display: flex;
+            background-size: 20px 20px;
+            background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc),
+                linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc);
+            background-position: 0 0, 10px 10px;
+        }
+
+        .image-with-grid> :first-child {
+            margin-left: 0;
+            margin-top: 0;
+        }
+
+        /* .card:hover {
+    box-shadow: 0px 0px 10px 10px #e9fbfa;
+} */
+
+        .card h5 {
+            font-size: 14px;
+            margin: 0 0 10px 0;
+        }
+
+        .card p {
+            margin: 0;
+            padding: 0;
+            /* max-height: 35px; */
+            overflow: hidden;
+            /* width: 98px; */
+        }
+
+        .apps .card img {
+            width: auto;
+            height: 100%;
+            margin: 0px;
+        }
+
+        #history_container .card img {
+            width: auto;
+            height: 100%;
+            margin: 0px;
+        }
+
+        .toggle {
+            border: none;
+        }
+
+        .card .item {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card .icon {
+            width: 48px;
+            height: 48px;
+            overflow: hidden;
+            background: #e3e3e3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card .version {
+            font-size: 12px;
+        }
+
+        .card .toggle {
+            margin-left: 12px;
+            background: none;
+            color: black;
+        }
+
+        .card .toggle:hover {
+            color: #7f7f7f !important;
+        }
+
+        em .toggle:hover {
+            color: #7f7f7f !important;
+        }
+
+        .detail_parent {
+            display: flex;
+            flex-direction: column;
+            margin: 12px;
+        }
+
+        .detail {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .detail .content {
+            margin-top: 6px;
+        }
+
+        #app_input_pannel {
+            max-height: calc(76vh - 28px);
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+
+        .description {
+            display: flex;
+            margin: 12px;
+            background: white;
+            padding: 8px;
+            width: 80%;
+        }
+
+        .description p {
+            max-width: 200px;
+            word-wrap: break-word;
+        }
+
+        .description img {
+            min-height: unset !important;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            min-width: 400px;
+            /* background: #eee; */
+            /* her */
+            margin: 14px;
+            /* flex: 1; */
+            align-items: center;
+            /* justify-content: center;*/
+        }
+
+        .panel .header {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .panel h1 {
+            padding: 0 12px;
+            margin: 0;
+        }
+
+        .panel img,
+        video {
+            height: fit-content;
+            width: fit-content;
+            max-width: 100%;
+            margin-left: 12px;
+            min-height: 200px;
+        }
+
+        .input_card {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .output {
+            width: 90%;
+            margin: 12px;
+        }
+
+        .output_card {
+            height: 100%;
+            width: 100%;
+            margin-top: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            /* justify-content: center;
+    align-items: center; */
+        }
+
+        .output_card img,
+        video {
+            max-width: 200px;
+            max-height: 600px;
+            margin: 8px;
+            min-width: 200px;
+            box-shadow: 0px 0px 20px 7px #e6e7e7;
+        }
+
+        .card {
+            /* background-color: #eee; */
+            display: flex;
+            flex-direction: column;
+            padding: 8px;
+            font-size: 12px;
+            /* outline: 1px solid #e0e0e0; */
+            margin: 6px 0;
+        }
+
+        .card textarea {
+            width: 100%;
+            height: fit-content;
+            /* min-width: 300px; */
+            margin-top: 14px;
+            resize: none;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .card .select {
+            margin-top: 12px;
+        }
+
+        #workflow_submit_pannel {
+            position: fixed;
+            bottom: 28px;
+            display: flex;
+            /* her */
+            left: calc(50% - 240px);
+            z-index: 100;
+            width: 480px;
+            /* align-items: center; */
+            /* justify-content: space-around; */
+            /* width: calc(50% - 100px); */
+            flex-direction: column;
+            background-color: #f7f7f7;
+            box-shadow: 3px 3px 8px 3px #cacaca;
+            border-radius: 8px;
+        }
+
+        .status {
+            /* background: #e7e7e7; */
+            color: black;
+            display: flex;
+            width: 120px;
+            padding-left: 11px;
+            font-size: 12px;
+            border-radius: 8px;
+            justify-content: flex-start;
+            align-items: center;
+            height: 48px;
+        }
+
+        .submit_div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+
+        /* icon_btn样式 */
+        .icon_btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px !important;
+            min-width: 56px !important;
+            height: 36px !important;
+            /* 可根据需要调整高度 */
+            background-color: transparent !important;
+            /* 透明背景色 */
+            color: black !important;
+            /* 按钮文字或图标颜色 */
+            border: none !important;
+            /* 圆角 */
+            cursor: pointer;
+            /* 鼠标悬停时显示手型光标 */
+            transition: background-color 0.3s, color 0.3s;
+
+            margin-top: 0px !important;
+        }
+
+        .icon_btn:hover {
+            background-color: rgb(234, 235, 152) !important;
+            /* 悬浮时的背景色 */
+            color: black !important;
+            /* 悬浮时的图标颜色 */
+        }
+
+        .icon_btn svg {
+            fill: none;
+            /* 无填充色 */
+            stroke: currentColor;
+            /* 使用当前文本颜色描边 */
+            width: 24px;
+            /* SVG宽度 */
+            height: 24px;
+            /* SVG高度 */
+        }
+
+
+        .main_btn {
+            background: black !important;
+            color: white !important;
+            /* width: calc(50% - 100px); */
+            min-width: 200px !important;
+            max-width: 460px !important;
+            height: 48px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            border: 3px solid !important;
+        }
+
+        .main_btn:hover {
+            border-color: yellow !important;
+            cursor: pointer !important;
+        }
+
+        #author {
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+
+        .mix_on {
+            color: #ffffff !important;
+            /* font-weight: 400; */
+            background: #232222;
+        }
+
+        button:hover {
+            /* border-color: yellow !important; */
+            color: #ffffff !important;
+            /* font-weight: 400; */
+            background: #232222;
+            cursor: pointer;
+        }
+
+        .disabled {
+            background-color: #eee !important;
+            color: #4a4a4a !important;
+        }
+
+        .upload_btn {
+            width: 188px;
+            cursor: pointer;
+            /* height: 188px; */
+            /* background: black; */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 14px;
+            color: black;
+        }
+
+        /* .upload_btn:hover {
+    outline: 4px solid yellow;
+    color: yellow;
+} */
+
+        .show_text {
+            font-size: 14px;
+            user-select: text;
+            margin: 8px;
+            padding: 32px;
+            min-width: 200px;
+            background: #242424;
+            color: white;
+        }
+
+        .link {
+            text-decoration: none;
+            color: gray;
+            font-size: 12px;
+            font-weight: 300;
+        }
+
+        label {
+            margin-bottom: 12px;
+            font-weight: 300;
+            background: #fcfcd3;
+            width: fit-content;
+            padding: 0 12px;
+            font-size: 12px;
+        }
+
+        label::after {
+            content: attr(data-content);
+            /* Set the initial content using the data-content attribute */
+            /* position: absolute; */
+            /* top: 100%;
+    left: 0; */
+            margin-left: 4px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        .card select,
+        .card button,
+        .card input {
+            height: 32px;
+            cursor: pointer;
+            background: #000000bf;
+            color: white;
+            outline: none;
+            border: none;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+    </style>
+
+    <style>
+        .pickr .pcr-button {
+            width: 56px !important;
+            height: 56px !important;
+            outline: 1px solid white;
+        }
+
+
+        /* 给prompt image 节点使用 */
+        .prompt_image {
+            color: #2f2f2f;
+            padding: 0 10px;
+            font-size: 12px;
+            width: 200px;
+        }
+
+
+
+
+        /* 图片的字幕 */
+        .pswp__custom-caption {
+            background: rgb(20 27 70);
+            font-size: 16px;
+            color: #fff;
+            width: calc(100% - 32px);
+            max-width: 400px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            position: absolute;
+            left: 50%;
+            bottom: 16px;
+            transform: translateX(-50%);
+        }
+
+        .pswp__custom-caption a {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .hidden-caption-content {
+            display: none;
+        }
+
+
+
+        /* 
+        .dynamic_prompt::after {
+            content: attr(title);
+            position: absolute;
+            color: black;
+            padding: 4px;
+            padding-left: 25px;
+            border-radius: 4px;
+        } */
+
+        summary {
+            user-select: none;
+        }
+    </style>
+
+    <style>
+        /* 图像编辑器 */
+        #editor_container {
+            position: fixed;
+            top: 0;
+            z-index: 9999;
+            background: #eee;
+            width: 100%;
+            display: none;
+            left: 0;
+            height: calc(100vh - 48px);
+            padding: 24px;
+        }
+
+        #canvasContainer {
+            position: absolute;
+            /* bottom: 0;
+            left: 0; */
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .editor_canvas {
+            position: absolute;
+        }
+
+        .unactive:hover {
+            background: none !important;
+            color: black !important;
+        }
+
+        .active:hover {
+            /* border-color: yellow !important; */
+            border: 1px solid yellow
+        }
+
+        .unactive {
+            background: none !important;
+            color: #4a4a4a !important;
+        }
+    </style>
+
+    <link href="/mixlab/app/lib/photoswipe.min.css" rel="stylesheet">
+    <link href="/mixlab/app/lib/classic.min.css" rel="stylesheet">
+    <script src="/mixlab/app/lib/pickr.min.js"></script>
+    <script type="module" src="/mixlab/app/lib/model-viewer.min.js"></script>
+    <link rel="stylesheet" href="/mixlab/app/lib/login.css">
+</head>
+
+<body>
+
+    <div class="editor" id="editor_container">
+        <div class="card" style="flex-direction: row;
+        font-size: 16px; 
+        align-items: center;">
+            <h4>蒙版绘制工具 </h4>
+            <div style="margin-left: 24px;">
+                <button id="clear">清空画布</button>
+                <button id="save">保存蒙版</button>
+                <button id="closeEditor">关闭</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="">
+                <button id="autoCut">Auto Cut</button>
+                <select id="modelSelect"></select>
+            </div>
+            <div class="">
+                <button id="brush" class="active">画笔</button>
+                <button id="eraser" class="unactive">橡皮擦</button>
+                <input type="range" id="size" min="1" max="150" value="10">
+                <span id="sizeValue">10</span>
+            </div>
+
+        </div>
+        <div id="canvasContainer">
+            <canvas id="baseCanvas" class="editor_canvas" width="800" height="600"></canvas>
+            <canvas id="hintCanvas" class="editor_canvas" width="800" height="600"></canvas>
+            <canvas id="maskCanvas" class="editor_canvas" width="800" height="600"></canvas>
+
+        </div>
+    </div>
+
+
+    <div class="header">
+        <div id="logo">Explore your creative potential with <a class="link"
+                href="https://github.com/shadowcz007/comfyui-mixlab-nodes" target="_blank">mixlab-nodes</a> / 尽情发挥你的创意
+            <br>
+            <a class="link" href="https://www.mixcomfy.com" target="_blank">ComfyUI中文爱好者社区推荐</a>
+        </div>
+        <a id="login_btn" target="_blank" href="https://discord.gg/xbP2GZF6gn" style="text-decoration: none;
+        color: black;font-size:12px">
+            <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
+                class="octicon octicon-mark-github v-align-middle color-fg-default">
+                <path
+                    d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z">
+                </path>
+            </svg> HELP/帮助</a>
+
+    </div>
+    <a id="author"></a>
+    <!-- <script type="module" src="https://cdn.bootcdn.net/ajax/libs/photoswipe/5.4.0/photoswipe-lightbox.esm.min.js"></script> -->
+    <script type="module">
+        import PhotoSwipeLightbox from '/mixlab/app/lib/photoswipe-lightbox.esm.min.js'
+        // console.log(Lightbox)
+        import { api } from "/mixlab/app/javascript/api.js";
+        import Command from '/mixlab/app/javascript/command.js'
+
+        const base64Df =
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAAXNSR0IArs4c6QAAALZJREFUKFOFkLERwjAQBPdbgBkInECGaMLUQDsE0AkRVRAYWqAByxldPPOWHwnw4OBGye1p50UDSoA+W2ABLPN7i+C5dyC6R/uiAUXRQCs0bXoNIu4QPQzAxDKxHoALOrZcqtiyR/T6CXw7+3IGHhkYcy6BOR2izwT8LptG8rbMiCRAUb+CQ6WzQVb0SNOi5Z2/nX35DRyb/ENazhpWKoGwrpD6nICp5c2qogc4of+c7QcrhgF4Aa/aoAFHiL+RAAAAAElFTkSuQmCC'
+
+
+        const uploadImageIcon = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="7 10 12 5 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="12" y1="5" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+`;
+        const clipboardIcon = `<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="5" y="3" width="14" height="18" rx="2" ry="2"/>
+  <path d="M9 3h6a2 2 0 0 1 2 2v1H7V5a2 2 0 0 1 2-2z"/>
+</svg>`
+        const editIcon = `
+       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 20h9"/>
+  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19H4v-3L16.5 3.5z"/>
+</svg>
+`
+        //给load image to batch节点使用的输入
+        function createBase64ImageForLoadImageToBatch(imageElement, nodeId, bs) {
+            let im = new Image()
+            im.src = bs;
+            im.className = "base64"
+            imageElement.appendChild(im);
+
+            let base64s = imageElement.querySelectorAll('.base64')
+            //更新输入 //兼容 ，如果data没有则不更新data
+            if (window._appData.data) window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+            //更新输入参数
+            updateInputData(nodeId, (inputs) => {
+                inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                return inputs
+            })
+
+            // 删除
+            im.addEventListener('click', e => {
+                e.preventDefault();
+                im.remove();
+                let base64s = imageElement.querySelectorAll('.base64')
+                //更新输入
+                if (window._appData.data) window._appData.data[nodeId].inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                updateInputData(nodeId, (inputs) => {
+                    inputs.images.base64 = Array.from(base64s, (b) => b.src)
+                    return inputs
+                })
+            })
+        }
+
+
+
+        // 图像编辑
+        async function editImage(image, data) {
+
+            let baseImage = await Command.createImage(data.options.defaultImage)
+            //app
+            document.body.querySelector('.app').style.display = 'none'
+            document.body.querySelector('#author').style.display = 'none'
+
+            let editor = document.querySelector('#editor_container')
+            editor.style.display = 'block';
+
+
+            // 使用示例
+            const maskDrawer = new MaskDrawer(
+                'baseCanvas',
+                'maskCanvas',
+                "hintCanvas",
+                'brush',
+                'eraser',
+                'size',
+                'sizeValue',
+                'clear',
+                'save',
+                'autoCut',
+                'modelSelect',
+                'closeEditor'
+            );
+
+            // 对外提供的接口
+            maskDrawer.newImageForMaskEdit(baseImage);
+
+
+            function imageParseMask(im) {
+                // 创建一个临时canvas
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // 设置临时canvas的尺寸
+                tempCanvas.width = im.naturalWidth;
+                tempCanvas.height = im.naturalHeight;
+
+                // 将图像绘制到临时canvas上
+                tempCtx.drawImage(im, 0, 0);
+
+                // 获取图像数据
+                const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                const data = imageData.data;
+
+                // 遍历每个像素并修改透明通道
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i + 3] < 255) { // 透明
+                        data[i] = 0;     // R
+                        data[i + 1] = 255; // G
+                        data[i + 2] = 0; // B
+                        data[i + 3] = 255 - data[i + 3]; // A
+                    } else { // 不透明
+                        data[i + 3] = 0; // 透明
+                    }
+                }
+
+                // 将修改后的数据放回临时canvas
+                tempCtx.putImageData(imageData, 0, 0);
+
+                return tempCanvas;
+            }
+
+            let im = await Command.createImage(image.src)
+            console.log(im.naturalWidth)
+            let maskElement = imageParseMask(im)
+            maskDrawer.loadMask(maskElement);
+
+            // maskDrawer.saveMask();
+            // maskDrawer.autoCut();
+            // maskDrawer.initializeModelOptions(['Model 1', 'Model 2', 'Model 3']);
+
+            //自动抠图
+            let rembgModels = await Command.get_rembg_models()
+            // 遍历模型列表并创建选项
+            maskDrawer.initializeModelOptions(rembgModels)
+
+            maskDrawer.close = () => {
+                editor.style.display = 'none';
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
+            }
+
+            maskDrawer.autoCutCallback = async (modelName, base64) => {
+                //api请求
+                let res = await Command.run_rembg(modelName, base64)
+                const match = res.match(/^data:image\/(\w+);base64,/);
+                if (!match) {
+                    res = 'data:image/png;base64,' + res
+                }
+
+                let image = await Command.createImage(res)
+
+                let mb = Command.convertImageToBlackBasedOnAlpha(image)
+                let mask = await Command.createImage(mb)
+                return mask
+            }
+
+            maskDrawer.saveCallback = async (base64, width, height) => {
+
+                let fileBlob = Command.base64ToBlob(base64)
+                // // 获取读取的文件内容，即 Blob 对象
+                let hashId = await Command.calculateImageHash(fileBlob)
+
+                if (window._appData.data && hashId == window._appData.data[data.id].hashId) {
+                    document.body.querySelector('.app').style.display = 'flex'
+                    document.body.querySelector('#author').style.display = 'block'
+                    return;
+                }
+
+                //底图
+                const { url: imgurl } = await Command.uploadImage(
+                    Command.base64ToBlob(data.options.defaultImage
+                    ))
+
+                //mask
+                let { url, name } = await Command.uploadMask(fileBlob, imgurl);
+                // 在这里可以对 Blob 对象进行进一步处理
+                // imageElement.src = url;
+                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
+
+                //更新输入参数
+                updateInputData(data.id, (inputs) => {
+                    inputs.image = name
+                    return inputs
+                })
+
+
+                // console.log("上传的文件：", url, data.id, name);
+                //更新图片
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+
+                const defaultImage = await Command.createImage(data.options.defaultImage)
+                ctx.drawImage(defaultImage, 0, 0, width, height);
+
+                // 绘制base64图片
+                // const base64Image = base64
+                const base64ImageObj = await Command.createImage(base64)
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.drawImage(base64ImageObj, 0, 0, width, height);
+                image.src = canvas.toDataURL();
+
+                document.body.querySelector('.app').style.display = 'flex'
+                document.body.querySelector('#author').style.display = 'block'
+                // console.log(base64);
+                editor.style.display = 'none';
+            }
+
+
+
+        }
+
+
+
+        // 种子的处理
+        function randomSeed(seed, data) {
+            let max_seed = 4294967295
+            //1849378600828930
+            for (const id in data) {
+                if (data[id].inputs.seed != undefined
+                    && !Array.isArray(data[id].inputs.seed) //如果是数组，则由其他节点控制
+                    && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
+                    data[id].inputs.seed = Math.round(Math.random() * max_seed)
+                    // console.log('new Seed', data[id])
+                }
+                if (data[id].inputs.noise_seed != undefined
+                    && !Array.isArray(data[id].inputs.noise_seed) //如果是数组，则由其他节点控制
+                    && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
+                    data[id].inputs.noise_seed = Math.round(Math.random() * max_seed)
+                }
+                // class_type:"Seed_"
+                if (data[id].class_type == "Seed_" && ['increment', 'decrement', 'randomize'].includes(seed[id])) {
+                    data[id].inputs.seed = Math.round(Math.random() * max_seed)
+                }
+                console.log('new Seed', data[id])
+            }
+            return data
+        }
+
+        function updateSeed(id, val) {
+            // console.log(val)
+            if (window._appData.data
+                && window._appData.data[id].inputs.seed
+                && !Array.isArray(window._appData.data[id].inputs.seed)) window._appData.data[id].inputs.seed = Math.round(val);
+            if (window._appData.data
+                && window._appData.data[id].inputs.noise_seed
+                && !Array.isArray(window._appData.data[id].inputs.noise_seed)) window._appData.data[id].inputs.noise_seed = Math.round(val);
+
+            //更新输入参数
+            updateInputData(id, (inputs) => {
+                inputs.seed = Math.round(val);
+                inputs.noise_seed = Math.round(val);
+                return inputs
+            })
+
+        }
+
+        //更新输入参数
+        function updateInputData(nodeId, callback) {
+            for (let index = 0; index < window._appData.input.length; index++) {
+                const inp = window._appData.input[index];
+                if (inp.id === nodeId) {
+                    window._appData.input[index].inputs = callback(window._appData.input[index].inputs);
+                }
+            }
+        }
+
+
+
+        async function get_my_app(category = "", filename = null) {
+            let data = await Command.get_my_app(category, filename);
+
+            // 排序 
+            let appSelected = localStorage.getItem('app_selected')
+            if (appSelected) {
+                async function moveElementToFront(array, targetId) {
+
+                    for (let i = 0; i < array.length; i++) {
+                        if (array[i].id === targetId) {
+
+                            if (i !== 0) {
+                                const targetElement = array.splice(i, 1)[0];
+
+                                let nt = (await Command.get_my_app(targetElement.category, targetElement.filename))[0];
+
+                                array.unshift(nt);
+                            }
+                            break;
+                        }
+                    }
+
+                    return array;
+                }
+                data = await moveElementToFront(data, appSelected)
+            }
+
+            return data
+        }
+
+
+        async function createOutputsForHer(outputData, link) {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const innerApp = params.get("innerApp");
+
+            const container = document.createElement('div');
+            container.className = "output";
+
+            const output_card = document.createElement("div");
+            output_card.className = 'output_card'
+
+            output_card.style = `max-width: 100%;
+                width: 100%;
+                height: fit-content;
+                max-height: fit-content;
+                position: fixed;
+                top: 72px;
+                left: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #ededed;
+                margin-top:0;
+                padding-top:24px
+                `
+
+            container.appendChild(output_card)
+
+            for (const node of outputData) {
+                // console.log('output', node)
+                if (node.class_type == "ShowTextForGPT") {
+                    let div = document.createElement('div');
+                    div.className = "show_text"
+                    div.id = `output_${node.id}`;
+                    div.innerText = Array.isArray(node.inputs.text) ? node.inputs.text[0] : node.inputs.text
+                    output_card.appendChild(div);
+                };
+
+                // video ,gif
+                if (["VHS_VideoCombine", "VideoCombine_Adv", "CombineAudioVideo"].includes(node.class_type)) {
+
+                    let a = document.createElement('a');
+                    a.id = `output_${node.id}`
+                    let video = document.createElement('video'), img = new Image();
+                    video.style.display = 'none'
+                    // video.controls = 'true'
+                    video.autoplay = 'true'
+                    // video.loop = 'false'
+                    video.style = `display: none;
+                        max-width: 500px;
+                        width: fit-content; 
+                        height: 70vh;
+                        max-height: fit-content;`
+
+                    a.appendChild(video);
+
+                    // _appData.her 设置了
+                    if (window._idle_animation_url) {
+                        video.src = window._idle_animation_url;
+                        video.style.display = 'block';
+                        video.onended = function () {
+                            //播放完，播放停顿视频
+                            // _appData.herIdleAnimation
+                            console.log("//播放完，播放停顿视频")
+                            //her
+                            if (window._idle_animation_url && video.src != window._idle_animation_url) {
+                                video.src = window._idle_animation_url;
+                            };
+                            video.play()
+                        };
+                    } else {
+                        img.src = _appData.icon || base64Df;
+                        img.style = `max-width: 500px;
+                            width: fit-content; 
+                            height: 70vh;
+                            max-height: fit-content; `
+
+                        a.appendChild(img);
+                    }
+                    output_card.appendChild(a);
+                }
+
+            }
+
+            return container
+        }
+
+
+        function generateRainbowVideo() {
+
+            // 创建一个canvas元素
+            const canvas = document.createElement('canvas');
+            canvas.width = 640; // 设置canvas宽度
+            canvas.height = 480; // 设置canvas高度
+            const context = canvas.getContext('2d');
+
+            // 绘制第一帧彩虹
+            context.fillStyle = 'red';
+            context.fillRect(0, 0, canvas.width / 2, canvas.height);
+            context.fillStyle = 'orange';
+            context.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+
+            // 绘制第二帧彩虹
+            context.fillStyle = 'yellow';
+            context.fillRect(0, 0, canvas.width / 2, canvas.height);
+            context.fillStyle = 'green';
+            context.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+
+            const stream = canvas.captureStream();
+
+            return new Promise((res, rej) => {
+                // 导出视频
+                const mediaRecorder = new MediaRecorder(stream);
+                const chunks = [];
+                mediaRecorder.ondataavailable = function (event) {
+                    chunks.push(event.data);
+                };
+                mediaRecorder.onstop = function () {
+                    const blob = new Blob(chunks, { type: 'video/mp4' });
+                    const url = URL.createObjectURL(blob);
+                    res(url)
+                };
+                mediaRecorder.start();
+                setTimeout(function () {
+                    mediaRecorder.stop();
+                }, 1000); // 设置录制时长，这里设置为1秒
+            })
+
+        }
+
+
+
+        async function handleClipboardImage(imageElement, data) {
+            //data.class_type === 'LoadImagesToBatch'
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                    for (const type of clipboardItem.types) {
+
+                        if (type.startsWith('image/')) {
+                            const fileBlob = await clipboardItem.getType(type);
+                            // // 获取读取的文件内容，即 Blob 对象
+                            let hashId = await Command.calculateImageHash(fileBlob)
+
+                            if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
+
+                            let base64 = await Command.blobToBase64(fileBlob)
+
+                            if (data.class_type === 'LoadImagesToBatch') {
+                                createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
+                            } else {
+                                let { url, name } = await Command.uploadImage(fileBlob);
+                                // 在这里可以对 Blob 对象进行进一步处理
+                                imageElement.src = url;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].hashId = hashId;
+                                console.log("上传的文件：", url, data.id, name);
+
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.image = name;
+                                    return inputs
+                                })
+
+                                //更换option里的default image
+                                window._appData.input = Array.from(window._appData.input, inp => {
+                                    if (inp.id === data.id) {
+                                        inp.options.defaultImage = base64;
+                                    }
+                                    return inp
+                                })
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('无法读取剪贴板中的图片:', error);
+            }
+        }
+
+
+
+
+        // const htmlWithImages = "<p>这是要复制的HTML内容</p><img src='data:image/png;base64,iVBORw0KG...'>"
+        // Command.copyHtmlWithImagesToClipboard(htmlWithImages);
+
+
+
+
+        // const htmlString = "<p>这是要复制的HTML内容</p><img src='url'><img src='url'>";
+        // Command.copyImagesToClipboard(htmlString);
+
+
+        // 上传音频转为base64
+        async function uploadAndConvertAudio(file) {
+            if (!file) {
+                alert('Please select a WAV file.')
+                return
+            }
+
+            if (file.type !== 'audio/wav') {
+                alert('Only WAV files are supported.')
+                return
+            }
+
+            try {
+                const base64Audio = await readFileAsDataURL(file)
+                return base64Audio
+            } catch (error) {
+                console.error('Error reading file:', error)
+                alert('Error reading file.')
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+
+                reader.onload = function (event) {
+                    resolve(event.target.result)
+                }
+
+                reader.onerror = function (error) {
+                    reject(error)
+                }
+
+                reader.readAsDataURL(file)
+            })
+        }
+
+        function createInputs(inputData) {
+            // Assuming you have an HTML element with the id "container" to hold the UI
+            const container = document.createElement("div");
+            container.className = 'input_card'
+
+            // const inputData = [
+            //     {
+            //         inputs: {
+            //             image: "1703554480406.png",
+            //             upload: "image"
+            //         },
+            //         class_type: "LoadImage"
+            //     },
+            //     {
+            //         inputs: {
+            //             image: "6b7f3c570ee13ef22aad3d26dcc7414.png",
+            //             upload: "image"
+            //         },
+            //         class_type: "LoadImage"
+            //     }
+            // ];
+            inputData = inputData.filter(inp => inp);
+            // console.log('inputData',inputData)
+            inputData.forEach(async data => {
+                // console.log('inputData', data);
+
+                // 图片 or 视频输入
+                if (Command._imageNodes.includes(data.class_type)) {
+
+                    let isVideoUpload = data.class_type === "VHS_LoadVideo";
+
+                    let isBase64Upload = data.class_type === "LoadImagesToBatch";
+
+                    // Create a container for the upload control
+                    const uploadContainer = document.createElement("div");
+                    uploadContainer.className = 'card';
+
+                    // Create a label for the upload control
+                    const nameLabel = document.createElement("label");
+                    nameLabel.textContent = data.title || (isVideoUpload ? "LoadVideo: " : "LoadImage: ");
+                    nameLabel.style.marginBottom = '12px'
+                    uploadContainer.appendChild(nameLabel);
+
+                    let actionDiv = document.createElement('div');
+                    actionDiv.style = `margin-bottom:8px;`
+
+                    // Create an input field for the image name
+                    const uploadImageInput = document.createElement("button");
+                    uploadImageInput.style = `width: 56px; min-width: 56px !important`;
+                    uploadImageInput.title = 'Upload image'; // 悬浮提示
+                    uploadImageInput.className = "icon_btn";
+
+                    // 添加 SVG 图标
+                    uploadImageInput.innerHTML = uploadImageIcon;
+
+                    const uploadImageInputHide = document.createElement('input');
+                    uploadImageInputHide.type = "file";
+                    uploadImageInputHide.style.display = "none"
+                    actionDiv.appendChild(uploadImageInput);
+                    actionDiv.appendChild(uploadImageInputHide);
+
+                    const btnFromClipboard = document.createElement("button");
+                    btnFromClipboard.style = `width: 56px;min-width:56px!important; margin-left: 12px;`
+                    btnFromClipboard.title = 'Paste from clipboard'; // 悬浮提示
+                    btnFromClipboard.className = "icon_btn";
+                    btnFromClipboard.innerHTML = clipboardIcon;
+
+
+                    if (!isVideoUpload) actionDiv.appendChild(btnFromClipboard);
+
+                    const btnForImageEdit = document.createElement("button");
+                    btnForImageEdit.style = ` width: 32px; background: none;margin-left: 18px;`
+                    btnForImageEdit.className = "icon_btn";
+                    btnForImageEdit.innerHTML = editIcon;
+                    // mask有输出，才有编辑mask功能
+                    if (!isVideoUpload
+                        && !isBase64Upload
+                        && data.class_type !== 'ImagesPrompt_'
+                        && data.options.hasMask
+                    ) actionDiv.appendChild(btnForImageEdit);
+
+
+                    uploadContainer.appendChild(actionDiv)
+
+                    // Create an image element to display the uploaded image
+                    let imageElement = document.createElement("img");
+                    if (isVideoUpload) {
+                        // 视频
+                        imageElement = document.createElement('video');
+                        imageElement.setAttribute('controls', true)
+                        let [subfolder, name] = data.inputs.video.split('/');
+                        //    console.log(subfolder,name)
+                        if (!name) {
+                            subfolder = "";
+                            name = data.inputs.video;
+                        }
+                        let url = `${Command.get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        imageElement.src = url;
+
+                        // imageElement.innerHTML=`<img src="${base64Df}"/>`
+
+                    } else if (data.class_type === 'LoadImage') {
+                        // 图片
+                        let [subfolder, name] = data.inputs.image.split('/');
+                        if (!name) {
+                            subfolder = "";
+                            name = data.inputs.image;
+                        }
+                        // imageElement.src = base64Df
+                        let url = `${Command.get_url()}/view?filename=${encodeURIComponent(name)}&type=input&subfolder=${subfolder}&rand=${Math.random()}`
+                        // 如果有默认图                        
+                        imageElement.src = data.options?.defaultImage || url;
+                        imageElement.setAttribute('onerror', `this.src='${base64Df}'`)
+
+                    } else if (data.class_type === 'ImagesPrompt_') {
+                        // 图片库模式
+                        const [imgDiv, mainImage] = createSelectForImages(
+                            data.title,
+                            data.options.images,
+                            data.inputs.imageIndex,
+                            (base64, text) => {
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = base64;
+                                if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.text = text;
+
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.image_base64 = base64;
+                                    inputs.text = text;
+                                    return inputs
+                                })
+
+                            })
+                        uploadContainer.appendChild(imgDiv);
+                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+
+                        //更新输入参数
+                        updateInputData(data.id, (inputs) => {
+                            inputs.image_base64 = mainImage.querySelector('.images_prompt_main').src;
+                            return inputs
+                        })
+
+                    } else if (data.class_type === 'LoadImagesToBatch') {
+                        // 多张base64 图片
+                        let base64 = data.inputs.images.base64
+
+                        imageElement = document.createElement('div');
+                        imageElement.className = "images"
+                        for (const bs of base64) {
+                            createBase64ImageForLoadImageToBatch(imageElement, data.id, bs)
+                        }
+
+                    }
+
+
+                    imageElement.style.maxWidth = '200px';
+
+                    if (!isVideoUpload) btnFromClipboard.addEventListener('click', (event) => handleClipboardImage(imageElement, data));
+
+                    // 只有mask有输出，才有编辑功能
+                    if (!isVideoUpload && !isBase64Upload && data.options.hasMask) btnForImageEdit.addEventListener('click', e => editImage(imageElement, data))
+
+
+                    uploadImageInput.addEventListener('click', (event) => {
+                        uploadImageInputHide.click()
+                    })
+                    uploadImageInputHide.addEventListener('change', (event) => {
+
+                        // 获取用户选择的文件
+                        const file = event.target.files[0];
+
+                        // 创建一个 FileReader 对象
+                        const reader = new FileReader();
+
+                        // 读取文件并在读取完成后执行回调函数
+                        reader.onloadend = async function () {
+                            // 获取读取的文件内容，即 Blob 对象
+                            const fileBlob = new Blob([reader.result], { type: file.type });
+                            // console.log( file.type.split('/')[1])
+                            let hashId = await Command.calculateImageHash(fileBlob)
+
+                            if (window._appData.data && hashId == window._appData.data[data.id].hashId) return
+
+                            if (data.class_type === 'LoadImagesToBatch') {
+                                // 上传 ，转为base64
+                                let base64 = await Command.blobToBase64(fileBlob)
+                                createBase64ImageForLoadImageToBatch(imageElement, data.id, base64)
+                            } else {
+                                //上传，返回url
+                                let { url, name } = await Command.uploadImage(fileBlob, '.' + file.type.split('/')[1])
+
+                                let base64 = await Command.parseImageToBase64(url);
+
+                                if (data.class_type === 'ImagesPrompt_') {
+                                    uploadContainer.querySelector('.images_prompt_main').src = base64;
+
+                                    if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image_base64 = base64;
+
+                                    //更新输入参数
+                                    updateInputData(data.id, (inputs) => {
+                                        inputs.image_base64 = base64;
+                                        return inputs
+                                    })
+
+                                } else {
+                                    if (isVideoUpload) {
+                                        imageElement.srcObject = null;
+                                    }
+                                    // 在这里可以对 Blob 对象进行进一步处理
+                                    imageElement.src = url;
+
+                                    if (isVideoUpload) {
+                                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.video = name;
+
+                                        //更新输入参数
+                                        updateInputData(data.id, (inputs) => {
+                                            inputs.video = name;
+                                            return inputs
+                                        })
+
+                                    } else {
+                                        //更换option里的default image
+                                        window._appData.input = Array.from(window._appData.input, inp => {
+                                            if (inp.id === data.id) {
+                                                inp.options.defaultImage = base64;
+                                            }
+                                            return inp
+                                        })
+
+                                        if (window._appData.data && window._appData.data[data.id]) window._appData.data[data.id].inputs.image = name;
+                                        //更新输入参数
+                                        updateInputData(data.id, (inputs) => {
+                                            inputs.image = name;
+                                            return inputs
+                                        })
+
+                                    }
+
+                                }
+
+
+                                if (window._appData.data) window._appData.data[data.id].hashId = hashId;
+
+                                console.log("上传的文件：", url, data.id, name);
+                            }
+
+
+
+                        };
+
+                        // 开始读取文件
+                        reader.readAsArrayBuffer(file);
+
+
+                    })
+
+                    // imageElement.src = `${Command.get_url()}/view?filename=${encodeURIComponent(data.inputs.image)}&type=${type}&subfolder=${subfolder}`;
+                    if (data.class_type !== 'ImagesPrompt_') {
+                        //增加div，用于放背景
+                        let imageGrid = document.createElement('div');
+                        imageGrid.className = "image-with-grid"
+                        imageGrid.appendChild(imageElement);
+                        uploadContainer.appendChild(imageGrid);
+                    }
+
+                    // Append the upload container to the main container
+                    container.appendChild(uploadContainer);
+                }
+
+                // 滑块输入
+                if (Command._slideNodes.includes(data.class_type)) {
+                    // 滑块输入
+                    let options = data.options || {
+                        min: -3,
+                        max: 3,
+                    };
+
+                    const label = data.title;
+
+                    if (options.keywords && !options.keywords?.includes(data.inputs.prompt_keyword)) {
+                        options.keywords = [data.inputs.prompt_keyword, ...options.keywords]
+                    };
+
+                    //  data.title == 'PromptSlide ♾️Mixlab' ? data.inputs.prompt_keyword : data.title
+                    let silde = createNumSlide(label,
+                        data.inputs.weight,
+                        (v) => {
+                            if (window._appData.data) window._appData.data[data.id].inputs.weight = parseFloat(v);
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.weight = parseFloat(v);
+                                return inputs
+                            })
+                        },
+                        options.min,
+                        options.max,
+                        'float',
+                        options.keywords,
+                        data.id
+                    )
+                    container.appendChild(silde);
+                }
+
+
+                // 数字输入支持
+                if (Command._numberNodes.includes(data.class_type)) {
+                    // console.log('data.options',data.options)
+                    // 滑块输入
+                    let options = data.options || {
+                        min: 0,
+                        max: data.class_type === 'IntNumber' ? 6000 : 1,
+                    };
+                    let silde = createNumSlide(data.title,
+                        data.inputs.number,
+                        (v) => {
+                            // console.log(data.id,window._appData.data[data.id])
+                            if (window._appData.data) window._appData.data[data.id].inputs.number = data.class_type === 'IntNumber' ? parseInt(v) : parseFloat(v);
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.number = data.class_type === 'IntNumber' ? parseInt(v) : parseFloat(v);
+                                return inputs
+                            })
+
+                        },
+                        options.min,
+                        options.max,
+                        data.class_type === 'IntNumber' ? 'int' : 'float',
+                        null,
+                        data.id
+                    )
+                    container.appendChild(silde);
+                }
+
+                // 文本输入支持
+                if (Command._textNodes.includes(data.class_type)) {
+                    // Create a container for the upload control
+                    const uploadContainer = document.createElement("div");
+                    uploadContainer.className = 'card';
+
+                    // Create a label for the upload control
+                    const nameLabel = document.createElement("label");
+                    nameLabel.textContent = data.title || "CLIPTextEncode: ";
+                    uploadContainer.appendChild(nameLabel);
+
+                    // Create an input field for the image name
+                    const textInput = document.createElement("textarea");
+                    textInput.id = `input_node_id_${data.id}`
+                    // textInput.className=;
+                    if (data.class_type == "PromptSimplification") {
+                        textInput.value = data.inputs.prompt;
+                    } else {
+                        textInput.value = data.inputs.text;
+                    };
+
+                    // uploadImageInput.type = "text";
+                    let json = localStorage.getItem(`t_${data.id}`)
+                    try {
+                        // 缓存
+                        const { value, height } = JSON.parse(json);
+                        textInput.value = value;
+                        textInput.style.height = height;
+
+                        if (data.class_type == "PromptSimplification") {
+                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.prompt = textInput.value;
+                                return inputs
+                            })
+                        } else {
+                            if (window._appData.data) window._appData.data[data.id].inputs.text = textInput.value;
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.text = textInput.value;
+                                return inputs
+                            })
+
+                        }
+
+                    } catch (error) {
+
+                    }
+
+                    uploadContainer.appendChild(textInput);
+                    // autoResize(textInput);
+
+
+
+                    function autoResize(textarea) {
+                        textarea.style.height = 'auto';
+                        textarea.style.height = textarea.scrollHeight + 'px';
+                    }
+
+                    textInput.addEventListener('input', (event) => {
+                        // console.log(textInput.value)
+                        autoResize(textInput);
+
+                        if (data.class_type == "PromptSimplification") {
+                            if (window._appData.data) window._appData.data[data.id].inputs.prompt = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.prompt = textInput.value;
+                                return inputs
+                            })
+                        } else {
+                            if (window._appData.data) window._appData.data[data.id].inputs.text = textInput.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.text = textInput.value;
+                                return inputs
+                            })
+                        }
+                        localStorage.setItem(`t_${data.id}`, JSON.stringify({
+                            value: textInput.value,
+                            height: textInput.style.height
+                        }));
+                    })
+
+                    // Append the upload container to the main container
+                    container.appendChild(uploadContainer);
+                }
+
+                // lora的输入支持
+                if (Command._loraNodes.includes(data.class_type)) {
+                    let value = data.inputs.ckpt_name || data.inputs.lora_name;
+
+                    try {
+                        let t = '';
+                        if (data.class_type == 'CheckpointLoaderSimple') {
+                            t = 'checkpoints'
+                        } else if (data.class_type == 'LoraLoader') {
+                            t = 'loras'
+                        }
+                        if (t) {
+                            const response = await fetch(`${Command.get_url()}/mixlab/folder_paths`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ type: t })
+                            });
+                            const data = await response.json();
+                            data.options = data.names;
+                            console.log(data.names);
+                        }
+
+                    } catch (error) {
+                        console.error(error);
+                    }
+
+
+                    try {
+                        let v = localStorage.getItem(`_model_${data.id}_${data.class_type}`)
+                        if (v) {
+                            value = v;
+                            if (data.class_type === 'CheckpointLoaderSimple') {
+
+                                if (window._appData.data) window._appData.data[data.id].inputs.ckpt_name = value;
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.ckpt_name = value;
+                                    return inputs
+                                })
+
+                            }
+                            if (data.class_type === 'LoraLoader') {
+
+                                if (window._appData.data) window._appData.data[data.id].inputs.lora_name = value;
+                                //更新输入参数
+                                updateInputData(data.id, (inputs) => {
+                                    inputs.lora_name = value;
+                                    return inputs
+                                })
+
+                            }
+                        }
+                    } catch (error) {
+
+                    }
+
+
+                    let [div, selectDom] = createSelectWithOptions(data.title, Array.from(data.options, o => {
+                        return {
+                            value: o,
+                            text: o
+                        }
+                    }), value);
+
+                    // 选择事件绑定
+                    selectDom.addEventListener('change', e => {
+                        e.preventDefault();
+                        // console.log(selectDom.value)
+                        if (data.class_type === 'CheckpointLoaderSimple') {
+                            if (window._appData.data) window._appData.data[data.id].inputs.ckpt_name = selectDom.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.ckpt_name = selectDom.value;
+                                return inputs
+                            })
+                        }
+                        if (data.class_type === 'LoraLoader') {
+                            if (window._appData.data) window._appData.data[data.id].inputs.lora_name = selectDom.value;
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.lora_name = selectDom.value;
+                                return inputs
+                            })
+                        }
+
+                        localStorage.setItem(`_model_${data.id}_${data.class_type}`, selectDom.value)
+                    })
+
+                    container.appendChild(div);
+                }
+
+                // 色彩选择器
+                if (Command._colorNodes.includes(data.class_type)) {
+                    let value = data.inputs.color.hex || '#000000';
+                    let d = document.createElement('div');
+                    d.className = 'card';
+
+                    let label = document.createElement('label');
+                    label.innerText = data.title;
+
+                    let color = document.createElement('div');
+                    color.id = `color_input_${data.id}`;
+                    color.className = 'color_input';
+                    color.setAttribute('data-color', value);
+                    color.setAttribute('data-id', data.id);
+
+                    d.appendChild(label);
+                    d.appendChild(color);
+
+                    container.appendChild(d);
+                }
+
+                // 加载音频 base64
+                if (Command._audioNodes.includes(data.class_type)) {
+                    let inpAudio = document.createElement('div');
+
+                    let inputAudio = document.createElement('button');
+
+                    inputAudio.innerText = data.title || 'Upload Audio'
+                    inputAudio.style = `cursor: pointer;
+                        font-weight: 300;
+                        margin: 2px; 
+                        color: var(--descrip-text);
+                        background-color: var(--comfy-input-bg);
+                        border-radius: 8px;
+                        border-color: var(--border-color);
+                        border-style: solid;height: 30px;min-width: 122px;
+                    `;
+
+                    let audioE = document.createElement('audio');
+                    audioE.setAttribute('controls', 'on')
+                    //暂时只支持一个
+                    audioE.src = data.inputs.audios.base64[0];
+
+                    inputAudio.addEventListener('click', e => {
+                        e.preventDefault()
+                        let inp = document.createElement('input')
+                        inp.type = 'file'
+                        inp.setAttribute('accept', "audio/*")
+
+                        inp.style.display = 'none'
+                        inp.addEventListener('change', async e => {
+                            e.preventDefault()
+                            const file = e.target.files[0]
+                            let base64 = await uploadAndConvertAudio(file)
+
+                            audioE.src = base64;
+
+                            if (window._appData.data) window._appData.data[data.id].inputs.audios.base64 = [base64];
+
+                            //更新输入参数
+                            updateInputData(data.id, (inputs) => {
+                                inputs.audios.base64 = [base64];
+                                return inputs
+                            })
+
+
+                        })
+
+                        inp.click()
+                        inp.remove()
+                    })
+
+                    inpAudio.appendChild(inputAudio)
+                    inpAudio.appendChild(audioE)
+
+                    container.appendChild(inpAudio);
+
+                }
+            });
+            return container
+        }
+
+        function createColorInput(elId, value, nodeId) {
+            const pickr = Pickr.create({
+                el: `#${elId}`,
+                theme: 'classic',
+                default: value,
+                swatches: [
+                    'rgba(244, 67, 54, 1)',
+                    'rgba(233, 30, 99, 0.95)',
+                    'rgba(156, 39, 176, 0.9)',
+                    'rgba(103, 58, 183, 0.85)',
+                    'rgba(63, 81, 181, 0.8)',
+                    'rgba(33, 150, 243, 0.75)',
+                    'rgba(3, 169, 244, 0.7)',
+                    'rgba(0, 188, 212, 0.7)',
+                    'rgba(0, 150, 136, 0.75)',
+                    'rgba(76, 175, 80, 0.8)',
+                    'rgba(139, 195, 74, 0.85)',
+                    'rgba(205, 220, 57, 0.9)',
+                    'rgba(255, 235, 59, 0.95)',
+                    'rgba(255, 193, 7, 1)'
+                ],
+                components: {
+                    // Main components
+                    preview: true,
+                    opacity: true,
+                    hue: true,
+                    // Input / output Options
+                    interaction: {
+                        hex: true,
+                        rgba: true,
+                        hsla: true,
+                        hsva: true,
+                        cmyk: true,
+                        input: true,
+                        // clear: true,
+                        save: true,
+                        cancel: true
+                    }
+                }
+            });
+
+            pickr
+                .on('save', (color, instance) => {
+                    try {
+                        // console.log(color)
+                        // window._appData.data[data.id].inputs.color.hex = color.toHEXA().toString();
+                        let [r, g, b, a] = color.toRGBA();
+                        r = parseInt(r);
+                        g = parseInt(g);
+                        b = parseInt(b);
+
+                        if (window._appData.data) window._appData.data[nodeId].inputs.color = {
+                            // ...window._appData.data[nodeId].inputs.color,
+                            r, g, b, a,
+                            hex: color.toHEXA().toString()
+                        };
+
+                        //更新输入参数 //todo color里的参数
+                        updateInputData(nodeId, (inputs) => {
+                            inputs.color = {
+                                // ...window._appData.data[nodeId].inputs.color,
+                                r, g, b, a,
+                                hex: color.toHEXA().toString()
+                            };
+                            return inputs
+                        })
+
+                    } catch (error) { }
+                })
+                .on('cancel', instance => {
+                    pickr && pickr.hide()
+                })
+        }
+
+        function createAllColorInput() {
+            for (const cInp of document.querySelectorAll('.color_input')) {
+                createColorInput(cInp.id, cInp.getAttribute('data-color'), cInp.getAttribute('data-id'));
+            }
+        }
+
+        function createToggleBtn() {
+            var toggleButton = document.createElement("button");
+            toggleButton.innerHTML = `<svg style="width:24px;height: 24px;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3972"><path d="M514 114.3c-219.9 0-398.9 178.9-398.9 398.8 0.1 220 179 398.9 398.9 398.9 219.9 0 398.8-178.9 398.8-398.8S733.9 114.3 514 114.3z m218.3 489v1.7c0 0.5-0.1 1-0.1 1.6 0 0.3 0 0.6-0.1 0.9 0 0.5-0.1 1-0.2 1.5 0 0.3-0.1 0.7-0.1 1-0.1 0.4-0.1 0.8-0.2 1.2-0.1 0.4-0.2 0.9-0.2 1.3-0.1 0.3-0.1 0.6-0.2 0.8-0.1 0.6-0.3 1.2-0.4 1.8 0 0.1-0.1 0.2-0.1 0.3-2.2 8.5-6.6 16.6-13.3 23.3L600.7 755.4c-20 20-52.7 20-72.6 0-20-20-20-52.7 0-72.6l28.9-28.9H347c-28.3 0-51.4-23.1-51.4-51.4 0-28.3 23.1-51.4 51.4-51.4h334c13.2 0 26.4 5 36.4 15s15 23.2 15 36.4c0 0.3-0.1 0.6-0.1 0.8z m0.1-179.5c0 28.3-23.1 51.4-51.4 51.4H347c-13.2 0-26.4-5-36.4-15s-15-23.2-15-36.4v-0.8-1.6c0-0.5 0.1-1.1 0.1-1.6 0-0.3 0-0.6 0.1-0.9 0-0.5 0.1-1 0.2-1.5 0-0.3 0.1-0.7 0.1-1 0.1-0.4 0.1-0.8 0.2-1.2 0.1-0.4 0.2-0.9 0.2-1.3 0.1-0.3 0.1-0.6 0.2-0.8 0.1-0.6 0.3-1.2 0.4-1.8 0-0.1 0.1-0.2 0.1-0.3 2.2-8.5 6.6-16.6 13.3-23.3l116.6-116.6c20-20 52.7-20 72.6 0 20 20 20 52.7 0 72.6L471 372.5h210c28.2 0 51.4 23.1 51.4 51.3z" p-id="3973"></path></svg>`;
+            toggleButton.className = 'toggle'
+            return toggleButton
+        }
+
+        function createCheckbox(defaultValue, labelText) {
+            let div = document.createElement('div');
+            // Create a checkbox element
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+
+            // Set the default value
+            checkbox.checked = defaultValue;
+
+            // Create a label element
+            var label = document.createElement('label');
+            label.innerHTML = labelText;
+
+            // Append the checkbox and label to the body or any other container element
+            div.appendChild(checkbox);
+            div.appendChild(label);
+
+            return [div, checkbox]
+
+        }
+
+        function createNumSlide(labelText, value = 0, callback, minValue = 0, maxValue = 1, type = 'float', keywords = null, targetId = null) {
+
+            value = 'float' ? parseFloat(value.toFixed(3)) : parseInt(value)
+            try {
+                let i = parseFloat(localStorage.getItem(`_slider_${targetId}`))
+                if (!!i) {
+                    value = i;
+                    callback && callback(value)
+                }
+            } catch (error) {
+
+            }
+
+            // 输入div
+            let inputDiv = document.createElement('div');
+            inputDiv.style.display = 'flex'
+
+            // 创建滑块输入元素
+            var slider = document.createElement("input");
+            slider.type = "range";
+            slider.min = minValue;
+            slider.max = maxValue;
+            slider.step = type == 'float' ? 0.01 : 1
+            slider.value = value;
+            slider.style.width = '150px'
+
+            // 创建标签元素
+            var label = document.createElement("label");
+            label.innerHTML = labelText;
+            label.setAttribute('data-content', value);
+
+            if (keywords && keywords[0]) {
+                // label.innerHTML = ``
+                // 有备选的关键词
+
+                let defaultValue = (targetId ? localStorage.getItem(`_slide_${targetId}`) : '') || keywords[0];
+
+                if (window._appData.data) window._appData.data[targetId].inputs.prompt_keyword = defaultValue;
+
+                //更新输入参数 //todo color里的参数
+                updateInputData(targetId, (inputs) => {
+                    inputs.prompt_keyword = defaultValue;
+                    return inputs
+                })
+
+
+                let selectTag = createSelect(Array.from(keywords, (k, i) => {
+                    return {
+                        value: k,
+                        text: k,
+                        selected: i == 0
+                    }
+                }), defaultValue);
+
+                selectTag.style = `background: none;
+                                    color: black;    max-width: 300px;
+                                    border-bottom: 1px solid #acacac;
+                                    border-radius: 0;`
+                // selectTag.setAttribute('data-content',labelText);
+                selectTag.addEventListener('change', e => {
+                    e.preventDefault();
+                    if (window._appData.data) window._appData.data[targetId].inputs.prompt_keyword = selectTag.value;
+
+                    //更新输入参数 //todo color里的参数
+                    updateInputData(targetId, (inputs) => {
+                        inputs.prompt_keyword = selectTag.value;
+                        return inputs
+                    })
+
+                    targetId ? localStorage.setItem(`_slide_${targetId}`, selectTag.value) : ''
+                })
+                label.appendChild(selectTag);
+            }
+
+            // 创建容器元素，并将滑块输入和标签添加到容器中
+            var container = document.createElement("div");
+            container.appendChild(label);
+
+            container.className = 'card';
+
+
+            // 创建切换按钮元素
+            var toggleButton = createToggleBtn()
+
+            toggleButton.addEventListener("click", function () {
+                if (slider.type === 'range') {
+                    slider.type = 'number'
+                } else {
+                    slider.type = 'range'
+                }
+            });
+
+            inputDiv.appendChild(slider);
+            inputDiv.appendChild(toggleButton);
+            container.appendChild(inputDiv)
+
+            // 添加change事件监听器
+            slider.addEventListener("input", function (event) {
+                var value = event.target.value;
+                value = type == 'float' ? value : Math.round(value)
+                console.log("滑块输入的值为：" + value);
+                label.setAttribute('data-content', value);
+                // 在这里可以执行其他操作，根据需要进行相应的处理
+                callback && callback(value)
+
+                localStorage.setItem(`_slider_${targetId}`, value)
+            });
+
+            // 返回容器元素
+            return container;
+
+        }
+
+        function createImageForSelect(isMain, imgurl, keyword) {
+            let im = new Image();
+            im.className = isMain ? 'images_prompt_main' : ''
+            im.src = imgurl;
+            im.title = keyword
+            im.style = `
+            width:${isMain ? 120 : 56}px;
+            height:auto;
+            min-height:${isMain ? 120 : 56}px;
+            filter: brightness(${isMain ? 1 : 0.8});
+            ${isMain ? 'filter: drop-shadow(1px 1px 4px black);' : ''}
+            `
+            let p = document.createElement('p');
+            p.innerText = keyword;
+            p.style = `position: absolute;
+    top: 14px;
+    left: 20px;
+    background-color: #00000075;
+    padding: 2px 4px;
+    color: white;
+    font-size: 12px;`
+            const div = document.createElement("div");
+            // div.className = 'card';
+            div.appendChild(im)
+            if (isMain) div.appendChild(p)
+            im.setAttribute('onerror', `this.src='${base64Df}'`)
+            return div
+        }
+
+        // 创建图库选择
+        function createSelectForImages(title, options, index = 0, callback) {
+
+            const div = document.createElement("div");
+            // div.className = 'card';
+            div.style = `margin-top: 24px;`
+
+            // Create a label for the upload control
+            // const nameLabel = document.createElement("label");
+            // nameLabel.textContent = title;
+            // div.appendChild(nameLabel);
+
+            var mainImg = createImageForSelect(true, options[index].imgurl, options[index].keyword);
+            div.appendChild(mainImg);
+
+            let imgs = document.createElement('div');
+            div.appendChild(imgs);
+            imgs.style = `display:flex; flex-wrap: wrap;`
+            for (const opt of options) {
+                var selectElement = createImageForSelect(false, opt.imgurl, opt.keyword);
+                imgs.appendChild(selectElement);
+                selectElement.addEventListener('click', async e => {
+                    e.preventDefault();
+                    mainImg.querySelector('p').innerText = opt.keyword;
+                    mainImg.querySelector('img').src = opt.imgurl;
+                    if (callback) {
+                        if (!opt.imgurl.match('data:image')) {
+                            opt.imgurl = await Command.parseImageToBase64(opt.imgurl)
+                        }
+                        callback(opt.imgurl, opt.keyword);
+                    }
+                })
+            }
+
+            return [div, mainImg];
+        }
+
+
+        // 创建下拉选择
+        function createSelect(options, defaultValue) {
+            var selectElement = document.createElement("select");
+            selectElement.className = "select"
+
+            // 循环遍历选项数组
+            for (var i = 0; i < options.length; i++) {
+                var option = document.createElement("option");
+                option.value = options[i].value;
+                option.innerText = options[i].text;
+                selectElement.appendChild(option);
+                // if(options[i].selected) 
+            }
+
+            // 设置默认值
+            selectElement.value = defaultValue;
+            // console.log(defaultValue, options)
+            return selectElement
+        }
+
+        // 创建下拉选择 - 带说明
+        function createSelectWithOptions(title, options, defaultValue) {
+
+            const div = document.createElement("div");
+            div.className = 'card';
+
+            // Create a label for the upload control
+            const nameLabel = document.createElement("label");
+            nameLabel.textContent = title;
+            div.appendChild(nameLabel);
+
+            var selectElement = createSelect(options, defaultValue);
+
+            div.appendChild(selectElement)
+
+            return [div, selectElement];
+        }
+
+
+        async function createUI(data, share = true) {
+            // appData.input, appData.output, appData.seed, share, appData.link
+            if (!data) return
+            // console.log('#createUI', data)
+            //her
+            const { input: inputData, output: outputData, data: workflow, seed, seedTitle, link, name, idle_animation
+            } = data;
+
+            if (idle_animation && idle_animation.length > 0) {
+                window._idle_animation_url = await Command.createVideoFromBase64Images(idle_animation)
+            }
+
+            if (document.body.querySelector('#app_container')) document.body.querySelector('#app_container').remove()
+            if (document.body.querySelector('#workflow_submit_pannel')) document.body.querySelector('#workflow_submit_pannel').remove()
+            // 创建标题
+            // let titleDiv = document.createElement('div');
+            // titleDiv.className = 'header'
+
+            // var title = document.createElement('h1');
+            // title.textContent = 'My Application';
+            // titleDiv.appendChild(title);
+
+            // if (share) {
+            //     const shareBtn = document.createElement('button');
+            //     shareBtn.innerText = 'copy url';
+            //     shareBtn.addEventListener('click', e => {
+            //         e.preventDefault();
+            //         let url = `${Command.get_url()}/mixlab/app?filename=${encodeURIComponent(window._appData.filename)}&category=${encodeURIComponent(window._appData.category || '')}`;
+            //         Command.copyTextToClipboard(url, Command.success(e, shareBtn, 'copy url'));
+            //     })
+
+            //     titleDiv.appendChild(shareBtn);
+            // }
+
+
+
+            // let iconDes = document.createElement('div');
+            // // 创建应用图标
+            // var icon = document.createElement('img');
+            // icon.style.width = '48px';
+            // // icon.style.height = '98px';
+            // icon.src = base64Df;
+
+            // var des = document.createElement('p');
+            // des.style = `margin-left: 12px; font-size: 14px;`
+            // iconDes.appendChild(icon)
+            // iconDes.appendChild(des);
+            // iconDes.className = 'description'
+
+
+            // *********** 输入面板 - 提交面板 合并 ：
+            // 输入、参数控制、状态、提交
+
+            // 创建输入框
+            const input1 = createInputs(inputData)
+
+            let inputDetailsCard = document.createElement('div');
+            inputDetailsCard.className = 'detail_parent';
+
+            //her
+            inputDetailsCard.innerHTML = ` `;
+            // inputDetailsCard.querySelector('details').addEventListener('toggle', e => {
+            //     e.preventDefault();
+            //     document.body.querySelector('.app')?.classList.toggle("max_view")
+            // })
+            //her
+            let inputCards = inputDetailsCard;
+            inputCards.className = 'panel'
+            inputCards.style.alignItems = 'flex-start';
+            inputCards.style.flex = 0.4
+
+            inputCards.appendChild(input1);
+
+            // 创建参数控制
+            let ksamplerCard = document.createElement('div');
+            ksamplerCard.className = 'detail_parent'
+
+            // seed 汇总
+            const seeds = document.createElement('details');
+
+            seeds.className = 'seeds detail';
+            try {
+                if (Object.keys(seed).length > 0) {
+                    seeds.innerHTML = `<summary>SEED</summary>
+                <div class="content"> </div>`;
+                    const content = seeds.querySelector('.content')
+                    for (const id in seed) {
+                        const s = seed[id];
+                        console.log('#createUI', !!(workflow && !Array.isArray(workflow[id].inputs.seed) || !workflow))
+                        if (!!(workflow && !Array.isArray(workflow[id].inputs.seed) || !workflow)) {
+
+                            let seedInput = document.createElement('div');
+                            content.appendChild(seedInput)
+                            seedInput.style = `outline: 1px dashed gray;margin-bottom: 12px;margin-top: 12px;`
+
+                            let em = document.createElement('em');
+                            let emText = document.createElement('span');
+                            emText.innerText = `#${seedTitle && seedTitle[id] ? seedTitle[id] : id} ${s.toUpperCase()}`;
+                            em.appendChild(emText);
+
+                            seedInput.appendChild(em)
+
+                            if (s === 'fixed') {
+                                // console.log('###fiex',1)
+                                let inSeed = createNumSlide(``, 0, (newSeed) => updateSeed(id, newSeed), 0, 1849378600828930, 'int');
+                                inSeed.style = `padding: 8px;background: none`
+
+                                let toggleRandomize = createToggleBtn();
+                                toggleRandomize.style = `background:none;color:black`;
+
+                                toggleRandomize.addEventListener("click", function () {
+                                    if (data.seed[id] === 'randomize') {
+                                        data.seed[id] = 'fixed';
+                                        inSeed.style.display = 'block'
+                                    } else {
+                                        data.seed[id] = 'randomize';
+                                        inSeed.style.display = 'none'
+                                    }
+                                    emText.innerText = `#${seedTitle && seedTitle[id] ? seedTitle[id] : id} ${data.seed[id].toUpperCase()}`;
+                                });
+
+                                seedInput.appendChild(inSeed);
+                                em.appendChild(toggleRandomize);
+
+                            }
+
+                        }
+
+                    }
+                }
+
+            } catch (error) {
+                console.log(error)
+            }
+            // ksamplerCard.appendChild(status);
+            //her
+            // if (seeds.innerHTML) ksamplerCard.appendChild(seeds);
+
+            // 动态组合和批量组合
+            const promptLab = document.createElement('details');
+            promptLab.className = 'prompt_lab detail';
+
+            //判断是否有 
+            let isPromptLab = false;
+            for (const node of window._appData.input) {
+                if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
+            }
+
+            if (isPromptLab) {
+                promptLab.innerHTML = `<summary>Prompt Lab</summary>
+                <div class="content"> </div>
+                `
+                const content = promptLab.querySelector('.content');
+                //动态提示功能
+                const dynamicPromptsBtn = document.createElement('button');
+                dynamicPromptsBtn.id = "dynamic_prompt"
+                dynamicPromptsBtn.className = "mix_on"
+                dynamicPromptsBtn.innerText = 'dynamic';
+                dynamicPromptsBtn.style.width = '88px'
+                content.appendChild(dynamicPromptsBtn);
+                dynamicPromptsBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dynamicPromptsBtn.classList.toggle("mix_on")
+                    if (dynamicPromptsBtn.classList.contains('mix_on')) {
+                        batchPromptsBtn.classList.remove("mix_on")
+                    }
+                })
+
+
+                //批量提示功能
+                const batchPromptsBtn = document.createElement('button');
+                batchPromptsBtn.id = "batch_prompt"
+                batchPromptsBtn.innerText = 'batch';
+                batchPromptsBtn.style.width = '88px'
+                content.appendChild(batchPromptsBtn);
+                batchPromptsBtn.addEventListener('click', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    batchPromptsBtn.classList.toggle("mix_on")
+                    if (batchPromptsBtn.classList.contains('mix_on')) {
+                        dynamicPromptsBtn.classList.remove("mix_on")
+                    }
+                })
+
+                //her
+                // ksamplerCard.appendChild(promptLab);
+            };
+
+
+            // 运行状态
+            const appStatus = document.createElement('div');
+            appStatus.textContent = 'Status';
+            appStatus.className = 'status';
+
+            // 底部的运行状态和提交按钮
+            let submitDiv = document.createElement('div');
+            submitDiv.className = "submit_div"
+
+            submitDiv.appendChild(appStatus);
+
+            const promptButton = document.createElement('button');
+            promptButton.textContent = 'Send'; //her
+            promptButton.className = 'main_btn'
+
+            submitDiv.appendChild(promptButton);
+
+            // 创建输入和提交面板
+            let workflowSubmitPannel = document.createElement('div');
+            workflowSubmitPannel.id = 'workflow_submit_pannel';
+
+            workflowSubmitPannel.appendChild(inputDetailsCard);
+            if (ksamplerCard.children.length > 0) workflowSubmitPannel.appendChild(ksamplerCard);
+            workflowSubmitPannel.appendChild(submitDiv);
+
+            document.body.appendChild(workflowSubmitPannel);
+
+
+            // 创建输出
+            const output = await createOutputsForHer(outputData, link);
+            let outputCards = document.createElement('div');
+            outputCards.className = 'panel'
+
+            outputCards.appendChild(output);
+
+
+            // app结果输出
+            let currentAppOutput = document.createElement('div');
+            currentAppOutput.className = 'app'
+            // currentAppOutput.appendChild(titleDiv);
+            // currentAppOutput.appendChild(iconDes);
+            currentAppOutput.appendChild(outputCards);
+
+            document.body.appendChild(currentAppOutput)
+
+
+            // 返回每个UI元素的引用和对应的更新方法
+            return {
+                // title: {
+                //     element: title,
+                //     update: function (newTitle) {
+                //         title.textContent = newTitle;
+                //     }
+                // },
+                // icon: {
+                //     element: icon,
+                //     update: function (newIconPath) {
+                //         icon.src = newIconPath;
+                //     }
+                // },
+                // des: {
+                //     element: des,
+                //     update: function (text) {
+                //         des.textContent = text;
+                //     }
+                // },
+                status: {
+                    element: status,
+                    update: function (newStatus) {
+                        appStatus.textContent = newStatus;
+                    }
+                },
+                input1: {
+                    element: input1,
+                    update: function () {
+                        // 可以在这里添加上传图片的逻辑
+                    }
+                },
+                output: {
+                    element: output,
+                    update: async function (type = "image", val, id) {
+                        console.log(val, id)
+                        if (val && type == "image" && output.querySelector(`#output_${id} img`)) {
+
+                            let im = await Command.createImage(val)
+
+                            output.querySelector(`#output_${id} img`).src = val;
+
+                            let a = output.querySelector(`#output_${id}`);
+                            a.setAttribute('data-pswp-width', im.naturalWidth);
+                            a.setAttribute('data-pswp-height', im.naturalHeight);
+                            a.setAttribute('target', "_blank");
+                            a.setAttribute('href', val);
+
+                        }
+
+                        if (val && (type == "images" || type == 'images_prompts') && output.querySelector(`#output_${id} img`)) {
+                            let imgDiv = output.querySelector(`#output_${id}`)
+                            imgDiv.style.display = 'none';
+
+                            // 清空
+                            // Array.from(imgDiv.parentElement.querySelectorAll('.output_images'), im => im.remove());
+
+                            for (const v of val) {
+
+                                let url = v, prompt = ''
+
+                                if (type == 'images_prompts') {
+                                    // 是个数组，多了对应的prompt
+                                    url = v[0];
+                                    prompt = v[1];
+                                }
+
+                                let im = await Command.createImage(url);
+
+                                // 构建新的
+                                let a = document.createElement('a');
+                                a.className = `${imgDiv.id} output_images`
+                                a.setAttribute('data-pswp-width', im.naturalWidth);
+                                a.setAttribute('data-pswp-height', im.naturalHeight);
+                                a.setAttribute('target', "_blank");
+                                a.setAttribute('href', url);
+
+
+                                let img = new Image();
+                                // img;
+                                img.src = url;
+                                a.appendChild(img);
+
+                                if (prompt) {
+                                    a.style.textDecoration = 'none';
+                                    let p = document.createElement('p')
+                                    p.className = 'prompt_image'
+                                    p.innerText = prompt;
+                                    a.appendChild(p)
+                                    img.alt = prompt
+                                }
+
+                                // imgDiv.parentElement.appendChild(a);
+                                imgDiv.parentElement.insertBefore(a, imgDiv.parentElement.firstChild);
+                            }
+
+                        }
+
+                        if (val && type == "video" && output.querySelector(`#output_${id} video`)) {
+
+                            //her
+                            let video = output.querySelector(`#output_${id} video`);
+                            let img = output.querySelector(`#output_${id} img`);
+                            if (img) img.style.display = 'none';
+                            video.style.display = 'block';
+
+                            video.onloadeddata = function () {
+                                //加载完自动播放
+                                console.log("//加载完自动播放")
+                            };
+
+                            video.src = val;
+
+                        }
+
+                        if (val && type == "text" && output.querySelector(`#output_${id}`)) output.querySelector(`#output_${id}`).innerText = val;
+
+                        // 3d meshes
+                        if (val && type == 'meshes' && output.querySelector(`#output_${id}`)) {
+
+                            let threeD = output.querySelector('.threeD')
+                            //判断默认的图片，需要去掉后创建model-viewer
+                            let imgDf = output.querySelector(`#output_${id} img`);
+                            if (!threeD) {
+                                if (imgDf) imgDf.parentElement.remove();
+                                threeD = document.createElement('div');
+                                threeD.className = 'threeD'
+                                threeD.id = `output_${id}`
+                                output.querySelector('.output_card').appendChild(threeD)
+                                // output.insertBefore(threeD, output.firstChild);
+                            };
+
+
+                            for (const meshUrl of val) {
+                                const modelViewer = document.createElement('div');
+                                modelViewer.style = `width:300px;margin:4px;height:300px;display:block`
+                                modelViewer.innerHTML = `<model-viewer  src="${meshUrl}" 
+                                    min-field-of-view="0deg" max-field-of-view="180deg"
+                                    shadow-intensity="1" 
+                                    camera-controls 
+                                    touch-action="pan-y"
+                                    style="width:300px;height:300px;"
+                                    > 
+                                    <div class="controls">
+                                        <button class="export">Save As</button>
+                                    </div>
+                                </model-viewer>`
+
+                                const btn = modelViewer.querySelector('.export');
+                                btn.addEventListener('click', async e => {
+                                    e.preventDefault();
+                                    const glTF = await (modelViewer.querySelector('model-viewer')).exportScene()
+                                    const file = new File([glTF], 'mixlab.glb')
+                                    const link = document.createElement('a')
+                                    link.download = file.name
+                                    link.href = URL.createObjectURL(file)
+                                    link.click()
+                                })
+                                threeD.appendChild(modelViewer)
+                            }
+
+                        }
+                    }
+                },
+                promptButton: {
+                    element: promptButton,
+                    update: function (runFn, cancelFn) {
+                        promptButton.addEventListener('dblclick', (e) => {
+                            e.preventDefault()
+                            promptButton.classList.remove('disabled');
+                        });
+                        promptButton.addEventListener('click', (e) => {
+                            e.preventDefault();
+
+                            if (promptButton.classList.contains('data-click')) {
+                                return
+                            } else {
+                                promptButton.classList.add('data-click')
+                                setTimeout(() => promptButton.classList.remove('data-click'), 500)
+                            }
+
+                            if (!promptButton.classList.contains('disabled')) {
+                                runFn && runFn();
+                                //her
+                                //播放停顿的动画帧
+                                promptButton.classList.add('disabled');
+                                promptButton.innerText = 'Cancel'
+                            } else {
+                                // 如果能取消
+                                let canCancel = cancelFn && cancelFn();
+                                if (canCancel) promptButton.classList.remove('disabled');
+                                if (canCancel) promptButton.innerText = 'Send'; //her
+                            }
+
+                        });
+                    },
+                    running: () => {
+                        promptButton.innerText = 'Cancel';
+                        if (!promptButton.classList.contains('disabled')) promptButton.classList.add('disabled');
+                    },
+                    reset: () => {
+                        promptButton.innerText = 'Send';//her
+                        promptButton.classList.remove('disabled');
+                        promptButton.classList.remove('data-click');
+                    }
+                },
+            };
+        }
+
+        function createUploadJson(detail) {
+
+            // 创建一个div元素
+            var div = document.createElement('div');
+            div.className = 'upload_btn card'
+            div.textContent = '上传并运行你的JSON文件';
+            div.addEventListener('click', function () {
+                document.getElementById('jsonFileInput').click();
+            });
+
+            // 创建一个input元素
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.id = 'jsonFileInput';
+            input.style.display = 'none';
+            input.addEventListener('change', function (event) {
+                var file = event.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var contents = e.target.result;
+                    var jsonData = JSON.parse(contents);
+
+
+                    Array.from(detail.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    div.className = 'upload_btn card selected'
+
+                    let { output, app } = jsonData;
+
+                    window._appData = {
+                        ...app,
+                        data: output
+                    };
+                    if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                    createApp(window._appData, false);
+
+                    // res(jsonData);
+                };
+                reader.readAsText(file);
+            });
+
+            // 将div和input元素添加到body中
+            // document.body.appendChild(div);
+            document.body.appendChild(input);
+            return div
+        }
+
+        function executed(detail, show) {
+            console.log('#executed', window.prompt_ids, detail)
+            if (detail?.node
+                && window.prompt_ids[detail.prompt_id]
+                && window._appData?.output.filter(f => f.id === detail.node)[0]) {
+                // 保存结果到记录里
+                window.prompt_ids[detail.prompt_id].data = detail
+                window.prompt_ids[detail.prompt_id].createTime = (new Date()).getTime()
+                Command.savePromptResult({
+                    ...window.prompt_ids[detail.prompt_id],
+                    prompt_id: detail.prompt_id
+                })
+            }
+            // if (!enabled) return;
+            const images = detail?.output?.images;
+            const text = detail?.output?.text;
+            const gifs = detail?.output?.gifs;
+
+            const prompt = detail?.output?.prompt;
+            const analysis = detail?.output?.analysis;
+
+            const _images = detail?.output?._images;
+            const prompts = detail?.output?.prompts;
+
+            // 3d模型
+            const meshes = detail?.output?.mesh;
+
+            if (images) {
+                // if (!images) return;
+
+                let url = Command.get_url();
+
+                show(Array.from(images, img => {
+                    return `${url}/view?filename=${encodeURIComponent(img.filename)}&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)}&t=${+new Date()}`;
+                }), detail.node, 'images');
+
+            } else if (meshes) {
+                //多个
+                let url = Command.get_url();
+
+                show(Array.from(meshes, mesh => {
+                    return `${url}/view?filename=${encodeURIComponent(mesh.filename)}&type=${mesh.type}&subfolder=${encodeURIComponent(mesh.subfolder)}&t=${+new Date()}`;
+                }), detail.node, 'meshes');
+
+            } else if (_images && prompts) {
+                let url = Command.get_url();
+
+                let items = [];
+                // 支持图片的batch
+                Array.from(_images, (imgs, i) => {
+
+                    for (const img of imgs) {
+                        items.push([`${url}/view?filename=${encodeURIComponent(img.filename)
+                            }&type=${img.type}&subfolder=${encodeURIComponent(img.subfolder)
+                            }&t=${+new Date()}`, prompts[i]])
+                    }
+
+                })
+
+                show(items, detail.node, 'images_prompts');
+
+            } else if (text) {
+                show(Array.isArray(text) ? text.join('\n\n') : text, detail.node, 'text')
+            } else if (gifs && gifs[0]) {
+                // if (!images) return; 
+                const src = `${Command.get_url()}/view?filename=${encodeURIComponent(gifs[0].filename)}&type=${gifs[0].type}&subfolder=${encodeURIComponent(gifs[0].subfolder)
+                    }&&format=${gifs[0].format}&t=${+new Date()}`;
+
+                show(src, detail.node, gifs[0].format.match('video') ? 'video' : 'image');
+            } else if (prompt && analysis) {
+                // #ClipInterrogator: …… 
+                show(`${prompt.join('\n\n')}\n${JSON.stringify(analysis, null, 2)}`, detail.node, 'text')
+            }
+        }
+
+
+
+        async function createApp(appData, share = true) {
+            // console.log(appData)
+            // 使用示例：
+            var ui = await createUI(appData, share);
+            if (!ui) return
+            // 更新标题
+            ui.title?.update(appData.name || 'Mixlab APP');
+
+            // 更新应用图标
+            ui.icon?.update(appData.icon || appData.output[0]?.options?.defaultImage || base64Df);
+
+            ui.des?.update(appData.description || '-');
+
+            // 更新状态标签
+            ui.status.update(appData ? 'READY' : '-');
+
+            // 添加提交按钮点击事件
+            ui.promptButton.update(
+                () => {
+
+                    // 在提交按钮点击时执行的逻辑
+                    // queuePrompt({
+                    //     name: window._appData.name,
+                    //     id: window._appData.id,
+                    //     icon: window._appData.icon,
+                    //     category: window._appData.category,
+                    //     filename: window._appData.filename
+                    // }, window._appData.data, window._appData.seed, api.clientId);
+
+                    //动态提示和批量提示功能
+
+                    //her
+                    // let isPromptLab = false;
+                    // for (const node of window._appData.input) {
+                    //     if (Command._textNodes.includes(node.class_type)) isPromptLab = true;
+                    // }
+
+                    // if (isPromptLab) {
+                    //     //如果是动态提示
+                    //     if (document.body.querySelector('#dynamic_prompt').classList.contains("mix_on")) {
+                    //         for (const node of window._appData.input) {
+                    //             if (Command._textNodes.includes(node.class_type)) {
+                    //                 let id = `#input_node_id_${node.id}`
+                    //                 let prompt = Command.dynamicPrompts(document.body.querySelector(id)?.value || "")
+                    //                 if (node.class_type == "PromptSimplification") {
+                    //                     if (window._appData.data) window._appData.data[node.id].inputs.prompt = prompt;
+                    //                     //更新输入参数
+                    //                     updateInputData(node.id, (inputs) => {
+                    //                         inputs.prompt = prompt;
+                    //                         return inputs
+                    //                     })
+                    //                 } else {
+                    //                     if (window._appData.data) window._appData.data[node.id].inputs.text = prompt;
+                    //                     //更新输入参数
+                    //                     updateInputData(node.id, (inputs) => {
+                    //                         inputs.text = prompt;
+                    //                         return inputs
+                    //                     })
+                    //                 }
+                    //             }
+                    //         };
+                    //     } else {
+                    //         //是批量功能
+                    //         let prompts = {};
+                    //         for (const node of window._appData.input) {
+                    //             if (Command._textNodes.includes(node.class_type)) {
+                    //                 let id = `#input_node_id_${node.id}`
+                    //                 let ps = Command.generateAllCombinations(document.body.querySelector(id)?.value || "")
+                    //                 if (node.class_type == "PromptSimplification") {
+                    //                     //更新输入参数
+                    //                     prompts[node.id] = ["prompt", ps]
+
+                    //                 } else {
+                    //                     //更新输入参数
+                    //                     prompts[node.id] = ["text", ps]
+                    //                 }
+                    //             }
+
+                    //         }
+
+
+                    //         function generateCombinations(prompts, input) {
+                    //             let results = [];
+
+                    //             function combine(currentInput, index) {
+                    //                 if (index === input.length) {
+                    //                     results.push(JSON.parse(JSON.stringify(currentInput)));
+                    //                     return;
+                    //                 }
+
+                    //                 let current = input[index];
+                    //                 let id = current.id;
+                    //                 let keys = Object.keys(current.inputs);
+
+                    //                 // 如果 prompts 中没有对应的 id，直接递归下一个
+                    //                 if (!prompts[id]) {
+                    //                     combine(currentInput, index + 1);
+                    //                     return;
+                    //                 }
+
+                    //                 let values = prompts[id][1];
+                    //                 for (let value of values) {
+                    //                     let newInput = JSON.parse(JSON.stringify(currentInput));
+
+                    //                     // 替换输入值
+                    //                     for (let key of keys) {
+                    //                         if (typeof newInput[index].inputs[key] === 'string') {
+                    //                             newInput[index].inputs[key] = value;
+                    //                         }
+                    //                     }
+                    //                     combine(newInput, index + 1);
+                    //                 }
+                    //             }
+
+                    //             combine(JSON.parse(JSON.stringify(input)), 0);
+                    //             return results;
+                    //         }
+
+                    //         console.log('##generateCombinations', prompts, [...window._appData.input.filter(inp => inp)])
+                    //         let inputs = generateCombinations(prompts, [...window._appData.input.filter(inp => inp)])
+
+                    //         for (const inp of inputs) {
+                    //             Command.queuePromptNew(
+                    //                 window._appData.filename,
+                    //                 window._appData.category,
+                    //                 window._appData.seed,
+                    //                 inp,
+                    //                 api.clientId,
+                    //                 window._appData.data ? [{
+                    //                     data: {
+                    //                         output: window._appData.data
+                    //                     }
+                    //                 }] : null
+                    //             ).then(res => {
+
+                    //                 if (!res) {
+                    //                     if (api.runningCancel) {
+                    //                         api.runningCancel();
+                    //                         api.runningCancel = null;
+                    //                     }
+
+                    //                     ui.promptButton.element.classList.remove('disabled');
+                    //                     ui.promptButton.element.innerText = 'Create';
+
+                    //                     return true
+
+                    //                 }
+                    //             })
+                    //         }
+
+                    //         return
+
+                    //     }
+
+                    // }
+
+
+                    Command.queuePromptNew(
+                        window._appData.filename,
+                        window._appData.category,
+                        window._appData.seed,
+                        window._appData.input.filter(inp => inp),
+                        api.clientId,
+                        window._appData.data ? [{
+                            data: {
+                                output: window._appData.data
+                            }
+                        }] : null
+                    ).then(res => {
+
+                        if (!res) {
+                            if (api.runningCancel) {
+                                api.runningCancel();
+                                api.runningCancel = null;
+                            }
+
+                            ui.promptButton.element.classList.remove('disabled');
+                            ui.promptButton.element.innerText = 'Send'; //her
+
+                            return true
+
+                        }
+                    })
+
+                }, () => {
+                    // 取消
+                    if (api.runningCancel) {
+                        api.runningCancel();
+                        api.runningCancel = null;
+                        return true
+                    }
+
+                });
+
+
+            const show = (src, id, type = "image") => {
+                // console.log(src)
+                ui.output.update(type, src, id)
+            };
+            // 暴露给history使用
+            window._show = show;
+
+            api.addEventListener("status", ({ detail }) => {
+                console.log("status", detail, detail?.exec_info?.queue_remaining);
+                try {
+                    ui.status.update(`queue#${detail.exec_info?.queue_remaining}`);
+                    window.parent.postMessage({ cmd: 'status', data: `queue#${detail.exec_info?.queue_remaining}` }, '*');
+                    if (detail.exec_info?.queue_remaining === 0) {
+                        // 运行按钮重设
+                        ui.promptButton.reset()
+                        console.log('运行按钮重设');
+
+                        document.body.addEventListener('mousemove', function () {
+                            document.body.querySelector('video')?.play()
+                        });
+
+                    }
+                } catch (error) {
+                    console.log(error)
+                    window.parent.postMessage({ cmd: 'status' }, '*');
+                }
+
+            });
+
+            api.addEventListener("progress", ({ detail }) => {
+                console.log("progress", detail);
+                const class_type = window._appData.data ? (window._appData.data[detail?.node]?.class_type || '') : ""
+                try {
+                    ui.status.update(`${parseFloat(100 * detail.value / detail.max).toFixed(1)}% ${class_type}`);
+                    ui.promptButton.running()
+                } catch (error) {
+
+                }
+            });
+
+            api.addEventListener("executed", async ({ detail }) => {
+                console.log("executed", detail)
+                executed(detail, show);
+                let class_type = window._appData.data ? window._appData.data[detail.node]?.class_type : ""
+                if (class_type) {
+                    try {
+                        ui.status.update(`executed_#${class_type}`);
+                        ui.promptButton.reset()
+                    } catch (error) {
+
+                    }
+                }
+
+
+                // console.log(Running, Pending);
+                try {
+                    const { Running, Pending } = await Command.getQueue(api.clientId);
+                    if (Running && Running[0]) {
+                        api.runningCancel = Running[0].remove;
+                        ui.promptButton.running()
+                    } else {
+                        api.runningCancel = null;
+                    }
+                } catch (error) {
+                    api.runningCancel = null;
+                }
+
+            });
+
+            // api.addEventListener("b_preview", ({ detail }) => {
+            //     // if (!enabled) return;
+            //     console.log("b_preview", detail)
+            //     show(URL.createObjectURL(detail));
+            // });
+            api.addEventListener("execution_error", ({ detail }) => {
+
+                console.log("execution_error", detail)
+                window.parent.postMessage({ cmd: 'status', data: `execution_error:${JSON.stringify(detail)}` }, '*');
+                // show(URL.createObjectURL(detail));
+            });
+
+
+            api.addEventListener('execution_start', async ({ detail }) => {
+                console.log("execution_start", detail)
+                try {
+                    ui.status.update(`execution_start`);
+                    ui.promptButton.running()
+                } catch (error) {
+
+                }
+
+                try {
+                    const { Running, Pending } = await Command.getQueue(api.clientId);
+                    if (Running && Running[0]) {
+                        api.runningCancel = Running[0].remove;
+                    } else {
+                        api.runningCancel = null;
+                    }
+                } catch (error) {
+                    api.runningCancel = null;
+                }
+            })
+
+            api.api_base = ""
+            api.init();
+
+            // 外挂的UI
+            createAllColorInput();
+
+            //her
+            // const lightbox = new PhotoSwipeLightbox({
+            //     gallery: '.output_card',
+            //     children: 'a',
+            //     pswpModule: () => import('/mixlab/app/lib/photoswipe.esm.min.js'),
+            //     // appendToEl: document.querySelector('#result')
+            // });
+            // lightbox.on('uiRegister', function () {
+            //     lightbox.pswp.ui.registerElement({
+            //         name: 'custom-caption',
+            //         order: 9,
+            //         isButton: false,
+            //         appendTo: 'root',
+            //         html: 'Caption text',
+            //         onInit: (el, pswp) => {
+            //             lightbox.pswp.on('change', () => {
+            //                 const currSlideElement = lightbox.pswp.currSlide.data.element
+            //                 let captionHTML = ''
+            //                 if (currSlideElement) {
+            //                     const hiddenCaption = currSlideElement.querySelector(
+            //                         '.hidden-caption-content'
+            //                     )
+            //                     if (hiddenCaption) {
+            //                         // get caption from element with class hidden-caption-content
+            //                         captionHTML = hiddenCaption.innerHTML
+            //                     } else {
+            //                         // get caption from alt attribute
+            //                         captionHTML = currSlideElement
+            //                             .querySelector('img')
+            //                             .getAttribute('alt')
+            //                     }
+            //                 }
+            //                 el.innerHTML = captionHTML || ''
+            //             })
+            //         }
+            //     })
+            // })
+            // lightbox.init();
+            // window._lightbox = lightbox
+
+            // lightbox.addFilter('preventPointerEvent', (preventPointerEvent, originalEvent, pointerType) => {
+            //     // return true to preventDefault pointermove/pointerdown events
+            //     // (also applies to touchmove/mousemove)
+            //     return true;
+            // });
+
+
+
+            // author信息
+            if (appData.author) {
+                let div = document.body.querySelector('#author');
+                if (div) {
+                    if (appData.author.link) div.href = appData.author.link;
+                    div.innerHTML = `<p style="font-size:12px;margin: 8px 0;">Author:</p>
+                <div style="display: flex;"> <img style="width:32px;height:32px;border-radius: 100%;" 
+                src="${appData.author.avatar || base64Df}"/>
+                <p style="margin-left:8px;font-size:12px;font-weight:800">${appData.author.name || '-'}</p></div>`
+                }
+
+            }
+
+        }
+
+        // 创建app的选择菜单
+        function createAppList(apps = [], innerApp = false) {
+            window.prompt_ids = {};
+            if (document.body.querySelector('.apps')) {
+                document.body.querySelector('.apps').remove()
+            }
+            let details = document.createElement('details');
+            details.className = 'apps';
+
+            details.innerHTML = `<summary>APP Store / ${apps.length}</summary>
+                <div class="content"> </div>`
+
+            let div = details.querySelector('div');
+
+            for (let index = 0; index < apps.length; index++) {
+                const app = apps[index];
+                let d = document.createDocumentFragment();
+                let dd = document.createElement('div');
+                d.appendChild(dd);
+                dd.className = 'card' + (index == 0 ? ' selected' : '')
+                dd.innerHTML = ` 
+                        <div class="item icon">
+                            <img src="${app.icon || base64Df}"/>
+                        </div>
+                        <div class="item" style="margin-left: 24px;">
+                            <div>
+                                <h5>${app.name}</h5>
+                                <p>${app.description}</p>
+                            </div>
+                            <div >
+                                <p class="version">Version: ${app.version}</p> 
+                            </div>
+                            <br>
+                            ${app.author && app.author.name ? `<p class="version">Author:</p><div 
+                            style="display: flex;justify-content: center;align-items: center;margin-top: 8px;"> 
+                                <img style="width:28px;height:28px;border-radius: 100%;" 
+                                src="${app.author.avatar || base64Df}"/>
+                                <p class="version" style="margin-left: 12px;">${app.author.name}</p> 
+                            </div>`: ''}
+                        </div>
+                      `
+
+
+                div.appendChild(d);
+                dd.addEventListener('click', async e => {
+                    e.preventDefault();
+                    Array.from(div.querySelectorAll('.card'), c => c.classList.remove('selected'));
+                    dd.className = 'card selected'
+
+                    details.removeAttribute('open');
+                    let res = (await get_my_app(app.category, app.filename)).filter(n => n.filename === app.filename)[0];
+
+                    if (res) {
+                        window._appData = res;
+                        if (document.body.querySelector('.app')) document.body.querySelector('.app').remove()
+                        createApp(window._appData);
+                        localStorage.setItem('app_selected', window._appData.id)
+                    }
+
+                })
+                // console.log(div)
+            };
+
+            if (!innerApp) {
+                let uploadApp = createUploadJson(details);
+                div.appendChild(uploadApp);
+            }
+
+            document.body.appendChild(details);
+            details.addEventListener('toggle', e => {
+                e.preventDefault();
+                if (document.body.querySelector('#app_container')) {
+                    document.body.querySelector('#app_container').removeAttribute('open');
+                    document.body.querySelector('#author').style.display = 'none'
+                }
+            })
+        }
+
+
+
+
+        async function createHistoryList(category) {
+            if (document.body.querySelector('#history_container')) document.body.querySelector('#history_container').remove();
+
+            window._historyData = await Command.getPromptResult(category);
+
+            if (!window._historyData || (window._historyData && window._historyData.length === 0)) return
+
+            let details = document.createElement('details');
+            details.id = "history_container"
+            details.innerHTML = `<summary>历史</summary>`;
+            details.style = `background: whitesmoke;
+            color: black;
+            padding: 12px;
+            cursor: pointer;
+            margin: 8px 44px;`;
+
+            details.addEventListener('toggle', function (event) {
+                if (details.open) {
+                    // console.log('details被展开了');
+                    // 在这里执行展开后的回调操作
+                    if (document.body.querySelector('#app_container')) {
+                        document.body.querySelector('#app_container').removeAttribute('open')
+                    }
+                    if (document.body.querySelector('.apps')) {
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    }
+                } else {
+                    // console.log('details被收起了');
+                    // 在这里执行收起后的回调操作
+                    if (document.body.querySelector('#app_container')) {
+                        document.body.querySelector('#app_container').removeAttribute('open')
+                    }
+                    if (document.body.querySelector('.apps')) {
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    }
+                }
+            });
+
+
+            let cards = document.createElement('div');
+            cards.style = `display: flex;flex-wrap: wrap;`
+
+            const addCard = (title, createTime, imgurl) => {
+                let card = document.createElement('div')
+                card.className = 'card';
+                card.innerHTML = `<div class="item icon">
+                            <img src="${imgurl || base64Df}"/>
+                            </div>
+                        <div class="item" style="margin-left: 24px;">
+                            <div>
+                                <h5>${title}</h5>
+                                <p></p>
+                            </div>
+                            <div>
+                                <p class="version">${new Date(createTime || (new Date()))}</p>
+                                
+                            </div>
+                        </div>`
+                return card
+            }
+
+            for (const c of window._historyData) {
+                let card = addCard(c.appInfo.name, c.createTime, c.appInfo.icon)
+                cards.appendChild(card)
+                card.addEventListener('click', async e => {
+                    e.preventDefault();
+                    // console.log(c)
+
+                    const { category, filename } = c.appInfo;
+                    window._appData = (await get_my_app(category, filename))[0];
+
+                    await createApp(window._appData);
+
+                    executed(c.data, window._show);
+
+                    try {
+                        document.body.querySelector('#app_container').setAttribute('open', true)
+                        document.body.querySelector('#app_input_pannel').removeAttribute('open')
+                        document.body.querySelector('.apps').removeAttribute('open')
+                    } catch (error) {
+                        console.log(error)
+                    }
+                })
+            }
+
+            details.appendChild(cards);
+
+            document.body.appendChild(details);
+        }
+
+        async function init_app() {
+
+            const innerApp = checkIsInnerApp();
+
+            if (!innerApp) {
+
+                window._apps = await Command.getAppInit();
+
+                window._appData = window._apps[0];
+
+                createAppList(window._apps);
+
+                // if (window._apps.length > 0) await createHistoryList(category || '');
+
+                createApp(window._appData);
+            }
+
+        };
+
+        init_app();
+
+        // 支持内嵌app
+        function checkIsInnerApp() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const innerApp = params.get("innerApp");
+            // console.log(window.location.href, innerApp == 1, document.body);
+            if (innerApp == 1) {
+                document.body.querySelector('.header').style.display = 'none';
+                window.parent.postMessage({ innerApp, cmd: 'init' }, '*');
+
+                // 在iframe中监听来自父窗口的消息
+                window.addEventListener("message", async function (event) {
+                    console.log("Received message from parent:", event.data);
+                    const { init, url } = event.data;
+
+                    window._hostUrl = url;
+
+                    window._apps = init;
+
+                    window._appData = window._apps[0];
+
+                    if (window._appData) {
+                        createAppList(window._apps, innerApp);
+
+                        // await createHistoryList();
+
+                        createApp(window._appData);
+                    } else {
+                        // todo welcome页面
+                        document.body.innerHTML = `<h3 id="welcome_info" style="padding: 99px;">Welcome to Mixlab Nodes App!</h3>`
+                    }
+                });
+            }
+
+            return innerApp == 1
+
+        }
+
+
+    </script>
+
+    <script>
+        class MaskDrawer {
+            constructor(
+                baseCanvasId,
+                maskCanvasId,
+                hintCanvasId,  // 添加新参数
+                brushBtnId,
+                eraserBtnId,
+                sizeSliderId,
+                sizeValueId,
+                clearBtnId,
+                saveBtnId,
+                autoCutBtnId,
+                modelSelectId,
+                closeBtnId
+            ) {
+                this.baseCanvas = document.getElementById(baseCanvasId);
+                this.maskCanvas = document.getElementById(maskCanvasId);
+                this.hintCanvas = document.getElementById(hintCanvasId);  // 获取新的 canvas
+                this.maskCanvas.style.opacity = "0.8";
+                this.baseCtx = this.baseCanvas.getContext('2d');
+                this.maskCtx = this.maskCanvas.getContext('2d');
+                this.hintCtx = this.hintCanvas.getContext('2d');  // 获取上下文
+                this.isDrawing = false;
+                this.currentTool = 'brush';
+                this.brushSize = 10;
+
+                // 设置初始底图背景为白色
+                this.baseCtx.fillStyle = 'white';
+                this.baseCtx.fillRect(0, 0, this.baseCanvas.width, this.baseCanvas.height);
+
+                // 设置 hintCanvas 的尺寸与其他 canvas 一致
+                this.hintCanvas.width = this.baseCanvas.width;
+                this.hintCanvas.height = this.baseCanvas.height;
+
+                // 工具选择
+                this.brushBtn = document.getElementById(brushBtnId);
+                this.eraserBtn = document.getElementById(eraserBtnId);
+
+                this.brushBtn.addEventListener('click', () => this.selectTool('brush'));
+                this.eraserBtn.addEventListener('click', () => this.selectTool('eraser'));
+
+                // 笔刷大小调节
+                this.sizeSlider = document.getElementById(sizeSliderId);
+                this.sizeValue = document.getElementById(sizeValueId);
+                this.sizeSlider.addEventListener('input', (e) => this.changeBrushSize(e));
+
+                // 清空画布
+                document.getElementById(clearBtnId).addEventListener('click', () => this.clearCanvas());
+
+                // 保存蒙版
+                document.getElementById(saveBtnId).addEventListener('click', () => this.saveMask());
+
+                // 自动抠图
+                this.autoCutBtn = document.getElementById(autoCutBtnId);
+                this.autoCutBtn.addEventListener('click', () => this.autoCut());
+
+                // 退出
+                this.closeBtn = document.getElementById(closeBtnId);
+                this.closeBtn.addEventListener('click', () => this.closeEdit());
+
+                // 模型选择
+                this.modelSelect = document.getElementById(modelSelectId);
+
+                // 绘制
+                this.maskCanvas.addEventListener('mousedown', (e) => this.startDrawing(e));
+                this.maskCanvas.addEventListener('mousemove', (e) => this.draw(e));
+                this.maskCanvas.addEventListener('mouseup', () => this.stopDrawing());
+                this.maskCanvas.addEventListener('mouseout', () => this.stopDrawing());
+
+                this.maskCanvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.startDrawing(e.touches[0]);
+                });
+                this.maskCanvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.draw(e.touches[0]);
+                });
+                this.maskCanvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.stopDrawing();
+                });
+                this.maskCanvas.addEventListener('touchcancel', (e) => {
+                    e.preventDefault();
+                    this.stopDrawing();
+                });
+            }
+
+            closeEdit() {
+                if (this.close) this.close();
+            }
+
+            drawBrushCircle(x, y) {
+                // 清除之前的提示圈
+                this.hintCtx.clearRect(0, 0, this.hintCanvas.width, this.hintCanvas.height);
+
+                this.hintCtx.fillStyle = `rgba(${this.currentTool === 'brush' ? 255 : 0},0,${this.currentTool === 'brush' ? 0 : 255},0.5)`
+                // 绘制新的提示圈
+                this.hintCtx.beginPath();
+                this.hintCtx.arc(x, y, this.brushSize / 2, 0, 2 * Math.PI);
+                // this.hintCtx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                // this.hintCtx.lineWidth = 1;
+                // this.hintCtx.stroke();
+                this.hintCtx.fill();
+            }
+            clearBrushCircle() {
+                this.hintCtx.clearRect(0, 0, this.hintCanvas.width, this.hintCanvas.height)
+            }
+
+            newImageForMaskEdit(img) {
+                let width = img.naturalWidth, height = img.naturalHeight;
+                this.baseCanvas.width = width;
+                this.baseCanvas.height = height;
+                this.maskCanvas.width = width;
+                this.maskCanvas.height = height;
+                // 设置 hintCanvas 的尺寸与其他 canvas 一致
+                this.hintCanvas.width = width;
+                this.hintCanvas.height = height;
+
+                this.baseCtx.drawImage(img, 0, 0, this.baseCanvas.width, this.baseCanvas.height);
+                //设置笔刷最大值和间隔
+                this.sizeSlider.setAttribute("max", parseInt(Math.max(width, height) * 0.5))
+                this.sizeSlider.setAttribute("step", Math.max(5, parseInt(Math.max(width, height) * 0.01)));
+
+                this.drawBrushCircle(
+                    parseInt(parseInt(this.maskCanvas.width * 0.5)),
+                    parseInt(parseInt(this.maskCanvas.height * 0.5))
+                );
+            }
+
+            loadMask(maskImg) {
+                let width = maskImg.naturalWidth || maskImg.width, height = maskImg.naturalHeight || maskImg.height;
+                this.maskCanvas.width = width;
+                this.maskCanvas.height = height;
+                this.maskCtx.drawImage(maskImg, 0, 0, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            selectTool(tool) {
+                this.currentTool = tool;
+                if (tool === 'brush') {
+                    this.brushBtn.classList.add('active');
+                    this.eraserBtn.classList.remove('active');
+
+                    this.brushBtn.classList.remove('unactive');
+                    this.eraserBtn.classList.add('unactive');
+
+                } else {
+                    this.eraserBtn.classList.add('active');
+                    this.brushBtn.classList.remove('active');
+
+                    this.eraserBtn.classList.remove('unactive');
+                    this.brushBtn.classList.add('unactive');
+                }
+            }
+
+            changeBrushSize(e) {
+                this.brushSize = parseInt(e.target.value);
+                this.sizeValue.textContent = this.brushSize;
+
+                this.drawBrushCircle(
+                    parseInt(parseInt(this.maskCanvas.width * 0.5)),
+                    parseInt(parseInt(this.maskCanvas.height * 0.5))
+                );
+            }
+
+            clearCanvas() {
+                this.maskCtx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            saveMask() {
+                const dataURL = this.maskCanvas.toDataURL('image/png');
+
+                // 获取图像数据
+                const imageData = this.maskCtx.getImageData(
+                    0, 0,
+                    this.maskCanvas.width, this.maskCanvas.height);
+                const imageDataData = imageData.data;
+
+                // 反相图像数据
+                for (let i = 0; i < imageDataData.length; i += 4) {
+                    imageDataData[i + 3] = 255 - imageDataData[i + 3]; // 反相透明度
+                }
+
+                // 更新画布
+                let tempCanvas = document.createElement('canvas');
+                tempCanvas.width = this.maskCanvas.width;
+                tempCanvas.height = this.maskCanvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.putImageData(imageData, 0, 0);
+
+                let base64 = tempCanvas.toDataURL();
+
+                // 对外提供接口，可以将dataURL传递到需要的地方
+                this.saveCallback(base64, this.maskCanvas.width, this.maskCanvas.height);
+            }
+
+            autoCut() {
+                const selectedModel = this.modelSelect.value;
+                console.log(`Using model: ${selectedModel}`);
+                const dataURL = this.baseCanvas.toDataURL('image/png');
+
+                this.autoCutCallback(selectedModel, dataURL).then(maskImg => {
+                    this.maskCtx.clearRect(0, 0, this.maskCanvas.width, this.maskCanvas.height);
+                    this.loadMask(maskImg);
+                });
+            }
+
+            startDrawing(e) {
+                this.isDrawing = true;
+                this.clearBrushCircle()
+                this.draw(e);
+            }
+
+            draw(e) {
+                const rect = this.maskCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                if (!this.isDrawing) {
+                    this.drawBrushCircle(x, y);
+                    return;
+                }
+
+                this.maskCtx.lineWidth = this.brushSize;
+                this.maskCtx.lineCap = 'round';
+                this.maskCtx.lineJoin = 'round';
+
+                if (this.currentTool === 'brush') {
+                    this.maskCtx.globalCompositeOperation = 'source-over';
+                    this.maskCtx.strokeStyle = 'rgba(0, 255, 0, 0.7)';
+                } else {
+                    this.maskCtx.globalCompositeOperation = 'destination-out';
+                }
+
+                this.maskCtx.lineTo(x, y);
+                this.maskCtx.stroke();
+                this.maskCtx.beginPath();
+                this.maskCtx.moveTo(x, y);
+            }
+
+            stopDrawing() {
+                this.isDrawing = false;
+                this.maskCtx.beginPath();
+            }
+
+            initializeModelOptions(models) {
+                this.modelSelect.innerHTML = '';
+                models.forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    this.modelSelect.appendChild(option);
+                });
+            }
+        }
+
+
+
+    </script>
+
+    <!-- <script src="/extensions/comfyui-mixlab-nodes/lib/login.js"></script> -->
+
+</body>
+
+</html>

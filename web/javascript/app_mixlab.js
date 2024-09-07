@@ -4,7 +4,12 @@ import { api } from '../../../scripts/api.js'
 
 import { td_bg } from './td_background.js'
 // console.log('td_bg', td_bg)
-import { getUrl, base64Df, get_position_style, getObjectInfo } from './common.js'
+import {
+  getUrl,
+  base64Df,
+  get_position_style,
+  getObjectInfo
+} from './common.js'
 
 //本机安装的插件节点全集
 window._nodesAll = null
@@ -229,8 +234,6 @@ async function extractInputAndOutputData (
   return { input, output, seed, seedTitle }
 }
 
- 
-
 async function save_app (json) {
   let url = getUrl()
 
@@ -265,18 +268,20 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
 async function save (json, download = false, showInfo = true) {
   let nodesAll = window._nodesAll || (await getObjectInfo())
 
-  console.log('####SAVE', nodesAll, json[0])
+  console.log('####SAVE', nodesAll, json)
 
   const name = json[0],
     version = json[5],
     share_prefix = json[6], //用于分享的功能扩展
     link = json[7], //用于创建界面上的跳转链接
     category = json[8] || '', //用于分类
+    idle_animation = json[9], //用于动画，比如数字人her
     description = json[4],
     inputIds = json[2].split('\n').filter(f => f),
     outputIds = json[3].split('\n').filter(f => f)
 
   const iconData = json[1][0]
+
   let { filename, subfolder, type } = iconData
   let iconUrl = api.apiURL(
     `/view?filename=${encodeURIComponent(
@@ -329,6 +334,27 @@ async function save (json, download = false, showInfo = true) {
     try {
       data.app.icon = await drawImageToCanvas(iconUrl)
     } catch (error) {}
+
+    let images = []
+    if (json[1].length > 1 && idle_animation) {
+      images = Array.from(json[1], j => {
+        let { filename, subfolder, type } = j
+        return api.apiURL(
+          `/view?filename=${encodeURIComponent(
+            filename
+          )}&type=${type}&subfolder=${subfolder}${app.getPreviewFormatParam()}${app.getRandParam()}`
+        )
+      })
+    }
+
+    try {
+      for (let index = 0; index < images.length; index++) {
+        const imgurl = images[index]
+        images[index] = await drawImageToCanvas(imgurl)
+      }
+      data.app.idle_animation = images
+    } catch (error) {}
+
     // console.log(data.app)
     // let http_workflow = app.graph.serialize()
     await save_app(data)
@@ -338,13 +364,17 @@ async function save (json, download = false, showInfo = true) {
 
     if (showInfo) {
       let open = window.confirm(
-        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+        `You can now access the standalone application on a new page!\n${getUrl()}/mixlab/app${
+          data.app.idle_animation ? '/her.html' : ''
+        }?filename=${encodeURIComponent(
           data.app.filename
         )}&category=${encodeURIComponent(data.app.category)}`
       )
       if (open)
         window.open(
-          `${getUrl()}/mixlab/app?filename=${encodeURIComponent(
+          `${getUrl()}/mixlab/app${
+            data.app.idle_animation ? '/her.html' : ''
+          }?filename=${encodeURIComponent(
             data.app.filename
           )}&category=${encodeURIComponent(data.app.category)}`
         )

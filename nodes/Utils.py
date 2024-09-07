@@ -82,13 +82,13 @@ def tensor2pil(image):
     return Image.fromarray(np.clip(255. * image.cpu().numpy().squeeze(), 0, 255).astype(np.uint8))
 
 
-def create_temp_file(image):
+def create_temp_file(image,counter=1):
     output_dir = folder_paths.get_temp_directory()
 
     (
             full_output_folder,
             filename,
-            counter,
+            _,
             subfolder,
             _,
         ) = folder_paths.get_save_image_path('tmp', output_dir)
@@ -601,6 +601,7 @@ class AppInfo:
                     "link":("STRING",{"multiline": False,"default": "https://","dynamicPrompts": False}),
                     "category":("STRING",{"multiline": False,"default": "","dynamicPrompts": False}),
                     "auto_save": (["enable","disable"],),
+                    "idle_animation": ("BOOLEAN", {"default": False},),
                 }
 
                 }
@@ -616,14 +617,19 @@ class AppInfo:
     INPUT_IS_LIST = True
     # OUTPUT_IS_LIST = (True,)
 
-    def run(self,name,input_ids,output_ids,image,description,version,share_prefix,link,category,auto_save):
+    def run(self,name,input_ids,output_ids,image,description,version,share_prefix,link,category,auto_save,idle_animation):
         name=name[0]
+
+        idle_animation=idle_animation[0]
         
-        im=None
+        im=[]
         if image:
-            im=image[0][0]
-            #TODO batch 的方式需要处理
-            im=create_temp_file(im)
+            # img=image[0][0]
+            print('AppInfo_image',len(image))
+            # batch 的方式需要处理
+            for i in range(len(image)):
+                img=image[i]
+                im.append(create_temp_file(img,i+1)[0])
         # image [img,] img[batch,w,h,a] 列表里面是batch，
 
         input_ids=input_ids[0]
@@ -636,7 +642,7 @@ class AppInfo:
         
         # id=get_json_hash([name,im,input_ids,output_ids,description,version])
 
-        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category]}, "result": ()}
+        return {"ui": {"json": [name,im,input_ids,output_ids,description,version,share_prefix,link,category,idle_animation]}, "result": ()}
     
 
     
