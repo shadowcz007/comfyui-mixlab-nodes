@@ -928,7 +928,6 @@ class scenesNode_:
         return {"required": {
                     "scenes_video": ('SCENE_VIDEO',),
                     "index": ("INT", {"default": 0, "min": 0, "step": 1}),
-                     
                      },}
 
     RETURN_TYPES = ('IMAGE','INT',)
@@ -940,14 +939,15 @@ class scenesNode_:
     INPUT_IS_LIST = True
 
     def load_video_cv_fallback(self, video, frame_load_cap, skip_first_frames):
-        # print('#video',video)
+        
+        images = []
+        total_frame_count = 0
         try:
             video_cap = cv2.VideoCapture(video)
             if not video_cap.isOpened():
                 raise ValueError(f"{video} could not be loaded with cv fallback.")
             # set video_cap to look at start_index frame
-            images = []
-            total_frame_count = 0
+            
             frames_added = 0
             base_frame_time = 1/video_cap.get(cv2.CAP_PROP_FPS)
             
@@ -986,6 +986,7 @@ class scenesNode_:
         finally:
             video_cap.release()
         
+        print("total_frame_count",total_frame_count)
         images = torch.cat(images, dim=0)
        
         return (images, frames_added,)
