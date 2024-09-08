@@ -64,7 +64,7 @@ def is_installed(package, package_overwrite=None,auto_install=True):
             print(f"Installing {package}...")
             # 清华源 -i https://pypi.tuna.tsinghua.edu.cn/simple
             command = f'"{python}" -m pip install {package}'
-    
+
             result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, env=os.environ)
 
             is_has=True
@@ -76,7 +76,7 @@ def is_installed(package, package_overwrite=None,auto_install=True):
         print(package+'## OK')
 
     return is_has
-     
+
 try:
     import OpenSSL
 except ImportError:
@@ -211,11 +211,11 @@ def read_workflow_json_files_all(folder_path):
                 data.append(file_info)
         except Exception as e:
             print(e)
-    
+
     sorted_data = sorted(data, key=lambda x: x['date'], reverse=True)
     return sorted_data
 
-# workflow  
+# workflow
 def read_workflow_json_files(folder_path ):
     json_files = []
     for filename in os.listdir(folder_path):
@@ -263,12 +263,12 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
     apps=[]
     if filename==None:
 
-        #TODO 支持目录内遍历 
+        #TODO 支持目录内遍历
         if is_all:
             data=read_workflow_json_files_all(category_path)
         else:
             data=read_workflow_json_files(category_path)
-        
+
         i=0
         for item in data:
             # print(item)
@@ -325,11 +325,11 @@ def get_my_workflow_for_app(filename="my_workflow_app.json",category="",is_all=F
                 }]
         except Exception as e:
             print("发生异常：", str(e))
-        
+
         # 这个代码不需要
         # if len(apps)==1 and category!='' and category!=None:
         data=read_workflow_json_files(category_path)
-            
+
         for item in data:
             x=item["data"]
             # print(apps[0]['filename'] ,item["filename"])
@@ -371,9 +371,9 @@ def save_prompt_result(id,data):
     if os.path.exists(prompt_result_path):
         with open(prompt_result_path) as json_file:
             prompt_result = json.load(json_file)
-    
+
     prompt_result[id]=data
-    
+
     with open(prompt_result_path, 'w') as file:
         json.dump(prompt_result, file)
     return prompt_result_path
@@ -403,16 +403,16 @@ def save_workflow_for_app(data,filename="my_workflow_app.json",category=""):
     category_path=os.path.join(app_path,category)
     if not os.path.exists(category_path):
         os.mkdir(category_path)
-    
+
     app_workflow_path=os.path.join(category_path, filename)
- 
+
     try:
         output_str = json.dumps(data['output'])
         data['app']['id']=calculate_md5(output_str)
         # id=data['app']['id']
     except Exception as e:
         print("发生异常：", str(e))
-    
+
     with open(app_workflow_path, 'w') as file:
         json.dump(data, file)
     return filename
@@ -439,7 +439,7 @@ _original_request = aiohttp.ClientSession._request
 # 定义新的 get 方法
 async def new_request(self, method, url, *args, **kwargs):
    # 检查环境变量以确定是否使用代理
-    proxy = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy') 
+    proxy = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY') or os.environ.get('http_proxy') or os.environ.get('https_proxy')
     # print('Proxy Config:',proxy)
     if proxy and 'proxy' not in kwargs:
         kwargs['proxy'] = proxy
@@ -470,7 +470,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
         # if not await check_port_available(address, port):
         #     raise RuntimeError(f"Port {port} is already in use.")
-        
+
         http_success = False
         http_port=port
         for i in range(11):  # 尝试最多11次
@@ -483,7 +483,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
 
         if not http_success:
             raise RuntimeError(f"Ports {port} to {port + 10} are all in use.")
-        
+
 
         # site = web.TCPSite(runner, address, port)
         # await site.start()
@@ -526,7 +526,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             address = '127.0.0.1'
         if address=='0.0.0.0':
             address = '127.0.0.1'
-            
+
         if verbose:
 
             logging.info("\n")
@@ -535,10 +535,14 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
             import socket
 
             hostname = socket.gethostname()
-            ip_address = socket.gethostbyname(hostname)
+            # logging.debug("hostname:", hostname)
+            try:
+                ip_address = socket.gethostbyname(hostname)
+            except Exception as e:
+                logging.debug("[mixlab]gethostbyname() downgraded due to exception:", e)
+                ip_address = socket.gethostbyname("")
 
-            # print(f"本机的IP地址是: {ip_address}")
-
+            # print(f"本机的 IP 地址是：{ip_address}")
 
             # print("\033[93mStarting server\n")
             logging.info("\033[93mTo see the GUI go to: http://{}:{} or http://{}:{}".format(ip_address, http_port,address,http_port))
@@ -556,7 +560,7 @@ async def new_start(self, address, port, verbose=True, call_on_start=None):
                     call_on_start(scheme,address, http_port)
             except:
                 call_on_start(address,http_port)
-            
+
 
     except Exception as e:
         print(f"Error starting the server: {e}")
@@ -586,9 +590,9 @@ async def mixlab_hander(request):
     return web.json_response(data)
 
 # llm的api key，使用硅基流动
-@routes.post('/mixlab/llm_api_key')  
-async def mixlab_llm_api_key_handler(request):  
-    data = await request.json()  
+@routes.post('/mixlab/llm_api_key')
+async def mixlab_llm_api_key_handler(request):
+    data = await request.json()
     api_key = data.get('key')
 
     app_folder = os.path.join(current_path, "app")
@@ -670,7 +674,7 @@ async def static_file_handler(request):
     filename = request.match_info['filename']
     file_path = os.path.join(current_path, "webApp", filename)
     print(file_path)
-    
+
     if os.path.exists(file_path) and os.path.isfile(file_path):
         if filename.endswith('.js'):
             content_type = 'application/javascript'
@@ -682,7 +686,7 @@ async def static_file_handler(request):
             content_type = 'image/svg+xml'
         else:
             content_type = 'application/octet-stream'
-        
+
         with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
             file_data = f.read()
             return web.Response(text=file_data, content_type=content_type)
@@ -723,7 +727,7 @@ async def mixlab_workflow_hander(request):
                     admin=data['admin']
 
                 ds=get_my_workflow_for_app(filename,category,admin)
-                data=[]           
+                data=[]
                 for json_data in ds:
                     # 不传给前端
                     if 'output' in json_data['data']:
@@ -760,7 +764,7 @@ async def mixlab_workflow_hander(request):
 async def nodes_map_hander(request):
     data = await request.json()
     result={}
-    try: 
+    try:
         result={
             'data':get_nodes_map(),
             'status':'success',
@@ -793,7 +797,7 @@ async def get_checkpoints(request):
             names=get_rembg_models(U2NET_HOME)
     except:
         print("rembg none")
-    
+
     return web.json_response({"names":names,"types":list(folder_paths.folder_names_and_paths.keys())})
 
 
@@ -805,7 +809,7 @@ async def rembg_hander(request):
 
     data_base64=remove_base64_prefix(data['base64'])
     image_data = base64.b64decode(data_base64)
-    
+
     # 创建一个BytesIO对象
     image_stream = io.BytesIO(image_data)
 
@@ -821,8 +825,8 @@ async def rembg_hander(request):
         rgba_images[0].save(buf, format='PNG')
         img_bytes = buf.getvalue()
     img_base64 = base64.b64encode(img_bytes).decode('utf-8')
-    
-    try: 
+
+    try:
         result={
             'data':img_base64,
             'model':model,
@@ -848,7 +852,7 @@ async def rembg_hander(request):
 #             res=get_prompt_result()
 #     except Exception as e:
 #         print('/mixlab/prompt_result',False,e)
-    
+
 #     return web.json_response({"result":res})
 
 # 种子设置
@@ -860,15 +864,15 @@ def random_seed(seed, data):
         if id in seed:
             if 'seed' in value['inputs'] and not isinstance(value['inputs']['seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['seed'] = round(random.random() * max_seed)
-            
+
             if 'noise_seed' in value['inputs'] and not isinstance(value['inputs']['noise_seed'], list) and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['noise_seed'] = round(random.random() * max_seed)
-            
+
             if value.get('class_type') == "Seed_" and seed[id] in ['increment', 'decrement', 'randomize']:
                 value['inputs']['seed'] = round(random.random() * max_seed)
-            
+     
         # print('new Seed', value)
-    
+
     return data
 
 
@@ -893,9 +897,9 @@ async def mixlab_post_prompt(request):
         apps=json_data['apps']
     except:
         apps=get_my_workflow_for_app(json_data['filename'],json_data['category'],False)
-    
+
     prompt=json_data['prompt'] if 'prompt' in json_data else None
-    
+
     if len(apps)>0:
         # 取到prompt
         prompt=apps[0]['data']['output']
@@ -917,13 +921,13 @@ async def mixlab_post_prompt(request):
         for inp in input_data:
             id=inp['id']
             if prompt[id]['class_type']==inp['class_type']:
-                prompt[id]['inputs'].update(inp['inputs']) 
+                prompt[id]['inputs'].update(inp['inputs'])
 
 
     if prompt==None:
         return web.json_response({"error": "no prompt", "node_errors": []}, status=400)
     else:
-        # 种子更新 
+        # 种子更新
         '''
             "seed": {
                     "45": "randomize",
@@ -935,7 +939,7 @@ async def mixlab_post_prompt(request):
     # print("#json_data",prompt)
     # 需要把apps处理成 prompt
     # 注意seed的处理
-    
+
     if "number" in json_data:
         number = float(json_data['number'])
     else:
@@ -1017,13 +1021,32 @@ NODE_CLASS_MAPPINGS = {
     "AppInfo":AppInfo,
     "TESTNODE_":TESTNODE_,
     "TESTNODE_TOKEN":TESTNODE_TOKEN,
+
+    # Prompt
     "RandomPrompt":RandomPrompt,
     # "LoraPrompt":LoraPrompt,
     "EmbeddingPrompt":EmbeddingPrompt,
     "PromptSlide":PromptSlide,
     "GLIGENTextBoxApply_Advanced":GLIGENTextBoxApply_Advanced,
     "PromptSimplification":PromptSimplification,
+
+    # Input
+    "GridInput":GridInput,
+    "ImagesPrompt_":ImagesPrompt,
+    "KeyInput":KeyInput,
+    "FloatSlider":FloatSlider,
+    "IntNumber":IntNumber,
+    "TextInput_":TextInput,
+    "Font":FontInput,
+    "LimitNumber":LimitNumber,
+
+    # Output
     "PromptImage":PromptImage,
+    "SaveImageToLocal":SaveImageToLocal,
+    "SaveImageAndMetadata_":SaveImageAndMetadata,
+    "ComparingTwoFrames_":ComparingTwoFrames,
+
+    # Image
     "MirroredImage":MirroredImage,
     "NoiseImage":NoiseImage,
     "GradientImage":GradientImage,
@@ -1035,65 +1058,76 @@ NODE_CLASS_MAPPINGS = {
     "TextImage":TextImage,
     "EnhanceImage":EnhanceImage,
     "SvgImage":SvgImage,
-    "3DImage":Image3D, 
-    "ImageColorTransfer":ImageColorTransfer,
-    "ShowLayer":ShowLayer,
-    "NewLayer":NewLayer,
     "ImageListToBatch_":ImageListToBatch_,
     "ImageBatchToList_":ImageBatchToList_,
-    "CompositeImages_":CompositeImages,
+    "ImageCropByAlpha":ImageCropByAlpha,
+    "GetImageSize_":GetImageSize_,
+
+    # 3D
+    "3DImage":Image3D,
     "DepthViewer": DepthViewer_,
+
+    # Color
+    "ImageColorTransfer":ImageColorTransfer,
+    "Color":ColorInput,
+
+    # Layer
+    "ShowLayer":ShowLayer,
+    "NewLayer":NewLayer,
+    "MergeLayers":MergeLayers,
+    "CompositeImages_":CompositeImages,
     "SplitImage":SplitImage,
     "CenterImage":CenterImage,
     "GridOutput":GridOutput,
     "GridDisplayAndSave":GridDisplayAndSave,
-    "GridInput":GridInput,
-    "MergeLayers":MergeLayers,
+
+    # Mask
     "SplitLongMask":SplitLongMask,
     "FeatheredMask":FeatheredMask,
     "SmoothMask":SmoothMask,
     "FaceToMask":FaceToMask,
     "AreaToMask":AreaToMask,
-    "ImageCropByAlpha":ImageCropByAlpha,
-    "ImagesPrompt_":ImagesPrompt,
-    # "VAELoaderConsistencyDecoder":VAELoader,
-    "SaveImageToLocal":SaveImageToLocal,
-    "SaveImageAndMetadata_":SaveImageAndMetadata,
-    "ComparingTwoFrames_":ComparingTwoFrames,
-    # "VAEDecodeConsistencyDecoder":VAEDecode,
-    "ScreenShare":ScreenShareNode,
-    "FloatingVideo":FloatingVideo,
-   
-    "SpeechRecognition":SpeechRecognition,
-    "SpeechSynthesis":SpeechSynthesis,
-    "KeyInput":KeyInput,
-    "Color":ColorInput,
-    "FloatSlider":FloatSlider,
-    "IntNumber":IntNumber,
-    "TextInput_":TextInput,
-    "Font":FontInput,
-    "TextToNumber":TextToNumber,
-    "DynamicDelayProcessor":DynamicDelayProcessor,
-    "MultiplicationNode":MultiplicationNode,
-    "GetImageSize_":GetImageSize_,
-    "SwitchByIndex":SwitchByIndex,
-    "LimitNumber":LimitNumber, 
     "OutlineMask":OutlineMask,
     "MaskListMerge_":MaskListMerge,
+    "PreviewMask_":PreviewMask_,
+
+    # "VAELoaderConsistencyDecoder":VAELoader,
+    # "VAEDecodeConsistencyDecoder":VAEDecode,
+
+    # Screen
+    "ScreenShare":ScreenShareNode,
+    "FloatingVideo":FloatingVideo,
+
+    # Audio
+    "SpeechRecognition":SpeechRecognition,
+    "SpeechSynthesis":SpeechSynthesis,
+    "AudioPlay":AudioPlayNode,
+
+    # Text
+    "TextToNumber":TextToNumber,
     "JoinWithDelimiter":JoinWithDelimiter,
+
+    # Utils
+    "MultiplicationNode":MultiplicationNode,
+    "DynamicDelayProcessor":DynamicDelayProcessor,
+    "SwitchByIndex":SwitchByIndex,
+    "ListSplit_":ListSplit,
+
+    # Experiment
     "Seed_":CreateSeedNode,
     "CkptNames_":CreateCkptNames,
     "SamplerNames_":CreateSampler_names,
     "LoraNames_":CreateLoraNames,
+
+    # Style
     "ApplyVisualStylePrompting_":ApplyVisualStylePrompting,
     "StyleAlignedReferenceSampler_": StyleAlignedReferenceSampler,
     "StyleAlignedSampleReferenceLatents_": StyleAlignedSampleReferenceLatents,
-    "StyleAlignedBatchAlign_": StyleAlignedBatchAlign, 
-    "ListSplit_":ListSplit,
-    "MaskListReplace_":MaskListReplace, 
+    "StyleAlignedBatchAlign_": StyleAlignedBatchAlign,
+
+    # Video
+    "MaskListReplace_":MaskListReplace,
     "IncrementingListNode_":IncrementingListNode,
-    "PreviewMask_":PreviewMask_,
-    "AudioPlay":AudioPlayNode,
 
     "P5Input":P5Input
 }
@@ -1101,65 +1135,118 @@ NODE_CLASS_MAPPINGS = {
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
     "AppInfo":"App Info ♾️MixlabApp",
-    "ScreenShare":"Screen Share ♾️Mixlab",
-    "FloatingVideo":"Floating Video ♾️Mixlab",
-    "TextImage":"Text Image ♾️Mixlab",
-    
-    "Color":"Color Input ♾️MixlabApp",
-    "TextInput_":"Text Input ♾️MixlabApp",
+    "TESTNODE_":"TESTNODE_ ♾️MixlabApp",
+    "TESTNODE_TOKEN":"TESTNODE_TOKEN ♾️MixlabApp",
+
+    # Prompt
+    "RandomPrompt": "Random Prompt ♾️Mixlab",
+    "EmbeddingPrompt":"Embedding Prompt ♾️Mixlab",
+    "PromptSlide":"Prompt Slide ♾️Mixlab",
+    "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab",
+    "PromptSimplification":"PromptSimplification ♾️Mixlab",
+    "PromptGenerate_Mix":"Prompt Generate ♾️Mixlab",
+    "ChinesePrompt_Mix":"Chinese Prompt ♾️Mixlab",
+
+    # Input
+    "GridInput":"Grid Input ♾️Mixlab",
+    "ImagesPrompt_":"Images Input ♾️MixlabApp",
     "KeyInput":"API Key Input ♾️MixlabApp",
     "FloatSlider":"Float Slider Input ♾️MixlabApp",
     "IntNumber":"Int Input ♾️MixlabApp",
-    "ImagesPrompt_":"Images Input ♾️MixlabApp",
+    "TextInput_":"Text Input ♾️MixlabApp",
+    "Font":"Font Input ♾️Mixlab",
+    "LimitNumber":"LimitNumber Input ♾️Mixlab",
+
+    # Output
+    "PromptImage":"Output Prompt and Image ♾️Mixlab",
+    "SaveImageToLocal":"Save Image To Local ♾️Mixlab",
     "SaveImageAndMetadata_":"Save Image Output ♾️MixlabApp",
     "ComparingTwoFrames_":"Comparing Two Frames ♾️MixlabApp",
+
+    # Image
+    "MirroredImage":"MirroredImage ♾️Mixlab",
+    "NoiseImage":"NoiseImage ♾️Mixlab",
+    "GradientImage":"GradientImage ♾️Mixlab",
+    "TransparentImage":"TransparentImage ♾️Mixlab",
     "ResizeImageMixlab":"Resize Image ♾️Mixlab",
-    "RandomPrompt": "Random Prompt ♾️Mixlab",
-    "PromptImage":"Output Prompt and Image ♾️Mixlab",
-    "SplitLongMask":"Splitting a long image into sections",
-    "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
-    "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
-    
-    
+    "LoadImagesFromPath":"Load Images From Path ♾️Mixlab",
+    "LoadImagesFromURL":"Load Images From URL ♾️Mixlab",
+    "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
+    "TextImage":"Text Image ♾️Mixlab",
+    "EnhanceImage":"Enhance Image ♾️Mixlab",
+    "SvgImage":"Svg Image ♾️Mixlab",
+    "ImageListToBatch_":"Image List To Batch ♾️Mixlab",
+    "ImageBatchToList_":"Image Batch To List ♾️Mixlab",
+    "ImageCropByAlpha":"ImageCropByAlpha ♾️Mixlab",
+    "GetImageSize_":"Get Image Size ♾️Mixlab",
+
+    # 3D
+    "3DImage":"3DImage ♾️Mixlab",
+    "DepthViewer": "Depth Viewer ♾️Mixlab",
+
+    # "VAELoaderConsistencyDecoder":"Consistency Decoder Loader",
+    # "VAEDecodeConsistencyDecoder":"Consistency Decoder Decode",
+
+    # Color
+    "ImageColorTransfer":"Image Color Transfer ♾️Mixlab",
+    "Color":"Color Input ♾️MixlabApp",
+
+    # Layer
+    "ShowLayer":"Show Layer ♾️Mixlab",
+    "NewLayer":"New Layer ♾️Mixlab",
     "MergeLayers":"Merge Layers ♾️Mixlab",
+    "CompositeImages_":"Composite Images ♾️Mixlab",
+    "SplitImage":"Split Image ♾️Mixlab",
+    "CenterImage":"Center Image ♾️Mixlab",
+    "GridDisplayAndSave":"Grid Display And Save ♾️Mixlab",
+    "GridOutput":"Grid Output ♾️Mixlab",
+
+    # Mask
+    "SplitLongMask":"Splitting a long image into sections",
+    "FeatheredMask":"Feathered Mask ♾️Mixlab",
+    "SmoothMask":"Smooth Mask ♾️Mixlab",
+    "FaceToMask":"Face To Mask ♾️Mixlab",
+    "AreaToMask":"Area To Mask ♾️Mixlab",
+    "OutlineMask":"Outline Mask ♾️Mixlab",
+    "MaskListMerge_":"MaskList to Mask ♾️Mixlab",
+    "PreviewMask_":"Preview Mask ♾️Mixlab",
+
+    # Screen
+    "ScreenShare":"Screen Share ♾️Mixlab",
+    "FloatingVideo":"Floating Video ♾️Mixlab",
+
+    # Audio
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
-    "3DImage":"3DImage ♾️Mixlab",
-    "ImageListToBatch_":"Image List To Batch",
-    "ImageBatchToList_":"Image Batch To List",
-    "CompositeImages_":"Composite Images ♾️Mixlab",
+    "AudioPlay":"Preview Audio ♾️Mixlab",
+
+    # Utils
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
-    "LaMaInpainting":"LaMaInpainting ♾️Mixlab",
-    "PromptSlide":"Prompt Slide ♾️Mixlab",
-    "PromptGenerate_Mix":"Prompt Generate ♾️Mixlab",
-    "ChinesePrompt_Mix":"Chinese Prompt ♾️Mixlab",
-    "GamePal":"GamePal ♾️Mixlab",
-    "RembgNode_Mix":"Remove Background ♾️Mixlab",
+    "MultiplicationNode":"Math Operation ♾️Mixlab",
+    "ListSplit_":"Split List ♾️Mixlab",
+    "SwitchByIndex":"List Switch By Index ♾️Mixlab",
+
+    # "GamePal":"GamePal ♾️Mixlab",
+    # Experiment
+    "Seed_":"CreateSeedNode ♾️Mixlab",
+    "CkptNames_":"CreateCkptNames ♾️Mixlab",
+    "SamplerNames_":"CreateSampler_names ♾️Mixlab",
     "LoraNames_":"LoraName ♾️Mixlab",
+
+    # Style
     "ApplyVisualStylePrompting_":"Apply VisualStyle Prompting ♾️Mixlab",
     "StyleAlignedReferenceSampler_": "StyleAligned Reference Sampler ♾️Mixlab",
     "StyleAlignedSampleReferenceLatents_": "StyleAligned Sample Reference Latents ♾️Mixlab",
     "StyleAlignedBatchAlign_": "StyleAligned Batch Align ♾️Mixlab",
+
+    # Video
+    "MaskListReplace_":"MaskList Replace ♾️Mixlab",
+    "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
     "LoadVideoAndSegment_":"Load Video And Segment ♾️Mixlab",
     "VideoCombine_Adv":"Video Combine ♾️Mixlab",
-    "MaskListMerge_":"MaskList to Mask ♾️Mixlab",
-    "ListSplit_":"Split List ♾️Mixlab",
-    "MaskListReplace_":"MaskList Replace ♾️Mixlab",
     "ImageListReplace_":"ImageList Replace ♾️Mixlab",
-    "SwitchByIndex":"List Switch By Index ♾️Mixlab",
-    "GLIGENTextBoxApply_Advanced":"GLIGEN TextBox Apply ♾️Mixlab",
-    "GridDisplayAndSave":"Grid Display And Save ♾️Mixlab",
-    "GridInput":"Grid Input ♾️Mixlab",
-    "GridOutput":"Grid Output ♾️Mixlab",
-    "GetImageSize_":"Get Image Size ♾️Mixlab",
-    "IncrementingListNode_":"Create Incrementing Number List ♾️Mixlab",
-    "LoadImagesToBatch":"Load Images(base64) ♾️Mixlab",
-    "PreviewMask_":"Preview Mask",
-    "AudioPlay":"Preview Audio ♾️Mixlab",
 
-     "MultiplicationNode":"Math Operation ♾️Mixlab",
-
-     "P5Input":"P5 Input ♾️Mixlab for test"
+    "P5Input":"P5 Input ♾️Mixlab for test"
 }
 
 # web ui的节点功能
@@ -1173,7 +1260,7 @@ try:
     from .nodes.ChatGPT import JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
-    NODE_CLASS_MAPPINGS_V = { 
+    NODE_CLASS_MAPPINGS_V = {
        "ChatGPTOpenAI":ChatGPTNode,
        "SiliconflowLLM":SiliconflowFreeNode,
         "ShowTextForGPT":ShowTextForGPT,
@@ -1183,7 +1270,7 @@ try:
     }
 
     # 一个包含节点友好/可读的标题的字典
-    NODE_DISPLAY_NAME_MAPPINGS_V = { 
+    NODE_DISPLAY_NAME_MAPPINGS_V = {
         "ChatGPTOpenAI":"ChatGPT & Local LLM ♾️Mixlab",
         "SiliconflowLLM":"LLM Siliconflow ♾️Mixlab",
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
@@ -1215,6 +1302,7 @@ try:
         logging.info('LaMaInpainting.available {}'.format(LaMaInpainting.available))
         if LaMaInpainting.available:
             NODE_CLASS_MAPPINGS['LaMaInpainting']=LaMaInpainting
+            NODE_DISPLAY_NAME_MAPPINGS['LaMaInpainting']="LaMaInpainting ♾️Mixlab"
 except Exception as e:
     logging.info('LaMaInpainting.available False')
 
@@ -1223,6 +1311,7 @@ try:
     logging.info('ClipInterrogator.available {}'.format(ClipInterrogator.available))
     if ClipInterrogator.available:
         NODE_CLASS_MAPPINGS['ClipInterrogator']=ClipInterrogator
+        NODE_DISPLAY_NAME_MAPPINGS['ClipInterrogator']="Clip Interrogator ♾️Mixlab"
 except Exception as e:
     logging.info('ClipInterrogator.available False')
 
@@ -1242,13 +1331,14 @@ try:
     logging.info('RembgNode_.available {}'.format(RembgNode_.available))
     if RembgNode_.available:
         NODE_CLASS_MAPPINGS['RembgNode_Mix']=RembgNode_
+        NODE_DISPLAY_NAME_MAPPINGS['RembgNode_Mix']="Remove Background ♾️Mixlab"
 except Exception as e:
     logging.info('RembgNode_.available False' )
 
 
 try:
     from .nodes.Video import GenerateFramesByCount,scenesNode_,CombineAudioVideo,VideoCombine_Adv,LoadVideoAndSegment,ImageListReplace,VAEEncodeForInpaint_Frames,LoadAndCombinedAudio_
-    
+
     NODE_CLASS_MAPPINGS_V = {
         "VAEEncodeForInpaint_Frames":VAEEncodeForInpaint_Frames,
         "ImageListReplace_":ImageListReplace,
@@ -1257,7 +1347,7 @@ try:
         "LoadAndCombinedAudio_":LoadAndCombinedAudio_,
         "CombineAudioVideo":CombineAudioVideo,
         "ScenesNode_":scenesNode_,
-        "GenerateFramesByCount":GenerateFramesByCount 
+        "GenerateFramesByCount":GenerateFramesByCount
     }
 
     # 一个包含节点友好/可读的标题的字典
@@ -1268,7 +1358,7 @@ try:
         "VideoCombine_Adv":"Video Combine",
         "LoadAndCombinedAudio_":"Load And Combined Audio",
         "CombineAudioVideo":"Combine Audio Video",
-        "ScenesNode_":"Select Scene", 
+        "ScenesNode_":"Select Scene",
         "GenerateFramesByCount":"Generate Frames By Count"
     }
 
@@ -1286,25 +1376,25 @@ try:
     # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['LoadTripoSRModel_']=LoadTripoSRModel
     NODE_DISPLAY_NAME_MAPPINGS["LoadTripoSRModel_"]= "Load TripoSR Model"
-    
+
     NODE_CLASS_MAPPINGS['TripoSRSampler_']=TripoSRSampler
     NODE_DISPLAY_NAME_MAPPINGS["TripoSRSampler_"]= "TripoSR Sampler"
 
     NODE_CLASS_MAPPINGS['SaveTripoSRMesh']=SaveTripoSRMesh
     NODE_DISPLAY_NAME_MAPPINGS["SaveTripoSRMesh"]= "Save TripoSR Mesh"
-    
+
 
 except Exception as e:
     logging.info('TripoSR.available False' )
 
 from .nodes.MiniCPMNode import MiniCPM_VQA_Simple
 try:
-    
+
     logging.info('MiniCPMNode.available')
     # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['MiniCPM_VQA_Simple']=MiniCPM_VQA_Simple
     NODE_DISPLAY_NAME_MAPPINGS["MiniCPM_VQA_Simple"]= "MiniCPM VQA Simple"
-    
+
 except Exception as e:
     logging.info('MiniCPMNode.available False' )
 
