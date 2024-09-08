@@ -1385,7 +1385,7 @@ class LoadImagesFromPath:
             }
     
     RETURN_TYPES = ('IMAGE','MASK','STRING','STRING',)
-    RETURN_NAMES = ("IMAGE","MASK","prompt_for_FloatingVideo","filepaths",)
+    RETURN_NAMES = ("image list","MASK","prompt_for_FloatingVideo","filepaths",)
 
     FUNCTION = "run"
 
@@ -2812,7 +2812,7 @@ class ResizeImage:
                 }
     
     RETURN_TYPES = ("IMAGE","IMAGE","STRING","MASK",)
-    RETURN_NAMES = ("image","average_image","average_hex","mask",)
+    RETURN_NAMES = ("image list","average_image","average_hex","mask",)
 
     FUNCTION = "run"
 
