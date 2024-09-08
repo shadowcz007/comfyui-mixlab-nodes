@@ -1134,9 +1134,9 @@ NODE_CLASS_MAPPINGS = {
 
 # 一个包含节点友好/可读的标题的字典
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "AppInfo":"App Info ♾️MixlabApp",
-    "TESTNODE_":"TESTNODE_ ♾️MixlabApp",
-    "TESTNODE_TOKEN":"TESTNODE_TOKEN ♾️MixlabApp",
+    "AppInfo":"App Info ♾️Mixlab",
+    "TESTNODE_":"TESTNODE_ ♾️Mixlab",
+    "TESTNODE_TOKEN":"TESTNODE_TOKEN ♾️Mixlab",
 
     # Prompt
     "RandomPrompt": "Random Prompt ♾️Mixlab",
@@ -1149,19 +1149,19 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
     # Input
     "GridInput":"Grid Input ♾️Mixlab",
-    "ImagesPrompt_":"Images Input ♾️MixlabApp",
-    "KeyInput":"API Key Input ♾️MixlabApp",
-    "FloatSlider":"Float Slider Input ♾️MixlabApp",
-    "IntNumber":"Int Input ♾️MixlabApp",
-    "TextInput_":"Text Input ♾️MixlabApp",
+    "ImagesPrompt_":"Images Input ♾️Mixlab",
+    "KeyInput":"API Key Input ♾️Mixlab",
+    "FloatSlider":"Float Slider Input ♾️Mixlab",
+    "IntNumber":"Int Input ♾️Mixlab",
+    "TextInput_":"Text Input ♾️Mixlab",
     "Font":"Font Input ♾️Mixlab",
     "LimitNumber":"LimitNumber Input ♾️Mixlab",
 
     # Output
     "PromptImage":"Output Prompt and Image ♾️Mixlab",
     "SaveImageToLocal":"Save Image To Local ♾️Mixlab",
-    "SaveImageAndMetadata_":"Save Image Output ♾️MixlabApp",
-    "ComparingTwoFrames_":"Comparing Two Frames ♾️MixlabApp",
+    "SaveImageAndMetadata_":"Save Image Output ♾️Mixlab",
+    "ComparingTwoFrames_":"Comparing Two Frames ♾️Mixlab",
 
     # Image
     "MirroredImage":"MirroredImage ♾️Mixlab",
