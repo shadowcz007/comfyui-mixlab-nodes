@@ -203,7 +203,7 @@ class SceneInfoNode:
  
 
 # 分割视频
-class scenedetectNode:
+class ScenedetectNode_:
     @classmethod
     def INPUT_TYPES(cls):
         video_extensions = ['webm', 'mp4', 'mkv', 'gif']
