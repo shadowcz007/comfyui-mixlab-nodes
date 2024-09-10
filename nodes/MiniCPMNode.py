@@ -123,5 +123,5 @@ class MiniCPM_VQA_Simple:
                 self.model = None  # set model to None
                 torch.cuda.empty_cache()  # release GPU memory
                 torch.cuda.ipc_collect()
-
+            print(result)
             return (result,)

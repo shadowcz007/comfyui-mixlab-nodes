@@ -1387,9 +1387,8 @@ try:
 except Exception as e:
     logging.info('TripoSR.available False' )
 
-from .nodes.MiniCPMNode import MiniCPM_VQA_Simple
 try:
-
+    from .nodes.MiniCPMNode import MiniCPM_VQA_Simple
     logging.info('MiniCPMNode.available')
     # logging.info( folder_paths.get_temp_directory())
     NODE_CLASS_MAPPINGS['MiniCPM_VQA_Simple']=MiniCPM_VQA_Simple
@@ -1397,6 +1396,19 @@ try:
 
 except Exception as e:
     logging.info('MiniCPMNode.available False' )
+
+
+try:
+    from .nodes.scenedetect import scenedetectNode,SceneInfoNode
+    logging.info('Scenedetect.available')
+
+    NODE_CLASS_MAPPINGS['ScenedetectNode_']=scenedetectNode
+    NODE_CLASS_MAPPINGS['SceneInfoNode']=SceneInfoNode
+    NODE_DISPLAY_NAME_MAPPINGS["ScenedetectNode_"]= "Video Scene Detect"
+    NODE_DISPLAY_NAME_MAPPINGS["SceneInfoNode"]= "Scene Info"
+
+except Exception as e:
+    logging.info('Scenedetect.available False' )
 
 
 logging.info('\033[93m -------------- \033[0m')

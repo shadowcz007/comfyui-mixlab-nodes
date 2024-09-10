@@ -22,7 +22,15 @@ import base64
 
 import mimetypes
 
-
+# 使用递归的方法将嵌套的列表展平为一维列表
+def flatten_list(nested_list):
+    flat_list = []
+    for item in nested_list:
+        if isinstance(item, list):
+            flat_list.extend(flatten_list(item))
+        else:
+            flat_list.append(item)
+    return flat_list
 
 def get_frames(frame_count, frames, revert=False):
     if not revert:
@@ -942,8 +950,8 @@ class scenesNode_:
         
         images = []
         total_frame_count = 0
+        video_cap = cv2.VideoCapture(video)
         try:
-            video_cap = cv2.VideoCapture(video)
             if not video_cap.isOpened():
                 raise ValueError(f"{video} could not be loaded with cv fallback.")
             # set video_cap to look at start_index frame
@@ -992,6 +1000,7 @@ class scenesNode_:
         return (images, frames_added,)
 
     def run(self, scenes_video,index):
+        scenes_video=flatten_list(scenes_video)
         print('#scenes_video',index,scenes_video)
         index=index[0]
         if len(scenes_video) > index:
