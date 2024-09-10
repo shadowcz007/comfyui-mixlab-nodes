@@ -949,9 +949,58 @@ def resize_image(layer_image, scale_option, width, height,color="white"):
     return layer_image
 
 
-def generate_text_image(text, font_path, font_size, text_color, vertical=True, stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0, line_spacing=0,padding=4):
-    # Split text into lines based on line breaks
-    lines = text.split("\n")
+
+def generate_text_image(text, 
+                        font_path,
+                        font_size, 
+                        text_color, 
+                        vertical=True, 
+                        stroke=False, 
+                        stroke_color=(0, 0, 0), 
+                        stroke_width=1, 
+                        spacing=0, 
+                        line_spacing=0,
+                        padding=4,
+                        max_characters_per_line=48):
+    
+    def split_text(text, max_chars):
+        lines = []
+        current_line = ""
+        current_length = 0
+        
+        for char in text:
+            if char == '\n':
+                lines.append(current_line)
+                current_line = ""
+                current_length = 0
+            elif '\u4e00' <= char <= '\u9fff':  # Chinese character
+                if current_length + 1 <= max_chars:
+                    current_line += char
+                    current_length += 1
+                else:
+                    lines.append(current_line)
+                    current_line = char
+                    current_length = 1
+            else:  # English character or other
+                if char == ' ':
+                    space_length = 1
+                else:
+                    space_length = 1
+                if current_length + space_length <= max_chars:
+                    current_line += char
+                    current_length += space_length
+                else:
+                    lines.append(current_line)
+                    current_line = char
+                    current_length = space_length
+        
+        if current_line:
+            lines.append(current_line)
+        return lines
+
+    # lines = text.split("\n")
+    # Split text into lines based on max_characters_per_line
+    lines = split_text(text, max_characters_per_line)
 
     # Load font
     font = ImageFont.truetype(font_path, font_size)
@@ -980,7 +1029,6 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
         max_width = x
         total_line_width = sum(font.getsize(line)[1] for line in lines)
         total_spacing = line_spacing * (len(lines) - 1)
-        # 确保左边和右边的padding都被计入max_width
         max_width = total_line_width + total_spacing + padding * 2
     else:
         for line in lines:
@@ -992,10 +1040,8 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
                 max_width = max(max_width, x + padding)
             y += line_height + line_spacing
             x = padding
-        # max_height = y
         total_line_heights = sum(font.getsize(line)[1] for line in lines)
         total_spacing = line_spacing * (len(lines) - 1)
-        # 确保顶部和底部的padding都被计入max_height
         max_height = total_line_heights + total_spacing + padding * 2
 
     # 3. Create image with calculated width and height
@@ -1008,10 +1054,10 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
         for char in line:
             x, y = char_coordinates[index]
             if stroke:
-                draw.text((x-stroke_width, y), char, font=font, fill=text_color)
-                draw.text((x+stroke_width, y), char, font=font, fill=text_color)
-                draw.text((x, y-stroke_width), char, font=font, fill=text_color)
-                draw.text((x, y+stroke_width), char, font=font, fill=text_color)
+                draw.text((x-stroke_width, y), char, font=font, fill=stroke_color)
+                draw.text((x+stroke_width, y), char, font=font, fill=stroke_color)
+                draw.text((x, y-stroke_width), char, font=font, fill=stroke_color)
+                draw.text((x, y+stroke_width), char, font=font, fill=stroke_color)
             
             draw.text((x, y), char, font=font, fill=text_color)
             index += 1
@@ -1026,6 +1072,8 @@ def generate_text_image(text, font_path, font_size, text_color, vertical=True, s
     image = image.convert('RGB')
 
     return (image, alpha_image)
+
+
 
 
 
@@ -1582,6 +1630,13 @@ class TextImage:
                     "text_color":("STRING",{"multiline": False,"default": "#000000","dynamicPrompts": False}),
                     "vertical":("BOOLEAN", {"default": True},),
                     "stroke":("BOOLEAN", {"default": False},),
+                    "max_characters_per_line": ("INT",{
+                                "default":44, 
+                                "min": 1, #Minimum value
+                                "max": 2000000000, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }),
                              },
                 }
     
@@ -1595,14 +1650,15 @@ class TextImage:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
 
-    def run(self,text,font,font_size,spacing,line_spacing,padding,text_color,vertical,stroke):
+    def run(self,text,font,font_size,spacing,line_spacing,padding,text_color,vertical,stroke,max_characters_per_line):
         
         font_path=os.path.join(FONT_PATH,font)
 
         if text=="":
             text=" "
         # stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0
-        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,line_spacing,padding)
+        # max_characters_per_line 英文字按照空格计算1个，中文按照字数计算
+        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,line_spacing,padding,max_characters_per_line)
         
         img=pil2tensor(img)
         mask=pil2tensor(mask)
