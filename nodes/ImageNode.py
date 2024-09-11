@@ -961,7 +961,8 @@ def generate_text_image(text,
                         spacing=0, 
                         line_spacing=0,
                         padding=4,
-                        max_characters_per_line=48):
+                        max_characters_per_line=48,
+                        fixed_width=None):
     
     def split_text(text, max_chars):
         lines = []
@@ -996,6 +997,11 @@ def generate_text_image(text,
         
         if current_line:
             lines.append(current_line)
+        
+        # Pad lines to max_characters_per_line if fixed_width is provided
+        if fixed_width:
+            lines = [line.ljust(max_chars) for line in lines]
+        
         return lines
 
     # lines = text.split("\n")
@@ -1071,8 +1077,14 @@ def generate_text_image(text,
 
     image = image.convert('RGB')
 
-    return (image, alpha_image)
+    # 5. Scale the image if fixed_width is specified
+    if fixed_width and fixed_width < max_width:
+        scaling_factor = fixed_width / max_width
+        new_height = int(max_height * scaling_factor)
+        image = image.resize((fixed_width, new_height), Image.ANTIALIAS)
+        alpha_image = alpha_image.resize((fixed_width, new_height), Image.ANTIALIAS)
 
+    return (image, alpha_image)
 
 
 
@@ -1637,6 +1649,13 @@ class TextImage:
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
                                 }),
+                    "fixed_width":("INT",{
+                                "default":0, 
+                                "min": 0, #Minimum value
+                                "max": 2000000000, #Maximum value
+                                "step": 1, #Slider's step
+                                "display": "number" # Cosmetic only: display as "number" or "slider"
+                                }),
                              },
                 }
     
@@ -1650,7 +1669,7 @@ class TextImage:
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,False,)
 
-    def run(self,text,font,font_size,spacing,line_spacing,padding,text_color,vertical,stroke,max_characters_per_line):
+    def run(self,text,font,font_size,spacing,line_spacing,padding,text_color,vertical,stroke,max_characters_per_line,fixed_width):
         
         font_path=os.path.join(FONT_PATH,font)
 
@@ -1658,7 +1677,12 @@ class TextImage:
             text=" "
         # stroke=False, stroke_color=(0, 0, 0), stroke_width=1, spacing=0
         # max_characters_per_line 英文字按照空格计算1个，中文按照字数计算
-        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,spacing,line_spacing,padding,max_characters_per_line)
+        if fixed_width==0:
+            fixed_width=None
+        img,mask=generate_text_image(text,font_path,font_size,text_color,vertical,stroke,(0, 0, 0),1,
+                                     spacing,line_spacing,padding,max_characters_per_line,
+                                     fixed_width
+                                     )
         
         img=pil2tensor(img)
         mask=pil2tensor(mask)
