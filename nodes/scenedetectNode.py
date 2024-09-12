@@ -93,6 +93,9 @@ def calculate_sample_range(start_frame, middle_frame, end_frame, number_of_sampl
     # 初始化采样帧列表
     samples = [middle_frame]
 
+    if number_of_sample_frames==1:
+        return samples
+
     # 计算间隔
     interval_before = (middle_frame - start_frame) // half_samples
     interval_after = (end_frame - middle_frame) // half_samples
