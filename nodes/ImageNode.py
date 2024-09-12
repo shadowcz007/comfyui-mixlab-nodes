@@ -964,11 +964,11 @@ def generate_text_image(text,
                         max_characters_per_line=48,
                         fixed_width=None):
     
-    def split_text(text, max_chars):
+    def split_text(text, max_chars, fixed_width=False):
         lines = []
         current_line = ""
         current_length = 0
-        
+
         for char in text:
             if char == '\n':
                 lines.append(current_line)
@@ -994,19 +994,23 @@ def generate_text_image(text,
                     lines.append(current_line)
                     current_line = char
                     current_length = space_length
-        
+
         if current_line:
             lines.append(current_line)
-        
-        # Pad lines to max_characters_per_line if fixed_width is provided
+
+        # Pad lines to max_chars if fixed_width is provided
         if fixed_width:
             lines = [line.ljust(max_chars) for line in lines]
-        
+
+        # If there's only one line and fixed_width is True, pad it
+        if fixed_width and len(lines) == 1:
+            lines[0] = lines[0].ljust(max_chars)
+
         return lines
 
     # lines = text.split("\n")
     # Split text into lines based on max_characters_per_line
-    lines = split_text(text, max_characters_per_line)
+    lines = split_text(text, max_characters_per_line,fixed_width)
 
     # Load font
     font = ImageFont.truetype(font_path, font_size)

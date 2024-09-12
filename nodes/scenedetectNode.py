@@ -208,7 +208,22 @@ def get_files_with_extension(directory, extension):
                 file_list.append(file_name)
     return file_list
 
+# 从list里取中间的元素
+def get_middle_element(lst):
+    if not lst:
+        return None  # 如果列表为空，返回None
+    mid_index = len(lst) // 2
+    index=0
+    if len(lst) % 2 == 0:
+        index=mid_index - 1
+    else:
+        index=mid_index
 
+    if index<0:
+        index=0
+    
+    return lst[index]  # 返回中间的一个元素
+    
 
 class SceneInfoNode:
     @classmethod
@@ -219,8 +234,8 @@ class SceneInfoNode:
                     "index": ("INT", {"default": 0, "min": -1, "step": 1}),
                      },}
 
-    RETURN_TYPES = ('IMAGE','INT','INT','SCENE_VIDEO',)
-    RETURN_NAMES = ("sample_frames","start_frame","end_frame","scene_video",)
+    RETURN_TYPES = ('IMAGE','IMAGE','INT','INT','SCENE_VIDEO',)
+    RETURN_NAMES = ("sample_frames","middle_frames","start_frame","end_frame","scene_video",)
     # OUTPUT_IS_LIST = (False,)
 
     FUNCTION = "run"
@@ -229,24 +244,28 @@ class SceneInfoNode:
     def run(self,scenes,index):
         
         if index==-1:
-            images=[]
+            images_list=[]
+            m_images=[]
             start_frames=[]
             end_frames=[]
             video_paths=[]
             for i in range(len(scenes)):
                 s=scenes[i]
-                for sf in s['sample_frames']:
-                    images.append(sf)
+                m_images.append(get_middle_element(s['sample_frames']))
+                sample_frames=torch.cat(s['sample_frames'], dim=0)
+                images_list.append(sample_frames)
                 start_frames.append(s['start_frame'])
                 end_frames.append(s['end_frame'])
                 video_paths.append(s['video_path'])
-            images = torch.cat(images, dim=0)
-            return (images,start_frames,end_frames,video_paths,)
+            # images = torch.cat(images, dim=0)
+            m_images=torch.cat(m_images, dim=0)
+            return (images_list,m_images,start_frames,end_frames,video_paths,)
         else:
             s=scenes[index]
             images=s['sample_frames']
             images = torch.cat(images, dim=0)
-            return (images,s['start_frame'],s['end_frame'],s['video_path'],)
+            m_images=get_middle_element(s['sample_frames']) 
+            return ([images],m_images,s['start_frame'],s['end_frame'],s['video_path'],)
  
 
 # 分割视频

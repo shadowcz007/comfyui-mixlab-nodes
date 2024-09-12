@@ -825,7 +825,7 @@ class TESTNODE_:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": { 
-            "ANY":(any_type,),                
+                                "ANY":(any_type,),                
                               },
                 }
     
@@ -840,6 +840,9 @@ class TESTNODE_:
     OUTPUT_IS_LIST = (True,)
 
     def run(self,ANY):
+
+        print('#TESTNODE_',len(ANY))
+
         print(type(ANY))
         try:
             print(ANY[0].shape)
