@@ -624,11 +624,13 @@ class AppInfo:
         
         im=[]
         if image:
-            # img=image[0][0]
-            print('AppInfo_image',len(image))
+            images=[image] 
             # batch 的方式需要处理
-            for i in range(len(image)):
-                img=image[i]
+            images=flatten_list(images)
+            # img=image[0][0] 
+            print('AppInfo_image',len(images))
+            for i in range(len(images)):
+                img=images[i]
                 im.append(create_temp_file(img,i+1)[0])
         # image [img,] img[batch,w,h,a] 列表里面是batch，
 
