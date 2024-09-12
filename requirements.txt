@@ -5,7 +5,7 @@ opencv-python-headless
 matplotlib
 openai
 torchaudio
-# simple-lama-inpainting
+
 clip-interrogator==0.6.0
 transformers>=4.36.0
 lark-parser
@@ -23,3 +23,8 @@ json-repair
 bitsandbytes
 accelerate
 scenedetect[opencv-headless]
+
+hydra-core>=1.3.2
+loralib>=0.1.2
+natsort>=8.4.0
+# simple-lama-inpainting

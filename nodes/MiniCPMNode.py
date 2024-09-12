@@ -6,7 +6,7 @@ import folder_paths
 from transformers import AutoTokenizer, AutoModel
 from torchvision.transforms.v2 import ToPILImage
 # from decord import VideoReader, cpu  # pip install decord
-from PIL import Image
+# from PIL import Image
 
 def get_model_path(n=""):
     try:
@@ -123,5 +123,5 @@ class MiniCPM_VQA_Simple:
                 self.model = None  # set model to None
                 torch.cuda.empty_cache()  # release GPU memory
                 torch.cuda.ipc_collect()
-            print(result)
+            # print(result)
             return (result,)
