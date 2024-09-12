@@ -54,7 +54,7 @@ class LoadVQGAN:
 
     #OUTPUT_NODE = False
 
-    CATEGORY = "FishSpeech"
+    CATEGORY = "♾️Mixlab/Audio/FishSpeech"
 
     def load_vqgan(self, config, model, device):
         config = config.rsplit(".", 1)[0]
@@ -63,53 +63,6 @@ class LoadVQGAN:
             self.vqgan = load_vqgan_model(config,model, device=device)
         return (self.vqgan, )
 
-
-# class LoadLLAMA:
-#     def __init__(self):
-#         self.llama = None
-#         self.decode_func = None
-#         pass
-    
-#     @classmethod
-#     def INPUT_TYPES(s):
-
-#         return {
-#             "required": {
-#                 # "model": ([str(p.relative_to(CKPTS_FOLDER)) for p in CKPTS_FOLDER.glob("*/")], {"default": "fish-speech-1.2-sft"}),
-#                 "device": (["cuda", "cpu"], {"default": "cuda"}),
-#                 "precision": (["bf16", "half"], {"default": "bf16"}),
-#                 "compile": (["yes", "no"], {"default": "no"}),
-#             },
-#         }
-
-#     @classmethod
-#     def IS_CHANGED(s, model):
-#         return ""
-
-#     @classmethod
-#     def VALIDATE_INPUTS(s, model):
-#         return True
-
-#     RETURN_TYPES = ("LLAMA", "DECODE_FUNC",)
-#     RETURN_NAMES = ("llama", "decode_func",)
-
-#     FUNCTION = "load_llama"
-
-#     #OUTPUT_NODE = False
-
-#     CATEGORY = "FishSpeech"
-
-#     def load_llama(self, model, device, precision, compile):
-#         model = str((CKPTS_FOLDER / model).resolve())
-#         precision = torch.bfloat16 if precision == "bf16" else torch.half
-#         compile=True if compile == "yes" else False
-#         if self.llama is None or self.decode_func is None:
-#             self.llama, self.decode_func = load_llama_model(model, device, precision, compile)
-#             prompt2semantic(self.llama, self.decode_func, 
-#                             "Warm up sentence!", None, None, 
-#                             0, 0.7, 1.2, 0.7, 
-#                             device, compile, 42, True, 100)
-#         return (self.llama, self.decode_func, )
 
 
 class AudioToPrompt:
@@ -135,7 +88,7 @@ class AudioToPrompt:
 
     #OUTPUT_NODE = False
 
-    CATEGORY = "FishSpeech"
+    CATEGORY = "♾️Mixlab/Audio/FishSpeech"
 
     def encode(self, vqgan, audio, device):
         return audio2prompt(vqgan, audio, device)
@@ -217,7 +170,7 @@ class Prompt2Semantic:
 
     #OUTPUT_NODE = False
 
-    CATEGORY = "FishSpeech"
+    CATEGORY = "♾️Mixlab/Audio/FishSpeech"
 
     def decode(
         self,
@@ -286,7 +239,7 @@ class Semantic2Audio:
 
     #OUTPUT_NODE = False
 
-    CATEGORY = "FishSpeech"
+    CATEGORY = "♾️Mixlab/Audio/FishSpeech"
 
     def generate(self, vqgan, codes, device):
         return semantic2audio(vqgan, codes, device)
