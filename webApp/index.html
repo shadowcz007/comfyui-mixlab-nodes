@@ -1983,6 +1983,7 @@
                         let inp = document.createElement('input')
                         inp.type = 'file'
                         inp.setAttribute('accept', "audio/*")
+
                         inp.style.display = 'none'
                         inp.addEventListener('change', async e => {
                             e.preventDefault()
@@ -2545,7 +2546,6 @@
             // 底部的运行状态和提交按钮
             let submitDiv = document.createElement('div');
             submitDiv.className = "submit_div"
-
 
             submitDiv.appendChild(appStatus);
 

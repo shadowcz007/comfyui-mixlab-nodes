@@ -214,7 +214,8 @@ async function extractInputAndOutputData (
         node.type === 'ChinesePrompt_Mix' ||
         node.type === 'Seed_' ||
         node.type === 'SiliconflowLLM' ||
-        node.type === 'ChatGPTOpenAI'
+        node.type === 'ChatGPTOpenAI' ||
+        node.type === 'SiliconflowTextToImageNode'
       ) {
         // seed 的类型收集
         try {

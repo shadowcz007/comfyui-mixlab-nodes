@@ -7,8 +7,18 @@ import hashlib
 import codecs,sys
 import importlib.util
 import subprocess
+import requests
+from PIL import Image
+from io import BytesIO
+import torch
+import numpy as np
 
 python = sys.executable
+
+# Convert PIL to Tensor
+def pil2tensor(image):
+    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
+
 
 # 从文本中提取json
 def extract_json_strings(text):
@@ -529,6 +539,82 @@ class SiliconflowFreeNode:
 
         return (response_content,json.dumps(messages, indent=4),json.dumps(self.session_history, indent=4),)
 
+
+
+class SiliconflowTextToImageNode:
+   
+    @classmethod
+    def INPUT_TYPES(cls):
+        model_list= [ 
+            "black-forest-labs/FLUX.1-schnell", 
+            ]
+        return {
+            "required": {
+                "api_key":("STRING", {"forceInput": True,}),
+                "prompt": ("STRING", {"multiline": True,"dynamicPrompts": False}), 
+                "width": ("INT", {"default": 512, "min": 512, "max": 4096, "step": 8}), 
+                "height": ("INT", {"default": 512, "min": 512, "max": 4096, "step": 8}), 
+                "model": ( model_list, 
+                    {"default": model_list[0]}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}), 
+            },
+               "optional":{
+                    "custom_model_name":("STRING", {"forceInput": True,}), #适合自定义model
+                },
+        }
+
+    RETURN_TYPES = ("IMAGE",)
+    RETURN_NAMES = ("image",)
+    FUNCTION = "generate_contextual_text"
+    CATEGORY = "♾️Mixlab/Image"
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    
+    def generate_contextual_text(self,
+                                api_key,
+                                prompt, 
+                                width,
+                                height,
+                                model, 
+                                seed,
+                                custom_model_name=None):
+
+        if custom_model_name!=None:
+            model=custom_model_name
+
+        url=f"https://api.siliconflow.cn/v1/{model}/text-to-image"
+
+        headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+        }
+        post_data = {
+            "prompt":prompt,
+            "image_size": f'{width}x{height}',
+        }
+
+        empty_img= pil2tensor(Image.new('RGB', (1, 1), color='white'))
+        
+        try:
+            response = requests.post(url, headers=headers, data=json.dumps(post_data))
+            response_data = response.json()
+
+            if response_data.get('code') == 20021:
+                return  (empty_img,)
+
+            image_url = response_data['images'][0]['url']
+             
+            # Fetch the image using the image URL and read it with PIL
+            image_response = requests.get(image_url)
+            image = Image.open(BytesIO(image_response.content))
+
+            image=pil2tensor(image)
+            return (image,)
+        except Exception as error:
+            print(error)
+            return (empty_img,)
 
 
 
