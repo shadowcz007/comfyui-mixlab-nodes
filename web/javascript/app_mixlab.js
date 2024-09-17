@@ -352,7 +352,7 @@ async function save (json, download = false, showInfo = true) {
         const imgurl = images[index]
         images[index] = await drawImageToCanvas(imgurl)
       }
-      data.app.idle_animation = images
+      if (idle_animation) data.app.idle_animation = images
     } catch (error) {}
 
     // console.log(data.app)
