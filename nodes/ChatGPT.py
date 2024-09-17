@@ -204,7 +204,7 @@ if is_installed('json_repair'):
     from json_repair import repair_json
 
 
-def chat(client, model_name,messages ):
+def chat(client, model_name,messages,max_tokens=4096,temperature=0.6 ):
         print('#chat',model_name,messages)
         try_count = 0
         while True:
@@ -213,7 +213,9 @@ def chat(client, model_name,messages ):
                 if hasattr(client, "chat"):
                     response = client.chat.completions.create(
                         model=model_name,
-                        messages=messages
+                        messages=messages,
+                        max_tokens=max_tokens,
+                        temperature=temperature
                     )
                 else:
                     # 是llama的
@@ -466,10 +468,11 @@ class SiliconflowFreeNode:
                     {"default": model_list[0]}),
                 "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
                 "context_size":("INT", {"default": 1, "min": 0, "max":30, "step": 1}),
+                "max_tokens":("INT", {"default": 512, "min": 512, "max":200000, "step": 1}),
             },
                "optional":{
                     "custom_model_name":("STRING", {"forceInput": True,}), #适合自定义model
-                }, 
+                },
         }
 
     RETURN_TYPES = ("STRING","STRING","STRING",)
@@ -481,11 +484,14 @@ class SiliconflowFreeNode:
 
     
     def generate_contextual_text(self,
-                                 api_key,
-                                 prompt, 
-                                 system_content,
+                                api_key,
+                                prompt, 
+                                system_content,
                                 model, 
-                                seed,context_size,custom_model_name=None):
+                                seed,
+                                context_size,
+                                max_tokens,
+                                custom_model_name=None):
 
         if custom_model_name!=None:
             model=custom_model_name
@@ -517,7 +523,7 @@ class SiliconflowFreeNode:
 
         messages=[{"role": "system", "content": self.system_content}]+session_history+[{"role": "user", "content": prompt}]
 
-        response_content = chat(client,model,messages)
+        response_content = chat(client,model,messages,max_tokens)
         
         self.session_history=self.session_history+[{"role": "user", "content": prompt}]+[{'role':'assistant',"content":response_content}]
 
