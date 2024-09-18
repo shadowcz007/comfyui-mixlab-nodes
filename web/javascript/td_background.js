@@ -6,6 +6,10 @@ window._bg_img = null
  * draws the back canvas (the one containing the background and the connections)
  * @method drawBackCanvas
  **/
+
+// 判断是否是新版的，LGraphCanvas.prototype.drawBackCanvas.toString().match('window.devicePixelRatio')
+let scale=LGraphCanvas.prototype.drawBackCanvas.toString().match('window.devicePixelRatio')?window.devicePixelRatio:1;
+
 LGraphCanvas.prototype.drawBackCanvas = function () {
   var canvas = this.bgcanvas
   if (
@@ -59,8 +63,8 @@ LGraphCanvas.prototype.drawBackCanvas = function () {
   //reset in case of error
   if (!this.viewport) {
     ctx.restore()
-    ctx.setTransform(1, 0, 0, 1, 0, 0)
-    // ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0)
+    // ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.setTransform(scale, 0, 0, scale, 0, 0)
   }
   this.visible_links.length = 0
 
