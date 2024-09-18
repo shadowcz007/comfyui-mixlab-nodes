@@ -41,6 +41,9 @@ class Visualizer {
       overflow: 'hidden'
     })
     this.iframe.src = '/mixlab/app/' + visualSrc + '.html'
+    // this.iframe.width="300";
+    // this.iframe.height="400";
+
     console.log('#Visualizer', container, this.iframe)
     container.appendChild(this.iframe)
   }
@@ -73,7 +76,7 @@ function createVisualizer (node, inputName, typeName, inputData, app) {
     draw: function (ctx, node, widgetWidth, widgetY, widgetHeight) {
       const margin = 10
       const top_offset = 5
-      const visible = app.canvas.ds.scale > 0.5 && this.type === typeName
+      const visible = app.canvas.ds.scale > 0.3 && this.type === typeName
       const w = widgetWidth - margin * 4
       const clientRectBound = ctx.canvas.getBoundingClientRect()
       const transform = new DOMMatrix()
@@ -85,12 +88,13 @@ function createVisualizer (node, inputName, typeName, inputData, app) {
         .translateSelf(margin, margin + widgetY)
 
       Object.assign(this.visualizer.style, {
-        left: `${transform.a * margin + transform.e + 40}px`,
+        left: `${transform.a * margin + transform.e + 0}px`,
         top: `${transform.d + transform.f + top_offset}px`,
         width: `${w * transform.a}px`,
-        height: `${
-          w * transform.d - widgetHeight - margin * 15 * transform.d
-        }px`,
+        height: `${(w * transform.a * 4) / 3 - margin * 5 * transform.d}px`,
+        // height: `${
+        //   w * transform.d - widgetHeight - margin * 15 * transform.d
+        // }px`,
         position: 'absolute',
         overflow: 'hidden',
         zIndex: app.graph._nodes.indexOf(node)
@@ -137,11 +141,11 @@ function createVisualizer (node, inputName, typeName, inputData, app) {
   // Make sure visualization iframe is always inside the node when resize the node
   node.onResize = function () {
     let [w, h] = this.size
-    if (w <= 600) w = 600
-    if (h <= 500) h = 500
+    if (w <= 300) w = 300
+    if (h <= 400) h = 400
 
-    if (w > 600) {
-      h = w - 100
+    if (w > 300) {
+      h = Math.round((w * 4) / 3)
     }
 
     this.size = [w, h]
@@ -181,14 +185,14 @@ function registerVisualizer (nodeType, nodeData, nodeClassName, typeName) {
         app
       ])
 
-      this.setSize([600, 500])
+      this.setSize([300, 400])
 
       return r
     }
 
     nodeType.prototype.onExecuted = async function (message) {
       // Check if reference image and depth map are available
-      console.log("#message",message)
+      console.log('#message', message)
       if (message.reference_image && message.depth_map) {
         const params = {}
         params.reference_image = message.reference_image[0]

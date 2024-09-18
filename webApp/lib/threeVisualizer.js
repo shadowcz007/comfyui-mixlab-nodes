@@ -237,8 +237,11 @@ const sleep = (t = 1000) => {
 // 方法：旋转摄像机并拍摄图片 // 每次旋转的角度增量，转换为弧度
 async function captureImages (
   totalFrames = 20,
-  angleIncrement = THREE.MathUtils.degToRad(1.5)
+  angleIncrement = 1.5,
+  scaleFactor = 1 // 添加放大倍数参数，默认为1
 ) {
+  angleIncrement = THREE.MathUtils.degToRad(angleIncrement)
+
   // 计算场景中所有物体的中心点
   const box = new THREE.Box3().setFromObject(scene)
   const center = new THREE.Vector3()
@@ -264,6 +267,21 @@ async function captureImages (
   const startAngle = initialAngle
   //  - (angleIncrement * totalFrames) / 2
 
+  // 保存原始尺寸
+  const originalWidth = renderer.domElement.width
+  const originalHeight = renderer.domElement.height
+
+  // 调整渲染器尺寸
+  renderer.setSize(
+    originalWidth * scaleFactor,
+    originalHeight * scaleFactor,
+    false
+  )
+
+  // 调整相机的视图矩阵（如果需要）
+  camera.aspect = (originalWidth * scaleFactor) / (originalHeight * scaleFactor)
+  camera.updateProjectionMatrix()
+
   for (let i = 0; i < totalFrames; i++) {
     const angle = startAngle + i * angleIncrement
 
@@ -284,6 +302,13 @@ async function captureImages (
     await new Promise(resolve => setTimeout(resolve, 500))
   }
 
+  // 恢复渲染器尺寸
+  renderer.setSize(originalWidth, originalHeight, false)
+
+  // 恢复相机的视图矩阵
+  camera.aspect = originalWidth / originalHeight
+  camera.updateProjectionMatrix()
+
   // 恢复相机到初始位置和朝向
   camera.position.copy(initialPosition)
   camera.lookAt(initialTarget)
@@ -294,7 +319,7 @@ async function captureImages (
 async function takeScreenshot () {
   // 更新相机的矩阵，以确保其世界矩阵是最新的
   camera.updateMatrixWorld()
-  const imgs = await captureImages()
+  const imgs = await captureImages(12,3,4)
 
   // 获取当前网页的 URL
   const currentUrl = window.location.href
