@@ -59,8 +59,8 @@ LGraphCanvas.prototype.drawBackCanvas = function () {
   //reset in case of error
   if (!this.viewport) {
     ctx.restore()
-    // ctx.setTransform(1, 0, 0, 1, 0, 0)
-    ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0)
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    // ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0)
   }
   this.visible_links.length = 0
 
