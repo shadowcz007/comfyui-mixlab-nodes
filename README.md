@@ -10,6 +10,8 @@ For business cooperation, please contact email 389570357@qq.com
 
 ##### `最新`：
 
+- 新增API调用图像生成节点 TextToImage Siliconflow，可以直接调用Siliconflow提供的flux生成图像
+
 - [增加 Her 的DEMO页面，和数字人对话](https://github.com/shadowcz007/ComfyUI-Backend-MixlabNodes/blob/main/workflow/her_demo_workflow.json)
 
 - 右键菜单支持 text-to-text，方便对 prompt 词补全，支持云LLM或者是本地LLM。
