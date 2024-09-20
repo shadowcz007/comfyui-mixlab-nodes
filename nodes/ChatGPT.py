@@ -460,7 +460,8 @@ class SiliconflowFreeNode:
     @classmethod
     def INPUT_TYPES(cls):
         model_list= [ 
-            "Qwen/Qwen2-7B-Instruct",
+            "Qwen/Qwen2.5-7B-Instruct",
+            "Qwen/Qwen2-7B-Instruct", 
             "THUDM/glm-4-9b-chat",
             "01-ai/Yi-1.5-9B-Chat-16K",
             "meta-llama/Meta-Llama-3.1-8B-Instruct"

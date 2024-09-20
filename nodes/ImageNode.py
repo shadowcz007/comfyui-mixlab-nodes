@@ -2873,14 +2873,14 @@ class ResizeImage:
                     "default": 512, 
                     "min": 1, #Minimum value
                     "max": 8192, #Maximum value
-                    "step": 8, #Slider's step
+                    "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
                 "height": ("INT",{
                     "default": 512, 
                     "min": 1, #Minimum value
                     "max": 8192, #Maximum value
-                    "step": 8, #Slider's step
+                    "step": 1, #Slider's step
                     "display": "number" # Cosmetic only: display as "number" or "slider"
                 }),
                 "scale_option": (["width","height",'overall','center'],),
