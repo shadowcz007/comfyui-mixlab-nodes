@@ -187,7 +187,8 @@ class PromptImage:
                 }
             }
     
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("json_str",)
    
     OUTPUT_NODE = True
 
@@ -202,14 +203,18 @@ class PromptImage:
         filename_prefix="mixlab_"
         filename_prefix += self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
-            filename_prefix, os.path.join(self.output_dir,'PromptImage'), images[0].shape[1], images[0].shape[0])
+            filename_prefix,self.output_dir, images[0].shape[1], images[0].shape[0])
         
+        full_output_folder=os.path.join(full_output_folder,'PromptImage')
+        subfolder='PromptImage'
+
         results = list()
 
         save_to_image=save_to_image[0]=='enable'
 
         #保存到本地的json文件，记录图片和prompt的对应关系
-        output_dict=[]
+        output_images=[]
+        output_prompt=[]
 
         for index in range(len(images)):
             res=[]
@@ -234,19 +239,20 @@ class PromptImage:
                     "subfolder": subfolder,
                     "type": self.type
                 })
-                output_dict.append({
-                    "file_path":fp,
-                    "prompt":prompt_text
-                })
+                output_images.append(fp)
+                output_prompt.append(prompt_text)
                 counter += 1
             results.append(res)
 
-        if save_to_image:
-            # 保存为本地文件
-            with open(os.path.join(full_output_folder,'PromptImage.json'), 'w') as file:
-                json.dump(output_dict, file, ensure_ascii=False, indent=4)
+        # if save_to_image:
+        #     # 保存为本地文件
+        #     with open(os.path.join(full_output_folder,'PromptImage.json'), 'w') as file:
+        #         json.dump(output_dict, file, ensure_ascii=False, indent=4)
 
-        return { "ui": { "_images": results,"prompts":prompts } }
+        return { "ui": { "_images": results,"prompts":prompts },"result":(json.dumps({
+            "images":output_images,
+            "prompts":output_prompt
+        }),) }
 
 
 

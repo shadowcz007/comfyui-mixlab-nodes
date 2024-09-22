@@ -132,6 +132,9 @@ def split_video_by_scenes(video_path, scenes, output_path, number_of_sample_fram
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
     
+    # 视频的总帧数
+    total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+
     # Create a list to hold the paths of the scene videos
     scenes_video = []
     keyframes = []
@@ -194,7 +197,7 @@ def split_video_by_scenes(video_path, scenes, output_path, number_of_sample_fram
     # Release the video file
     video.release()
     
-    return scenes_video, keyframes
+    return scenes_video, keyframes,total_frames
 
 
 def get_files_with_extension(directory, extension):
@@ -287,8 +290,8 @@ class ScenedetectNode_:
                      "number_of_sample_frames": ("INT", {"default": 1, "min": 1, "step": 1}), # 抽取的帧数，默认是1帧，中间帧
                      },}
 
-    RETURN_TYPES = ("SCENE_VIDEO","SCENE_", "INT",)
-    RETURN_NAMES = ("scenes_video","scenes","scene_len",)
+    RETURN_TYPES = ("SCENE_VIDEO","SCENE_", "INT","INT",)
+    RETURN_NAMES = ("scenes_video","scenes","scene_len","total_frames",)
     OUTPUT_IS_LIST = (False,False,False,)
 
     FUNCTION = "run"
@@ -310,9 +313,9 @@ class ScenedetectNode_:
         folder_path = create_folder(tp,name_without_extension)
         # print("New folder created:", folder_path)
 
-        vs_files,keyframes=split_video_by_scenes(video_path,scenes,folder_path,number_of_sample_frames)
+        vs_files,keyframes,total=split_video_by_scenes(video_path,scenes,folder_path,number_of_sample_frames)
         # print("New folder created:", vs_files)
 
-        return (vs_files,keyframes,len(scenes),)
+        return (vs_files,keyframes,len(scenes),total,)
     
 

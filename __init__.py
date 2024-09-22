@@ -1007,7 +1007,7 @@ from .nodes.ImageNode import DepthViewer_,ImageBatchToList_,ImageListToBatch_,Co
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
 from .nodes.Audio import AudioPlayNode,SpeechRecognition,SpeechSynthesis
-from .nodes.Utils import KeyInput,IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
+from .nodes.Utils import CreateJsonNode,KeyInput,IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
 from .nodes.Style import ApplyVisualStylePrompting,StyleAlignedReferenceSampler,StyleAlignedBatchAlign,StyleAlignedSampleReferenceLatents
@@ -1045,6 +1045,7 @@ NODE_CLASS_MAPPINGS = {
     "SaveImageToLocal":SaveImageToLocal,
     "SaveImageAndMetadata_":SaveImageAndMetadata,
     "ComparingTwoFrames_":ComparingTwoFrames,
+    "CreateJsonNode":CreateJsonNode,
 
     # Image
     "MirroredImage":MirroredImage,
@@ -1225,6 +1226,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "MultiplicationNode":"Math Operation ♾️Mixlab",
     "ListSplit_":"Split List ♾️Mixlab",
     "SwitchByIndex":"List Switch By Index ♾️Mixlab",
+    "CreateJsonNode":"Create Json",
 
     # "GamePal":"GamePal ♾️Mixlab",
     # Experiment

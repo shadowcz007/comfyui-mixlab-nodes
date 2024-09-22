@@ -648,6 +648,49 @@ class AppInfo:
     
 
     
+class CreateJsonNode:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "key": ("STRING",{"multiline": False,"default": "data","dynamicPrompts": False}),
+                    "value":(any_type,),
+                    "save":("BOOLEAN", {"default": True},),
+                             }, 
+                "optional":{
+                    "json_str":("STRING", {"forceInput": True,}),
+                }
+
+                }
+    
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("json_str",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Output"
+
+    OUTPUT_NODE = True
+    INPUT_IS_LIST = False
+    # OUTPUT_IS_LIST = (True,)
+
+    def run(self,key,value,save,json_str=None):
+        data={}
+
+        data[key]=value
+
+        if json_str:
+            json_obj = json.loads(json_str)
+            data.update(json_obj)
+
+        if save:
+            # 保存为本地文件
+            with open(os.path.join(folder_paths.get_output_directory(),'data.json'), 'w') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+
+        return (json.dumps(data),)
+    
+
+    
 
 
 class SwitchByIndex:
