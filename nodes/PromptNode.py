@@ -202,11 +202,14 @@ class PromptImage:
         filename_prefix="mixlab_"
         filename_prefix += self.prefix_append
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(
-            filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0])
+            filename_prefix, os.path.join(self.output_dir,'PromptImage'), images[0].shape[1], images[0].shape[0])
         
         results = list()
 
         save_to_image=save_to_image[0]=='enable'
+
+        #保存到本地的json文件，记录图片和prompt的对应关系
+        output_dict=[]
 
         for index in range(len(images)):
             res=[]
@@ -215,23 +218,34 @@ class PromptImage:
             for image in imgs:
                 img=tensor2pil(image)
 
+                prompt_text=prompts[index]
+
                 metadata = None
                 if save_to_image:
                     metadata = PngInfo()
-                    prompt_text=prompts[index]
                     if prompt_text is not None:
                         metadata.add_text("prompt_text", prompt_text)
                     
                 file = f"{filename}_{index}_{counter:05}_.png"
-                img.save(os.path.join(full_output_folder, file), pnginfo=metadata, compress_level=self.compress_level)
+                fp=os.path.join(full_output_folder,file)
+                img.save(fp, pnginfo=metadata, compress_level=self.compress_level)
                 res.append({
                     "filename": file,
                     "subfolder": subfolder,
                     "type": self.type
                 })
+                output_dict.append({
+                    "file_path":fp,
+                    "prompt":prompt_text
+                })
                 counter += 1
             results.append(res)
-        
+
+        if save_to_image:
+            # 保存为本地文件
+            with open(os.path.join(full_output_folder,'PromptImage.json'), 'w') as file:
+                json.dump(output_dict, file, ensure_ascii=False, indent=4)
+
         return { "ui": { "_images": results,"prompts":prompts } }
 
 
