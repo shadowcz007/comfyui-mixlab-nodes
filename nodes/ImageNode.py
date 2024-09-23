@@ -13,11 +13,25 @@ import json,io
 import comfy.utils
 from comfy.cli_args import args
 import cv2
-import string
+import string,re
 import math,glob
 from .Watcher import FolderWatcher
 
 from itertools import product
+
+
+# 文件名排序
+def sort_by_filename(items):
+    def extract_parts(filename):
+        # 使用正则表达式将文件名拆分为数字和非数字部分
+        parts = re.split(r'(\d+)', filename)
+        # 将数字部分转换为整数以便正确排序，同时保留非数字部分
+        parts = [int(part) if part.isdigit() else part for part in parts]
+        return parts
+
+    # 按照 file_name 的拆分部分进行排序
+    sorted_items = sorted(items, key=lambda x: extract_parts(x['file_name']))
+    return sorted_items
 
 # 将PIL图片转换为OpenCV格式
 def pil_to_opencv(image):
@@ -768,8 +782,7 @@ def areaToMask(x,y,w,h,image):
 #     return bg_image
 
 
-import cv2
-import numpy as np
+
 
 # ps的正片叠底
 # 可以基于https://www.cnblogs.com/jsxyhelu/p/16947810.html ，用gpt写python代码
@@ -1433,7 +1446,7 @@ class LoadImagesFromPath:
                             },
                 "optional":{
                     "white_bg": (["disable","enable"],),
-                    "newest_files": (["enable", "disable"],),
+                    "sort_by": (["file_name", "newest"],),#根据文件名来排序，还是按照最新创建时间
                     "index_variable":("INT", {
                         "default": 0, 
                         "min": -1, #Minimum value
@@ -1462,7 +1475,7 @@ class LoadImagesFromPath:
     watcher_folder=None
 
     # 运行的函数
-    def run(self,file_path,white_bg,newest_files,index_variable,watcher,result,prompt,seed=1):
+    def run(self,file_path,white_bg,sort_by,index_variable,watcher,result,prompt,seed=1):
         global watcher_folder
         # print('###监听:',watcher_folder,watcher,file_path,result)
 
@@ -1485,19 +1498,23 @@ class LoadImagesFromPath:
         # 当开启了监听，则取最新的，第一个文件
         if watcher=='enable':
             index_variable=0
-            newest_files='enable'
+            sort_by='newest'
 
         # 排序
-        sorted_files = sorted(images, key=lambda x: os.path.getmtime(x['file_path']), reverse=(newest_files=='enable'))
+        if sort_by=='newest':
+            sorted_files = sorted(images, key=lambda x: os.path.getmtime(x['file_path']), reverse=True)
+        elif sort_by=='file_name':
+            # 根据文件名排序
+            sorted_files = sort_by_filename(images)
 
         imgs=[]
         masks=[]
-        file_names=[]
+        file_paths=[]
 
         for im in sorted_files:
             imgs.append(im['image'])
             masks.append(im['mask'])
-            file_names.append(im['file_name'])
+            file_paths.append(im['file_path'])
         
         # print('index_variable',index_variable)
         
@@ -1505,13 +1522,13 @@ class LoadImagesFromPath:
             if index_variable!=-1:
                 imgs=[imgs[index_variable]] if index_variable < len(imgs) else None
                 masks=[masks[index_variable]] if index_variable < len(masks) else None
-                file_names=[file_names[index_variable]] if index_variable < len(file_names) else None
+                file_paths=[file_paths[index_variable]] if index_variable < len(file_paths) else None
         except Exception as e:
             print("发生了一个未知的错误：", str(e))
 
         # print('#prompt::::',prompt)
         # return  {"ui": {"seed": [1]}, "result":(imgs,masks,prompt,file_names,)}
-        return  (imgs,masks,prompt,file_names,)
+        return  (imgs,masks,prompt,file_paths,)
 
 
 # TODO 扩大选区的功能,重新输出mask
