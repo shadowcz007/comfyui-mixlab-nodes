@@ -1429,6 +1429,15 @@ try:
 except Exception as e:
     logging.info('FishSpeech.available False' )
 
+try:
+    from .nodes.SenseVoice import SenseVoiceNode
+    logging.info('SenseVoice.available')
+    NODE_CLASS_MAPPINGS['SenseVoiceNode']=SenseVoiceNode
+    NODE_DISPLAY_NAME_MAPPINGS["SenseVoiceNode"]= "Sense Voice"
+
+except Exception as e:
+    logging.info('SenseVoice.available False' )  
+
 
 
 logging.info('\033[93m -------------- \033[0m')
