@@ -4,7 +4,7 @@ import os
 import time
 
 from huggingface_hub import snapshot_download
-import torch
+import torch,re
 from sensevoice.onnx.sense_voice_ort_session import SenseVoiceInferenceSession
 from sensevoice.utils.frontend import WavFrontend
 from sensevoice.utils.fsmn_vad import FSMNVad
@@ -29,7 +29,34 @@ class AnyType(str):
   def __ne__(self, __value: object) -> bool:
     return False
 
-any_type = AnyType("*")    
+any_type = AnyType("*")
+
+# 字幕
+def format_to_srt(channel_id, start_time_ms, end_time_ms, asr_result):
+    start_time = start_time_ms / 1000
+    end_time = end_time_ms / 1000
+    
+    def format_time(seconds):
+        hours = int(seconds // 3600)
+        minutes = int((seconds % 3600) // 60)
+        seconds = seconds % 60
+        milliseconds = int((seconds - int(seconds)) * 1000)
+        return f"{hours:02}:{minutes:02}:{int(seconds):02},{milliseconds:03}"
+    
+    start_time_str = format_time(start_time)
+    end_time_str = format_time(end_time)
+
+    pattern = r"<\|(.+?)\|><\|(.+?)\|><\|(.+?)\|><\|(.+?)\|>(.+)"
+    match = re.match(pattern,asr_result)
+    lang, emotion, audio_type, itn, text = match.groups()
+     # 😊 表示高兴，😡 表示愤怒，😔 表示悲伤。对于音频事件，🎼 表示音乐，😀 表示笑声，👏 表示掌声
+    
+    srt_content = f"1\n{start_time_str} --> {end_time_str}\n{text}\n"
+    
+    logging.info(f"[Channel {channel_id}] [{start_time}s - {end_time}s] [{lang}] [{emotion}] [{audio_type}] [{itn}] {text}")
+
+    return lang, emotion, audio_type, itn,srt_content,start_time,end_time,text
+
 
 class SenseVoiceProcessor:
     def __init__(self, download_model_path, device, num_threads, use_int8):
@@ -81,9 +108,23 @@ class SenseVoiceProcessor:
                     language=languages[language],
                     use_itn=use_itn,
                 )
-                logging.info(f"[Channel {channel_id}] [{part[0] / 1000}s - {part[1] / 1000}s] {asr_result}")
-                
-                results.append(asr_result)
+
+                lang, emotion, audio_type, itn,srt_content,start_time,end_time,text=format_to_srt(
+                    channel_id, 
+                    part[0] , 
+                    part[1], 
+                    asr_result)
+
+                results.append({
+                    "language":lang, 
+                    "emotion":emotion,
+                    "audio_type":audio_type, 
+                    "itn":itn,
+                    "srt_content":srt_content,
+                    "start_time":start_time,
+                    "end_time":end_time,
+                    "text":text
+                })
 
             self.vad.vad.all_reset_detection()
             pbar.update(1)  # 更新进度条
