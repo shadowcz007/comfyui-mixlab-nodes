@@ -14,6 +14,9 @@ import folder_paths
 
 languages = {"auto": 0, "zh": 3, "en": 4, "yue": 7, "ja": 11, "ko": 12, "nospeech": 13}
 
+# 设置环境变量
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+
 # 
 def get_model_path():
     try:
