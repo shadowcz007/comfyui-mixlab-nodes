@@ -8,8 +8,7 @@ import torch
 from sensevoice.onnx.sense_voice_ort_session import SenseVoiceInferenceSession
 from sensevoice.utils.frontend import WavFrontend
 from sensevoice.utils.fsmn_vad import FSMNVad
-import comfy.utils  # 假设这个模块包含ProgressBar
-from comfy.model_management import get_torch_device  # 假设这个函数在这个模块中
+import comfy.utils
 import folder_paths
 
 languages = {"auto": 0, "zh": 3, "en": 4, "yue": 7, "ja": 11, "ko": 12, "nospeech": 13}
@@ -23,7 +22,14 @@ def get_model_path():
         return folder_paths.get_folder_paths('sense_voice')[0]
     except:
         return os.path.join(folder_paths.models_dir, "sense_voice")
-    
+
+class AnyType(str):
+  """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
+
+  def __ne__(self, __value: object) -> bool:
+    return False
+
+any_type = AnyType("*")    
 
 class SenseVoiceProcessor:
     def __init__(self, download_model_path, device, num_threads, use_int8):
@@ -94,6 +100,9 @@ class SenseVoiceNode:
         self.processor = None
         self.download_model_path=get_model_path()
         self.device="cpu"
+        self.num_threads = 4
+        self.use_int8 = True
+        self.language='auto'
 
     @classmethod
     def INPUT_TYPES(s):
@@ -101,14 +110,14 @@ class SenseVoiceNode:
         return {"required": {
                     "audio": ("AUDIO", ), 
                     "device": ( ['auto','cpu'], {"default": 'auto'}),
-                     "language": (languages.keys(), {"default": 'auto'}),
+                     "language": (list(languages.keys()), {"default": 'auto'}),# 不能直接写 languages.keys(),json.dumps会报错
                      "num_threads":("INT",{
                                 "default":4, 
                                 "min": 1, #Minimum value
                                 "max": 32, #Maximum value
                                 "step": 1, #Slider's step
                                 "display": "number" # Cosmetic only: display as "number" or "slider"
-                                }),
+                                },),
                      "use_int8":("BOOLEAN", {"default": True},),
                      "use_itn":("BOOLEAN", {"default": True},),
                      },
@@ -118,13 +127,16 @@ class SenseVoiceNode:
 
     OUTPUT_NODE = True
     FUNCTION = "run" 
-    RETURN_TYPES = ("SCENE_VIDEO",)
-    RETURN_NAMES = ("SCENE_VIDEO",)
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("result",)
 
     def run(self,audio,device,language,num_threads,use_int8,use_itn ):
  
         if device!=self.device:
             self.device=device
+            self.processor=None
+        if language!=self.language:
+            self.language=language
             self.processor=None
         if num_threads!=self.num_threads:
             self.num_threads=num_threads
@@ -146,8 +158,15 @@ class SenseVoiceNode:
                                                  self.use_int8)
 
         if 'waveform' in audio and 'sample_rate' in audio:
-            waveform_numpy=audio['waveform'].numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
-            _sample_rate=audio['sample_rate']
+            waveform = audio['waveform']
+            # print("Original shape:", waveform.shape)  # 打印原始形状
+            if waveform.ndim == 3 and waveform.shape[0] == 1:  # 检查是否为三维且 batch_size 为 1
+                waveform = waveform.squeeze(0)  # 移除 batch_size 维度
+                waveform_numpy = waveform.numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
+            else:
+                raise ValueError("Unexpected waveform dimensions")
+
+            _sample_rate = audio['sample_rate']
 
         results=self.processor.process_audio(waveform_numpy, _sample_rate, language, use_itn)
 
