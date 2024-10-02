@@ -168,8 +168,9 @@ class SenseVoiceNode:
 
     OUTPUT_NODE = True
     FUNCTION = "run" 
-    RETURN_TYPES = (any_type,)
-    RETURN_NAMES = ("result",)
+    
+    RETURN_TYPES = (any_type,"STRING","FLOAT",)
+    RETURN_NAMES = ("result","text","total_seconds",)
 
     def run(self,audio,device,language,num_threads,use_int8,use_itn ):
  
@@ -200,16 +201,21 @@ class SenseVoiceNode:
 
         if 'waveform' in audio and 'sample_rate' in audio:
             waveform = audio['waveform']
+            sample_rate = audio['sample_rate']
             # print("Original shape:", waveform.shape)  # 打印原始形状
             if waveform.ndim == 3 and waveform.shape[0] == 1:  # 检查是否为三维且 batch_size 为 1
                 waveform = waveform.squeeze(0)  # 移除 batch_size 维度
-                waveform_numpy = waveform.numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
             else:
                 raise ValueError("Unexpected waveform dimensions")
 
-            _sample_rate = audio['sample_rate']
+            print("waveform.shape:", waveform.shape) 
+            total_length_seconds = waveform.shape[1] / sample_rate
 
-        results=self.processor.process_audio(waveform_numpy, _sample_rate, language, use_itn)
+            waveform_numpy = waveform.numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
 
+        results=self.processor.process_audio(waveform_numpy, sample_rate, language, use_itn)
 
-        return (results,)
+        srt_content="\n".join([s['srt_content'] for s in results])
+
+        return (results,srt_content,total_length_seconds,)
+ 

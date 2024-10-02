@@ -32,3 +32,4 @@ natsort>=8.4.0
 
 git+https://github.com/shadowcz007/SenseVoice-python.git
 
+faster_whisper
