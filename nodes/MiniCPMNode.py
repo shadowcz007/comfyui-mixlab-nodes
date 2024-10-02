@@ -1,4 +1,5 @@
 # Referenced some code：https://github.com/IuvenisSapiens/ComfyUI_MiniCPM-V-2_6-int4
+# https://github.com/CY-CHENYUE/ComfyUI-MiniCPM-Plus
 
 import os
 import torch
@@ -35,6 +36,7 @@ class MiniCPM_VQA_Simple:
                 "images": ("IMAGE",),
                 "text": ("STRING", {"default": "", "multiline": True}),   
                 "seed": ("INT", {"default": -1}),  # add seed parameter, default is -1
+                "extract_keywords":("BOOLEAN", {"default": False}),
                 "temperature": (
                     "FLOAT",
                     {
@@ -46,7 +48,9 @@ class MiniCPM_VQA_Simple:
             
         }
 
-    RETURN_TYPES = ("STRING",)
+    RETURN_TYPES = ("STRING","STRING",)
+    RETURN_NAMES = ("result","keywords",)
+
     FUNCTION = "inference"
     CATEGORY = "♾️Mixlab/Image"
 
@@ -55,6 +59,7 @@ class MiniCPM_VQA_Simple:
         images,
         text, 
         seed,  # add seed parameter, default is -1
+        extract_keywords,
         temperature,
         keep_model_loaded,
     ):
@@ -90,6 +95,7 @@ class MiniCPM_VQA_Simple:
                 torch_dtype=torch.bfloat16 if self.bf16_support else torch.float16,
             )
 
+
         with torch.no_grad():
             images = images.permute([0, 3, 1, 2])
             images = [ToPILImage()(img).convert("RGB") for img in images]
@@ -113,6 +119,30 @@ class MiniCPM_VQA_Simple:
                 # max_new_tokens=max_new_tokens,
                 **params,
             )
+
+            keyword_result=""
+
+            if extract_keywords:#extract_keywords
+                keyword_prompt = f"""Please extract keywords from the following text, including all occurrences of language (e.g. Chinese, English, etc.)：
+                [[[{result}]]]
+                Please list the keywords extracted, separated by commas. Make sure to include all important words, no matter what language. For English words, please keep the original case."""
+
+                keyword_msgs = [{'role': 'user', 'content': keyword_prompt}]
+                keyword_result = self.model.chat(
+                    image=None,
+                    msgs=keyword_msgs,
+                    tokenizer=self.tokenizer,
+                    sampling=True,
+                    # top_k=top_k,
+                    # top_p=top_p,
+                    temperature=temperature,
+                    # repetition_penalty=repetition_penalty,
+                    # max_new_tokens=max_new_tokens,
+                    **params,
+                )
+                print("keyword_result",keyword_result)
+
+               
             # offload model to GPU
             # self.model = self.model.to(torch.device("cpu"))
             # self.model.eval()
@@ -124,4 +154,4 @@ class MiniCPM_VQA_Simple:
                 torch.cuda.empty_cache()  # release GPU memory
                 torch.cuda.ipc_collect()
             # print(result)
-            return (result,)
+            return (result,keyword_result,)
