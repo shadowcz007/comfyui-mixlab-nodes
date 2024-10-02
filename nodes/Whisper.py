@@ -162,7 +162,8 @@ class WhisperTranscribe:
                     "srt_content":srt_content,
                     "start_time":start_time,
                     "end_time":end_time,
-                    "text":text
+                    "text":text,
+                    "language":[info.language]
             })
         
         srt_content="\n".join([s['srt_content'] for s in results])
