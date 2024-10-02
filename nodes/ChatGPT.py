@@ -802,6 +802,9 @@ class JsonRepair:
 
     def run(self, json_string,key=""):
 
+        if not isinstance(json_string, str):
+            json_string=json.dumps(json_string)
+    
         json_string=extract_json_strings(json_string)
         # print(json_string)
         good_json_string = repair_json(json_string)
