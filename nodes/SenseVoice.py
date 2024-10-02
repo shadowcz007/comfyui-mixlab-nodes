@@ -169,8 +169,8 @@ class SenseVoiceNode:
     OUTPUT_NODE = True
     FUNCTION = "run" 
     
-    RETURN_TYPES = (any_type,"STRING","FLOAT",)
-    RETURN_NAMES = ("result","text","total_seconds",)
+    RETURN_TYPES = (any_type,"STRING","STRING","FLOAT",)
+    RETURN_NAMES = ("result","srt","text","total_seconds",)
 
     def run(self,audio,device,language,num_threads,use_int8,use_itn ):
  
@@ -216,6 +216,7 @@ class SenseVoiceNode:
         results=self.processor.process_audio(waveform_numpy, sample_rate, language, use_itn)
 
         srt_content="\n".join([s['srt_content'] for s in results])
+        text="\n".join([s['text'] for s in results])
 
-        return (results,srt_content,total_length_seconds,)
+        return (results,srt_content,text,total_length_seconds,)
  
