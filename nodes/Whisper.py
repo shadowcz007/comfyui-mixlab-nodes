@@ -97,8 +97,8 @@ class WhisperTranscribe:
                              },
                 }
     
-    RETURN_TYPES = (any_type,"STRING","FLOAT",)
-    RETURN_NAMES = ("result","text","total_seconds",)
+    RETURN_TYPES = (any_type,"STRING","STRING","FLOAT",)
+    RETURN_NAMES = ("result","srt","text","total_seconds",)
 
     FUNCTION = "run"
 
@@ -166,6 +166,7 @@ class WhisperTranscribe:
             })
         
         srt_content="\n".join([s['srt_content'] for s in results])
+        text="\n".join([s['text'] for s in results])
 
-        return (results,srt_content,total_length_seconds,)
+        return (results,srt_content,text,total_length_seconds,)
 
