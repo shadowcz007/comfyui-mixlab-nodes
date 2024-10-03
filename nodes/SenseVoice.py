@@ -48,6 +48,9 @@ def format_to_srt(channel_id, start_time_ms, end_time_ms, asr_result):
 
     pattern = r"<\|(.+?)\|><\|(.+?)\|><\|(.+?)\|><\|(.+?)\|>(.+)"
     match = re.match(pattern,asr_result)
+    print('#format_to_srt',match,asr_result)
+    if match==None:
+        return None, None, None, None,None,start_time,end_time,text
     lang, emotion, audio_type, itn, text = match.groups()
      # 😊 表示高兴，😡 表示愤怒，😔 表示悲伤。对于音频事件，🎼 表示音乐，😀 表示笑声，👏 表示掌声
     
@@ -115,16 +118,17 @@ class SenseVoiceProcessor:
                     part[1], 
                     asr_result)
 
-                results.append({
-                    "language":lang, 
-                    "emotion":emotion,
-                    "audio_type":audio_type, 
-                    "itn":itn,
-                    "srt_content":srt_content,
-                    "start_time":start_time,
-                    "end_time":end_time,
-                    "text":text
-                })
+                if lang!=None:
+                    results.append({
+                        "language":lang, 
+                        "emotion":emotion,
+                        "audio_type":audio_type, 
+                        "itn":itn,
+                        "srt_content":srt_content,
+                        "start_time":start_time,
+                        "end_time":end_time,
+                        "text":text
+                    })
 
             self.vad.vad.all_reset_detection()
             pbar.update(1)  # 更新进度条
