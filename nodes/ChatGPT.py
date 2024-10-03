@@ -786,9 +786,12 @@ class JsonRepair:
     def INPUT_TYPES(s):
         return {
             "required": {
-                 "json_string":("STRING", {"forceInput": True,}), 
-                 "key":("STRING", {"multiline": False,"dynamicPrompts": False,"default": ""}),
-            }
+                "json_string":("STRING", {"forceInput": True,}), 
+                "key":("STRING", {"multiline": False,"dynamicPrompts": False,"default": ""}),
+            },
+            "optional":{
+                "json_string2":("STRING", {"forceInput": True,})
+            },
         }
 
     INPUT_IS_LIST = False
@@ -800,7 +803,7 @@ class JsonRepair:
 
     CATEGORY = "♾️Mixlab/GPT"
 
-    def run(self, json_string,key=""):
+    def run(self, json_string,key="",json_string2=None):
 
         if not isinstance(json_string, str):
             json_string=json.dumps(json_string)
@@ -811,6 +814,20 @@ class JsonRepair:
 
         # 将 JSON 字符串解析为 Python 对象
         data = json.loads(good_json_string)
+
+        if json_string2!=None:
+            if not isinstance(json_string2, str):
+                json_string2=json.dumps(json_string2)
+    
+            json_string2=extract_json_strings(json_string2)
+            # print(json_string)
+            good_json_string2 = repair_json(json_string2)
+
+            # 将 JSON 字符串解析为 Python 对象
+            data2 = json.loads(good_json_string2)
+
+            data={**data, **data2}
+
 
         v=""
         if key!="" and (key in data):
