@@ -50,7 +50,7 @@ def format_to_srt(channel_id, start_time_ms, end_time_ms, asr_result):
     match = re.match(pattern,asr_result)
     print('#format_to_srt',match,asr_result)
     if match==None:
-        return None, None, None, None,None,start_time,end_time,text
+        return None, None, None, None,None,start_time,end_time,None
     lang, emotion, audio_type, itn, text = match.groups()
      # 😊 表示高兴，😡 表示愤怒，😔 表示悲伤。对于音频事件，🎼 表示音乐，😀 表示笑声，👏 表示掌声
     
