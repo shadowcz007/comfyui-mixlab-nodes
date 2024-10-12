@@ -1,4 +1,6 @@
 import openai 
+from swarm import Swarm, Agent
+
 import time
 import urllib.error
 import re,json,os,string,random
@@ -837,3 +839,254 @@ class JsonRepair:
         json_str_with_chinese = json.dumps(data, ensure_ascii=False)
 
         return (json_str_with_chinese,v,)
+    
+
+# 以下为固定提示词的LLM节点示例
+class SimulateDevDesignDiscussions:
+    def __init__(self):
+        # self.__client = OpenAI()
+        self.session_history = []  # 用于存储会话历史的列表
+        # self.seed=0
+        self.system_content="You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."
+
+    @classmethod
+    def INPUT_TYPES(cls):
+
+        model_list=[ 
+            "gpt-4o",
+            "gpt-4o-2024-05-13",
+            "gpt-4",
+            "gpt-4-0314",
+            "gpt-4-0613",
+            "qwen-turbo",
+            "qwen-plus",
+            "qwen-long",
+            "qwen-max",
+            "qwen-max-longcontext",
+            "glm-4",
+            "glm-3-turbo",
+            "moonshot-v1-8k",
+            "moonshot-v1-32k",
+            "moonshot-v1-128k",
+            "deepseek-chat",
+            "Qwen/Qwen2-7B-Instruct",
+            "THUDM/glm-4-9b-chat",
+            "01-ai/Yi-1.5-9B-Chat-16K"
+                    ]
+        
+        return {
+            "required": {
+                "subject": ("STRING", {"multiline": True,"dynamicPrompts": False}),
+                "model": ( model_list, 
+                    {"default": model_list[0]}),
+                "api_url":(list(llm_apis_dict.keys()), 
+                    {"default": list(llm_apis_dict.keys())[0]}),
+            },
+             "optional":{
+                    "api_key":("STRING", {"forceInput": True,}),
+                    "custom_model_name":("STRING", {"forceInput": True,}), #适合自定义model
+                     "custom_api_url":("STRING", {"forceInput": True,}), #适合自定义model
+                },
+             
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "generate_contextual_text"
+    CATEGORY = "♾️Mixlab/GPT"
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def generate_contextual_text(self,
+                                 subject, 
+                                 model, 
+                                api_url,
+                                api_key=None,
+                                custom_model_name=None,
+                                custom_api_url=None,
+                                ):
+        
+        # 设置黄色文本的ANSI转义序列
+        YELLOW = "\033[33m"
+        # 重置文本颜色的ANSI转义序列
+        RESET = "\033[0m"
+
+        if custom_model_name!=None:
+            model=custom_model_name
+
+        api_url=llm_apis_dict[api_url] if api_url in llm_apis_dict else ""
+
+        if custom_api_url!=None:
+            api_url=custom_api_url
+
+        if api_key==None:
+            api_key="lm_studio"
+
+        print("api_key,api_url",api_key,api_url)
+        # 
+        if is_azure_url(api_url):
+            client=azure_client(api_key,api_url)
+        else:
+            # 根据用户选择的模型，设置相应的接口和模型名称
+            if model == "glm-4" :
+                client = ZhipuAI_client(api_key)  # 使用 Zhipuai 的接口
+                print('using Zhipuai interface')
+            else :
+                client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
+               
+  
+        
+        # 以下为多智能体框架
+        client = Swarm(client=client)
+
+        # 定义两个代理：软件系统架构师和设计师
+        software_architect_agent = Agent(
+            name="Software Architect",
+            instructions='''用脱口秀的风格回答编程问题，简短且口语化。
+
+        输出格式
+        ====
+
+        *   答案格式：`程序员：xxxxxxxxx`
+
+        示例
+        ==
+
+        **输入：**  
+        如何优化代码性能？
+
+        **输出：**  
+        程序员：兄弟，先把那些循环里的debug信息删掉，CPU都快哭了。'''
+        )
+
+        designer_agent = Agent(
+            name="Designer",
+            instructions='''回答问题时，请扮演一位具有多年空间设计和用户体验设计经验的设计师。你的回答应当天马行空，但又富有深度，带有苏格拉底的思考方式，并且使用脱口秀的风格。回答要简短且非常口语化。格式如下：
+
+        设计师：\[回答内容\]
+
+        Output Format
+        =============
+
+        *   回答应当使用“设计师：\[回答内容\]”的格式。
+        *   回答应当简短、口语化，富有创意和深度。
+
+        Examples
+        ========
+
+        **Example 1:**
+
+        主持人：你觉得未来的家会是什么样子？
+
+        设计师：未来的家？想象一下，房子会像变形金刚一样，随时变形满足你的需求。今天是健身房，明天是电影院，后天是游戏场。家不再是四面墙，而是一个随心所欲的魔法空间。
+
+        **Example 2:**
+
+        主持人：你怎么看待极简主义设计？
+
+        设计师：极简主义？就像吃寿司，去掉所有不必要的装饰，只留下最精华的部分。让空间呼吸，让心灵自由。
+
+        **Example 3:**
+
+        主持人：你觉得色彩在设计中有多重要？
+
+        设计师：色彩？哦，那可是设计的灵魂！就像人生中的调味料，一点红色让你激情澎湃，一点蓝色让你心如止水。色彩决定了空间的情绪基调。'''
+        )
+
+        # 定义一个函数，用于转移问题到designer_agent
+        def transfer_to_designer_agent():
+            return designer_agent
+
+        # 将转移函数添加到软件系统架构师和设计师的函数列表中
+        software_architect_agent.functions.append(transfer_to_designer_agent)
+
+        # 问题生成
+        host_agent = Agent(
+            name="Host",
+            instructions='''
+        为播客的主持人生成4到5个问题，这些问题有些是针对设计师问的，有些是针对程序员问的。
+
+        *   主持人：你知道如何开发一款APP产品，从想法到上线吗？
+        *   主持人：站在设计师的角度，你怎么看？
+        *   主持人：不知道程序员又是怎么想的呢？
+        *   主持人：感谢大家的参与，今天收获蛮大的
+
+        Steps
+        =====
+
+        1.  确定问题的对象：设计师或程序员。
+        2.  根据对象设计相关的问题，确保问题的多样性和深度。
+        3.  整理问题，使其符合播客主持人的风格和语气。
+
+        Output Format
+        =============
+
+        问题列表，每个问题以“主持人：”开头，不要出现序号。
+
+        Examples
+        ========
+
+        *   主持人：作为一名设计师，你是如何开始一个新项目的？
+        *   主持人：程序员在开发过程中遇到的最大挑战是什么？
+        *   主持人：设计师在团队协作中扮演什么角色？
+        *   主持人：程序员如何确保代码的质量和稳定性？
+        *   主持人：感谢大家的参与，今天的讨论非常有意义。
+
+        Notes
+        =====
+
+        *   确保问题针对不同的角色（设计师和程序员）。
+        *   保持问题的多样性，涵盖从项目开始到完成的各个阶段。
+        *   确保问题能引导出深入的讨论和见解。
+        ''')
+
+
+        response = client.run(agent=host_agent, messages=[{
+            "role":"user",
+            "content":f"主题是‘{subject}’"
+        }],model_override=model)
+
+        content=response.messages[-1]["content"]
+        print(f"{YELLOW}{content}{RESET}")
+
+        texts=content.split("\n")
+
+        # texts='''
+        # 主持人：你知道如何开发一款APP产品，从想法到上线吗？
+        # 主持人：站在设计师的角度，你怎么看？
+        # 主持人：不知道程序员又是怎么想的呢？
+        # 主持人：感谢大家的参与，今天收获蛮大的
+        # '''.split("\n")
+
+        messages=[]
+
+        texts = [text.strip() for text in texts if text.strip()]
+
+        result=[]
+
+        for text in texts:
+            messages.append({
+                "role": "user",
+                "content": text
+            })
+
+            # 运行客户端，使用软件系统架构师作为初始代理
+            response = client.run(agent=software_architect_agent, messages=messages,model_override=model)
+
+            print(f"{text}")
+            result.append(text)
+
+            # 输出最后一个响应消息的内容
+            content=response.messages[-1]["content"]
+            print(f"{YELLOW}{content}{RESET}")
+            
+            result.append(content)
+
+            messages.append({
+                "role":"assistant",
+                "content":content
+            })
+
+        
+        return ("\n".join(result),)
+

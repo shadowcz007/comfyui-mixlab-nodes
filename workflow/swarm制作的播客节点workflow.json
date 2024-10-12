@@ -1,0 +1,416 @@
+{
+  "last_node_id": 9,
+  "last_link_id": 8,
+  "nodes": [
+    {
+      "id": 3,
+      "type": "TextInput_",
+      "pos": [
+        137,
+        420
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            2
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "使用 Azure OpenAI",
+      "properties": {
+        "Node name for S&R": "TextInput_"
+      },
+      "widgets_values": [
+        "https://mixcopilot.openai.azure.com"
+      ]
+    },
+    {
+      "id": 2,
+      "type": "KeyInput",
+      "pos": [
+        144,
+        257
+      ],
+      "size": {
+        "0": 315,
+        "1": 70
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            1
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "使用你自己的key",
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 6,
+      "type": "MultiPersonPodcast",
+      "pos": [
+        1099,
+        480
+      ],
+      "size": [
+        481.8963185574753,
+        268.61682945154007
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "speaker",
+          "type": "SPEAKER",
+          "link": 7,
+          "slot_index": 0
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio_list",
+          "type": "AUDIO",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            8
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MultiPersonPodcast"
+      },
+      "widgets_values": [
+        "小明：大家好，欢迎收听本周的《AI新动态》。我是主持人小明，今天我们有两位嘉宾，分别是小李和小王。大家跟听众打个招呼吧！\n小李：大家好，我是小李，很高兴今天能和大家聊聊最新的AI动态。\n小王：大家好，我是小王，也很期待今天的讨论。",
+        0,
+        0,
+        0,
+        0,
+        false,
+        1
+      ]
+    },
+    {
+      "id": 7,
+      "type": "LoadSpeaker",
+      "pos": [
+        584,
+        567
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "speaker",
+          "type": "SPEAKER",
+          "links": [
+            6
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "title": "opus",
+      "properties": {
+        "Node name for S&R": "LoadSpeaker"
+      },
+      "widgets_values": [
+        "opus_00001"
+      ]
+    },
+    {
+      "id": 1,
+      "type": "SimulateDevDesignDiscussions",
+      "pos": [
+        611,
+        201
+      ],
+      "size": [
+        391.9864763335838,
+        217.95792637114943
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 1,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "custom_api_url",
+          "type": "STRING",
+          "link": 2,
+          "widget": {
+            "name": "custom_api_url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            3,
+            4
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SimulateDevDesignDiscussions"
+      },
+      "widgets_values": [
+        "数字艺术好看吗？",
+        "gpt-4o",
+        "openai",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 8,
+      "type": "RenameSpeaker",
+      "pos": [
+        593,
+        681
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "speaker",
+          "type": "SPEAKER",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "speaker",
+          "type": "SPEAKER",
+          "links": [
+            7
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RenameSpeaker"
+      },
+      "widgets_values": [
+        "主持人"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "ShowTextForGPT",
+      "pos": [
+        1071,
+        128
+      ],
+      "size": [
+        624.2005965936271,
+        279.47889630613906
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 3,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "* 主持人：作为一名设计师，你如何定义“好看”的数字艺术？\n设计师：好看的数字艺术？就像你在沙漠中看到绿洲的那一刻，它能吸引你的眼球，抓住你的心，它能传达情感，让人产生共鸣。可能是颜色的对撞，也可能是形状的魔法，总之，它让你想多看几眼，还想收藏到你的精神博物馆里。\n* 主持人：程序员，你们在开发支持数字艺术的软件时，如何确保用户体验的直观性和美观性？\n程序员：哎呀，这可是门艺术活啊！这时候我们可不像写代码那样呆板，想象力飞起来。我们会尽量让界面简洁好用，不搞那些让人摸不着头脑的功能。动效啥的也要调校好，太多就变花里胡哨了，太少用户觉得干巴巴。最重要的是，多听设计师的，他们可是颜值担当啊！\n* 主持人：站在设计师的角度，你觉得技术如何影响了数字艺术的表现力？\n设计师：技术啊，那可是我们的魔法棒！有了高端的硬件和软件，我们可以在屏幕上玩出各种花样，大到宇宙，小到细胞，想象力在技术的加持下，才能飞得更高更远。不管是3D渲染，还是AR互动，技术就是让我们的创意从草图变成现实的桥梁，让我们画布上的每一个像素都能发光。\n* 主持人：不知道程序员又是怎么看待数字艺术的后台开发和前端展示关系的呢？\n程序员：后端和前端就像魔法师和舞台演员。后端是幕后默默挥舞魔法杖，搞定数据处理啊、服务器啥的，让那台机器运转得顺溜。前端呢，就是站在舞台中央光彩夺目，把数据和功能打包成美美的界面展示给用户。说白了，后端是灵魂，前端是颜值，两个缺一不可，配合得好才是真正的艺术！\n* 主持人：感谢大家的参与，今天关于数字艺术的讨论让我受益匪浅。\n程序员：不客气，代码和艺术的碰撞总是火花四射！\n\n设计师：没错，灵感和技术结合，才能创作出让人惊艳的作品。期待下次再聊！"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "PreviewAudio",
+      "pos": [
+        1740,
+        453
+      ],
+      "size": {
+        "0": 315,
+        "1": 76
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 8
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewAudio"
+      },
+      "widgets_values": [
+        null
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      2,
+      0,
+      1,
+      0,
+      "STRING"
+    ],
+    [
+      2,
+      3,
+      0,
+      1,
+      2,
+      "STRING"
+    ],
+    [
+      3,
+      1,
+      0,
+      5,
+      0,
+      "STRING"
+    ],
+    [
+      4,
+      1,
+      0,
+      6,
+      1,
+      "STRING"
+    ],
+    [
+      6,
+      7,
+      0,
+      8,
+      0,
+      "SPEAKER"
+    ],
+    [
+      7,
+      8,
+      0,
+      6,
+      0,
+      "SPEAKER"
+    ],
+    [
+      8,
+      6,
+      1,
+      9,
+      0,
+      "AUDIO"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1.3310000000000006,
+      "offset": [
+        -361.773434010461,
+        27.423855709687306
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -32,7 +32,7 @@ _URL_=None
 # except:
 #     print("##nodes.ChatGPT ImportError")
 
-from .nodes.ChatGPT import openai_client
+# from .nodes.ChatGPT import openai_client
 
 from .nodes.RembgNode import get_rembg_models,U2NET_HOME,run_briarmbg,run_rembg
 
@@ -1261,7 +1261,7 @@ logging.info('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 # print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 
 try:
-    from .nodes.ChatGPT import SiliconflowTextToImageNode,JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
+    from .nodes.ChatGPT import SimulateDevDesignDiscussions,SiliconflowTextToImageNode,JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
     NODE_CLASS_MAPPINGS_V = {
@@ -1271,7 +1271,9 @@ try:
         "ShowTextForGPT":ShowTextForGPT,
         "CharacterInText":CharacterInText,
         "TextSplitByDelimiter":TextSplitByDelimiter,
-        "JsonRepair":JsonRepair
+        "JsonRepair":JsonRepair,
+
+        "SimulateDevDesignDiscussions":SimulateDevDesignDiscussions
     }
 
     # 一个包含节点友好/可读的标题的字典
@@ -1282,7 +1284,9 @@ try:
         "ShowTextForGPT":"Show Text ♾️MixlabApp",
         "CharacterInText":"Character In Text",
         "TextSplitByDelimiter":"Text Split By Delimiter",
-        "JsonRepair":"Json Repair"
+        "JsonRepair":"Json Repair",
+
+        "SimulateDevDesignDiscussions":"SimulateDevDesignDiscussions ♾️Mixlab Podcast"
     }
 
 
