@@ -843,12 +843,7 @@ class JsonRepair:
 
 # 以下为固定提示词的LLM节点示例
 class SimulateDevDesignDiscussions:
-    def __init__(self):
-        # self.__client = OpenAI()
-        self.session_history = []  # 用于存储会话历史的列表
-        # self.seed=0
-        self.system_content="You are ChatGPT, a large language model trained by OpenAI. Answer as concisely as possible."
-
+    
     @classmethod
     def INPUT_TYPES(cls):
 
