@@ -48,6 +48,9 @@ def format_to_srt(channel_id, start_time_ms, end_time_ms, asr_result):
 
     pattern = r"<\|(.+?)\|><\|(.+?)\|><\|(.+?)\|><\|(.+?)\|>(.+)"
     match = re.match(pattern,asr_result)
+    print('#format_to_srt',match,asr_result)
+    if match==None:
+        return None, None, None, None,None,start_time,end_time,None
     lang, emotion, audio_type, itn, text = match.groups()
      # 😊 表示高兴，😡 表示愤怒，😔 表示悲伤。对于音频事件，🎼 表示音乐，😀 表示笑声，👏 表示掌声
     
@@ -115,16 +118,17 @@ class SenseVoiceProcessor:
                     part[1], 
                     asr_result)
 
-                results.append({
-                    "language":lang, 
-                    "emotion":emotion,
-                    "audio_type":audio_type, 
-                    "itn":itn,
-                    "srt_content":srt_content,
-                    "start_time":start_time,
-                    "end_time":end_time,
-                    "text":text
-                })
+                if lang!=None:
+                    results.append({
+                        "language":lang, 
+                        "emotion":emotion,
+                        "audio_type":audio_type, 
+                        "itn":itn,
+                        "srt_content":srt_content,
+                        "start_time":start_time,
+                        "end_time":end_time,
+                        "text":text
+                    })
 
             self.vad.vad.all_reset_detection()
             pbar.update(1)  # 更新进度条
@@ -168,8 +172,9 @@ class SenseVoiceNode:
 
     OUTPUT_NODE = True
     FUNCTION = "run" 
-    RETURN_TYPES = (any_type,)
-    RETURN_NAMES = ("result",)
+    
+    RETURN_TYPES = (any_type,"STRING","STRING","FLOAT",)
+    RETURN_NAMES = ("result","srt","text","total_seconds",)
 
     def run(self,audio,device,language,num_threads,use_int8,use_itn ):
  
@@ -200,16 +205,22 @@ class SenseVoiceNode:
 
         if 'waveform' in audio and 'sample_rate' in audio:
             waveform = audio['waveform']
+            sample_rate = audio['sample_rate']
             # print("Original shape:", waveform.shape)  # 打印原始形状
             if waveform.ndim == 3 and waveform.shape[0] == 1:  # 检查是否为三维且 batch_size 为 1
                 waveform = waveform.squeeze(0)  # 移除 batch_size 维度
-                waveform_numpy = waveform.numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
             else:
                 raise ValueError("Unexpected waveform dimensions")
 
-            _sample_rate = audio['sample_rate']
+            print("waveform.shape:", waveform.shape) 
+            total_length_seconds = waveform.shape[1] / sample_rate
 
-        results=self.processor.process_audio(waveform_numpy, _sample_rate, language, use_itn)
+            waveform_numpy = waveform.numpy().transpose(1, 0)  # 转换为 (num_samples, num_channels)
 
+        results=self.processor.process_audio(waveform_numpy, sample_rate, language, use_itn)
 
-        return (results,)
+        srt_content="\n".join([s['srt_content'] for s in results])
+        text="\n".join([s['text'] for s in results])
+
+        return (results,srt_content,text,total_length_seconds,)
+ 

@@ -1006,7 +1006,7 @@ from .nodes.ImageNode import DepthViewer_,ImageBatchToList_,ImageListToBatch_,Co
 # from .nodes.Vae import VAELoader,VAEDecode
 from .nodes.ScreenShareNode import ScreenShareNode,FloatingVideo
 
-from .nodes.Audio import AudioPlayNode,SpeechRecognition,SpeechSynthesis
+from .nodes.Audio import AudioPlayNode,SpeechRecognition,SpeechSynthesis,AnalyzeAudioNone
 from .nodes.Utils import CreateJsonNode,KeyInput,IncrementingListNode,ListSplit,CreateLoraNames,CreateSampler_names,CreateCkptNames,CreateSeedNode,TESTNODE_,TESTNODE_TOKEN,AppInfo,IntNumber,FloatSlider,TextInput,ColorInput,FontInput,TextToNumber,DynamicDelayProcessor,LimitNumber,SwitchByIndex,MultiplicationNode
 from .nodes.Mask import PreviewMask_,MaskListReplace,MaskListMerge,OutlineMask,FeatheredMask
 
@@ -1103,6 +1103,7 @@ NODE_CLASS_MAPPINGS = {
     "SpeechRecognition":SpeechRecognition,
     "SpeechSynthesis":SpeechSynthesis,
     "AudioPlay":AudioPlayNode,
+    "AnalyzeAudio":AnalyzeAudioNone,
 
     # Text
     "TextToNumber":TextToNumber,
@@ -1220,6 +1221,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SpeechSynthesis":"SpeechSynthesis ♾️Mixlab",
     "SpeechRecognition":"SpeechRecognition ♾️Mixlab",
     "AudioPlay":"Preview Audio ♾️Mixlab",
+    "AnalyzeAudio":"Analyze Audio ♾️Mixlab",
 
     # Utils
     "DynamicDelayProcessor":"DynamicDelayByText ♾️Mixlab",
@@ -1433,11 +1435,20 @@ try:
     from .nodes.SenseVoice import SenseVoiceNode
     logging.info('SenseVoice.available')
     NODE_CLASS_MAPPINGS['SenseVoiceNode']=SenseVoiceNode
-    NODE_DISPLAY_NAME_MAPPINGS["SenseVoiceNode"]= "Sense Voice"
+    NODE_DISPLAY_NAME_MAPPINGS["SenseVoiceNode"]= "Sense Voice ♾️Mixlab"
 
 except Exception as e:
     logging.info('SenseVoice.available False' )  
 
+try:
+    from .nodes.Whisper import LoadWhisperModel,WhisperTranscribe
+    logging.info('Whisper.available')
+    NODE_CLASS_MAPPINGS['LoadWhisperModel_']=LoadWhisperModel
+    NODE_CLASS_MAPPINGS['WhisperTranscribe_']=WhisperTranscribe
+    NODE_DISPLAY_NAME_MAPPINGS["LoadWhisperModel_"]= "Load Whisper Model ♾️Mixlab"
+    NODE_DISPLAY_NAME_MAPPINGS["WhisperTranscribe_"]= "Whisper Transcribe ♾️Mixlab"
 
+except Exception as e:
+    logging.info('Whisper.available False' )  
 
 logging.info('\033[93m -------------- \033[0m')

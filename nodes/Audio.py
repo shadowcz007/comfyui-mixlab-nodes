@@ -3,6 +3,101 @@ import os
 import folder_paths
 import torchaudio
 
+class AnyType(str):
+  """A special class that is always equal in not equal comparisons. Credit to pythongosssss"""
+
+  def __ne__(self, __value: object) -> bool:
+    return False
+
+any_type = AnyType("*")
+
+
+def analyze_audio_data(audio_data):
+    total_duration = 0
+    total_gap_duration = 0
+    emotion_counts = {}
+    audio_types = set()
+    languages = set()
+
+    for i, entry in enumerate(audio_data):
+        # Calculate the duration of each audio segment
+        start_time = entry['start_time']
+        end_time = entry['end_time']
+        duration = end_time - start_time
+        total_duration += duration
+
+        # Count the emotions
+        if "emotion" in entry:
+            emotion = entry['emotion']
+            if emotion in emotion_counts:
+                emotion_counts[emotion] += 1
+            else:
+                emotion_counts[emotion] = 1
+
+        # Collect the audio types
+        if "audio_type" in entry:
+            audio_types.add(entry['audio_type'])
+
+        if "language" in entry:
+            languages.add(entry['language'])
+
+        # Calculate gap duration if not the last entry
+        if i < len(audio_data) - 1:
+            next_start_time = audio_data[i + 1]['start_time']
+            gap_duration = next_start_time - end_time
+            if gap_duration > 0:
+                total_gap_duration += gap_duration
+
+    # Get the most frequent emotion
+    if len(emotion_counts.keys())>0:
+        most_frequent_emotion = max(emotion_counts, key=emotion_counts.get)
+    else:
+        most_frequent_emotion=None
+
+    # Convert audio_types set to list for better readability
+    audio_types = list(audio_types)
+
+    languages=list(languages)
+
+    # Print the results
+    print(f"Total Effective Duration: {total_duration:.2f} seconds")
+    print(f"Total Gap Duration: {total_gap_duration:.2f} seconds")
+    print(f"Emotion Changes: {emotion_counts}")
+    print(f"Most Frequent Emotion: {most_frequent_emotion}")
+    print(f"Audio Types: {audio_types}")
+
+
+    return {
+        "total_duration": total_duration,
+        "total_gap_duration": total_gap_duration,
+        "emotion_changes": emotion_counts,
+        "most_frequent_emotion": most_frequent_emotion,
+        "audio_types": audio_types,
+        "languages":languages
+    }
+
+
+# 分析音频数据
+class AnalyzeAudioNone:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required": { 
+                    "json":(any_type,),}, 
+                }
+    
+    RETURN_TYPES = (any_type,)
+    RETURN_NAMES = ("result",)
+
+    FUNCTION = "run"
+
+    CATEGORY = "♾️Mixlab/Audio"
+
+    def run(self,json):
+        result=analyze_audio_data(json)
+        return (result,)
+
+
+
 class SpeechRecognition:
     @classmethod
     def INPUT_TYPES(s):

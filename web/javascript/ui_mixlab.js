@@ -544,7 +544,7 @@ async function getCustomnodeMappings () {
     const data = (await get_nodes_map()).data
     window._nodes_maps = data
   }
-  console.log('#getCustomnodeMappings', window._nodes_maps)
+  // console.log('#getCustomnodeMappings', window._nodes_maps)
   for (let url in window._nodes_maps) {
     let n = window._nodes_maps[url]
     for (let node of n[0]) {
