@@ -10,7 +10,7 @@ For business cooperation, please contact email 389570357@qq.com
 
 ##### `最新`：
 
-- 新增 SimulateDevDesignDiscussions，需要安装[swarm](https://github.com/openai/swarm)和[Comfyui-ChatTTS](https://github.com/shadowcz007/Comfyui-ChatTTS)，工作流下载[./workflow/swarm制作的播客节点workflow.json]
+- 新增 SimulateDevDesignDiscussions，需要安装[swarm](https://github.com/openai/swarm)和[Comfyui-ChatTTS](https://github.com/shadowcz007/Comfyui-ChatTTS)，[工作流下载](./workflow/swarm制作的播客节点workflow.json)
 
 - 新增 SenseVoice
 
