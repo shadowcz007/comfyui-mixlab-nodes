@@ -82,6 +82,30 @@ def is_installed(package, package_overwrite=None,auto_install=True):
     return is_has
   
 
+def save_to_json(file_path, data):
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(data, f)
+    except Exception as e:
+            print(e)
+
+def read_from_json(file_path):
+    data={}
+    try:
+        with open(file_path, 'r') as f:
+            data = json.load(f)
+    except Exception as e:
+            print(e)
+    return data
+
+
+# read_from_json()
+current_path = os.path.abspath(os.path.dirname(__file__))
+social_profile_json=os.path.join(current_path,'social_profile.json')
+# print('Watcher:',config_json)
+
+def save_social_profile_config(data):
+     save_to_json(social_profile_json,data)
 
 
 # def is_installed(package):
@@ -897,7 +921,7 @@ class SimulateDevDesignDiscussions:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
     FUNCTION = "generate_contextual_text"
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Agent"
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
@@ -1140,14 +1164,14 @@ class AvatarGeneratorAgent:
              
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
-    FUNCTION = "generate_contextual_text"
-    CATEGORY = "♾️Mixlab/GPT"
+    RETURN_TYPES = ("STRING","STRING","STRING",)
+    RETURN_NAMES = ("subject","result","role_desc",)
+    FUNCTION = "run"
+    CATEGORY = "♾️Mixlab/Agent"
     INPUT_IS_LIST = False
     OUTPUT_IS_LIST = (False,)
 
-    def generate_contextual_text(self,
+    def run(self,
                                  subject, 
                                  social_profile,
                                  model, 
@@ -1260,6 +1284,7 @@ class AvatarGeneratorAgent:
             print(f"Account Details: {username} {profile_id} {skills}")
 
             # 
+            save_social_profile_config(context_variables)
             return "Success"
 
         generator_agent = Agent(

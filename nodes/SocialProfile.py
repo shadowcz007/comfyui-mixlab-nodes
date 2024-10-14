@@ -48,16 +48,13 @@ user=read_social_profile_config()
 
 class SocialProfileNode:
 
-    def __init__(self):
-        self.user =read_social_profile_config()
-
     @classmethod
-    def INPUT_TYPES(self):
+    def INPUT_TYPES(s):
         return {
             "required": {
-                "username": ("STRING", {"forceInput": False, "default": self.user['username']}),
-                "profile_id": ("STRING", {"forceInput": False, "default": self.user['profile_id']}),
-                "skills": ("STRING", {"forceInput": False, "multiline": True, "default": ",".join(self.user['skills'])}),
+                "username": ("STRING", {"forceInput": False, "default": user['username']}),
+                "profile_id": ("STRING", {"forceInput": False, "default": user['profile_id']}),
+                "skills": ("STRING", {"forceInput": False, "multiline": True, "default": ",".join(user['skills'])}),
             },
         }
 
@@ -66,7 +63,7 @@ class SocialProfileNode:
     RETURN_NAMES = ("social_profile(json_string)",)
     FUNCTION = "run"
     # OUTPUT_IS_LIST = (False,)
-    CATEGORY = "♾️Mixlab/Test"
+    CATEGORY = "♾️Mixlab/Agent"
 
     def run(self, username, profile_id, skills):
         
