@@ -15,6 +15,7 @@ from io import BytesIO
 import torch
 import numpy as np
 
+
 python = sys.executable
 
 # Convert PIL to Tensor
@@ -44,6 +45,13 @@ def extract_json_strings(text):
 
     return json_strings[0] if len(json_strings)>0 else "{}"
 
+# text2json
+def text_to_json(text):
+    text=extract_json_strings(text)
+    good_json_string = repair_json(text)
+    # 将 JSON 字符串解析为 Python 对象
+    data = json.loads(good_json_string)
+    return data
 
 def is_installed(package, package_overwrite=None,auto_install=True):
     is_has=False
@@ -73,6 +81,7 @@ def is_installed(package, package_overwrite=None,auto_install=True):
 
     return is_has
   
+
 
 
 # def is_installed(package):
@@ -1084,4 +1093,296 @@ class SimulateDevDesignDiscussions:
 
         
         return ("\n".join(result),)
+
+
+
+class AvatarGeneratorAgent:
+    
+    @classmethod
+    def INPUT_TYPES(cls):
+
+        model_list=[ 
+            "gpt-4o",
+            "gpt-4o-2024-05-13",
+            "gpt-4",
+            "gpt-4-0314",
+            "gpt-4-0613",
+            "qwen-turbo",
+            "qwen-plus",
+            "qwen-long",
+            "qwen-max",
+            "qwen-max-longcontext",
+            "glm-4",
+            "glm-3-turbo",
+            "moonshot-v1-8k",
+            "moonshot-v1-32k",
+            "moonshot-v1-128k",
+            "deepseek-chat",
+            "Qwen/Qwen2-7B-Instruct",
+            "THUDM/glm-4-9b-chat",
+            "01-ai/Yi-1.5-9B-Chat-16K"
+                    ]
+        
+        return {
+            "required": {
+                "subject": ("STRING", {"multiline": True,"dynamicPrompts": False}),
+                "social_profile":("STRING", {"forceInput": True}),
+                "model": ( model_list, 
+                    {"default": model_list[0]}),
+                "api_url":(list(llm_apis_dict.keys()), 
+                    {"default": list(llm_apis_dict.keys())[0]}),
+            },
+             "optional":{
+                    "api_key":("STRING", {"forceInput": True,}),
+                    "custom_model_name":("STRING", {"forceInput": True,}), #适合自定义model
+                     "custom_api_url":("STRING", {"forceInput": True,}), #适合自定义model
+                },
+             
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("text",)
+    FUNCTION = "generate_contextual_text"
+    CATEGORY = "♾️Mixlab/GPT"
+    INPUT_IS_LIST = False
+    OUTPUT_IS_LIST = (False,)
+
+    def generate_contextual_text(self,
+                                 subject, 
+                                 social_profile,
+                                 model, 
+                                api_url,
+                                api_key=None,
+                                custom_model_name=None,
+                                custom_api_url=None,
+                                ):
+        
+        # 设置黄色文本的ANSI转义序列
+        YELLOW = "\033[33m"
+        # 重置文本颜色的ANSI转义序列
+        RESET = "\033[0m"
+
+        if custom_model_name!=None:
+            model=custom_model_name
+
+        api_url=llm_apis_dict[api_url] if api_url in llm_apis_dict else ""
+
+        if custom_api_url!=None:
+            api_url=custom_api_url
+
+        if api_key==None:
+            api_key="lm_studio"
+
+        print("api_key,api_url",api_key,api_url)
+        # 
+        if is_azure_url(api_url):
+            client=azure_client(api_key,api_url)
+        else:
+            # 根据用户选择的模型，设置相应的接口和模型名称
+            if model == "glm-4" :
+                client = ZhipuAI_client(api_key)  # 使用 Zhipuai 的接口
+                print('using Zhipuai interface')
+            else :
+                client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
+               
+  
+        
+        # 以下为多智能体框架
+        client = Swarm(client=client)
+
+        # 定义1个代理：生成器
+
+        # instructions
+        def generator_instructions(context_variables):
+            # user = context_variables.get("name", "User")
+            user=json.dumps(context_variables)
+            return f'''
+        根据用户的背景信息 {user} 来欢迎用户，并根据具体的指令进行深度思考后回复。
+
+        请确保以下内容：
+
+        *   使用 `username` 来欢迎用户。
+        *   考虑用户的背景信息，提供相关和定制化的回复。
+        *   详细思考过程，并确保结论或结果在最后给出。
+
+        Steps
+        =====
+
+        1.  使用 `username` 来欢迎用户。
+        2.  分析和理解用户的背景信息 {user}。
+        3.  根据具体的指令进行深度思考。
+        4.  详细的思考过程应包括对用户背景的分析和指令的具体执行。
+        5.  最后给出结论或结果。
+
+        Output Format
+        =============
+
+        *   欢迎语应简洁明了。
+        *   思考过程不需要显示。
+        *   直接输出结论或结果。
+
+        Examples
+        ========
+
+        **Example 1:**
+
+        **Input:**  
+        背景信息: "username: John, occupation: software engineer, interests: AI, hobbies: chess"  
+        指令: "推荐一本书"
+
+        **Output:**  
+        欢迎你, John！我推荐你阅读《人工智能：现代方法》。这本书详细介绍了AI的基本原理和最新进展，非常适合你这样的软件工程师。此外，如果你对休闲阅读也有兴趣，我还推荐《棋类游戏中的人工智能》，这本书结合了你的AI兴趣和下棋的爱好。
+
+        **Example 2:**
+
+        **Input:**  
+        背景信息: "username: Alice, occupation: graphic designer, interests: UX/UI, hobbies: painting"  
+        指令: "推荐一个在线课程"
+
+        **Output:**  
+        欢迎你, Alice！我推荐你参加Coursera上的《用户体验设计基础》课程。这个课程专为像你这样的平面设计师设计，涵盖了UX/UI设计的基本原则和实践。考虑到你对绘画的爱好，你可能也会喜欢《数字艺术创作》这个课程，它将帮助你将传统艺术技巧应用到数字平台上。
+
+        Notes
+        =====
+
+        *   确保欢迎语与用户背景信息相关。
+        *   思考过程应包括对用户背景的分析和指令的具体执行。
+        *   结论应简洁明了，并与用户的背景信息和指令密切相关。
+        '''.strip()
+
+        # 用于更新用户信息
+        def update_account_details(context_variables: dict):
+            profile_id = context_variables.get("profile_id", None)
+            username = context_variables.get("username", None)
+            skills = context_variables.get("skills", None)
+            if skills:
+                skills=",".join(skills)
+            print(f"Account Details: {username} {profile_id} {skills}")
+
+            # 
+            return "Success"
+
+        generator_agent = Agent(
+            name="generator_agent",
+            instructions=generator_instructions,
+            functions=[update_account_details],
+        )
+
+        # dict
+        context_variables = json.loads(social_profile)
+
+        response = client.run(
+            messages=[{"role": "user", "content":subject}],
+            agent=generator_agent,
+            context_variables=context_variables,
+            model_override=model
+        )
+        result=response.messages[-1]["content"]
+        print(f"{YELLOW}{result}{RESET}")
+
+
+        # 答案生成
+
+        def answer_instructions(context_variables):
+            # user = context_variables.get("name", "User")
+            user=json.dumps(context_variables)
+
+            return '''
+                根据提供的金句，先判断属于哪个领域的信息，然后选择最不相关的其他领域里的新概念，结合用户的'''+user+'''信息，生成一个新的职业标签。目的是激发新灵感的产生。
+
+        Steps
+        =====
+
+        1.  **判断领域**: 根据提供的金句，判断其所属领域。
+        2.  **选择不相关概念**: 从其他领域中选择一个最不相关的新概念。
+        3.  **结合用户信息**: 将上述步骤中的信息与用户的user信息结合。
+        4.  **生成职业标签**: 生成一个新的职业标签，激发新灵感。
+
+        Output Format
+        =============
+
+        用JSON格式输出新的职业标签:
+
+        ```
+        { "result": "new_tag" }
+        ```
+
+        Examples
+        ========
+
+        **Example 1:**
+
+        *   Input:
+            *   金句: "科技是第一生产力"
+            *   user信息: "对金融科技有浓厚兴趣"
+        *   Output:
+
+            ```
+            { "result": "金融科技园艺师" }
+            ```
+
+        **Example 2:**
+
+        *   Input:
+            *   金句: "艺术是心灵的镜子"
+            *   user信息: "喜欢编程和数据分析"
+        *   Output:
+
+            ```
+            { "result": "数据分析画家" }
+            ```
+
+        Notes
+        =====
+
+        *   确保新概念与原领域尽量不相关。
+        *   职业标签应有创意且能激发灵感。'''.strip()
+
+        answer_agent = Agent(
+                    name="Answer",
+                    instructions=answer_instructions)
+
+        response = client.run(
+            messages=[{"role": "user", "content": result}],
+            agent=answer_agent,
+            context_variables=context_variables,
+            model_override=model
+        )
+        content=response.messages[-1]["content"]
+
+        answer_json=text_to_json(content)
+
+        print(f"{YELLOW}{content}{RESET}") 
+
+        
+        new_tag=None
+        if "result" in answer_json:
+            new_tag=answer_json['result']
+            context_variables['skills'].append(new_tag)
+
+        role_desc
+
+        if new_tag!=None:
+            response = client.run(
+                messages=[{"role": "user", "content": f"请80%参考{new_tag},20%特征参考我的数字分身信息，描绘一张游戏人物的角色设计图，直接输出角色设计图的描述给我，不要多余的不相关信息"}],
+                agent=generator_agent,
+                context_variables=context_variables,
+                model_override=model
+            )
+
+            role_desc=response.messages[-1]["content"]
+            print(f"{YELLOW}{role_desc}{RESET}") 
+
+
+        response = client.run(
+            messages=[{"role": "user", "content": "请更新我的数字分身信息"}],
+            agent=generator_agent,
+            context_variables=context_variables,
+            model_override=model
+        )
+
+        content=response.messages[-1]["content"]
+        print(f"{YELLOW}{content}{RESET}")
+        
+        return (subject,result,role_desc,)
 

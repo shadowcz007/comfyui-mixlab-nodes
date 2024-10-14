@@ -1261,7 +1261,7 @@ logging.info('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 # print('\033[91m ### Mixlab Nodes: \033[93mLoaded')
 
 try:
-    from .nodes.ChatGPT import SimulateDevDesignDiscussions,SiliconflowTextToImageNode,JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
+    from .nodes.ChatGPT import AvatarGeneratorAgent,SimulateDevDesignDiscussions,SiliconflowTextToImageNode,JsonRepair,ChatGPTNode,ShowTextForGPT,CharacterInText,TextSplitByDelimiter,SiliconflowFreeNode
     logging.info('ChatGPT.available True')
 
     NODE_CLASS_MAPPINGS_V = {
@@ -1273,7 +1273,8 @@ try:
         "TextSplitByDelimiter":TextSplitByDelimiter,
         "JsonRepair":JsonRepair,
 
-        "SimulateDevDesignDiscussions":SimulateDevDesignDiscussions
+        "SimulateDevDesignDiscussions":SimulateDevDesignDiscussions,
+        "AvatarGeneratorAgent":AvatarGeneratorAgent
     }
 
     # 一个包含节点友好/可读的标题的字典
@@ -1286,7 +1287,8 @@ try:
         "TextSplitByDelimiter":"Text Split By Delimiter",
         "JsonRepair":"Json Repair",
 
-        "SimulateDevDesignDiscussions":"SimulateDevDesignDiscussions ♾️Mixlab Podcast"
+        "SimulateDevDesignDiscussions":"SimulateDevDesignDiscussions ♾️Mixlab Podcast",
+        "AvatarGeneratorAgent":"Avatar Generator Agent ♾️Mixlab"
     }
 
 
@@ -1473,5 +1475,17 @@ try:
 
 except Exception as e:
     logging.info('FalVideo.available False' )  
+
+
+try:
+    from .nodes.SocialProfile import SocialProfileNode
+    logging.info('SocialProfile.available')
+    # Update Node class mappings
+    NODE_CLASS_MAPPINGS['SocialProfileNode']=SocialProfileNode
+    
+    NODE_DISPLAY_NAME_MAPPINGS["SocialProfileNode"]=  "Social Profile ♾️Mixlab"
+
+except Exception as e:
+    logging.info('SocialProfile.available False' )  
 
 logging.info('\033[93m -------------- \033[0m')
