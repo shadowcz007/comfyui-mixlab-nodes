@@ -1168,8 +1168,8 @@ class AvatarGeneratorAgent:
     RETURN_NAMES = ("subject","result","role_desc",)
     FUNCTION = "run"
     CATEGORY = "♾️Mixlab/Agent"
-    INPUT_IS_LIST = False
-    OUTPUT_IS_LIST = (False,)
+    # INPUT_IS_LIST = False
+    # OUTPUT_IS_LIST = (False,)
 
     def run(self,
                                  subject, 
