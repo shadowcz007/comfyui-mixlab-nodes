@@ -1,0 +1,775 @@
+{
+  "last_node_id": 18,
+  "last_link_id": 15,
+  "nodes": [
+    {
+      "id": 6,
+      "type": "LoadImage",
+      "pos": [
+        -32,
+        79
+      ],
+      "size": {
+        "0": 315,
+        "1": 314
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            1,
+            2,
+            3
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1.jpg",
+        "image"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "KeyInput",
+      "pos": [
+        -34,
+        585
+      ],
+      "size": {
+        "0": 315,
+        "1": 94
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            4,
+            5,
+            6
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 10,
+      "type": "LoadVideoFromURL",
+      "pos": [
+        1038,
+        21
+      ],
+      "size": [
+        315,
+        266
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "url",
+          "type": "STRING",
+          "link": 7,
+          "widget": {
+            "name": "url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "links": [
+            8
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadVideoFromURL"
+      },
+      "widgets_values": [
+        "https://example.com/video.mp4",
+        0,
+        "Disabled",
+        512,
+        512,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 13,
+      "type": "LoadVideoFromURL",
+      "pos": [
+        1032,
+        715
+      ],
+      "size": {
+        "0": 315,
+        "1": 266
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "url",
+          "type": "STRING",
+          "link": 10,
+          "widget": {
+            "name": "url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "links": [
+            12
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadVideoFromURL"
+      },
+      "widgets_values": [
+        "https://example.com/video.mp4",
+        0,
+        "Disabled",
+        512,
+        512,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 11,
+      "type": "PreviewImage",
+      "pos": [
+        1436,
+        6
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 8
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 3,
+      "type": "VideoGenKlingNode",
+      "pos": [
+        527.4816383216086,
+        19.100152539671797
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 1
+        },
+        {
+          "name": "fal_key",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "fal_key"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            7,
+            13
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VideoGenKlingNode"
+      },
+      "widgets_values": [
+        "The man is shaking his head with a wry smile.\n\n",
+        "5",
+        "16:9",
+        "standard",
+        ""
+      ]
+    },
+    {
+      "id": 16,
+      "type": "ShowTextForGPT",
+      "pos": [
+        1702,
+        -85
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 13,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "https://v2.fal.media/files/0f9f44093c7442d5b0819616880bca65_output.mp4"
+      ]
+    },
+    {
+      "id": 4,
+      "type": "VideoGenRunwayGen3Node",
+      "pos": [
+        529,
+        297
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 2
+        },
+        {
+          "name": "fal_key",
+          "type": "STRING",
+          "link": 5,
+          "widget": {
+            "name": "fal_key"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            9,
+            14
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VideoGenRunwayGen3Node"
+      },
+      "widgets_values": [
+        "The man is shaking his head with a wry smile.\n\n",
+        "5",
+        "16:9",
+        ""
+      ]
+    },
+    {
+      "id": 5,
+      "type": "VideoGenLumaDreamMachineNode",
+      "pos": [
+        534,
+        570
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 3
+        },
+        {
+          "name": "fal_key",
+          "type": "STRING",
+          "link": 6,
+          "widget": {
+            "name": "fal_key"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            10,
+            15
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VideoGenLumaDreamMachineNode"
+      },
+      "widgets_values": [
+        "The man is shaking his head with a wry smile.\n\n",
+        "16:9",
+        "",
+        true
+      ]
+    },
+    {
+      "id": 18,
+      "type": "ShowTextForGPT",
+      "pos": [
+        1719,
+        665
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 15,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "https://v2.fal.media/files/a622a5aac002452ba0e75f7d8871389d_output.mp4"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "LoadVideoFromURL",
+      "pos": [
+        1049,
+        349
+      ],
+      "size": {
+        "0": 315,
+        "1": 266
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "url",
+          "type": "STRING",
+          "link": 9,
+          "widget": {
+            "name": "url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "links": [
+            11
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadVideoFromURL"
+      },
+      "widgets_values": [
+        "https://example.com/video.mp4",
+        0,
+        "Disabled",
+        512,
+        512,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "id": 17,
+      "type": "ShowTextForGPT",
+      "pos": [
+        1711,
+        318
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 14,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "https://v2.fal.media/files/755d51c8984a4445a852268a209b07e4_output.mp4"
+      ]
+    },
+    {
+      "id": 15,
+      "type": "PreviewImage",
+      "pos": [
+        1444,
+        650
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 12
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 14,
+      "type": "PreviewImage",
+      "pos": [
+        1416,
+        310
+      ],
+      "size": [
+        210,
+        246
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 11
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    }
+  ],
+  "links": [
+    [
+      1,
+      6,
+      0,
+      3,
+      0,
+      "IMAGE"
+    ],
+    [
+      2,
+      6,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      3,
+      6,
+      0,
+      5,
+      0,
+      "IMAGE"
+    ],
+    [
+      4,
+      7,
+      0,
+      3,
+      1,
+      "STRING"
+    ],
+    [
+      5,
+      7,
+      0,
+      4,
+      1,
+      "STRING"
+    ],
+    [
+      6,
+      7,
+      0,
+      5,
+      1,
+      "STRING"
+    ],
+    [
+      7,
+      3,
+      0,
+      10,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      10,
+      0,
+      11,
+      0,
+      "IMAGE"
+    ],
+    [
+      9,
+      4,
+      0,
+      12,
+      0,
+      "STRING"
+    ],
+    [
+      10,
+      5,
+      0,
+      13,
+      0,
+      "STRING"
+    ],
+    [
+      11,
+      12,
+      0,
+      14,
+      0,
+      "IMAGE"
+    ],
+    [
+      12,
+      13,
+      0,
+      15,
+      0,
+      "IMAGE"
+    ],
+    [
+      13,
+      3,
+      0,
+      16,
+      0,
+      "STRING"
+    ],
+    [
+      14,
+      4,
+      0,
+      17,
+      0,
+      "STRING"
+    ],
+    [
+      15,
+      5,
+      0,
+      18,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7247295000000012,
+      "offset": [
+        -59.526177135875514,
+        197.10624904779425
+      ]
+    }
+  },
+  "version": 0.4
+}
