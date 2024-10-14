@@ -1455,4 +1455,23 @@ try:
 except Exception as e:
     logging.info('Whisper.available False' )  
 
+
+try:
+    from .nodes.FalVideo import VideoGenKlingNode,VideoGenLumaDreamMachineNode,VideoGenRunwayGen3Node,LoadVideoFromURL
+    logging.info('FalVideo.available')
+    # Update Node class mappings
+    NODE_CLASS_MAPPINGS['VideoGenKlingNode']=VideoGenKlingNode
+    NODE_CLASS_MAPPINGS['VideoGenRunwayGen3Node']=VideoGenRunwayGen3Node
+    NODE_CLASS_MAPPINGS['VideoGenLumaDreamMachineNode']=VideoGenLumaDreamMachineNode
+    NODE_CLASS_MAPPINGS['LoadVideoFromURL']=LoadVideoFromURL
+    
+    NODE_DISPLAY_NAME_MAPPINGS["VideoGenKlingNode"]=  "Kling Video Generation @fal"
+    NODE_DISPLAY_NAME_MAPPINGS["VideoGenRunwayGen3Node"]= "Runway Gen3 Image-to-Video @fal"
+    NODE_DISPLAY_NAME_MAPPINGS["VideoGenLumaDreamMachineNode"]= "Luma Dream Machine @fal"
+    NODE_DISPLAY_NAME_MAPPINGS["LoadVideoFromURL"]= "Load Video from URL"
+    
+
+except Exception as e:
+    logging.info('FalVideo.available False' )  
+
 logging.info('\033[93m -------------- \033[0m')
