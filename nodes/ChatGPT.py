@@ -1221,7 +1221,7 @@ class AvatarGeneratorAgent:
             # user = context_variables.get("name", "User")
             user=json.dumps(context_variables)
             return f'''
-        根据用户的背景信息 {user} 来欢迎用户，并根据具体的指令进行深度思考后回复。
+        根据用户的背景信息 {user} 来欢迎用户，并根据提供的信息，推荐或者生成回复，记得进行深度思考后回复。
 
         请确保以下内容：
 
@@ -1385,7 +1385,7 @@ class AvatarGeneratorAgent:
             new_tag=answer_json['result']
             context_variables['skills'].append(new_tag)
 
-        role_desc
+        role_desc=""
 
         if new_tag!=None:
             response = client.run(
