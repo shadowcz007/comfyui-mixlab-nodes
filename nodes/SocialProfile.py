@@ -126,6 +126,7 @@ class LoadSocialProfileNode:
             "required": {
                 "file_name": ( files, 
                     {"default": files[0]}),
+                "seed": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "step": 1}),
             },
         }
 
@@ -136,7 +137,7 @@ class LoadSocialProfileNode:
     # OUTPUT_IS_LIST = (False,)
     CATEGORY = "♾️Mixlab/Agent"
 
-    def run(self,file_name):
+    def run(self,file_name,seed):
         # print("#read_from_json",os.path.join(agent_dir,file_name))
         social_profile=read_from_json(os.path.join(agent_dir,file_name))
 
