@@ -1,7 +1,7 @@
 # 用于定义社交名片
 
 import json,os
-
+import folder_paths
 
 def save_to_json(file_path, data):
     try:
@@ -11,35 +11,62 @@ def save_to_json(file_path, data):
             print(e)
 
 def read_from_json(file_path):
-    data={}
+    data=None
     try:
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, 'w') as f:
             data = json.load(f)
     except Exception as e:
             print(e)
+            return None
     return data
 
 
-# read_from_json()
-current_path = os.path.abspath(os.path.dirname(__file__))
-social_profile_json=os.path.join(current_path,'social_profile.json')
-# print('Watcher:',config_json)
+default_agent={
+                    "username":"shadow",
+                    "profile_id":"ML000",
+                    "skills":"Design Hacker,Programmer,Architect,Experience Designer".split(",")
+                }
 
-def read_social_profile_config():
-    config={
-         "username":"shadow",
-         "profile_id":"ML000",
-         "skills":"Design Hacker,Programmer,Architect,Experience Designer".split(",")
-    }
+def create_default_file(agent_dir):
+    fp=os.path.join(agent_dir,'shadow.json')
+    if not os.path.exists(fp):
+        save_to_json(fp,default_agent)
+
+def get_social_profile_dir():
     try:
-        if os.path.exists(social_profile_json):
-            config=read_from_json(social_profile_json)
-    except Exception as e:
-            print(e)  
-    return config
+        return folder_paths.get_folder_paths('agent')[0]
+    except:
+        agent_dir=os.path.join(folder_paths.models_dir, "agent")
+        if not os.path.exists(agent_dir):
+            os.makedirs(agent_dir, exist_ok=True)
+            create_default_file(agent_dir)
+        return agent_dir
 
-def save_social_profile_config(data):
-     save_to_json(social_profile_json,data)
+def list_all_json_files(directory_path):
+    json_files = []
+    
+    try:
+        for filename in os.listdir(directory_path):
+            if filename.endswith('.json'):
+                json_files.append(filename)
+                
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    
+    return json_files
+
+
+def read_social_profiles():
+    agent_dir=get_social_profile_dir()
+    return list_all_json_files(agent_dir)
+
+def save_social_profile_config(agent_dir,file_name,data):
+     save_to_json(os.path.join(agent_dir,file_name),data)
+
+
+
+agent_dir=get_social_profile_dir()
+# print('Watcher:',config_json)
 
 
 class NewSocialProfileNode:
@@ -47,13 +74,14 @@ class NewSocialProfileNode:
     @classmethod
     def INPUT_TYPES(s):
  
-        user=read_social_profile_config()
+        user=default_agent
 
         return {
             "required": {
                 "username": ("STRING", {"forceInput": False, "default": user['username']}),
                 "profile_id": ("STRING", {"forceInput": False, "default": user['profile_id']}),
                 "skills": ("STRING", {"forceInput": False, "multiline": True, "default": ",".join(user['skills'])}),
+                "file_name": ("STRING", {"forceInput": False, "default": "agent"}),
             },
         }
 
@@ -64,7 +92,7 @@ class NewSocialProfileNode:
     # OUTPUT_IS_LIST = (False,)
     CATEGORY = "♾️Mixlab/Agent"
 
-    def run(self, username, profile_id, skills):
+    def run(self, username, profile_id, skills,file_name):
         
         # 将skills字符串分割为列表
         skills_list = [skill.strip() for skill in skills.split(",")]
@@ -79,7 +107,7 @@ class NewSocialProfileNode:
         # 将社交名片转换为JSON字符串
         json_string = json.dumps(social_profile, ensure_ascii=False)
 
-        save_social_profile_config(social_profile)
+        save_social_profile_config(agent_dir,file_name+'.json',social_profile)
 
         # 返回JSON字符串和一个示例值
         return (json_string,)
@@ -89,9 +117,12 @@ class LoadSocialProfileNode:
 
     @classmethod
     def INPUT_TYPES(s):
-        
+        files=read_social_profiles()
         return {
-            "required": {},
+            "required": {
+                "file_name": ( files, 
+                    {"default": files[0]}),
+            },
         }
 
     # INPUT_IS_LIST = False
@@ -101,9 +132,11 @@ class LoadSocialProfileNode:
     # OUTPUT_IS_LIST = (False,)
     CATEGORY = "♾️Mixlab/Agent"
 
-    def run(self):
+    def run(self,file_name):
 
-        social_profile=read_social_profile_config()
+        social_profile=read_from_json(os.path.join(agent_dir,file_name))
+
+        social_profile['file_name']=file_name
 
         # 将社交名片转换为JSON字符串
         json_string = json.dumps(social_profile, ensure_ascii=False)
