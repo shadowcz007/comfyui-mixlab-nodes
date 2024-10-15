@@ -1,0 +1,742 @@
+{
+  "last_node_id": 23,
+  "last_link_id": 25,
+  "nodes": [
+    {
+      "id": 13,
+      "type": "LoadSocialProfileNode",
+      "pos": [
+        -237,
+        145
+      ],
+      "size": {
+        "0": 304.9859313964844,
+        "1": 106
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "social_profile(json_string)",
+          "type": "STRING",
+          "links": [
+            15,
+            16
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadSocialProfileNode"
+      },
+      "widgets_values": [
+        "shadow.json",
+        301906438421316,
+        "randomize"
+      ]
+    },
+    {
+      "id": 5,
+      "type": "TextInput_",
+      "pos": [
+        -241,
+        526
+      ],
+      "size": {
+        "0": 388.0786437988281,
+        "1": 95.20309448242188
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            4
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextInput_"
+      },
+      "widgets_values": [
+        "https://mixcopilot.openai.azure.com"
+      ]
+    },
+    {
+      "id": 7,
+      "type": "AvatarGeneratorAgent",
+      "pos": [
+        377,
+        149
+      ],
+      "size": {
+        "0": 403.5807189941406,
+        "1": 232
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "social_profile",
+          "type": "STRING",
+          "link": 15,
+          "widget": {
+            "name": "social_profile"
+          }
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 6,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "custom_api_url",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "custom_api_url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "subject",
+          "type": "STRING",
+          "links": null,
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "result",
+          "type": "STRING",
+          "links": [
+            7
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "role_desc",
+          "type": "STRING",
+          "links": [
+            8,
+            17
+          ],
+          "shape": 3,
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AvatarGeneratorAgent"
+      },
+      "widgets_values": [
+        "火箭成功发射",
+        "",
+        "gpt-4o",
+        "openai",
+        0,
+        "fixed",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 3,
+      "type": "KeyInput",
+      "pos": [
+        -237,
+        325
+      ],
+      "size": {
+        "0": 305.9283752441406,
+        "1": 94
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            6
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 16,
+      "type": "KeyInput",
+      "pos": [
+        -241,
+        726
+      ],
+      "size": {
+        "0": 305.9283752441406,
+        "1": 94
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            18,
+            20
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 23,
+      "type": "AudioPlay",
+      "pos": [
+        1916,
+        649
+      ],
+      "size": {
+        "0": 661.04638671875,
+        "1": 267.5342102050781
+      },
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 25
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AudioPlay"
+      },
+      "widgets_values": [
+        [
+          "/view?filename=._00001_.wav&type=temp&subfolder=&rand=0.7571876633162242",
+          null
+        ]
+      ]
+    },
+    {
+      "id": 15,
+      "type": "SiliconflowLLM",
+      "pos": [
+        361,
+        732
+      ],
+      "size": {
+        "0": 400,
+        "1": 290
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 18,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 17,
+          "widget": {
+            "name": "prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "links": [
+            19
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "messages",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "session_history",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SiliconflowLLM"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "Translate the provided Chinese text into English.\n\nOutput Format\n=============\n\nThe output should be a direct translation of the Chinese text into English, maintaining the meaning and context as closely as possible. The translation should be in a clear and concise paragraph format.\n\nExamples\n========\n\n**Example 1:**\n\n*   Input: 你好，世界！\n*   Output: Hello, World!\n\n**Example 2:**\n\n*   Input: 今天天气很好。\n*   Output: The weather is nice today.\n\n**Example 3:**\n\n*   Input: 我喜欢学习新的语言。\n*   Output: I enjoy learning new languages.",
+        "Qwen/Qwen2.5-7B-Instruct",
+        229040653167958,
+        "fixed",
+        1,
+        1024,
+        ""
+      ]
+    },
+    {
+      "id": 14,
+      "type": "SiliconflowTextToImageNode",
+      "pos": [
+        865,
+        759
+      ],
+      "size": {
+        "0": 454.55438232421875,
+        "1": 199.4187469482422
+      },
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 20,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 19,
+          "widget": {
+            "name": "prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            21
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SiliconflowTextToImageNode"
+      },
+      "widgets_values": [
+        "",
+        "",
+        1480,
+        768,
+        "black-forest-labs/FLUX.1-schnell",
+        785396648889378,
+        "randomize",
+        ""
+      ]
+    },
+    {
+      "id": 18,
+      "type": "PreviewImage",
+      "pos": [
+        1428,
+        53
+      ],
+      "size": {
+        "0": 904.1870727539062,
+        "1": 548.9772338867188
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 11,
+      "type": "ShowTextForGPT",
+      "pos": [
+        364,
+        536
+      ],
+      "size": {
+        "0": 391.9880065917969,
+        "1": 109.51235961914062
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 16,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "{\"username\": \"shadow\", \"profile_id\": \"ML000\", \"skills\": [\"Design Hacker\", \"Programmer\", \"Architect\", \"Experience Designer\"], \"file_name\": \"shadow.json\"}"
+      ]
+    },
+    {
+      "id": 9,
+      "type": "ShowTextForGPT",
+      "pos": [
+        837,
+        361
+      ],
+      "size": {
+        "0": 525.2688598632812,
+        "1": 310.5832214355469
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 8,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "角色设计图描述如下：\n\n**人物名称**：星际园艺师·影子 (Interstellar Horticulturist · Shadow)\n\n**外貌特征**：\n- **性别**：无明确性别特征，具备中性美感\n- **身高**：约1.75米，身材匀称\n- **发型**：短发，银灰色，散发微光\n- **眼睛**：深邃的蓝色，似乎能看到宇宙深处\n- **肤色**：浅色，略带星光点缀\n\n**服装描述**：\n- **上衣**：穿着一件未来感十足的园艺工作服，颜色为深绿带有银色边缘；衣服上有多处小型储物袋，方便携带各种小型园艺工具\n- **裤子**：配套的深绿色裤子，左腿侧面有一个大口袋\n- **鞋子**：穿一双银色的防护靴，靴口可以自动调节大小确保舒适\n- **手套**：手戴银色多功能手套，手背上有一个透明的触控屏\n\n**装备与工具**：\n- **背包**：背着一个多功能背包，背包内部空间远大于外观，外形像一个紧凑的星际背包\n- **工具腰带**：腰部佩戴一条多功能腰带，上面悬挂着多种园艺工具，如等离子剪刀、微型灌溉设备等\n- **护目镜**：头戴一副高科技护目镜，可以检测植物的健康状态并分析环境参数\n\n**角色背景**：\n- 星际园艺师·影子是人类与AI结合的产物，具有超高的园艺知识和操作技能。\n- 曾参与多个星球的生态改良项目，致力于在严苛环境下创造绿色家园。\n- 拥有极高的设计和编程能力，能够设计复杂的生态系统和相应的管理程序。\n- 善于利用建筑学知识设计园艺设施，确保空间有效使用并符合美学原则。\n\n**技能特长**：\n- **园艺知识**：掌握丰富的植物学和生态学知识，能够在各种环境中栽培植物。\n- **设计与编程**：能够设计并编程自动化园艺系统，提高管理效率。\n- **建筑设计**：具备空间站园艺设施设计经验，使环境既美观又实用。\n- **经验设计**：以用户为中心，设计出良好体验的园艺互动系统。"
+      ]
+    },
+    {
+      "id": 22,
+      "type": "ChatTTS_",
+      "pos": [
+        1417,
+        773
+      ],
+      "size": {
+        "0": 443.7690124511719,
+        "1": 116.3807601928711
+      },
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 24,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            25
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ChatTTS_"
+      },
+      "widgets_values": [
+        "大家好，我是shadow",
+        false,
+        false
+      ]
+    },
+    {
+      "id": 8,
+      "type": "ShowTextForGPT",
+      "pos": [
+        2351,
+        129
+      ],
+      "size": {
+        "0": 523.0282592773438,
+        "1": 246.36700439453125
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 7,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            24
+          ],
+          "shape": 6,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "欢迎回来，shadow！恭喜你看到火箭成功发射的消息，非常鼓舞人心！作为一名兼具设计、编程、建筑和体验设计技能的多面手，我们为你设计了一些新的技能挑战，希望你能在这些挑战中发挥出色。\n\n1. **设计黑客挑战**：利用你的设计黑客技能，创建一个可以追踪火箭发射状态的实时监控系统，确保数据的实时更新和防篡改。\n\n2. **编程任务**：编写一个程序模拟火箭发射过程中各个阶段的关键步骤，从点火起飞到抵达轨道，确保每一步都精确无误。\n\n3. **建筑与体验设计组合挑战**：设计一个地面控制中心的内部结构和用户体验，使其能够有效管理火箭发射的各个环节，同时提升工作人员的工作效率和舒适度。\n\n祝你在这些挑战中取得成功！"
+      ]
+    }
+  ],
+  "links": [
+    [
+      4,
+      5,
+      0,
+      7,
+      3,
+      "STRING"
+    ],
+    [
+      6,
+      3,
+      0,
+      7,
+      1,
+      "STRING"
+    ],
+    [
+      7,
+      7,
+      1,
+      8,
+      0,
+      "STRING"
+    ],
+    [
+      8,
+      7,
+      2,
+      9,
+      0,
+      "STRING"
+    ],
+    [
+      15,
+      13,
+      0,
+      7,
+      0,
+      "STRING"
+    ],
+    [
+      16,
+      13,
+      0,
+      11,
+      0,
+      "STRING"
+    ],
+    [
+      17,
+      7,
+      2,
+      15,
+      2,
+      "STRING"
+    ],
+    [
+      18,
+      16,
+      0,
+      15,
+      0,
+      "STRING"
+    ],
+    [
+      19,
+      15,
+      0,
+      14,
+      2,
+      "STRING"
+    ],
+    [
+      20,
+      16,
+      0,
+      14,
+      0,
+      "STRING"
+    ],
+    [
+      21,
+      14,
+      0,
+      18,
+      0,
+      "IMAGE"
+    ],
+    [
+      24,
+      8,
+      0,
+      22,
+      0,
+      "STRING"
+    ],
+    [
+      25,
+      22,
+      0,
+      23,
+      0,
+      "AUDIO"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.5989500000000008,
+      "offset": [
+        48.03306357140377,
+        244.62146115430392
+      ]
+    }
+  },
+  "version": 0.4
+}
