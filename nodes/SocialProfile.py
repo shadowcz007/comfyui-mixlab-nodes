@@ -43,13 +43,13 @@ def save_social_profile_config(data):
      save_to_json(social_profile_json,data)
 
 
-user=read_social_profile_config()
-
-
 class SocialProfileNode:
 
     @classmethod
     def INPUT_TYPES(s):
+ 
+        user=read_social_profile_config()
+
         return {
             "required": {
                 "username": ("STRING", {"forceInput": False, "default": user['username']}),

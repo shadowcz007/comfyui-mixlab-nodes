@@ -1,6 +1,4 @@
 import openai 
-from swarm import Swarm, Agent
-
 import time
 import urllib.error
 import re,json,os,string,random
@@ -14,7 +12,6 @@ from PIL import Image
 from io import BytesIO
 import torch
 import numpy as np
-
 
 python = sys.executable
 
@@ -247,6 +244,9 @@ def get_llama_path():
 
 if is_installed('json_repair'):
     from json_repair import repair_json
+
+if is_installed('swarm','git+https://github.com/openai/swarm.git'):
+    from swarm import Swarm, Agent
 
 
 def chat(client, model_name,messages,max_tokens=4096,temperature=0.6 ):

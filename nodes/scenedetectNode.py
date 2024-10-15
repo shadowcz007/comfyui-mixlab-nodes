@@ -292,7 +292,7 @@ class ScenedetectNode_:
 
     RETURN_TYPES = ("SCENE_VIDEO","SCENE_", "INT","INT",)
     RETURN_NAMES = ("scenes_video","scenes","scene_len","total_frames",)
-    OUTPUT_IS_LIST = (False,False,False,)
+    # OUTPUT_IS_LIST = (False,False,False,)
 
     FUNCTION = "run"
     CATEGORY = "♾️Mixlab/Video"
