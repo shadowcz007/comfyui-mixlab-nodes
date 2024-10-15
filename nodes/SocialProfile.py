@@ -58,7 +58,11 @@ def list_all_json_files(directory_path):
 
 def read_social_profiles():
     agent_dir=get_social_profile_dir()
-    return list_all_json_files(agent_dir)
+    files=list_all_json_files(agent_dir)
+    if len(files)==0:
+        create_default_file(agent_dir)
+    files=list_all_json_files(agent_dir)
+    return files
 
 def save_social_profile_config(agent_dir,file_name,data):
      save_to_json(os.path.join(agent_dir,file_name),data)
