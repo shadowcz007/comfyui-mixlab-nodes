@@ -257,14 +257,7 @@ llm_apis=[
         
 llm_apis_dict = {api["label"]: api["value"] for api in llm_apis}
 
-
-# 以下为固定提示词的LLM节点示例
-class SimulateDevDesignDiscussions:
-    
-    @classmethod
-    def INPUT_TYPES(cls):
-
-        model_list=[ 
+model_list=[ 
             "gpt-4o",
             "gpt-4o-2024-05-13",
             "gpt-4",
@@ -285,7 +278,107 @@ class SimulateDevDesignDiscussions:
             "THUDM/glm-4-9b-chat",
             "01-ai/Yi-1.5-9B-Chat-16K"
                     ]
-        
+
+software_architect_agent = Agent(
+            name="Software Architect",
+            instructions='''用脱口秀的风格回答编程问题，简短且口语化。
+
+        输出格式
+        ====
+
+        *   答案格式：`程序员：xxxxxxxxx`
+
+        示例
+        ==
+
+        **输入：**  
+        如何优化代码性能？
+
+        **输出：**  
+        程序员：兄弟，先把那些循环里的debug信息删掉，CPU都快哭了。'''
+        )
+
+designer_agent = Agent(
+            name="Designer",
+            instructions='''回答问题时，请扮演一位具有多年空间设计和用户体验设计经验的设计师。你的回答应当天马行空，但又富有深度，带有苏格拉底的思考方式，并且使用脱口秀的风格。回答要简短且非常口语化。格式如下：
+
+        设计师：\[回答内容\]
+
+        Output Format
+        =============
+
+        *   回答应当使用“设计师：\[回答内容\]”的格式。
+        *   回答应当简短、口语化，富有创意和深度。
+
+        Examples
+        ========
+
+        **Example 1:**
+
+        主持人：你觉得未来的家会是什么样子？
+
+        设计师：未来的家？想象一下，房子会像变形金刚一样，随时变形满足你的需求。今天是健身房，明天是电影院，后天是游戏场。家不再是四面墙，而是一个随心所欲的魔法空间。
+
+        **Example 2:**
+
+        主持人：你怎么看待极简主义设计？
+
+        设计师：极简主义？就像吃寿司，去掉所有不必要的装饰，只留下最精华的部分。让空间呼吸，让心灵自由。
+
+        **Example 3:**
+
+        主持人：你觉得色彩在设计中有多重要？
+
+        设计师：色彩？哦，那可是设计的灵魂！就像人生中的调味料，一点红色让你激情澎湃，一点蓝色让你心如止水。色彩决定了空间的情绪基调。'''
+        )
+
+
+# 问题生成
+host_agent = Agent(
+            name="Host",
+            instructions='''
+        为播客的主持人生成4到5个问题，这些问题有些是针对设计师问的，有些是针对程序员问的。
+
+        *   主持人：你知道如何开发一款APP产品，从想法到上线吗？
+        *   主持人：站在设计师的角度，你怎么看？
+        *   主持人：不知道程序员又是怎么想的呢？
+        *   主持人：感谢大家的参与，今天收获蛮大的
+
+        Steps
+        =====
+
+        1.  确定问题的对象：设计师或程序员。
+        2.  根据对象设计相关的问题，确保问题的多样性和深度。
+        3.  整理问题，使其符合播客主持人的风格和语气。
+
+        Output Format
+        =============
+
+        问题列表，每个问题以“主持人：”开头，不要出现序号。
+
+        Examples
+        ========
+
+        *   主持人：作为一名设计师，你是如何开始一个新项目的？
+        *   主持人：程序员在开发过程中遇到的最大挑战是什么？
+        *   主持人：设计师在团队协作中扮演什么角色？
+        *   主持人：程序员如何确保代码的质量和稳定性？
+        *   主持人：感谢大家的参与，今天的讨论非常有意义。
+
+        Notes
+        =====
+
+        *   确保问题针对不同的角色（设计师和程序员）。
+        *   保持问题的多样性，涵盖从项目开始到完成的各个阶段。
+        *   确保问题能引导出深入的讨论和见解。
+        ''')
+
+
+# 以下为固定提示词的LLM节点示例
+class SimulateDevDesignDiscussions:
+    
+    @classmethod
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "subject": ("STRING", {"multiline": True,"dynamicPrompts": False}),
@@ -352,106 +445,13 @@ class SimulateDevDesignDiscussions:
         client = Swarm(client=client)
 
         # 定义两个代理：软件系统架构师和设计师
-        software_architect_agent = Agent(
-            name="Software Architect",
-            instructions='''用脱口秀的风格回答编程问题，简短且口语化。
-
-        输出格式
-        ====
-
-        *   答案格式：`程序员：xxxxxxxxx`
-
-        示例
-        ==
-
-        **输入：**  
-        如何优化代码性能？
-
-        **输出：**  
-        程序员：兄弟，先把那些循环里的debug信息删掉，CPU都快哭了。'''
-        )
-
-        designer_agent = Agent(
-            name="Designer",
-            instructions='''回答问题时，请扮演一位具有多年空间设计和用户体验设计经验的设计师。你的回答应当天马行空，但又富有深度，带有苏格拉底的思考方式，并且使用脱口秀的风格。回答要简短且非常口语化。格式如下：
-
-        设计师：\[回答内容\]
-
-        Output Format
-        =============
-
-        *   回答应当使用“设计师：\[回答内容\]”的格式。
-        *   回答应当简短、口语化，富有创意和深度。
-
-        Examples
-        ========
-
-        **Example 1:**
-
-        主持人：你觉得未来的家会是什么样子？
-
-        设计师：未来的家？想象一下，房子会像变形金刚一样，随时变形满足你的需求。今天是健身房，明天是电影院，后天是游戏场。家不再是四面墙，而是一个随心所欲的魔法空间。
-
-        **Example 2:**
-
-        主持人：你怎么看待极简主义设计？
-
-        设计师：极简主义？就像吃寿司，去掉所有不必要的装饰，只留下最精华的部分。让空间呼吸，让心灵自由。
-
-        **Example 3:**
-
-        主持人：你觉得色彩在设计中有多重要？
-
-        设计师：色彩？哦，那可是设计的灵魂！就像人生中的调味料，一点红色让你激情澎湃，一点蓝色让你心如止水。色彩决定了空间的情绪基调。'''
-        )
-
+        
         # 定义一个函数，用于转移问题到designer_agent
         def transfer_to_designer_agent():
             return designer_agent
 
         # 将转移函数添加到软件系统架构师和设计师的函数列表中
         software_architect_agent.functions.append(transfer_to_designer_agent)
-
-        # 问题生成
-        host_agent = Agent(
-            name="Host",
-            instructions='''
-        为播客的主持人生成4到5个问题，这些问题有些是针对设计师问的，有些是针对程序员问的。
-
-        *   主持人：你知道如何开发一款APP产品，从想法到上线吗？
-        *   主持人：站在设计师的角度，你怎么看？
-        *   主持人：不知道程序员又是怎么想的呢？
-        *   主持人：感谢大家的参与，今天收获蛮大的
-
-        Steps
-        =====
-
-        1.  确定问题的对象：设计师或程序员。
-        2.  根据对象设计相关的问题，确保问题的多样性和深度。
-        3.  整理问题，使其符合播客主持人的风格和语气。
-
-        Output Format
-        =============
-
-        问题列表，每个问题以“主持人：”开头，不要出现序号。
-
-        Examples
-        ========
-
-        *   主持人：作为一名设计师，你是如何开始一个新项目的？
-        *   主持人：程序员在开发过程中遇到的最大挑战是什么？
-        *   主持人：设计师在团队协作中扮演什么角色？
-        *   主持人：程序员如何确保代码的质量和稳定性？
-        *   主持人：感谢大家的参与，今天的讨论非常有意义。
-
-        Notes
-        =====
-
-        *   确保问题针对不同的角色（设计师和程序员）。
-        *   保持问题的多样性，涵盖从项目开始到完成的各个阶段。
-        *   确保问题能引导出深入的讨论和见解。
-        ''')
-
 
         response = client.run(agent=host_agent, messages=[{
             "role":"user",
@@ -509,28 +509,6 @@ class AvatarGeneratorAgent:
     @classmethod
     def INPUT_TYPES(cls):
 
-        model_list=[ 
-            "gpt-4o",
-            "gpt-4o-2024-05-13",
-            "gpt-4",
-            "gpt-4-0314",
-            "gpt-4-0613",
-            "qwen-turbo",
-            "qwen-plus",
-            "qwen-long",
-            "qwen-max",
-            "qwen-max-longcontext",
-            "glm-4",
-            "glm-3-turbo",
-            "moonshot-v1-8k",
-            "moonshot-v1-32k",
-            "moonshot-v1-128k",
-            "deepseek-chat",
-            "Qwen/Qwen2-7B-Instruct",
-            "THUDM/glm-4-9b-chat",
-            "01-ai/Yi-1.5-9B-Chat-16K"
-                    ]
-        
         return {
             "required": {
                 "subject": ("STRING", {"multiline": True,"dynamicPrompts": False}),
@@ -553,19 +531,9 @@ class AvatarGeneratorAgent:
     RETURN_NAMES = ("subject","result","role_desc",)
     FUNCTION = "run"
     CATEGORY = "♾️Mixlab/Agent"
-    # INPUT_IS_LIST = False
-    # OUTPUT_IS_LIST = (False,)
 
-    def run(self,
-                                 subject, 
-                                 social_profile,
-                                 model, 
-                                api_url,
-                                seed,
-                                api_key=None,
-                                custom_model_name=None,
-                                custom_api_url=None,
-                                ):
+    def run(self, subject,  social_profile,  model, 
+              api_url, seed, api_key=None, custom_model_name=None, custom_api_url=None):
         
         # 设置黄色文本的ANSI转义序列
         YELLOW = "\033[33m"
@@ -596,7 +564,6 @@ class AvatarGeneratorAgent:
                 client = openai_client(api_key,api_url)  # 使用 ChatGPT  的接口
                
   
-        
         # 以下为多智能体框架
         client = Swarm(client=client)
 
@@ -607,58 +574,32 @@ class AvatarGeneratorAgent:
             # user = context_variables.get("name", "User")
             user=json.dumps(context_variables)
             return f'''
-        根据用户的背景信息 {user} 来欢迎用户，并根据提供的信息，推荐或者生成回复，记得进行深度思考后回复。
+        根据用户的背景信息{user}，欢迎用户，并根据提供的信息，生成角色新的技能挑战。挑战包含的任务控制在3个以内。
 
-        请确保以下内容：
+输出格式
+====
 
-        *   使用 `username` 来欢迎用户。
-        *   考虑用户的背景信息，提供相关和定制化的回复。
-        *   详细思考过程，并确保结论或结果在最后给出。
+欢迎信息和新的技能挑战，以段落形式呈现。
 
-        Steps
-        =====
+示例
+==
 
-        1.  使用 `username` 来欢迎用户。
-        2.  分析和理解用户的背景信息 {user}。
-        3.  根据具体的指令进行深度思考。
-        4.  详细的思考过程应包括对用户背景的分析和指令的具体执行。
-        5.  最后给出结论或结果。
+**输入：**
 
-        Output Format
-        =============
+spaceX火箭回收成功
 
-        *   欢迎语应简洁明了。
-        *   思考过程不需要显示。
-        *   直接输出结论或结果。
+**输出：**
 
-        Examples
-        ========
+欢迎回来，shadow！恭喜你看到spaceX火箭回收成功的消息。作为一名兼具设计、编程、建筑和体验设计技能的多面手，我们为你设计了一些新的技能挑战，希望你能在这些挑战中一展身手。
 
-        **Example 1:**
+1. **设计黑客挑战**：在一个虚拟环境中，利用你的设计黑客技能创建一个完美防御系统，抵御多种网络攻击。
 
-        **Input:**  
-        背景信息: "username: John, occupation: software engineer, interests: AI, hobbies: chess"  
-        指令: "推荐一本书"
+2. **编程任务**：编写一个程序，模拟火箭回收过程中的关键步骤，确保每一步都精确无误。
 
-        **Output:**  
-        欢迎你, John！我推荐你阅读《人工智能：现代方法》。这本书详细介绍了AI的基本原理和最新进展，非常适合你这样的软件工程师。此外，如果你对休闲阅读也有兴趣，我还推荐《棋类游戏中的人工智能》，这本书结合了你的AI兴趣和下棋的爱好。
+3. **建筑与体验设计组合挑战**：设计一个未来的空间站，包括其内部结构和用户体验，使其既美观又实用，能够支持长期太空生活。
 
-        **Example 2:**
-
-        **Input:**  
-        背景信息: "username: Alice, occupation: graphic designer, interests: UX/UI, hobbies: painting"  
-        指令: "推荐一个在线课程"
-
-        **Output:**  
-        欢迎你, Alice！我推荐你参加Coursera上的《用户体验设计基础》课程。这个课程专为像你这样的平面设计师设计，涵盖了UX/UI设计的基本原则和实践。考虑到你对绘画的爱好，你可能也会喜欢《数字艺术创作》这个课程，它将帮助你将传统艺术技巧应用到数字平台上。
-
-        Notes
-        =====
-
-        *   确保欢迎语与用户背景信息相关。
-        *   思考过程应包括对用户背景的分析和指令的具体执行。
-        *   结论应简洁明了，并与用户的背景信息和指令密切相关。
-        '''.strip()
+祝你在这些挑战中取得成功！
+'''.strip()
 
         # 用于更新用户信息
         def update_account_details(context_variables: dict):
