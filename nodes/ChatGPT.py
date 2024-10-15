@@ -81,15 +81,15 @@ def is_installed(package, package_overwrite=None,auto_install=True):
 
 def save_to_json(file_path, data):
     try:
-        with open(file_path, 'w') as f:
-            json.dump(data, f)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
             print(e)
 
 def read_from_json(file_path):
     data={}
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             data = json.load(f)
     except Exception as e:
             print(e)

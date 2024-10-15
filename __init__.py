@@ -1478,12 +1478,14 @@ except Exception as e:
 
 
 try:
-    from .nodes.SocialProfile import SocialProfileNode
+    from .nodes.SocialProfile import NewSocialProfileNode,LoadSocialProfileNode
     logging.info('SocialProfile.available')
     # Update Node class mappings
-    NODE_CLASS_MAPPINGS['SocialProfileNode']=SocialProfileNode
-    
-    NODE_DISPLAY_NAME_MAPPINGS["SocialProfileNode"]=  "Social Profile ♾️Mixlab"
+    NODE_CLASS_MAPPINGS['NewSocialProfileNode']=NewSocialProfileNode
+    NODE_CLASS_MAPPINGS['LoadSocialProfileNode']=LoadSocialProfileNode
+
+    NODE_DISPLAY_NAME_MAPPINGS["NewSocialProfileNode"]=  "New Social Profile ♾️Mixlab"
+    NODE_DISPLAY_NAME_MAPPINGS["LoadSocialProfileNode"]=  "Load Social Profile ♾️Mixlab"
 
 except Exception as e:
     logging.info('SocialProfile.available False' )  

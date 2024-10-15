@@ -3,18 +3,17 @@
 import json,os
 
 
-
 def save_to_json(file_path, data):
     try:
-        with open(file_path, 'w') as f:
-            json.dump(data, f)
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
     except Exception as e:
             print(e)
 
 def read_from_json(file_path):
     data={}
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path, 'w', encoding='utf-8') as f:
             data = json.load(f)
     except Exception as e:
             print(e)
@@ -43,7 +42,7 @@ def save_social_profile_config(data):
      save_to_json(social_profile_json,data)
 
 
-class SocialProfileNode:
+class NewSocialProfileNode:
 
     @classmethod
     def INPUT_TYPES(s):
@@ -81,6 +80,33 @@ class SocialProfileNode:
         json_string = json.dumps(social_profile, ensure_ascii=False)
 
         save_social_profile_config(social_profile)
+
+        # 返回JSON字符串和一个示例值
+        return (json_string,)
+
+
+class LoadSocialProfileNode:
+
+    @classmethod
+    def INPUT_TYPES(s):
+        
+        return {
+            "required": {},
+        }
+
+    # INPUT_IS_LIST = False
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("social_profile(json_string)",)
+    FUNCTION = "run"
+    # OUTPUT_IS_LIST = (False,)
+    CATEGORY = "♾️Mixlab/Agent"
+
+    def run(self):
+
+        social_profile=read_social_profile_config()
+
+        # 将社交名片转换为JSON字符串
+        json_string = json.dumps(social_profile, ensure_ascii=False)
 
         # 返回JSON字符串和一个示例值
         return (json_string,)
