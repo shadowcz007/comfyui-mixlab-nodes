@@ -137,8 +137,11 @@ class LoadSocialProfileNode:
     CATEGORY = "♾️Mixlab/Agent"
 
     def run(self,file_name):
-
+        # print("#read_from_json",os.path.join(agent_dir,file_name))
         social_profile=read_from_json(os.path.join(agent_dir,file_name))
+
+        if social_profile==None:
+            social_profile=default_agent
 
         social_profile['file_name']=file_name
 

@@ -1290,7 +1290,7 @@ try:
     NODE_DISPLAY_NAME_MAPPINGS.update(NODE_DISPLAY_NAME_MAPPINGS_V)
 
 except Exception as e:
-    logging.info('ChatGPT.available False')
+    logging.info('ChatGPT.available False',e)
 
 
 try:
