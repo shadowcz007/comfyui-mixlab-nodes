@@ -91,12 +91,13 @@ def save_to_json(file_path, data):
             print(e)
 
 def read_from_json(file_path):
-    data={}
+    data = None
     try:
-        with open(file_path, 'w') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:  # 使用 'r' 模式打开文件
             data = json.load(f)
     except Exception as e:
-            print(e)
+        print('#read_from_json', e)
+        return None
     return data
 
 

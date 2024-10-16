@@ -1,23 +1,25 @@
 # 用于定义社交名片
 
-import json,os
+import json,os,re
 import folder_paths
 
 def save_to_json(file_path, data):
     try:
+        print(f"Saving data to {file_path}")  # 调试信息
         with open(file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
+        print("Data saved successfully.")  # 调试信息
     except Exception as e:
-            print(e)
+        print('#save_to_json', e)
 
 def read_from_json(file_path):
-    data=None
+    data = None
     try:
-        with open(file_path, 'w') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:  # 使用 'r' 模式打开文件
             data = json.load(f)
     except Exception as e:
-            print(e)
-            return None
+        print('#read_from_json', e)
+        return None
     return data
 
 
@@ -98,8 +100,8 @@ class NewSocialProfileNode:
 
     def run(self, username, profile_id, skills,file_name):
         
-        # 将skills字符串分割为列表
-        skills_list = [skill.strip() for skill in skills.split(",")]
+        # 使用正则表达式匹配英文和中文逗号
+        skills_list = [skill.strip() for skill in re.split(r'[，,]', skills)]
 
         # 创建社交名片的JSON对象
         social_profile = {
@@ -138,11 +140,11 @@ class LoadSocialProfileNode:
     CATEGORY = "♾️Mixlab/Agent"
 
     def run(self,file_name,seed):
-        # print("#read_from_json",os.path.join(agent_dir,file_name))
+        
         social_profile=read_from_json(os.path.join(agent_dir,file_name))
-
+        # print("#read_from_json",os.path.join(agent_dir,file_name),social_profile)
         if social_profile==None:
-            social_profile=default_agent
+            return ("",)
 
         social_profile['file_name']=file_name
 
