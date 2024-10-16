@@ -1,6 +1,6 @@
 {
-  "last_node_id": 23,
-  "last_link_id": 25,
+  "last_node_id": 33,
+  "last_link_id": 40,
   "nodes": [
     {
       "id": 13,
@@ -33,7 +33,7 @@
       },
       "widgets_values": [
         "shadow.json",
-        301906438421316,
+        2695872565826,
         "randomize"
       ]
     },
@@ -70,6 +70,219 @@
       ]
     },
     {
+      "id": 3,
+      "type": "KeyInput",
+      "pos": [
+        -237,
+        325
+      ],
+      "size": {
+        "0": 305.9283752441406,
+        "1": 94
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            6
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 14,
+      "type": "SiliconflowTextToImageNode",
+      "pos": [
+        865,
+        759
+      ],
+      "size": {
+        "0": 454.55438232421875,
+        "1": 199.4187469482422
+      },
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 20,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 19,
+          "widget": {
+            "name": "prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            21
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SiliconflowTextToImageNode"
+      },
+      "widgets_values": [
+        "",
+        "",
+        1480,
+        768,
+        "black-forest-labs/FLUX.1-schnell",
+        67611207227642,
+        "randomize",
+        ""
+      ]
+    },
+    {
+      "id": 11,
+      "type": "ShowTextForGPT",
+      "pos": [
+        364,
+        536
+      ],
+      "size": {
+        "0": 391.9880065917969,
+        "1": 109.51235961914062
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 16,
+          "widget": {
+            "name": "text"
+          }
+        },
+        {
+          "name": "output_dir",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "output_dir"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowTextForGPT"
+      },
+      "widgets_values": [
+        "",
+        "",
+        "{\"username\": \"shadow\", \"profile_id\": \"ML000\", \"skills\": [\"Design Hacker\", \"Programmer\", \"Architect\", \"Experience Designer\", \"设计黑客\", \"科技诗人\", \"美食数据分析家\", \"生物信息设计黑客\"], \"file_name\": \"shadow.json\"}"
+      ]
+    },
+    {
+      "id": 16,
+      "type": "KeyInput",
+      "pos": [
+        -241,
+        726
+      ],
+      "size": {
+        "0": 305.9283752441406,
+        "1": 94
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "key",
+          "type": "STRING",
+          "links": [
+            18,
+            20
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KeyInput"
+      },
+      "widgets_values": [
+        null,
+        null
+      ]
+    },
+    {
+      "id": 29,
+      "type": "TextInput_",
+      "pos": [
+        1078.5104790285282,
+        1456.5442943960802
+      ],
+      "size": {
+        "0": 369.3819885253906,
+        "1": 76.00003051757812
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            31
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TextInput_"
+      },
+      "widgets_values": [
+        "AI："
+      ]
+    },
+    {
       "id": 7,
       "type": "AvatarGeneratorAgent",
       "pos": [
@@ -81,7 +294,7 @@
         "1": 232
       },
       "flags": {},
-      "order": 5,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -121,7 +334,9 @@
         {
           "name": "subject",
           "type": "STRING",
-          "links": null,
+          "links": [
+            40
+          ],
           "shape": 3,
           "slot_index": 0
         },
@@ -129,7 +344,7 @@
           "name": "result",
           "type": "STRING",
           "links": [
-            7
+            32
           ],
           "shape": 3,
           "slot_index": 1
@@ -143,13 +358,19 @@
           ],
           "shape": 3,
           "slot_index": 2
+        },
+        {
+          "name": "new_skill",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
         "Node name for S&R": "AvatarGeneratorAgent"
       },
       "widgets_values": [
-        "火箭成功发射",
+        "Mothbox是一款低成本、高性能的昆虫监测设备，旨在帮助野外生物学家在丛林深处进行部署，同时也适合在家中研究生物多样性。所有物理设计、电子原理图、Pi脚本和昆虫识别的人工智能都是免费开源的，用户可以自行构建、分享和改进。Mothbox利用超高分辨率传感器和开源AI脚本进行昆虫监测，提供高度本地化的环境健康数据，特别适用于研究飞蛾和甲虫等高度多样化的昆虫。",
         "",
         "gpt-4o",
         "openai",
@@ -161,108 +382,251 @@
       ]
     },
     {
-      "id": 3,
-      "type": "KeyInput",
+      "id": 30,
+      "type": "SwitchByIndex",
       "pos": [
-        -237,
-        325
+        1090.5886311086074,
+        1286.6318223001306
       ],
       "size": {
-        "0": 305.9283752441406,
-        "1": 94
+        "0": 315,
+        "1": 102
       },
       "flags": {},
-      "order": 2,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "key",
-          "type": "STRING",
-          "links": [
-            6
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "KeyInput"
-      },
-      "widgets_values": [
-        null,
-        null
-      ]
-    },
-    {
-      "id": 16,
-      "type": "KeyInput",
-      "pos": [
-        -241,
-        726
-      ],
-      "size": {
-        "0": 305.9283752441406,
-        "1": 94
-      },
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "key",
-          "type": "STRING",
-          "links": [
-            18,
-            20
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "KeyInput"
-      },
-      "widgets_values": [
-        null,
-        null
-      ]
-    },
-    {
-      "id": 23,
-      "type": "AudioPlay",
-      "pos": [
-        1916,
-        649
-      ],
-      "size": {
-        "0": 661.04638671875,
-        "1": 267.5342102050781
-      },
-      "flags": {},
-      "order": 11,
+      "order": 9,
       "mode": 0,
       "inputs": [
         {
-          "name": "audio",
-          "type": "AUDIO",
-          "link": 25
+          "name": "A",
+          "type": "*",
+          "link": 31
+        },
+        {
+          "name": "B",
+          "type": "*",
+          "link": 32
+        }
+      ],
+      "outputs": [
+        {
+          "name": "list",
+          "type": "*",
+          "links": [
+            33
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
         }
       ],
       "properties": {
-        "Node name for S&R": "AudioPlay"
+        "Node name for S&R": "SwitchByIndex"
       },
       "widgets_values": [
-        [
-          "/view?filename=._00001_.wav&type=temp&subfolder=&rand=0.7571876633162242",
-          null
-        ]
+        -1,
+        "on"
+      ]
+    },
+    {
+      "id": 31,
+      "type": "JoinWithDelimiter",
+      "pos": [
+        1092.5886311086074,
+        1153.6318223001306
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_list",
+          "type": "*",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            35
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "JoinWithDelimiter"
+      },
+      "widgets_values": [
+        "space"
+      ]
+    },
+    {
+      "id": 32,
+      "type": "SwitchByIndex",
+      "pos": [
+        1609.5657926184056,
+        1137.279123924561
+      ],
+      "size": {
+        "0": 315,
+        "1": 102
+      },
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "A",
+          "type": "*",
+          "link": 34
+        },
+        {
+          "name": "B",
+          "type": "*",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "list",
+          "type": "*",
+          "links": [
+            36
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SwitchByIndex"
+      },
+      "widgets_values": [
+        -1,
+        "on"
+      ]
+    },
+    {
+      "id": 25,
+      "type": "MultiPersonPodcast",
+      "pos": [
+        2025,
+        1097
+      ],
+      "size": {
+        "0": 400,
+        "1": 239.99996948242188
+      },
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "speaker",
+          "type": "SPEAKER",
+          "link": null
+        },
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 37,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "audio_list",
+          "type": "AUDIO",
+          "links": null,
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            38
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MultiPersonPodcast"
+      },
+      "widgets_values": [
+        "小明：大家好，欢迎收听本周的《AI新动态》。我是主持人小明，今天我们有两位嘉宾，分别是小李和小王。大家跟听众打个招呼吧！\n小李：大家好，我是小李，很高兴今天能和大家聊聊最新的AI动态。\n小王：大家好，我是小王，也很期待今天的讨论。",
+        0,
+        0,
+        0,
+        0,
+        false,
+        2
+      ]
+    },
+    {
+      "id": 33,
+      "type": "JoinWithDelimiter",
+      "pos": [
+        1608.5657926184056,
+        1296.279123924561
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_list",
+          "type": "*",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            37,
+            39
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "JoinWithDelimiter"
+      },
+      "widgets_values": [
+        "newline"
       ]
     },
     {
       "id": 15,
       "type": "SiliconflowLLM",
       "pos": [
-        361,
+        358,
         732
       ],
       "size": {
@@ -270,7 +634,7 @@
         "1": 290
       },
       "flags": {},
-      "order": 8,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -337,157 +701,140 @@
       ]
     },
     {
-      "id": 14,
-      "type": "SiliconflowTextToImageNode",
+      "id": 27,
+      "type": "TextInput_",
       "pos": [
-        865,
-        759
+        369,
+        1162
       ],
       "size": {
-        "0": 454.55438232421875,
-        "1": 199.4187469482422
+        "0": 369.3819885253906,
+        "1": 76
       },
       "flags": {},
-      "order": 10,
+      "order": 5,
       "mode": 0,
-      "inputs": [
-        {
-          "name": "api_key",
-          "type": "STRING",
-          "link": 20,
-          "widget": {
-            "name": "api_key"
-          }
-        },
-        {
-          "name": "custom_model_name",
-          "type": "STRING",
-          "link": null,
-          "widget": {
-            "name": "custom_model_name"
-          }
-        },
-        {
-          "name": "prompt",
-          "type": "STRING",
-          "link": 19,
-          "widget": {
-            "name": "prompt"
-          }
-        }
-      ],
       "outputs": [
         {
-          "name": "image",
-          "type": "IMAGE",
+          "name": "STRING",
+          "type": "STRING",
           "links": [
-            21
+            28
           ],
           "shape": 3,
           "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "SiliconflowTextToImageNode"
+        "Node name for S&R": "TextInput_"
       },
       "widgets_values": [
-        "",
-        "",
-        1480,
-        768,
-        "black-forest-labs/FLUX.1-schnell",
-        785396648889378,
-        "randomize",
-        ""
+        "shadow："
       ]
     },
     {
-      "id": 18,
-      "type": "PreviewImage",
+      "id": 28,
+      "type": "SwitchByIndex",
       "pos": [
-        1428,
-        53
+        365,
+        1284
       ],
       "size": {
-        "0": 904.1870727539062,
-        "1": 548.9772338867188
+        "0": 315,
+        "1": 102
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "A",
+          "type": "*",
+          "link": 28
+        },
+        {
+          "name": "B",
+          "type": "*",
+          "link": 40
+        }
+      ],
+      "outputs": [
+        {
+          "name": "list",
+          "type": "*",
+          "links": [
+            30
+          ],
+          "shape": 6,
+          "slot_index": 0
+        },
+        {
+          "name": "count",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "SwitchByIndex"
+      },
+      "widgets_values": [
+        -1,
+        "on"
+      ]
+    },
+    {
+      "id": 26,
+      "type": "JoinWithDelimiter",
+      "pos": [
+        718,
+        1297
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
       },
       "flags": {},
       "order": 12,
       "mode": 0,
       "inputs": [
         {
-          "name": "images",
-          "type": "IMAGE",
-          "link": 21
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "PreviewImage"
-      }
-    },
-    {
-      "id": 11,
-      "type": "ShowTextForGPT",
-      "pos": [
-        364,
-        536
-      ],
-      "size": {
-        "0": 391.9880065917969,
-        "1": 109.51235961914062
-      },
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "text",
-          "type": "STRING",
-          "link": 16,
-          "widget": {
-            "name": "text"
-          }
-        },
-        {
-          "name": "output_dir",
-          "type": "STRING",
-          "link": null,
-          "widget": {
-            "name": "output_dir"
-          }
+          "name": "text_list",
+          "type": "*",
+          "link": 30
         }
       ],
       "outputs": [
         {
           "name": "STRING",
           "type": "STRING",
-          "links": null,
-          "shape": 6
+          "links": [
+            34
+          ],
+          "shape": 3,
+          "slot_index": 0
         }
       ],
       "properties": {
-        "Node name for S&R": "ShowTextForGPT"
+        "Node name for S&R": "JoinWithDelimiter"
       },
       "widgets_values": [
-        "",
-        "",
-        "{\"username\": \"shadow\", \"profile_id\": \"ML000\", \"skills\": [\"Design Hacker\", \"Programmer\", \"Architect\", \"Experience Designer\"], \"file_name\": \"shadow.json\"}"
+        "space"
       ]
     },
     {
       "id": 9,
       "type": "ShowTextForGPT",
       "pos": [
-        837,
-        361
+        875,
+        491
       ],
-      "size": {
-        "0": 525.2688598632812,
-        "1": 310.5832214355469
-      },
+      "size": [
+        433.9467013095634,
+        159.20663263167785
+      ],
       "flags": {},
-      "order": 7,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -521,72 +868,84 @@
       "widgets_values": [
         "",
         "",
-        "角色设计图描述如下：\n\n**人物名称**：星际园艺师·影子 (Interstellar Horticulturist · Shadow)\n\n**外貌特征**：\n- **性别**：无明确性别特征，具备中性美感\n- **身高**：约1.75米，身材匀称\n- **发型**：短发，银灰色，散发微光\n- **眼睛**：深邃的蓝色，似乎能看到宇宙深处\n- **肤色**：浅色，略带星光点缀\n\n**服装描述**：\n- **上衣**：穿着一件未来感十足的园艺工作服，颜色为深绿带有银色边缘；衣服上有多处小型储物袋，方便携带各种小型园艺工具\n- **裤子**：配套的深绿色裤子，左腿侧面有一个大口袋\n- **鞋子**：穿一双银色的防护靴，靴口可以自动调节大小确保舒适\n- **手套**：手戴银色多功能手套，手背上有一个透明的触控屏\n\n**装备与工具**：\n- **背包**：背着一个多功能背包，背包内部空间远大于外观，外形像一个紧凑的星际背包\n- **工具腰带**：腰部佩戴一条多功能腰带，上面悬挂着多种园艺工具，如等离子剪刀、微型灌溉设备等\n- **护目镜**：头戴一副高科技护目镜，可以检测植物的健康状态并分析环境参数\n\n**角色背景**：\n- 星际园艺师·影子是人类与AI结合的产物，具有超高的园艺知识和操作技能。\n- 曾参与多个星球的生态改良项目，致力于在严苛环境下创造绿色家园。\n- 拥有极高的设计和编程能力，能够设计复杂的生态系统和相应的管理程序。\n- 善于利用建筑学知识设计园艺设施，确保空间有效使用并符合美学原则。\n\n**技能特长**：\n- **园艺知识**：掌握丰富的植物学和生态学知识，能够在各种环境中栽培植物。\n- **设计与编程**：能够设计并编程自动化园艺系统，提高管理效率。\n- **建筑设计**：具备空间站园艺设施设计经验，使环境既美观又实用。\n- **经验设计**：以用户为中心，设计出良好体验的园艺互动系统。"
+        "设计一个适应不同环境和需求的模块化Mothbox外壳。开发一个集成数据分析功能的用户界面，并优化和扩展昆虫识别的AI脚本。"
       ]
     },
     {
-      "id": 22,
-      "type": "ChatTTS_",
+      "id": 23,
+      "type": "AudioPlay",
       "pos": [
-        1417,
-        773
+        3308,
+        680
       ],
-      "size": {
-        "0": 443.7690124511719,
-        "1": 116.3807601928711
-      },
+      "size": [
+        542.9514256223783,
+        326.0058338522547
+      ],
       "flags": {},
-      "order": 9,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
-          "name": "text",
-          "type": "STRING",
-          "link": 24,
-          "widget": {
-            "name": "text"
-          }
-        }
-      ],
-      "outputs": [
-        {
           "name": "audio",
           "type": "AUDIO",
-          "links": [
-            25
-          ],
-          "shape": 3,
-          "slot_index": 0
+          "link": 38
         }
       ],
       "properties": {
-        "Node name for S&R": "ChatTTS_"
+        "Node name for S&R": "AudioPlay"
       },
       "widgets_values": [
-        "大家好，我是shadow",
-        false,
-        false
+        [
+          "/view?filename=._00001_.wav&type=temp&subfolder=&rand=0.7715247141565349",
+          null
+        ]
       ]
+    },
+    {
+      "id": 18,
+      "type": "PreviewImage",
+      "pos": [
+        2665,
+        -21
+      ],
+      "size": [
+        1175.3549223753057,
+        641.5775857955676
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 21
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
     },
     {
       "id": 8,
       "type": "ShowTextForGPT",
       "pos": [
-        2351,
-        129
+        2659,
+        682
       ],
-      "size": {
-        "0": 523.0282592773438,
-        "1": 246.36700439453125
-      },
+      "size": [
+        626.5560187649498,
+        333.37546816789154
+      ],
       "flags": {},
-      "order": 6,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 7,
+          "link": 39,
           "widget": {
             "name": "text"
           }
@@ -604,9 +963,7 @@
         {
           "name": "STRING",
           "type": "STRING",
-          "links": [
-            24
-          ],
+          "links": [],
           "shape": 6,
           "slot_index": 0
         }
@@ -617,7 +974,7 @@
       "widgets_values": [
         "",
         "",
-        "欢迎回来，shadow！恭喜你看到火箭成功发射的消息，非常鼓舞人心！作为一名兼具设计、编程、建筑和体验设计技能的多面手，我们为你设计了一些新的技能挑战，希望你能在这些挑战中发挥出色。\n\n1. **设计黑客挑战**：利用你的设计黑客技能，创建一个可以追踪火箭发射状态的实时监控系统，确保数据的实时更新和防篡改。\n\n2. **编程任务**：编写一个程序模拟火箭发射过程中各个阶段的关键步骤，从点火起飞到抵达轨道，确保每一步都精确无误。\n\n3. **建筑与体验设计组合挑战**：设计一个地面控制中心的内部结构和用户体验，使其能够有效管理火箭发射的各个环节，同时提升工作人员的工作效率和舒适度。\n\n祝你在这些挑战中取得成功！"
+        "shadow： 我有个新话题，是Mothbox这款设备，性价比特别高，主要用来监测昆虫。它不仅适合野外生物学家在丛林里使用，在家里研究生物多样性也是很棒的选择。它的所有物理设计、电子图纸、Pi脚本和昆虫识别用的AI都是免费开源的，用户可以自己动手构建、分享和改进。Mothbox用的是超高分辨率传感器和开源AI脚本监测昆虫，可以提供非常本地化的环境健康数据，尤其对研究飞蛾和甲虫这些种类特别多的昆虫很有帮助。\nAI： 欢迎shadow！我们很高兴你对Mothbox感兴趣。根据你的多重技能，我们为你设计了以下创意性的技能挑战：第一个挑战是**设计一个适应不同环境和需求的模块化Mothbox外壳**，运用你的建筑师和设计黑客技能，创造一个可以在森林和家中灵活使用的创新设计。第二个挑战是**开发一个集成数据分析功能的用户界面**，作为程序员和体验设计师，设计一个直观、用户友好的界面，使用户能够轻松地配置Mothbox并实时监控及分析收集到的昆虫数据。第三个挑战是**优化和扩展昆虫识别的AI脚本**，结合你的程序员和生物信息设计黑客技能，改善现有开源AI脚本的准确性和效率，支持更多昆虫种类的识别。我们非常期待你如何利用你的多样化技能来提升和改进Mothbox项目！"
       ]
     }
   ],
@@ -636,14 +993,6 @@
       0,
       7,
       1,
-      "STRING"
-    ],
-    [
-      7,
-      7,
-      1,
-      8,
-      0,
       "STRING"
     ],
     [
@@ -711,30 +1060,144 @@
       "IMAGE"
     ],
     [
-      24,
-      8,
+      28,
+      27,
       0,
-      22,
+      28,
+      0,
+      "*"
+    ],
+    [
+      30,
+      28,
+      0,
+      26,
+      0,
+      "*"
+    ],
+    [
+      31,
+      29,
+      0,
+      30,
+      0,
+      "*"
+    ],
+    [
+      32,
+      7,
+      1,
+      30,
+      1,
+      "*"
+    ],
+    [
+      33,
+      30,
+      0,
+      31,
+      0,
+      "*"
+    ],
+    [
+      34,
+      26,
+      0,
+      32,
+      0,
+      "*"
+    ],
+    [
+      35,
+      31,
+      0,
+      32,
+      1,
+      "*"
+    ],
+    [
+      36,
+      32,
+      0,
+      33,
+      0,
+      "*"
+    ],
+    [
+      37,
+      33,
+      0,
+      25,
+      1,
+      "STRING"
+    ],
+    [
+      38,
+      25,
+      1,
+      23,
+      0,
+      "AUDIO"
+    ],
+    [
+      39,
+      33,
+      0,
+      8,
       0,
       "STRING"
     ],
     [
-      25,
-      22,
+      40,
+      7,
       0,
-      23,
-      0,
-      "AUDIO"
+      28,
+      1,
+      "*"
     ]
   ],
-  "groups": [],
+  "groups": [
+    {
+      "title": "提问",
+      "bounding": [
+        355,
+        1088,
+        688,
+        308
+      ],
+      "color": "#8A8",
+      "font_size": 24
+    },
+    {
+      "title": "回答",
+      "bounding": [
+        1068,
+        1079,
+        389,
+        463
+      ],
+      "color": "#A88",
+      "font_size": 24
+    },
+    {
+      "title": "合并",
+      "bounding": [
+        1599,
+        1063,
+        336,
+        301
+      ],
+      "color": "#8AA",
+      "font_size": 24
+    }
+  ],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.5989500000000008,
+      "scale": 0.9646149645000102,
       "offset": [
-        48.03306357140377,
-        244.62146115430392
+        -2293.035785376245,
+        -123.474185860505
       ]
     }
   },
