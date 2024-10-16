@@ -528,8 +528,8 @@ class AvatarGeneratorAgent:
              
         }
 
-    RETURN_TYPES = ("STRING","STRING","STRING",)
-    RETURN_NAMES = ("subject","result","role_desc",)
+    RETURN_TYPES = ("STRING","STRING","STRING","STRING",)
+    RETURN_NAMES = ("subject","result","task_desc","new_skill",)
     FUNCTION = "run"
     CATEGORY = "♾️Mixlab/Agent"
 
@@ -581,7 +581,7 @@ class AvatarGeneratorAgent:
 1.  **欢迎用户**
 
     *   欢迎用户并提及其用户名。
-    *   简要介绍涉及到的信息要点（如果有功能和用途等）。
+    
 2.  **生成技能挑战**
 
     *   根据用户的技能，设计创意性的技能挑战。
@@ -591,7 +591,7 @@ class AvatarGeneratorAgent:
 输出格式
 ====
 
-*   输出格式为段落。每个段落包含欢迎信息、涉及到的信息要点。
+*   输出格式为口语化的一个段落,不要有换行。
 
 示例1
 ==
@@ -608,23 +608,13 @@ class AvatarGeneratorAgent:
 
 
 **输出：**  
-欢迎shadow！我们很高兴你对Mothbox感兴趣。Mothbox是一款低成本、高性能的昆虫监测设备，旨在帮助野外生物学家在丛林深处进行部署，同时也适合在家中研究生物多样性。所有物理设计、电子原理图、Pi脚本和昆虫识别的人工智能都是免费开源的，用户可以自行构建、分享和改进。
-
-根据你的技能，我们为你设计了以下创意性技能挑战：
-
-1.  **设计和构建一个模块化的Mothbox外壳**：利用你的建筑师和设计黑客技能，创造一个可以适应不同环境和需求的模块化外壳设计。
-2.  **开发一个用户友好的界面**：作为一名程序员和体验设计师，设计一个直观的用户界面，使用户可以轻松地配置和监测Mothbox。
-3.  **优化昆虫识别算法**：结合你的程序员和设计黑客技能，改进现有的开源AI脚本，提高昆虫识别的准确性和速度。
-
-我们期待看到你如何运用你的多重技能来挑战和改进Mothbox！
-
+欢迎shadow！我们很高兴你对Mothbox感兴趣。根据你的技能，我们为你设计了以下创意性技能挑战：第一个挑战是**设计和构建一个模块化的Mothbox外壳**，利用你的建筑师和设计黑客技能，创造一个可以适应不同环境和需求的模块化外壳设计。挑战二是**开发一个用户友好的界面**，作为一名程序员和体验设计师，设计一个直观的用户界面，使用户可以轻松地配置和监测Mothbox。挑战三是**优化昆虫识别算法**：结合你的程序员和设计黑客技能，改进现有的开源AI脚本，提高昆虫识别的准确性和速度。我们期待看到你如何运用你的多重技能来挑战和改进Mothbox！
 
 
 示例2
 ==
 
 **输入：**
-
 
 {
   "username": "meadow",
@@ -636,19 +626,92 @@ class AvatarGeneratorAgent:
 
 
 **输出：**  
-欢迎meadow！我们很高兴你对苹果发布的新的iPad mini感兴趣。新的iPad mini不仅带来了更强大的硬件，还加入了令人期待的AI功能，进一步提升了用户体验。
-
-根据你的技能，我们为你设计了以下创意性技能挑战：
-
-1.  **设计一个AI驱动的用户体验测试平台**：利用你的体验设计师技能，创建一个平台，使用户可以通过iPad mini的AI功能进行用户体验测试，收集和分析数据，优化应用和服务。
-
-2.  **撰写一篇关于AI在移动设备上应用的深度文章**：作为一名作家，撰写一篇详细的文章，探讨AI功能如何改变了iPad mini的使用体验，并预测未来的发展趋势。
-
-3.  **开发一个互动的iPad mini用户指南**：结合你的体验设计师和作家技能，设计并编写一个互动的用户指南，使新用户可以轻松上手iPad mini，充分利用其AI功能。
-
-我们期待看到你如何运用你的多重技能来挑战和改进iPad mini的用户体验！
+欢迎meadow！我们很高兴你对苹果发布的新的iPad mini感兴趣。根据你的技能，我们为你设计了以下创意性技能挑战：第一个挑战是**设计一个AI驱动的用户体验测试平台**：利用你的体验设计师技能，创建一个平台，使用户可以通过iPad mini的AI功能进行用户体验测试，收集和分析数据，优化应用和服务。挑战二是**撰写一篇关于AI在移动设备上应用的深度文章**：作为一名作家，撰写一篇详细的文章，探讨AI功能如何改变了iPad mini的使用体验，并预测未来的发展趋势。挑战三是**开发一个互动的iPad mini用户指南**：结合你的体验设计师和作家技能，设计并编写一个互动的用户指南，使新用户可以轻松上手iPad mini，充分利用其AI功能。我们期待看到你如何运用你的多重技能来挑战和改进iPad mini的用户体验！
 '''.strip()
 
+        
+        def skills_instructions(context_variables):
+            new_skill = context_variables.get("new_skill", "")
+            user=json.dumps(context_variables)
+            return f'''根据用户信息{user}和新技能{new_skill}，判断是否需要更新用户的技能树。'''+'''
+如果需要更新，输出技能树中需要添加的新标签`new_tag`；如果不需要更新，则输出`new_tag`为空。
+
+*   用户信息 (`user`): 包括用户名、配置文件ID和现有技能。
+*   新技能 (`new_skill`): 需要判断的新技能。
+
+Steps
+=====
+
+1.  检查新技能是否已经存在于用户的技能列表中。
+2.  如果新技能存在，`new_tag`为空。
+3.  如果新技能不存在，`new_tag`为新技能。
+
+Output Format
+=============
+
+```
+{
+  "new_tag": "[new_skill or empty string]"
+}
+```
+
+Examples
+========
+
+**Example 1**
+
+*   **Input:**
+
+    ```
+    {
+      "user": {
+        "username": "shadow",
+        "profile_id": "ML000",
+        "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer"]
+      },
+      "new_skill": "设计黑客"
+    }
+    ```
+
+*   **Reasoning:**  
+    新技能"设计黑客"不在现有技能列表中，因此需要更新技能树。
+
+*   **Output:**
+
+    ```
+    {
+      "new_tag": "设计黑客"
+    }
+    ```
+
+**Example 2**
+
+*   **Input:**
+
+    ```
+    {
+      "user": {
+        "username": "shadow",
+        "profile_id": "ML000",
+        "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer"]
+      },
+      "new_skill": "Programmer"
+    }
+    ```
+
+*   **Reasoning:**  
+    新技能"Programmer"已经在现有技能列表中，因此不需要更新技能树。
+
+*   **Output:**
+
+    ```
+    {
+      "new_tag": ""
+    }
+    ```
+    '''
+
+        
         # 用于更新用户信息
         def update_account_details(context_variables: dict):
             profile_id = context_variables.get("profile_id", None)
@@ -666,6 +729,13 @@ class AvatarGeneratorAgent:
         generator_agent = Agent(
             name="generator_agent",
             instructions=generator_instructions,
+            # functions=[update_account_details],
+        )
+
+        # 用于判断是否需要更新
+        skills_agent = Agent(
+            name="skills_agent",
+            instructions=skills_instructions,
             functions=[update_account_details],
         )
 
@@ -688,56 +758,52 @@ class AvatarGeneratorAgent:
             # user = context_variables.get("name", "User")
             user=json.dumps(context_variables)
 
-            return '''
-                根据提供的金句，先判断属于哪个领域的信息，然后选择最不相关的其他领域里的新概念，结合用户的'''+user+'''信息，生成一个新的职业标签。目的是激发新灵感的产生。
+            return '''根据提供的挑战任务，提炼任务的关键词，生成任务的图像文字描述。然后，结合用户信息'''+user+'''里的技能信息，构建一个技能树，给完成任务设计一个奖励，这个奖励是一个新的技能标签，为这颗技能树提供新的分支或者是加粗原有的技能。用JSON格式输出新的技能标签和图像的文字描述:
 
-        Steps
-        =====
+Steps
+=====
 
-        1.  **判断领域**: 根据提供的金句，判断其所属领域。
-        2.  **选择不相关概念**: 从其他领域中选择一个最不相关的新概念。
-        3.  **结合用户信息**: 将上述步骤中的信息与用户的user信息结合。
-        4.  **生成职业标签**: 生成一个新的职业标签，激发新灵感。
+1.  提炼任务的关键词。
+2.  根据关键词生成图像文字描述。
+3.  结合用户的技能信息，构建技能树。
+4.  设计奖励的新技能标签。
+5.  用JSON格式输出新的技能标签和图像的文字描述。
 
-        Output Format
-        =============
+Output Format
+=============
 
-        用JSON格式输出新的职业标签:
+JSON格式，包含新的技能标签和图像文字描述。
 
-        ```
-        { "result": "new_tag" }
-        ```
+Examples
+========
 
-        Examples
-        ========
+**Input:**
 
-        **Example 1:**
+```
+{
+  "username": "shadow",
+  "profile_id": "ML000",
+  "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer", "设计黑客"]
+}
 
-        *   Input:
-            *   金句: "科技是第一生产力"
-            *   user信息: "对金融科技有浓厚兴趣"
-        *   Output:
+挑战任务:设计模块化Mothbox外壳，开发用户友好的数据分析平台，并将美食数据分析技术应用于昆虫数据解析，提升设备功能和表现。
 
-            ```
-            { "result": "金融科技园艺师" }
-            ```
+```
 
-        **Example 2:**
+**Output:**
 
-        *   Input:
-            *   金句: "艺术是心灵的镜子"
-            *   user信息: "喜欢编程和数据分析"
-        *   Output:
+```
+{
+  "skill": "Environmental Data Analyst",
+  "image": "设计模块化Mothbox外壳，开发用户友好数据分析平台，结合美食数据分析技术应用于环保领域。"
+}
+```
 
-            ```
-            { "result": "数据分析画家" }
-            ```
+Notes
+=====
 
-        Notes
-        =====
-
-        *   确保新概念与原领域尽量不相关。
-        *   职业标签应有创意且能激发灵感。'''.strip()
+*   关键词应包括：模块化外壳、数据分析平台、美食数据分析、环境健康、昆虫监测。
+*   奖励的新技能标签应与任务相关，并补充现有技能树。'''.strip()
 
         answer_agent = Agent(
                     name="Answer",
@@ -756,34 +822,71 @@ class AvatarGeneratorAgent:
         print(f"{YELLOW}{content}{RESET}") 
 
         
-        new_tag=None
-        if "result" in answer_json:
-            new_tag=answer_json['result']
-            context_variables['skills'].append(new_tag)
-
-        role_desc=""
-
-        if new_tag!=None:
-            response = client.run(
-                messages=[{"role": "user", "content": f"请80%参考{new_tag},20%特征参考我的数字分身信息，描绘一张游戏人物的角色设计图，直接输出角色设计图的描述给我，不要多余的不相关信息"}],
-                agent=generator_agent,
-                context_variables=context_variables,
-                model_override=model
-            )
-
-            role_desc=response.messages[-1]["content"]
-            print(f"{YELLOW}{role_desc}{RESET}") 
-
+        task_desc=""
+        new_skill=""
+        if "skill" in answer_json and 'image' in answer_json:
+            context_variables['new_skill']=answer_json['skill']
+            new_skill=answer_json['skill']
+            task_desc=answer_json['image']
+            print(f"{YELLOW}{task_desc}{RESET}") 
+        
 
         response = client.run(
-            messages=[{"role": "user", "content": "请更新我的数字分身信息"}],
-            agent=generator_agent,
+            messages=[{"role": "user", "content": "请判断是否需要更新我的数字分身信息"}],
+            agent=skills_agent,
             context_variables=context_variables,
             model_override=model
         )
 
         content=response.messages[-1]["content"]
         print(f"{YELLOW}{content}{RESET}")
-        
-        return (subject,result,role_desc,)
+
+        # 重新改写subject - > 提问
+        prompt='''用口语化的表达改写文本，开头使用“我有个新话题，是”。
+
+确保改写后的内容自然、流畅。
+
+Steps
+=====
+
+1.  阅读并理解原文本。
+2.  将文本改写成口语化的表达，注意语气和句式。
+3.  在改写后的文本开头加上“我有个新话题，是”。
+
+Output Format
+=============
+
+输出格式为段落，使用口语化的表达，开头为“我有个新话题，是”。
+
+Examples
+========
+
+**Input:**  
+今天的天气真好，阳光明媚，适合出去散步。
+
+**Output:**  
+我有个新话题，是今天的天气真好，阳光明媚，特别适合出去散步。
+
+**Input:**  
+读书可以增长知识，开阔视野。
+
+**Output:**  
+我有个新话题，是读书可以增长知识，还能开阔视野。'''
+
+        # 改写
+        subject_agent = Agent(
+            name="subject_agent",
+            instructions=prompt, 
+        )
+
+        response = client.run(
+            messages=[{"role": "user", "content":subject}],
+            agent=subject_agent,
+            model_override=model
+        )
+        # 改写
+        subject=response.messages[-1]["content"]
+        print(f"{YELLOW}{subject}{RESET}")
+
+        return (subject,result,task_desc,new_skill,)
 
