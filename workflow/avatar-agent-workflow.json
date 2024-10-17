@@ -1,6 +1,6 @@
 {
-  "last_node_id": 33,
-  "last_link_id": 40,
+  "last_node_id": 37,
+  "last_link_id": 46,
   "nodes": [
     {
       "id": 13,
@@ -20,10 +20,7 @@
         {
           "name": "social_profile(json_string)",
           "type": "STRING",
-          "links": [
-            15,
-            16
-          ],
+          "links": [],
           "shape": 3,
           "slot_index": 0
         }
@@ -33,7 +30,7 @@
       },
       "widgets_values": [
         "shadow.json",
-        2695872565826,
+        177210488890360,
         "randomize"
       ]
     },
@@ -162,7 +159,7 @@
         1480,
         768,
         "black-forest-labs/FLUX.1-schnell",
-        67611207227642,
+        1064786019662375,
         "randomize",
         ""
       ]
@@ -179,13 +176,13 @@
         "1": 109.51235961914062
       },
       "flags": {},
-      "order": 6,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
           "name": "text",
           "type": "STRING",
-          "link": 16,
+          "link": 42,
           "widget": {
             "name": "text"
           }
@@ -213,7 +210,7 @@
       "widgets_values": [
         "",
         "",
-        "{\"username\": \"shadow\", \"profile_id\": \"ML000\", \"skills\": [\"Design Hacker\", \"Programmer\", \"Architect\", \"Experience Designer\", \"设计黑客\", \"科技诗人\", \"美食数据分析家\", \"生物信息设计黑客\"], \"file_name\": \"shadow.json\"}"
+        "{\"user_name\": \"薛志荣\", \"profile_id\": \"ML001\", \"skills\": [\"程序员\", \"人机交互设计师\", \"作者\"]}"
       ]
     },
     {
@@ -280,105 +277,6 @@
       },
       "widgets_values": [
         "AI："
-      ]
-    },
-    {
-      "id": 7,
-      "type": "AvatarGeneratorAgent",
-      "pos": [
-        377,
-        149
-      ],
-      "size": {
-        "0": 403.5807189941406,
-        "1": 232
-      },
-      "flags": {},
-      "order": 7,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "social_profile",
-          "type": "STRING",
-          "link": 15,
-          "widget": {
-            "name": "social_profile"
-          }
-        },
-        {
-          "name": "api_key",
-          "type": "STRING",
-          "link": 6,
-          "widget": {
-            "name": "api_key"
-          }
-        },
-        {
-          "name": "custom_model_name",
-          "type": "STRING",
-          "link": null,
-          "widget": {
-            "name": "custom_model_name"
-          }
-        },
-        {
-          "name": "custom_api_url",
-          "type": "STRING",
-          "link": 4,
-          "widget": {
-            "name": "custom_api_url"
-          }
-        }
-      ],
-      "outputs": [
-        {
-          "name": "subject",
-          "type": "STRING",
-          "links": [
-            40
-          ],
-          "shape": 3,
-          "slot_index": 0
-        },
-        {
-          "name": "result",
-          "type": "STRING",
-          "links": [
-            32
-          ],
-          "shape": 3,
-          "slot_index": 1
-        },
-        {
-          "name": "role_desc",
-          "type": "STRING",
-          "links": [
-            8,
-            17
-          ],
-          "shape": 3,
-          "slot_index": 2
-        },
-        {
-          "name": "new_skill",
-          "type": "STRING",
-          "links": null,
-          "shape": 3
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "AvatarGeneratorAgent"
-      },
-      "widgets_values": [
-        "Mothbox是一款低成本、高性能的昆虫监测设备，旨在帮助野外生物学家在丛林深处进行部署，同时也适合在家中研究生物多样性。所有物理设计、电子原理图、Pi脚本和昆虫识别的人工智能都是免费开源的，用户可以自行构建、分享和改进。Mothbox利用超高分辨率传感器和开源AI脚本进行昆虫监测，提供高度本地化的环境健康数据，特别适用于研究飞蛾和甲虫等高度多样化的昆虫。",
-        "",
-        "gpt-4o",
-        "openai",
-        0,
-        "fixed",
-        "",
-        "",
-        ""
       ]
     },
     {
@@ -483,7 +381,7 @@
         "1": 102
       },
       "flags": {},
-      "order": 15,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -534,7 +432,7 @@
         "1": 239.99996948242188
       },
       "flags": {},
-      "order": 18,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -594,7 +492,7 @@
         "1": 58
       },
       "flags": {},
-      "order": 17,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -701,56 +599,24 @@
       ]
     },
     {
-      "id": 27,
-      "type": "TextInput_",
-      "pos": [
-        369,
-        1162
-      ],
-      "size": {
-        "0": 369.3819885253906,
-        "1": 76
-      },
-      "flags": {},
-      "order": 5,
-      "mode": 0,
-      "outputs": [
-        {
-          "name": "STRING",
-          "type": "STRING",
-          "links": [
-            28
-          ],
-          "shape": 3,
-          "slot_index": 0
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "TextInput_"
-      },
-      "widgets_values": [
-        "shadow："
-      ]
-    },
-    {
       "id": 28,
       "type": "SwitchByIndex",
       "pos": [
-        365,
-        1284
+        374.66028676435093,
+        1321.641147057404
       ],
       "size": {
         "0": 315,
         "1": 102
       },
       "flags": {},
-      "order": 8,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
           "name": "A",
           "type": "*",
-          "link": 28
+          "link": 46
         },
         {
           "name": "B",
@@ -787,15 +653,15 @@
       "id": 26,
       "type": "JoinWithDelimiter",
       "pos": [
-        718,
-        1297
+        727.6602867643508,
+        1334.641147057404
       ],
       "size": {
         "0": 315,
         "1": 58
       },
       "flags": {},
-      "order": 12,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -829,10 +695,10 @@
         875,
         491
       ],
-      "size": [
-        433.9467013095634,
-        159.20663263167785
-      ],
+      "size": {
+        "0": 433.94671630859375,
+        "1": 159.20663452148438
+      },
       "flags": {},
       "order": 10,
       "mode": 0,
@@ -868,7 +734,7 @@
       "widgets_values": [
         "",
         "",
-        "设计一个适应不同环境和需求的模块化Mothbox外壳。开发一个集成数据分析功能的用户界面，并优化和扩展昆虫识别的AI脚本。"
+        "设计一个更具互动性的人机界面，优化Habitica的用户体验，使之更直观和富有乐趣。"
       ]
     },
     {
@@ -878,12 +744,12 @@
         3308,
         680
       ],
-      "size": [
-        542.9514256223783,
-        326.0058338522547
-      ],
+      "size": {
+        "0": 542.951416015625,
+        "1": 326.0058288574219
+      },
       "flags": {},
-      "order": 20,
+      "order": 22,
       "mode": 0,
       "inputs": [
         {
@@ -897,7 +763,7 @@
       },
       "widgets_values": [
         [
-          "/view?filename=._00001_.wav&type=temp&subfolder=&rand=0.7715247141565349",
+          "/view?filename=._00001_.wav&type=temp&subfolder=&rand=0.26499909844163816",
           null
         ]
       ]
@@ -909,10 +775,10 @@
         2665,
         -21
       ],
-      "size": [
-        1175.3549223753057,
-        641.5775857955676
-      ],
+      "size": {
+        "0": 1175.35498046875,
+        "1": 641.5775756835938
+      },
       "flags": {},
       "order": 16,
       "mode": 0,
@@ -928,18 +794,251 @@
       }
     },
     {
+      "id": 7,
+      "type": "AvatarGeneratorAgent",
+      "pos": [
+        377,
+        149
+      ],
+      "size": {
+        "0": 403.5807189941406,
+        "1": 232
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "social_profile",
+          "type": "STRING",
+          "link": 41,
+          "widget": {
+            "name": "social_profile"
+          }
+        },
+        {
+          "name": "api_key",
+          "type": "STRING",
+          "link": 6,
+          "widget": {
+            "name": "api_key"
+          }
+        },
+        {
+          "name": "custom_model_name",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "custom_model_name"
+          }
+        },
+        {
+          "name": "custom_api_url",
+          "type": "STRING",
+          "link": 4,
+          "widget": {
+            "name": "custom_api_url"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "subject",
+          "type": "STRING",
+          "links": [
+            40
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "result",
+          "type": "STRING",
+          "links": [
+            32
+          ],
+          "shape": 3,
+          "slot_index": 1
+        },
+        {
+          "name": "role_desc",
+          "type": "STRING",
+          "links": [
+            8,
+            17
+          ],
+          "shape": 3,
+          "slot_index": 2
+        },
+        {
+          "name": "new_skill",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "AvatarGeneratorAgent"
+      },
+      "widgets_values": [
+        "Habitica是一款免费的习惯养成和生产力应用，通过将生活游戏化来激励用户完成任务。用户可以通过移动应用和Web界面跟踪和管理习惯、每日目标和待办事项列表，完成任务后还能获得虚拟奖励。Habitica社区提供互动支持，帮助用户实现健康、工作、学习等各方面的目标，并享受与朋友一起战斗怪兽的乐趣。",
+        "",
+        "gpt-4o",
+        "openai",
+        0,
+        "fixed",
+        "",
+        "",
+        ""
+      ]
+    },
+    {
+      "id": 34,
+      "type": "NewSocialProfileNode",
+      "pos": [
+        -287,
+        -168
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "social_profile(json_string)",
+          "type": "STRING",
+          "links": [
+            41,
+            42,
+            44
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "NewSocialProfileNode"
+      },
+      "widgets_values": [
+        "薛志荣",
+        "ML001",
+        "程序员，人机交互设计师，作者",
+        "薛志荣"
+      ]
+    },
+    {
+      "id": 37,
+      "type": "JoinWithDelimiter",
+      "pos": [
+        650.6602867643508,
+        1208.641147057404
+      ],
+      "size": {
+        "0": 315,
+        "1": 58
+      },
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text_list",
+          "type": "*",
+          "link": 45
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            46
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "JoinWithDelimiter"
+      },
+      "widgets_values": [
+        "colon"
+      ]
+    },
+    {
+      "id": 36,
+      "type": "JsonRepair",
+      "pos": [
+        328.66028676435093,
+        1155.641147057404
+      ],
+      "size": {
+        "0": 315,
+        "1": 126
+      },
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "json_string",
+          "type": "STRING",
+          "link": 44,
+          "widget": {
+            "name": "json_string"
+          }
+        },
+        {
+          "name": "json_string2",
+          "type": "STRING",
+          "link": null,
+          "widget": {
+            "name": "json_string2"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "json_string",
+          "type": "STRING",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "value",
+          "type": "STRING",
+          "links": [
+            45
+          ],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "JsonRepair"
+      },
+      "widgets_values": [
+        "",
+        "user_name",
+        ""
+      ]
+    },
+    {
       "id": 8,
       "type": "ShowTextForGPT",
       "pos": [
         2659,
         682
       ],
-      "size": [
-        626.5560187649498,
-        333.37546816789154
-      ],
+      "size": {
+        "0": 626.5560302734375,
+        "1": 333.3754577636719
+      },
       "flags": {},
-      "order": 19,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -974,7 +1073,7 @@
       "widgets_values": [
         "",
         "",
-        "shadow： 我有个新话题，是Mothbox这款设备，性价比特别高，主要用来监测昆虫。它不仅适合野外生物学家在丛林里使用，在家里研究生物多样性也是很棒的选择。它的所有物理设计、电子图纸、Pi脚本和昆虫识别用的AI都是免费开源的，用户可以自己动手构建、分享和改进。Mothbox用的是超高分辨率传感器和开源AI脚本监测昆虫，可以提供非常本地化的环境健康数据，尤其对研究飞蛾和甲虫这些种类特别多的昆虫很有帮助。\nAI： 欢迎shadow！我们很高兴你对Mothbox感兴趣。根据你的多重技能，我们为你设计了以下创意性的技能挑战：第一个挑战是**设计一个适应不同环境和需求的模块化Mothbox外壳**，运用你的建筑师和设计黑客技能，创造一个可以在森林和家中灵活使用的创新设计。第二个挑战是**开发一个集成数据分析功能的用户界面**，作为程序员和体验设计师，设计一个直观、用户友好的界面，使用户能够轻松地配置Mothbox并实时监控及分析收集到的昆虫数据。第三个挑战是**优化和扩展昆虫识别的AI脚本**，结合你的程序员和生物信息设计黑客技能，改善现有开源AI脚本的准确性和效率，支持更多昆虫种类的识别。我们非常期待你如何利用你的多样化技能来提升和改进Mothbox项目！"
+        "薛志荣: 我有个新话题，是Habitica这款免费的习惯养成和生产力应用特别有意思。它通过把生活变成一个游戏来激励你完成任务。你可以用手机或网页来跟踪和管理自己的习惯、每日目标和待办事项，完成任务后还能得到虚拟奖励。Habitica的社区也很棒，你可以在里面得到大家的互动支持，帮助你在健康、工作、学习等各方面实现目标，而且还能和朋友一起打怪兽，特有意思。\nAI： 欢迎钮志荣！很高兴见到你对Habitica感兴趣。根据你的技能背景，我们为你设计了以下创意性的技能挑战：第一个挑战是**设计一个更具互动性的人机界面**，利用你的程序员和人机交互设计师技能，来优化Habitica的用户体验，使之更直观和富有乐趣。第二个挑战是**创作关于高效使用Habitica的系列文章或博客**，作为一名作者，撰写一些指导性内容，分享如何通过Habitica来达成各种目标，提升生产力和养成好习惯。通过这两个挑战，我们相信你能极大地贡献于Habitica社区，让更多用户受益！期待看到你对这些挑战的解决方案和创新！"
       ]
     }
   ],
@@ -1000,22 +1099,6 @@
       7,
       2,
       9,
-      0,
-      "STRING"
-    ],
-    [
-      15,
-      13,
-      0,
-      7,
-      0,
-      "STRING"
-    ],
-    [
-      16,
-      13,
-      0,
-      11,
       0,
       "STRING"
     ],
@@ -1058,14 +1141,6 @@
       18,
       0,
       "IMAGE"
-    ],
-    [
-      28,
-      27,
-      0,
-      28,
-      0,
-      "*"
     ],
     [
       30,
@@ -1154,16 +1229,56 @@
       28,
       1,
       "*"
+    ],
+    [
+      41,
+      34,
+      0,
+      7,
+      0,
+      "STRING"
+    ],
+    [
+      42,
+      34,
+      0,
+      11,
+      0,
+      "STRING"
+    ],
+    [
+      44,
+      34,
+      0,
+      36,
+      0,
+      "STRING"
+    ],
+    [
+      45,
+      36,
+      1,
+      37,
+      0,
+      "*"
+    ],
+    [
+      46,
+      37,
+      0,
+      28,
+      0,
+      "*"
     ]
   ],
   "groups": [
     {
       "title": "提问",
       "bounding": [
-        355,
-        1088,
-        688,
-        308
+        319,
+        1082,
+        734,
+        352
       ],
       "color": "#8A8",
       "font_size": 24
@@ -1194,10 +1309,10 @@
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.9646149645000102,
+      "scale": 0.4500000000000025,
       "offset": [
-        -2293.035785376245,
-        -123.474185860505
+        386.5562046324799,
+        661.809370255148
       ]
     }
   },
