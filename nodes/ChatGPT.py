@@ -827,7 +827,7 @@ class JsonRepair:
     # OUTPUT_NODE = True
     OUTPUT_IS_LIST = (False,False,)
 
-    CATEGORY = "♾️Mixlab/GPT"
+    CATEGORY = "♾️Mixlab/Utils"
 
     def run(self, json_string,key="",json_string2=None):
 

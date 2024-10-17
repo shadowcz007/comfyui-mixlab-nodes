@@ -99,7 +99,7 @@ def read_from_json(file_path):
 
 
 default_agent={
-                    "username":"shadow",
+                    "user_name":"shadow",
                     "profile_id":"ML000",
                     "skills":"Design Hacker,Programmer,Architect,Experience Designer".split(",")
                 }
@@ -599,7 +599,7 @@ class AvatarGeneratorAgent:
 **输入：**
 
 {
-  "username": "shadow",
+  "user_name": "shadow",
   "profile_id": "ML000",
   "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer", "设计黑客"]
 }
@@ -617,7 +617,7 @@ class AvatarGeneratorAgent:
 **输入：**
 
 {
-  "username": "meadow",
+  "user_name": "meadow",
   "profile_id": "ML002",
   "skills": ["体验设计师", "作家"]
 }
@@ -665,7 +665,7 @@ Examples
     ```
     {
       "user": {
-        "username": "shadow",
+        "user_name": "shadow",
         "profile_id": "ML000",
         "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer"]
       },
@@ -691,7 +691,7 @@ Examples
     ```
     {
       "user": {
-        "username": "shadow",
+        "user_name": "shadow",
         "profile_id": "ML000",
         "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer"]
       },
@@ -715,12 +715,12 @@ Examples
         # 用于更新用户信息
         def update_account_details(context_variables: dict):
             profile_id = context_variables.get("profile_id", None)
-            username = context_variables.get("username", None)
+            user_name = context_variables.get("user_name", None)
             skills = context_variables.get("skills", None)
             file_name=context_variables.get('file_name','agent.json')
             if skills:
                 skills=",".join(skills)
-            print(f"Account Details: {username} {profile_id} {skills}")
+            print(f"Account Details: {user_name} {profile_id} {skills}")
 
             # 
             save_social_profile_config(get_social_profile_dir(),file_name,context_variables)
@@ -781,7 +781,7 @@ Examples
 
 ```
 {
-  "username": "shadow",
+  "user_name": "shadow",
   "profile_id": "ML000",
   "skills": ["Design Hacker", "Programmer", "Architect", "Experience Designer", "设计黑客"]
 }

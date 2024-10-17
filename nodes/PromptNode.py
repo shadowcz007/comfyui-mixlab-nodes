@@ -684,7 +684,7 @@ class JoinWithDelimiter:
     def INPUT_TYPES(s):
         return {"required": {
                     "text_list": (any_type,),
-                    "delimiter":(["newline","comma","backslash","space"],),
+                    "delimiter":(["newline","comma","backslash","space","colon"],),
                              },
                 }
     
@@ -707,7 +707,13 @@ class JoinWithDelimiter:
             delimiter='\\'
         elif delimiter=='space':
             delimiter=' '
+        elif delimiter=='colon':
+            delimiter=":"
         t=''
         if isinstance(text_list, list):
             t=join_with_(text_list,delimiter)
+            # 如果只有一个元素，则末尾补充delimiter ，尤其适合制作播客的 name: 这种前缀
+            if len(text_list)==1:
+                t=t+delimiter
+
         return (t,)

@@ -24,7 +24,7 @@ def read_from_json(file_path):
 
 
 default_agent={
-                    "username":"shadow",
+                    "user_name":"shadow",
                     "profile_id":"ML000",
                     "skills":"Design Hacker,Programmer,Architect,Experience Designer".split(",")
                 }
@@ -84,7 +84,7 @@ class NewSocialProfileNode:
 
         return {
             "required": {
-                "username": ("STRING", {"forceInput": False, "default": user['username']}),
+                "user_name": ("STRING", {"forceInput": False, "default": user['user_name']}),
                 "profile_id": ("STRING", {"forceInput": False, "default": user['profile_id']}),
                 "skills": ("STRING", {"forceInput": False, "multiline": True, "default": ",".join(user['skills'])}),
                 "file_name": ("STRING", {"forceInput": False, "default": "agent"}),
@@ -98,14 +98,14 @@ class NewSocialProfileNode:
     # OUTPUT_IS_LIST = (False,)
     CATEGORY = "♾️Mixlab/Agent"
 
-    def run(self, username, profile_id, skills,file_name):
+    def run(self, user_name, profile_id, skills,file_name):
         
         # 使用正则表达式匹配英文和中文逗号
         skills_list = [skill.strip() for skill in re.split(r'[，,]', skills)]
 
         # 创建社交名片的JSON对象
         social_profile = {
-            "username": username,
+            "user_name": user_name,
             "profile_id": profile_id,
             "skills": skills_list,
         }

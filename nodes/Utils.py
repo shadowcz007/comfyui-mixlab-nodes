@@ -667,7 +667,7 @@ class CreateJsonNode:
 
     FUNCTION = "run"
 
-    CATEGORY = "♾️Mixlab/Output"
+    CATEGORY = "♾️Mixlab/Utils"
 
     OUTPUT_NODE = True
     INPUT_IS_LIST = False
