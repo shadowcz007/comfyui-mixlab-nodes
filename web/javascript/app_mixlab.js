@@ -267,7 +267,13 @@ function downloadJsonFile (jsonData, fileName = 'mix_app.json') {
 }
 
 async function save (json, download = false, showInfo = true) {
-  let nodesAll = window._nodesAll || (await getObjectInfo())
+  if (!window._nodesAll) {
+    window._nodesAll = await getObjectInfo();
+  }
+
+  let nodesAll = window._nodesAll;
+  
+  // let nodesAll = window._nodesAll || (await getObjectInfo())
 
   console.log('####SAVE', nodesAll, json)
 
@@ -417,9 +423,9 @@ function getInputsAndOutputs () {
 app.registerExtension({
   name: 'Mixlab.utils.AppInfo',
   init () {
-    if (!window._nodesAll) {
-      getObjectInfo().then(r => (window._nodesAll = r))
-    }
+    // if (!window._nodesAll) {
+    //   getObjectInfo().then(r => (window._nodesAll = r))
+    // }
   },
   async beforeRegisterNodeDef (nodeType, nodeData, app) {
     if (nodeType.comfyClass == 'AppInfo') {
