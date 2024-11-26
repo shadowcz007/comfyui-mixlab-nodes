@@ -123,8 +123,13 @@ def composite_images(foreground, background, mask, is_multiply_blend=False, posi
         }
 
     # Resize the foreground image with antialiasing
-    layer_image = layer['image'].resize((layer['width'], layer['height']), Image.ANTIALIAS)
-    layer_mask = layer['mask'].resize((layer['width'], layer['height']), Image.ANTIALIAS)
+    try:
+        resampling_method = Image.Resampling.LANCZOS
+    except AttributeError:
+        resampling_method = Image.ANTIALIAS
+
+    layer_image = layer['image'].resize((layer['width'], layer['height']), resampling_method)
+    layer_mask = layer['mask'].resize((layer['width'], layer['height']), resampling_method)
 
     bg_image.paste(layer_image, (layer['x'], layer['y']), layer_mask)
 
