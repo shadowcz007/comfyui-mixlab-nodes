@@ -1046,31 +1046,32 @@ def generate_text_image(text,
 
     if layout == "vertical":
         for line in lines:
-            max_char_width = max(font.getsize(char)[0] for char in line)
+            max_char_width = max(font.getbbox(char)[2] for char in line)
             for char in line:
-                char_width, char_height = font.getsize(char)
-                char_coordinates.append((x, y))
+                left, top, char_width, char_height = font.getbbox(char)
+                char_coordinates.append((x,y))
                 y += char_height + spacing
                 max_height = max(max_height, y + padding)
-            x += max_char_width + line_spacing
+            x += max_char_width + spacing
             y = padding
         max_width = x
-        total_line_width = sum(font.getsize(line)[1] for line in lines)
-        total_spacing = line_spacing * (len(lines) - 1)
-        max_width = total_line_width + total_spacing + padding * 2
     else:
         for line in lines:
-            line_width, line_height = font.getsize(line)
+            left,top, line_width, line_height = font.getbbox(line)
             for char in line:
-                char_width, char_height = font.getsize(char)
-                char_coordinates.append((x, y))
+                left, top, char_width, char_height=font.getbbox(char)
+                char_coordinates.append((x,y))
                 x += char_width + spacing
                 max_width = max(max_width, x + padding)
             y += line_height + line_spacing
             x = padding
-        total_line_heights = sum(font.getsize(line)[1] for line in lines)
+        max_height = y
+
+        total_line_heights = sum(font.getbbox(line)[3] - font.getbbox(line)[1] for line in lines)
         total_spacing = line_spacing * (len(lines) - 1)
-        max_height = total_line_heights + total_spacing + padding * 2
+
+        extra_height = round(font_size*0.1)
+        max_height = total_line_heights + total_spacing + padding * 2 + extra_height
 
     # 3. Create image with calculated width and height
     image = Image.new('RGBA', (max_width, max_height), (255, 255, 255, 0))
