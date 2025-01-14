@@ -2171,6 +2171,10 @@ app.registerExtension({
 
     fetch('manager/badge_mode').then(r => {
       if (r.status === 404) {
+        // 已有ComfyUI自带的badge
+        if(node.badges?.[0]?.()){
+          return
+        }
         // 右上角的badge是否已经绘制
         if (!node.badge_enabled) {
           if (!node.getNickname) {
